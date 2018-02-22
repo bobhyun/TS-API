@@ -215,67 +215,68 @@ code.language-yaml {
       <div class="mume markdown-preview   ">
       <h1 class="mume-header" id="ts-rest-api-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-%EC%95%88%EB%82%B4%EC%84%9C">ts-rest-api 프로그래밍 안내서</h1>
 
+<p><code>[참고]</code> <em>이 문서에 포함된 예제 코드 일부는 <a href="http://ts-rest-api.md">ts-rest-api.md</a> 파일로 보면 정상적으로 보이지 않을 수 있습니다. 대신 ts-rest-api.html 파일을 다운로드받아 사용하시기 바랍니다.</em></p>
 <h2 class="mume-header" id="%EC%88%9C%EC%84%9C">순서</h2>
 
 <p><a href="#%EA%B0%9C%EC%9A%94">개요</a></p>
-<blockquote>
-<p><a href="#%EB%B2%84%EC%A0%84">버전</a><br>
-<a href="#%ED%94%BC%EB%93%9C%EB%B0%B1">피드백</a><br>
-<a href="#%EB%AF%B8%EB%A6%AC-%EC%95%8C%EC%95%84%EC%95%BC-%ED%95%A0-%EA%B2%83">미리 알아야 할 것</a><br>
-<a href="#%EC%A0%9C%ED%92%88%EB%B3%84-%EA%B8%B0%EB%8A%A5-%EC%A7%80%EC%9B%90-%ED%91%9C">제품별 기능 지원 표</a></p>
-</blockquote>
+<ol>
+<li><a href="#%EB%B2%84%EC%A0%84">버전</a></li>
+<li><a href="#%ED%94%BC%EB%93%9C%EB%B0%B1">피드백</a></li>
+<li><a href="#%EB%AF%B8%EB%A6%AC-%EC%95%8C%EC%95%84%EC%95%BC-%ED%95%A0-%EA%B2%83">미리 알아야 할 것</a></li>
+<li><a href="#%EC%A0%9C%ED%92%88%EB%B3%84-%EA%B8%B0%EB%8A%A5-%EC%A7%80%EC%9B%90-%ED%91%9C">제품별 기능 지원 표</a></li>
+</ol>
 <p><a href="#%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0">시작하기</a></p>
-<blockquote>
-<p><a href="#%EB%8F%99%EC%98%81%EC%83%81-%EB%B3%B4%EA%B8%B0">동영상 보기</a><br>
-<a href="#%EC%9B%B9-%ED%8E%98%EC%9D%B4%EC%A7%80%EC%97%90-%EB%8F%99%EC%98%81%EC%83%81-%EC%82%BD%EC%9E%85%ED%95%98%EA%B8%B0">웹 페이지에 동영상 삽입하기</a></p>
-</blockquote>
+<ol>
+<li><a href="#%EB%8F%99%EC%98%81%EC%83%81-%EB%B3%B4%EA%B8%B0">동영상 보기</a></li>
+<li><a href="#%EC%9B%B9-%ED%8E%98%EC%9D%B4%EC%A7%80%EC%97%90-%EB%8F%99%EC%98%81%EC%83%81-%EC%82%BD%EC%9E%85%ED%95%98%EA%B8%B0">웹 페이지에 동영상 삽입하기</a></li>
+</ol>
 <p><a href="#%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%98%81%EC%83%81-%ED%91%9C%EC%8B%9C">실시간 영상 표시</a></p>
-<blockquote>
-<p><a href="#%EC%8B%A4%EC%A0%9C-%EC%84%9C%EB%B2%84%EC%97%90-%EC%A0%91%EC%86%8D%ED%95%98%EA%B8%B0">실제 서버에 접속하기</a><br>
-<a href="#%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%9D%B8%EC%A6%9D">사용자 인증</a><br>
-<a href="#base64-%EC%9D%B8%EC%BD%94%EB%94%A9">base64 인코딩</a><br>
-<a href="#%EC%B1%84%EB%84%90-%EB%B3%80%EA%B2%BD">채널 변경</a></p>
-</blockquote>
+<ol>
+<li><a href="#%EC%8B%A4%EC%A0%9C-%EC%84%9C%EB%B2%84%EC%97%90-%EC%A0%91%EC%86%8D%ED%95%98%EA%B8%B0">실제 서버에 접속하기</a></li>
+<li><a href="#%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%9D%B8%EC%A6%9D">사용자 인증</a></li>
+<li><a href="#base64-%EC%9D%B8%EC%BD%94%EB%94%A9">base64 인코딩</a></li>
+<li><a href="#%EC%B1%84%EB%84%90-%EB%B3%80%EA%B2%BD">채널 변경</a></li>
+</ol>
 <p><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81-%ED%91%9C%EC%8B%9C">녹화 영상 표시</a></p>
-<blockquote>
-<p><a href="#%EB%82%A0%EC%A7%9C-%EC%8B%9C%EA%B0%81-%ED%91%9C%EA%B8%B0%EB%B2%95">날짜, 시각 표기법</a><br>
-<a href="#url-%EC%9D%B8%EC%BD%94%EB%94%A9">URL 인코딩</a><br>
-<a href="#%EC%A7%80%EC%9B%90%ED%95%98%EB%8A%94-%EC%96%B8%EC%96%B4-%EB%AA%A9%EB%A1%9D">지원하는 언어 목록</a></p>
-</blockquote>
+<ol>
+<li><a href="#%EB%82%A0%EC%A7%9C-%EC%8B%9C%EA%B0%81-%ED%91%9C%EA%B8%B0%EB%B2%95">날짜, 시각 표기법</a></li>
+<li><a href="#url-%EC%9D%B8%EC%BD%94%EB%94%A9">URL 인코딩</a></li>
+<li><a href="#%EC%A7%80%EC%9B%90%ED%95%98%EB%8A%94-%EC%96%B8%EC%96%B4-%EB%AA%A9%EB%A1%9D">지원하는 언어 목록</a></li>
+</ol>
 <p><a href="#json-%EB%8D%B0%EC%9D%B4%ED%84%B0">JSON 데이터</a></p>
 <p><a href="#%EC%84%B8%EC%85%98-%EC%9D%B8%EC%A6%9D">세션 인증</a></p>
-<blockquote>
-<p><a href="#%EB%A1%9C%EA%B7%B8%EC%9D%B8">로그인</a><br>
-<a href="#%EB%A1%9C%EA%B7%B8%EC%95%84%EC%9B%83">로그아웃</a></p>
-</blockquote>
+<ol>
+<li><a href="#%EB%A1%9C%EA%B7%B8%EC%9D%B8">로그인</a></li>
+<li><a href="#%EB%A1%9C%EA%B7%B8%EC%95%84%EC%9B%83">로그아웃</a></li>
+</ol>
 <p><a href="#%EC%84%9C%EB%B2%84-%EC%A0%95%EB%B3%B4-%EC%9A%94%EC%B2%AD">서버 정보 요청</a></p>
-<blockquote>
-<p><a href="#api-%EB%B2%84%EC%A0%84">API 버전</a><br>
-<a href="#%EC%82%AC%EC%9D%B4%ED%8A%B8-%EC%9D%B4%EB%A6%84">사이트 이름</a><br>
-<a href="#url-%EB%94%94%EC%BD%94%EB%94%A9">URL 디코딩</a><br>
-<a href="#%EC%84%9C%EB%B2%84-%EC%8B%9C%EA%B0%84%EB%8C%80">서버 시간대</a><br>
-<a href="#%EC%A0%9C%ED%92%88-%EC%A0%95%EB%B3%B4">제품 정보</a><br>
-<a href="#%EB%9D%BC%EC%9D%B4%EC%84%BC%EC%8A%A4-%EC%A0%95%EB%B3%B4">라이센스 정보</a><br>
-<a href="#%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%A0%95%EB%B3%B4">사용자 정보</a><br>
-<a href="#%EB%AA%A8%EB%91%90-%ED%95%9C-%EB%B2%88%EC%97%90-%EC%9A%94%EC%B2%AD">모두 한 번에 요청</a></p>
-</blockquote>
+<ol>
+<li><a href="#api-%EB%B2%84%EC%A0%84">API 버전</a></li>
+<li><a href="#%EC%82%AC%EC%9D%B4%ED%8A%B8-%EC%9D%B4%EB%A6%84">사이트 이름</a></li>
+<li><a href="#url-%EB%94%94%EC%BD%94%EB%94%A9">URL 디코딩</a></li>
+<li><a href="#%EC%84%9C%EB%B2%84-%EC%8B%9C%EA%B0%84%EB%8C%80">서버 시간대</a></li>
+<li><a href="#%EC%A0%9C%ED%92%88-%EC%A0%95%EB%B3%B4">제품 정보</a></li>
+<li><a href="#%EB%9D%BC%EC%9D%B4%EC%84%BC%EC%8A%A4-%EC%A0%95%EB%B3%B4">라이센스 정보</a></li>
+<li><a href="#%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%A0%95%EB%B3%B4">사용자 정보</a></li>
+<li><a href="#%EB%AA%A8%EB%91%90-%ED%95%9C-%EB%B2%88%EC%97%90-%EC%9A%94%EC%B2%AD">모두 한 번에 요청</a></li>
+</ol>
 <p><a href="#%EA%B0%81%EC%A2%85-%EB%AA%A9%EB%A1%9D-%EC%9A%94%EC%B2%AD">각종 목록 요청</a></p>
-<blockquote>
-<p><a href="#%EC%B1%84%EB%84%90-%EB%AA%A9%EB%A1%9D">채널 목록</a><br>
-<a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EC%9D%B8%EC%8B%9D-%EC%9E%A5%EC%B9%98-%EB%AA%A9%EB%A1%9D">차량 번호 인식 장치 목록</a><br>
-<a href="#%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EC%A2%85%EB%A5%98-%EB%AA%A9%EB%A1%9D">이벤트 로그 종류 목록</a></p>
-</blockquote>
+<ol>
+<li><a href="#%EC%B1%84%EB%84%90-%EB%AA%A9%EB%A1%9D">채널 목록</a></li>
+<li><a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EC%9D%B8%EC%8B%9D-%EC%9E%A5%EC%B9%98-%EB%AA%A9%EB%A1%9D">차량 번호 인식 장치 목록</a></li>
+<li><a href="#%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EC%A2%85%EB%A5%98-%EB%AA%A9%EB%A1%9D">이벤트 로그 종류 목록</a></li>
+</ol>
 <p><a href="#%EC%A0%80%EC%9E%A5-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EA%B2%80%EC%83%89">저장 데이터 검색</a></p>
-<blockquote>
-<p><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%82%A0%EC%A7%9C-%EA%B2%80%EC%83%89">녹화 영상이 있는 날짜 검색</a><br>
-<a href="#%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">이벤트 로그 검색</a><br>
-<a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">차량 번호 로그 검색</a></p>
-</blockquote>
+<ol>
+<li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%82%A0%EC%A7%9C-%EA%B2%80%EC%83%89">녹화 영상이 있는 날짜 검색</a></li>
+<li><a href="#%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">이벤트 로그 검색</a></li>
+<li><a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">차량 번호 로그 검색</a></li>
+</ol>
 <p><a href="#%EB%8F%99%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4-%EA%B2%80%EC%83%89">동영상 소스 검색</a></p>
-<blockquote>
-<p><a href="#%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4">실시간 영상 소스</a><br>
-<a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4">녹화 영상 소스</a></p>
-</blockquote>
+<ol>
+<li><a href="#%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4">실시간 영상 소스</a></li>
+<li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4">녹화 영상 소스</a></li>
+</ol>
 <h2 class="mume-header" id="%EA%B0%9C%EC%9A%94">개요</h2>
 
 <p>이 문서는 <strong>(주)티에스 솔루션</strong>의 <strong>TS-CMS</strong>, <strong>TS-NVR</strong>, <strong>TS-LPR</strong>에 내장된 <strong>ts-rest-api</strong>를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.<br>
@@ -498,11 +499,11 @@ API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 
 <h3 class="mume-header" id="base64-%EC%9D%B8%EC%BD%94%EB%94%A9">base64 인코딩</h3>
 
 <p>base64 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.</p>
-<blockquote>
-<p><a href="https://www.base64encode.org/">https://www.base64encode.org/</a><br>
-<a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding">https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding</a><br>
-<a href="https://www.w3schools.com/jsref/met_win_btoa.asp">https://www.w3schools.com/jsref/met_win_btoa.asp</a></p>
-</blockquote>
+<ul>
+<li><a href="https://www.base64encode.org/">https://www.base64encode.org/</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding">https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding</a></li>
+<li><a href="https://www.w3schools.com/jsref/met_win_btoa.asp">https://www.w3schools.com/jsref/met_win_btoa.asp</a></li>
+</ul>
 <p>이번 예제에서는 자바스크립트로 로그인 정보를 base64 인코딩해서 접속하는 방식으로 개선해 보도록 하겠습니다.</p>
 <pre class="language-html"><span class="token doctype">&lt;!DOCTYPE>
 &lt;head></span>
@@ -848,8 +849,8 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
 <pre class="language-json"><span class="token punctuation">{</span>
   <span class="token property">"timezone"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"Asia/Seoul"</span><span class="token punctuation">,</span>   // IANA 타임존 명
-    <span class="token property">"bias"</span><span class="token operator">:</span> <span class="token string">"+09:00"</span>        // 영국 표준 시각(UTC 또는 GMT<span class="token punctuation">)</span> 오프셋
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"Asia/Seoul"</span><span class="token punctuation">,</span>   # IANA 타임존 명
+    <span class="token property">"bias"</span><span class="token operator">:</span> <span class="token string">"+09:00"</span>        # 영국 표준 시각(UTC 또는 GMT<span class="token punctuation">)</span> 오프셋
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </pre>
