@@ -824,9 +824,9 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>siteName
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"siteName"</span><span class="token operator">:</span> <span class="token string">"%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84"</span>  // (URL 인코딩<span class="token punctuation">)</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">{
+  &quot;siteName&quot;: &quot;%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84&quot;  // (URL &#xC778;&#xCF54;&#xB529;)
+}
 </pre>
 <p><code>siteName</code>에 해당하는 텍스트<code>&quot;%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84&quot;</code>는 서버의 웹 서비스 설정 창에 입력한 내용이며 어떤 문자를 사용하더라도 JSON 형식으로 표현하기 위해 URL 인코딩되어 있습니다.<br>
 위의 문자열을 URL 디코딩하면 <code>&quot;우리집 서버&quot;</code>로 변환됩니다.</p>
@@ -847,12 +847,12 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>timezone
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"timezone"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"Asia/Seoul"</span><span class="token punctuation">,</span>   # IANA 타임존 명
-    <span class="token property">"bias"</span><span class="token operator">:</span> <span class="token string">"+09:00"</span>        # 영국 표준 시각(UTC 또는 GMT<span class="token punctuation">)</span> 오프셋
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">{
+  &quot;timezone&quot;: {
+    &quot;name&quot;: &quot;Asia/Seoul&quot;,   // IANA &#xD0C0;&#xC784;&#xC874; &#xBA85;
+    &quot;bias&quot;: &quot;+09:00&quot;        // &#xC601;&#xAD6D; &#xD45C;&#xC900; &#xC2DC;&#xAC01;(UTC &#xB610;&#xB294; GMT) &#xC624;&#xD504;&#xC14B;
+  }
+}
 </pre>
 <p><code>Asia/Seoul</code> 부분은 <code>IANA</code> 형식의 타임 존 이름이며, 해당 서버의 운영체제에 따라 IANA 타임 존 이름 대신 <code>UTC+09:00</code>로 표기될 수도 있습니다.</p>
 <h3 class="mume-header" id="%EC%A0%9C%ED%92%88-%EC%A0%95%EB%B3%B4">제품 정보</h3>
@@ -862,29 +862,29 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>product
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json">// TS-CMS인 경우<span class="token operator">:</span>
-<span class="token punctuation">{</span>
-  <span class="token property">"product"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"TS-CMS"</span><span class="token punctuation">,</span>               // 제품명
-    <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"v0.38.0 (64-bit)"</span>   // 버전명
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">// TS-CMS&#xC778; &#xACBD;&#xC6B0;:
+{
+  &quot;product&quot;: {
+    &quot;name&quot;: &quot;TS-CMS&quot;,               // &#xC81C;&#xD488;&#xBA85;
+    &quot;version&quot;: &quot;v0.38.0 (64-bit)&quot;   // &#xBC84;&#xC804;&#xBA85;
+  }
+}
 
-// TS-NVR인 경우<span class="token operator">:</span>
-<span class="token punctuation">{</span>
-  <span class="token property">"product"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"TS-NVR"</span><span class="token punctuation">,</span>               // 제품명
-    <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"v0.35.0 (64-bit)"</span>   // 버전명
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+// TS-NVR&#xC778; &#xACBD;&#xC6B0;:
+{
+  &quot;product&quot;: {
+    &quot;name&quot;: &quot;TS-NVR&quot;,               // &#xC81C;&#xD488;&#xBA85;
+    &quot;version&quot;: &quot;v0.35.0 (64-bit)&quot;   // &#xBC84;&#xC804;&#xBA85;
+  }
+}
 
-// TS-LPR인 경우<span class="token operator">:</span>
-<span class="token punctuation">{</span>
-  <span class="token property">"product"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"TS-LPR"</span><span class="token punctuation">,</span>               // 제품명
-    <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"v0.2.0A (64-bit)"</span>   // 버전명
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+// TS-LPR&#xC778; &#xACBD;&#xC6B0;:
+{
+  &quot;product&quot;: {
+    &quot;name&quot;: &quot;TS-LPR&quot;,               // &#xC81C;&#xD488;&#xBA85;
+    &quot;version&quot;: &quot;v0.2.0A (64-bit)&quot;   // &#xBC84;&#xC804;&#xBA85;
+  }
+}
 </pre>
 <h3 class="mume-header" id="%EB%9D%BC%EC%9D%B4%EC%84%BC%EC%8A%A4-%EC%A0%95%EB%B3%B4">라이센스 정보</h3>
 
@@ -893,26 +893,26 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>license
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json">정품인 경우<span class="token operator">:</span>
-<span class="token punctuation">{</span>
-  <span class="token property">"license"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>    // 정품 라이센스
-    <span class="token property">"maxChannels"</span><span class="token operator">:</span> <span class="token number">36</span><span class="token punctuation">,</span>    // 최대 사용할 수 있는 채널 수
-    <span class="token property">"extension"</span><span class="token operator">:</span> <span class="token punctuation">[</span>        // 부가 기능
-      <span class="token string">"lprExt"</span>            // 차량 번호 인식 장치 연동
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">// &#xC815;&#xD488;&#xC778; &#xACBD;&#xC6B0;:
+{
+  &quot;license&quot;: {
+    &quot;type&quot;: &quot;genuine&quot;,    // &#xC815;&#xD488; &#xB77C;&#xC774;&#xC13C;&#xC2A4;
+    &quot;maxChannels&quot;: 36,    // &#xCD5C;&#xB300; &#xC0AC;&#xC6A9;&#xD560; &#xC218; &#xC788;&#xB294; &#xCC44;&#xB110; &#xC218;
+    &quot;extension&quot;: [        // &#xBD80;&#xAC00; &#xAE30;&#xB2A5;
+      &quot;lprExt&quot;            // &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xC778;&#xC2DD; &#xC7A5;&#xCE58; &#xC5F0;&#xB3D9;
+    ]
+  }
+}
 
-무료 평가판인 경우<span class="token operator">:</span>
-<span class="token punctuation">{</span>
-  <span class="token property">"license"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"trial"</span><span class="token punctuation">,</span>    // 무료 평가판
-    <span class="token property">"maxChannels"</span><span class="token operator">:</span> <span class="token number">16</span><span class="token punctuation">,</span>  // 최대 사용할 수 있는 채널 수
-    <span class="token property">"trialDays"</span><span class="token operator">:</span> <span class="token number">30</span><span class="token punctuation">,</span>    // <span class="token number">30</span>일 무료 사용
-    <span class="token property">"leftDays"</span><span class="token operator">:</span> <span class="token number">15</span>      // <span class="token number">15</span>일 남음
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+// &#xBB34;&#xB8CC; &#xD3C9;&#xAC00;&#xD310;&#xC778; &#xACBD;&#xC6B0;:
+{
+  &quot;license&quot;: {
+    &quot;type&quot;: &quot;trial&quot;,    // &#xBB34;&#xB8CC; &#xD3C9;&#xAC00;&#xD310;
+    &quot;maxChannels&quot;: 16,  // &#xCD5C;&#xB300; &#xC0AC;&#xC6A9;&#xD560; &#xC218; &#xC788;&#xB294; &#xCC44;&#xB110; &#xC218;
+    &quot;trialDays&quot;: 30,    // 30&#xC77C; &#xBB34;&#xB8CC; &#xC0AC;&#xC6A9;
+    &quot;leftDays&quot;: 15      // 15&#xC77C; &#xB0A8;&#xC74C;
+  }
+}
 </pre>
 <h3 class="mume-header" id="%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%A0%95%EB%B3%B4">사용자 정보</h3>
 
@@ -923,21 +923,21 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.<br>
 만약 <a href="#%EC%84%B8%EC%85%98-%EC%9D%B8%EC%A6%9D">세션 인증</a> 상태가 아니라면 서버는 HTTP 응답 코드 401 에러를 보냅니다.</p>
-<pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"whoAmI"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"uid"</span><span class="token operator">:</span><span class="token string">"admin"</span><span class="token punctuation">,</span>      // 사용자 아이디 (URL 인코딩<span class="token punctuation">)</span>
-    <span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"admin"</span><span class="token punctuation">,</span>     // 사용자 이름 (URL 인코딩<span class="token punctuation">)</span>
-    <span class="token property">"accessRights"</span><span class="token operator">:</span> <span class="token punctuation">[</span>   // 사용 권한
-      <span class="token string">"DataExport"</span><span class="token punctuation">,</span>     // 이미지<span class="token punctuation">,</span> 동영상 받아내기
-      <span class="token string">"Control"</span><span class="token punctuation">,</span>        // 팬틸트<span class="token punctuation">,</span> 릴레이 제어
-      <span class="token string">"Settings"</span><span class="token punctuation">,</span>       // 설정 변경
-      <span class="token string">"Playback"</span><span class="token punctuation">,</span>       // 녹화 데이터 보기
-      <span class="token string">"LPR"</span><span class="token punctuation">,</span>            // 차량 번호 조회
-      <span class="token string">"SearchEdit"</span><span class="token punctuation">,</span>     // 검색 데이터 편집
-      <span class="token string">"Remote"</span>          // 원격 접속
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">{
+  &quot;whoAmI&quot;: {
+    &quot;uid&quot;:&quot;admin&quot;,      // &#xC0AC;&#xC6A9;&#xC790; &#xC544;&#xC774;&#xB514; (URL &#xC778;&#xCF54;&#xB529;)
+    &quot;name&quot;:&quot;admin&quot;,     // &#xC0AC;&#xC6A9;&#xC790; &#xC774;&#xB984; (URL &#xC778;&#xCF54;&#xB529;)
+    &quot;accessRights&quot;: [   // &#xC0AC;&#xC6A9; &#xAD8C;&#xD55C;
+      &quot;DataExport&quot;,     // &#xC774;&#xBBF8;&#xC9C0;, &#xB3D9;&#xC601;&#xC0C1; &#xBC1B;&#xC544;&#xB0B4;&#xAE30;
+      &quot;Control&quot;,        // &#xD32C;&#xD2F8;&#xD2B8;, &#xB9B4;&#xB808;&#xC774; &#xC81C;&#xC5B4;
+      &quot;Settings&quot;,       // &#xC124;&#xC815; &#xBCC0;&#xACBD;
+      &quot;Playback&quot;,       // &#xB179;&#xD654; &#xB370;&#xC774;&#xD130; &#xBCF4;&#xAE30;
+      &quot;LPR&quot;,            // &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xC870;&#xD68C;
+      &quot;SearchEdit&quot;,     // &#xAC80;&#xC0C9; &#xB370;&#xC774;&#xD130; &#xD3B8;&#xC9D1;
+      &quot;Remote&quot;          // &#xC6D0;&#xACA9; &#xC811;&#xC18D;
+    ]
+  }
+}
 </pre>
 <h4 class="mume-header" id="%EB%AA%A8%EB%91%90-%ED%95%9C-%EB%B2%88%EC%97%90-%EC%9A%94%EC%B2%AD">모두 한 번에 요청</h4>
 
@@ -945,60 +945,60 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>all
 </pre>
 <p>이 요청은 세션 인증 상태인 경우는 HTTP 응답 코드 200과 함께 JSON 데이터를 반환하며, 인증이 되지 않은 경우는 HTTP 응답 코드 401과 함께 <code>&quot;whoAmI&quot;</code> 항목이 빠진 JSON 데이터를 반환합니다.</p>
-<pre class="language-json">// 세션 인증된 상태 (HTTP 응답 코드<span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">)</span><span class="token operator">:</span>
-<span class="token punctuation">{</span>
-  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"ts-rest-api@0.1.0"</span><span class="token punctuation">,</span>
-  <span class="token property">"siteName"</span><span class="token operator">:</span> <span class="token string">"%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84"</span><span class="token punctuation">,</span>
-  <span class="token property">"timezone"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"Asia/Seoul"</span><span class="token punctuation">,</span>
-    <span class="token property">"bias"</span><span class="token operator">:</span> <span class="token string">"+09:00"</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token property">"product"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"TS-LPR"</span><span class="token punctuation">,</span>
-    <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"v0.2.0A (64-bit)"</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token property">"license"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>
-    <span class="token property">"maxChannels"</span><span class="token operator">:</span> <span class="token number">36</span><span class="token punctuation">,</span>
-    <span class="token property">"extension"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token string">"lprExt"</span>
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token property">"whoAmI"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"uid"</span><span class="token operator">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span>
-    <span class="token property">"accessRights"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token string">"DataExport"</span><span class="token punctuation">,</span>
-      <span class="token string">"Control"</span><span class="token punctuation">,</span>
-      <span class="token string">"Settings"</span><span class="token punctuation">,</span>
-      <span class="token string">"Playback"</span><span class="token punctuation">,</span>
-      <span class="token string">"LPR"</span><span class="token punctuation">,</span>
-      <span class="token string">"SearchEdit"</span><span class="token punctuation">,</span>
-      <span class="token string">"Remote"</span>
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">// &#xC138;&#xC158; &#xC778;&#xC99D;&#xB41C; &#xC0C1;&#xD0DC; (HTTP &#xC751;&#xB2F5; &#xCF54;&#xB4DC;: 200):
+{
+  &quot;apiVersion&quot;: &quot;ts-rest-api@0.1.0&quot;,
+  &quot;siteName&quot;: &quot;%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84&quot;,
+  &quot;timezone&quot;: {
+    &quot;name&quot;: &quot;Asia/Seoul&quot;,
+    &quot;bias&quot;: &quot;+09:00&quot;
+  },
+  &quot;product&quot;: {
+    &quot;name&quot;: &quot;TS-LPR&quot;,
+    &quot;version&quot;: &quot;v0.2.0A (64-bit)&quot;
+  },
+  &quot;license&quot;: {
+    &quot;type&quot;: &quot;genuine&quot;,
+    &quot;maxChannels&quot;: 36,
+    &quot;extension&quot;: [
+      &quot;lprExt&quot;
+    ]
+  },
+  &quot;whoAmI&quot;: {
+    &quot;uid&quot;: &quot;admin&quot;,
+    &quot;name&quot;: &quot;admin&quot;,
+    &quot;accessRights&quot;: [
+      &quot;DataExport&quot;,
+      &quot;Control&quot;,
+      &quot;Settings&quot;,
+      &quot;Playback&quot;,
+      &quot;LPR&quot;,
+      &quot;SearchEdit&quot;,
+      &quot;Remote&quot;
+    ]
+  }
+}
 
-// 세션 인증 안된 상태 (HTTP 응답 코드<span class="token operator">:</span> <span class="token number">401</span><span class="token punctuation">)</span><span class="token operator">:</span>
-<span class="token punctuation">{</span>
-  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"ts-rest-api@0.1.0"</span><span class="token punctuation">,</span>
-  <span class="token property">"siteName"</span><span class="token operator">:</span> <span class="token string">"%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84"</span><span class="token punctuation">,</span>
-  <span class="token property">"timezone"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"Asia/Seoul"</span><span class="token punctuation">,</span>
-    <span class="token property">"bias"</span><span class="token operator">:</span> <span class="token string">"+09:00"</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token property">"product"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"TS-LPR"</span><span class="token punctuation">,</span>
-    <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"v0.2.0A (64-bit)"</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token property">"license"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>
-    <span class="token property">"maxChannels"</span><span class="token operator">:</span> <span class="token number">36</span><span class="token punctuation">,</span>
-    <span class="token property">"extension"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token string">"lprExt"</span>
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>     // whoAmI 부분 없음
-<span class="token punctuation">}</span>
+// &#xC138;&#xC158; &#xC778;&#xC99D; &#xC548;&#xB41C; &#xC0C1;&#xD0DC; (HTTP &#xC751;&#xB2F5; &#xCF54;&#xB4DC;: 401):
+{
+  &quot;apiVersion&quot;: &quot;ts-rest-api@0.1.0&quot;,
+  &quot;siteName&quot;: &quot;%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84&quot;,
+  &quot;timezone&quot;: {
+    &quot;name&quot;: &quot;Asia/Seoul&quot;,
+    &quot;bias&quot;: &quot;+09:00&quot;
+  },
+  &quot;product&quot;: {
+    &quot;name&quot;: &quot;TS-LPR&quot;,
+    &quot;version&quot;: &quot;v0.2.0A (64-bit)&quot;
+  },
+  &quot;license&quot;: {
+    &quot;type&quot;: &quot;genuine&quot;,
+    &quot;maxChannels&quot;: 36,
+    &quot;extension&quot;: [
+      &quot;lprExt&quot;
+    ]
+  }     // whoAmI &#xBD80;&#xBD84; &#xC5C6;&#xC74C;
+}
 </pre>
 <h2 class="mume-header" id="%EA%B0%81%EC%A2%85-%EB%AA%A9%EB%A1%9D-%EC%9A%94%EC%B2%AD">각종 목록 요청</h2>
 
@@ -1009,16 +1009,16 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>channel
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">[</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>                                                  //채널 번호
-    <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"%EC%A0%84%EB%B0%A9%20%EC%B6%9C%EC%9E%85%EA%B5%AC"</span> //채널 이름 (URL 인코딩<span class="token punctuation">)</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>                                                  //채널 번호
-    <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"%ED%9B%84%EB%B0%A9%20%EC%B6%9C%EC%9E%85%EA%B5%AC"</span> //채널 이름 (URL 인코딩<span class="token punctuation">)</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">]</span>
+<pre class="language-text">[
+  {
+    &quot;chid&quot;: 1,                                                  //&#xCC44;&#xB110; &#xBC88;&#xD638;
+    &quot;title&quot;: &quot;%EC%A0%84%EB%B0%A9%20%EC%B6%9C%EC%9E%85%EA%B5%AC&quot; //&#xCC44;&#xB110; &#xC774;&#xB984; (URL &#xC778;&#xCF54;&#xB529;)
+  },
+  {
+    &quot;chid&quot;: 2,                                                  //&#xCC44;&#xB110; &#xBC88;&#xD638;
+    &quot;title&quot;: &quot;%ED%9B%84%EB%B0%A9%20%EC%B6%9C%EC%9E%85%EA%B5%AC&quot; //&#xCC44;&#xB110; &#xC774;&#xB984; (URL &#xC778;&#xCF54;&#xB529;)
+  }
+]
 </pre>
 <h3 class="mume-header" id="%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EC%9D%B8%EC%8B%9D-%EC%9E%A5%EC%B9%98-%EB%AA%A9%EB%A1%9D">차량 번호 인식 장치 목록</h3>
 
@@ -1027,47 +1027,47 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>lprSrc
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">[</span>
-  // 연동된 차량 번호 인식 장치로부터 수신한 정보
-  <span class="token punctuation">{</span>
-    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>                  // 장치 번호
-    <span class="token property">"code"</span><span class="token operator">:</span> <span class="token string">"F00001"</span><span class="token punctuation">,</span>         // 장치 코드 (URL 인코딩<span class="token punctuation">)</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"F00001"</span><span class="token punctuation">,</span>         // 장치 이름 (URL 인코딩<span class="token punctuation">)</span>
-    <span class="token property">"linkedChannel"</span><span class="token operator">:</span> <span class="token punctuation">[</span>        // 트리거 발생 시 연동되는 채널 목록
-      <span class="token number">1</span><span class="token punctuation">,</span>
-      <span class="token number">2</span>
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-    <span class="token property">"tag"</span><span class="token operator">:</span> <span class="token string">"Normal"</span>           // 상태 (Normal<span class="token operator">:</span> 사용중인 채널<span class="token punctuation">,</span> NotUsed<span class="token operator">:</span> 사용 안하는 채널<span class="token punctuation">,</span> ReadOnly<span class="token operator">:</span> 읽기 전용 채널<span class="token punctuation">)</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<pre class="language-text">[
+  // &#xC5F0;&#xB3D9;&#xB41C; &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xC778;&#xC2DD; &#xC7A5;&#xCE58;&#xB85C;&#xBD80;&#xD130; &#xC218;&#xC2E0;&#xD55C; &#xC815;&#xBCF4;
+  {
+    &quot;id&quot;: 1,                  // &#xC7A5;&#xCE58; &#xBC88;&#xD638;
+    &quot;code&quot;: &quot;F00001&quot;,         // &#xC7A5;&#xCE58; &#xCF54;&#xB4DC; (URL &#xC778;&#xCF54;&#xB529;)
+    &quot;name&quot;: &quot;F00001&quot;,         // &#xC7A5;&#xCE58; &#xC774;&#xB984; (URL &#xC778;&#xCF54;&#xB529;)
+    &quot;linkedChannel&quot;: [        // &#xD2B8;&#xB9AC;&#xAC70; &#xBC1C;&#xC0DD; &#xC2DC; &#xC5F0;&#xB3D9;&#xB418;&#xB294; &#xCC44;&#xB110; &#xBAA9;&#xB85D;
+      1,
+      2
+    ],
+    &quot;tag&quot;: &quot;Normal&quot;           // &#xC0C1;&#xD0DC; (Normal: &#xC0AC;&#xC6A9;&#xC911;&#xC778; &#xCC44;&#xB110;, NotUsed: &#xC0AC;&#xC6A9; &#xC548;&#xD558;&#xB294; &#xCC44;&#xB110;, ReadOnly: &#xC77D;&#xAE30; &#xC804;&#xC6A9; &#xCC44;&#xB110;)
+  },
 
-  // TS-LPR의 경우 차량 번호 인식 영역에 의해 인식된 정보
-  <span class="token punctuation">{</span>
-    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>                  // 장치 번호
-    <span class="token property">"code"</span><span class="token operator">:</span> <span class="token string">"1%2D1%2D1"</span><span class="token punctuation">,</span>      // 장치 코드 (URL 인코딩<span class="token punctuation">)</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"1%2D1%2D1"</span><span class="token punctuation">,</span>      // 장치 이름 (URL 인코딩<span class="token punctuation">)</span>
-    <span class="token property">"linkedChannel"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>      // 트리거 발생 시 연동되는 채널 목록 (추가 연동 채널이 없는 경우 비어있음<span class="token punctuation">)</span>
-    <span class="token property">"tag"</span><span class="token operator">:</span> <span class="token string">"Normal"</span><span class="token punctuation">,</span>          // 상태 (Normal<span class="token operator">:</span> 사용중인 채널<span class="token punctuation">,</span> NotUsed<span class="token operator">:</span> 사용 안하는 채널<span class="token punctuation">,</span> ReadOnly<span class="token operator">:</span> 읽기 전용 채널<span class="token punctuation">)</span>
-    <span class="token property">"zone"</span><span class="token operator">:</span> <span class="token punctuation">{</span>                 // 인식 영역
-      <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>                // 영역 번호
-      <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>              // 채널 번호
-      <span class="token property">"rect"</span><span class="token operator">:</span> <span class="token punctuation">[</span>               // 영역 좌표
-        <span class="token number">2622</span><span class="token punctuation">,</span> <span class="token number">1499</span><span class="token punctuation">,</span>           // 사각형 테두리의 왼쪽 위 좌표 (x0<span class="token punctuation">,</span>y0<span class="token punctuation">)</span> 
-        <span class="token number">4297</span><span class="token punctuation">,</span> <span class="token number">4297</span>            // 사각형 테두리의 오른쪽 아래 좌표 (x1<span class="token punctuation">,</span>y1<span class="token punctuation">)</span> 
-      <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token property">"mode"</span><span class="token operator">:</span> <span class="token string">"driving"</span><span class="token punctuation">,</span>      // 번호 인식 동작 모드 (driving<span class="token operator">:</span> 주행 모드<span class="token punctuation">,</span> parking<span class="token operator">:</span> 주차 모드<span class="token punctuation">)</span>
-      <span class="token property">"disabledOnly"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>  // 장애인 전용 주차면일 경우 <span class="token boolean">true</span><span class="token punctuation">,</span> 아니면 <span class="token boolean">false</span>
-      <span class="token property">"noParkingAllowed"</span><span class="token operator">:</span> <span class="token boolean">false</span> // 주차 금지 구역일 경우 <span class="token boolean">true</span><span class="token punctuation">,</span> 아니면 <span class="token boolean">false</span>
-    <span class="token punctuation">}</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">]</span>
+  // TS-LPR&#xC758; &#xACBD;&#xC6B0; &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xC778;&#xC2DD; &#xC601;&#xC5ED;&#xC5D0; &#xC758;&#xD574; &#xC778;&#xC2DD;&#xB41C; &#xC815;&#xBCF4;
+  {
+    &quot;id&quot;: 2,                  // &#xC7A5;&#xCE58; &#xBC88;&#xD638;
+    &quot;code&quot;: &quot;1%2D1%2D1&quot;,      // &#xC7A5;&#xCE58; &#xCF54;&#xB4DC; (URL &#xC778;&#xCF54;&#xB529;)
+    &quot;name&quot;: &quot;1%2D1%2D1&quot;,      // &#xC7A5;&#xCE58; &#xC774;&#xB984; (URL &#xC778;&#xCF54;&#xB529;)
+    &quot;linkedChannel&quot;: [],      // &#xD2B8;&#xB9AC;&#xAC70; &#xBC1C;&#xC0DD; &#xC2DC; &#xC5F0;&#xB3D9;&#xB418;&#xB294; &#xCC44;&#xB110; &#xBAA9;&#xB85D; (&#xCD94;&#xAC00; &#xC5F0;&#xB3D9; &#xCC44;&#xB110;&#xC774; &#xC5C6;&#xB294; &#xACBD;&#xC6B0; &#xBE44;&#xC5B4;&#xC788;&#xC74C;)
+    &quot;tag&quot;: &quot;Normal&quot;,          // &#xC0C1;&#xD0DC; (Normal: &#xC0AC;&#xC6A9;&#xC911;&#xC778; &#xCC44;&#xB110;, NotUsed: &#xC0AC;&#xC6A9; &#xC548;&#xD558;&#xB294; &#xCC44;&#xB110;, ReadOnly: &#xC77D;&#xAE30; &#xC804;&#xC6A9; &#xCC44;&#xB110;)
+    &quot;zone&quot;: {                 // &#xC778;&#xC2DD; &#xC601;&#xC5ED;
+      &quot;id&quot;: 0,                // &#xC601;&#xC5ED; &#xBC88;&#xD638;
+      &quot;chid&quot;: 1,              // &#xCC44;&#xB110; &#xBC88;&#xD638;
+      &quot;rect&quot;: [               // &#xC601;&#xC5ED; &#xC88C;&#xD45C;
+        2622, 1499,           // &#xC0AC;&#xAC01;&#xD615; &#xD14C;&#xB450;&#xB9AC;&#xC758; &#xC67C;&#xCABD; &#xC704; &#xC88C;&#xD45C; (x0,y0) 
+        4297, 4297            // &#xC0AC;&#xAC01;&#xD615; &#xD14C;&#xB450;&#xB9AC;&#xC758; &#xC624;&#xB978;&#xCABD; &#xC544;&#xB798; &#xC88C;&#xD45C; (x1,y1) 
+      ],
+      &quot;mode&quot;: &quot;driving&quot;,      // &#xBC88;&#xD638; &#xC778;&#xC2DD; &#xB3D9;&#xC791; &#xBAA8;&#xB4DC; (driving: &#xC8FC;&#xD589; &#xBAA8;&#xB4DC;, parking: &#xC8FC;&#xCC28; &#xBAA8;&#xB4DC;)
+      &quot;disabledOnly&quot;: false,  // &#xC7A5;&#xC560;&#xC778; &#xC804;&#xC6A9; &#xC8FC;&#xCC28;&#xBA74;&#xC77C; &#xACBD;&#xC6B0; true, &#xC544;&#xB2C8;&#xBA74; false
+      &quot;noParkingAllowed&quot;: false // &#xC8FC;&#xCC28; &#xAE08;&#xC9C0; &#xAD6C;&#xC5ED;&#xC77C; &#xACBD;&#xC6B0; true, &#xC544;&#xB2C8;&#xBA74; false
+    }
+  }
+]
 
-여기서<span class="token punctuation">,</span>
-  zone의 rect를 표현하는 좌푯값은 다양한 실제 해상도와 무관하게 영상 위의 위치를
-  표현하기 위해 논리적 좌표계 8K(7680x4320<span class="token punctuation">)</span>를 기준으로 물리적 좌표계(실제 영상의
-  해상도<span class="token punctuation">)</span>를 비례식으로 계산한 값을 사용합니다.
-  예를 들어<span class="token punctuation">,</span> 1920x1080 영상에서 사각형 영역의 좌표가 (<span class="token number">480</span><span class="token punctuation">,</span> <span class="token number">270</span><span class="token punctuation">,</span> <span class="token number">1440</span><span class="token punctuation">,</span> <span class="token number">810</span><span class="token punctuation">)</span>일 경우 
-  각각 가로 좌표에는 <span class="token number">7680</span>/<span class="token number">1920</span>을 곱하고<span class="token punctuation">,</span> 세로 좌표에는 각각 <span class="token number">4320</span>/<span class="token number">1080</span>을 곱해서
-  (<span class="token number">1920</span><span class="token punctuation">,</span> <span class="token number">1080</span><span class="token punctuation">,</span> <span class="token number">5760</span><span class="token punctuation">,</span> <span class="token number">3240</span><span class="token punctuation">)</span>으로 표현합니다.
+&#xC5EC;&#xAE30;&#xC11C;,
+  zone&#xC758; rect&#xB97C; &#xD45C;&#xD604;&#xD558;&#xB294; &#xC88C;&#xD46F;&#xAC12;&#xC740; &#xB2E4;&#xC591;&#xD55C; &#xC2E4;&#xC81C; &#xD574;&#xC0C1;&#xB3C4;&#xC640; &#xBB34;&#xAD00;&#xD558;&#xAC8C; &#xC601;&#xC0C1; &#xC704;&#xC758; &#xC704;&#xCE58;&#xB97C;
+  &#xD45C;&#xD604;&#xD558;&#xAE30; &#xC704;&#xD574; &#xB17C;&#xB9AC;&#xC801; &#xC88C;&#xD45C;&#xACC4; 8K(7680x4320)&#xB97C; &#xAE30;&#xC900;&#xC73C;&#xB85C; &#xBB3C;&#xB9AC;&#xC801; &#xC88C;&#xD45C;&#xACC4;(&#xC2E4;&#xC81C; &#xC601;&#xC0C1;&#xC758;
+  &#xD574;&#xC0C1;&#xB3C4;)&#xB97C; &#xBE44;&#xB840;&#xC2DD;&#xC73C;&#xB85C; &#xACC4;&#xC0B0;&#xD55C; &#xAC12;&#xC744; &#xC0AC;&#xC6A9;&#xD569;&#xB2C8;&#xB2E4;.
+  &#xC608;&#xB97C; &#xB4E4;&#xC5B4;, 1920x1080 &#xC601;&#xC0C1;&#xC5D0;&#xC11C; &#xC0AC;&#xAC01;&#xD615; &#xC601;&#xC5ED;&#xC758; &#xC88C;&#xD45C;&#xAC00; (480, 270, 1440, 810)&#xC77C; &#xACBD;&#xC6B0; 
+  &#xAC01;&#xAC01; &#xAC00;&#xB85C; &#xC88C;&#xD45C;&#xC5D0;&#xB294; 7680/1920&#xC744; &#xACF1;&#xD558;&#xACE0;, &#xC138;&#xB85C; &#xC88C;&#xD45C;&#xC5D0;&#xB294; &#xAC01;&#xAC01; 4320/1080&#xC744; &#xACF1;&#xD574;&#xC11C;
+  (1920, 1080, 5760, 3240)&#xC73C;&#xB85C; &#xD45C;&#xD604;&#xD569;&#xB2C8;&#xB2E4;.
 </pre>
 <h3 class="mume-header" id="%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EC%A2%85%EB%A5%98-%EB%AA%A9%EB%A1%9D">이벤트 로그 종류 목록</h3>
 
@@ -1075,27 +1075,27 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>eventType
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">[</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>                  // 이벤트 로그 유형 번호
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"시스템 로그"</span><span class="token punctuation">,</span>     // 이벤트 로그 유형 이름
-    <span class="token property">"code"</span><span class="token operator">:</span> <span class="token punctuation">[</span>                 // 이벤트 로그 코드 목록
-      <span class="token punctuation">{</span>
-        <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>              // 이벤트 로그 코드 번호
-        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"시스템 시작"</span>  // 이벤트 로그 코드 이름
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      <span class="token punctuation">{</span>
-        <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"시스템 종료"</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<pre class="language-text">[
+  {
+    &quot;id&quot;: 0,                  // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xC720;&#xD615; &#xBC88;&#xD638;
+    &quot;name&quot;: &quot;&#xC2DC;&#xC2A4;&#xD15C; &#xB85C;&#xADF8;&quot;,     // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xC720;&#xD615; &#xC774;&#xB984;
+    &quot;code&quot;: [                 // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xCF54;&#xB4DC; &#xBAA9;&#xB85D;
+      {
+        &quot;id&quot;: 1,              // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xCF54;&#xB4DC; &#xBC88;&#xD638;
+        &quot;name&quot;: &quot;&#xC2DC;&#xC2A4;&#xD15C; &#xC2DC;&#xC791;&quot;  // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xCF54;&#xB4DC; &#xC774;&#xB984;
+      },
+      {
+        &quot;id&quot;: 2,
+        &quot;name&quot;: &quot;&#xC2DC;&#xC2A4;&#xD15C; &#xC885;&#xB8CC;&quot;
+      },
 
-      ... // 중략
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">6</span><span class="token punctuation">,</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"사용자 정의 이벤트"</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">]</span>
+      ... // &#xC911;&#xB7B5;
+  },
+  {
+    &quot;id&quot;: 6,
+    &quot;name&quot;: &quot;&#xC0AC;&#xC6A9;&#xC790; &#xC815;&#xC758; &#xC774;&#xBCA4;&#xD2B8;&quot;
+  }
+]
 </pre>
 <p>이처럼 이벤트 로그 종류 목록은 유형별로 코드가 정의되어 있습니다.</p>
 <p>언어를 지정하지 않으면 기본값으로 서버의 언어 설정에 따라 결과를 반환합니다.<br>
@@ -1108,31 +1108,31 @@ lang      <span class="token comment" spellcheck="true"># 언어</span>
 <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>eventType<span class="token operator">&amp;</span>lang<span class="token operator">=</span>en<span class="token operator">-</span><span class="token constant">US</span>
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">[</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"System log"</span><span class="token punctuation">,</span>
-    <span class="token property">"code"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token punctuation">{</span>
-        <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"System startup"</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      <span class="token punctuation">{</span>
-        <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"System shutdown"</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      <span class="token punctuation">{</span>
-        <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
-        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"Abnormal shutdown"</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<pre class="language-text">[
+  {
+    &quot;id&quot;: 0,
+    &quot;name&quot;: &quot;System log&quot;,
+    &quot;code&quot;: [
+      {
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;System startup&quot;
+      },
+      {
+        &quot;id&quot;: 2,
+        &quot;name&quot;: &quot;System shutdown&quot;
+      },
+      {
+        &quot;id&quot;: 3,
+        &quot;name&quot;: &quot;Abnormal shutdown&quot;
+      },
 
-      ... // 중략
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">6</span><span class="token punctuation">,</span>
-    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"User-defined event"</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">]</span>
+      ... // &#xC911;&#xB7B5;
+  },
+  {
+    &quot;id&quot;: 6,
+    &quot;name&quot;: &quot;User-defined event&quot;
+  }
+]
 </pre>
 <h2 class="mume-header" id="%EC%A0%80%EC%9E%A5-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EA%B2%80%EC%83%89">저장 데이터 검색</h2>
 
@@ -1143,24 +1143,24 @@ lang      <span class="token comment" spellcheck="true"># 언어</span>
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays      <span class="token operator">/</span><span class="token operator">/</span> 녹화된 영상이 있는 모든 날짜를 요청
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"2018-1"</span><span class="token operator">:</span> <span class="token punctuation">[</span> // 년-월 형식으로 데이터가 존재하는 날짜를 배열로 표시
-      <span class="token number">8</span><span class="token punctuation">,</span>        // <span class="token number">2018</span>-<span class="token number">1</span>-<span class="token number">18</span>  녹화 데이터 있음
-      <span class="token number">23</span><span class="token punctuation">,</span>       // <span class="token number">2018</span>-<span class="token number">1</span>-<span class="token number">23</span>  녹화 데이터 있음
-      <span class="token number">24</span>        // <span class="token number">2018</span>-<span class="token number">1</span>-<span class="token number">24</span>  녹화 데이터 있음
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-    <span class="token property">"2018-2"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token number">5</span><span class="token punctuation">,</span>
-      <span class="token number">6</span><span class="token punctuation">,</span>
-      <span class="token number">7</span><span class="token punctuation">,</span>
-      <span class="token number">9</span><span class="token punctuation">,</span>
-      <span class="token number">13</span><span class="token punctuation">,</span>
-      <span class="token number">14</span><span class="token punctuation">,</span>
-      <span class="token number">19</span>
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">{
+  &quot;result&quot;: {
+    &quot;2018-1&quot;: [ // &#xB144;-&#xC6D4; &#xD615;&#xC2DD;&#xC73C;&#xB85C; &#xB370;&#xC774;&#xD130;&#xAC00; &#xC874;&#xC7AC;&#xD558;&#xB294; &#xB0A0;&#xC9DC;&#xB97C; &#xBC30;&#xC5F4;&#xB85C; &#xD45C;&#xC2DC;
+      8,        // 2018-1-18  &#xB179;&#xD654; &#xB370;&#xC774;&#xD130; &#xC788;&#xC74C;
+      23,       // 2018-1-23  &#xB179;&#xD654; &#xB370;&#xC774;&#xD130; &#xC788;&#xC74C;
+      24        // 2018-1-24  &#xB179;&#xD654; &#xB370;&#xC774;&#xD130; &#xC788;&#xC74C;
+    ],
+    &quot;2018-2&quot;: [
+      5,
+      6,
+      7,
+      9,
+      13,
+      14,
+      19
+    ]
+  }
+}
 </pre>
 <p>아래와 같은 매개 변수를 추가하여 특정 조건에 해당하는 결과를 요청할 수 있습니다.</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># 매개 변수</span>
@@ -1183,18 +1183,18 @@ timeEnd     <span class="token comment" spellcheck="true"># 특정 날짜, 시�
 <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>01T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00<span class="token operator">%</span>2B09<span class="token operator">%</span>3A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>31T23<span class="token operator">%</span>3A59<span class="token operator">%</span>3A59<span class="token number">.999</span><span class="token operator">%</span>2B09<span class="token operator">%</span>3A00
 </pre>
 <p><code>ch</code>, <code>timeBegin</code> 또는 <code>timeEnd</code>와 같은 매개 변수를 사용하여 조건을 지정한 경우는 아래와 같이 요청받은 조건을 포함하여 결과가 반환됩니다.</p>
-<pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"timeBegin"</span><span class="token operator">:</span> <span class="token string">"2018-01-01T00:00:00+09:00"</span><span class="token punctuation">,</span>     // 요청받은 처음 날짜<span class="token punctuation">,</span> 시각
-  <span class="token property">"timeEnd"</span><span class="token operator">:</span> <span class="token string">"2018-01-31T23:59:59.999+09:00"</span><span class="token punctuation">,</span>   // 요청받은 마지막 날짜<span class="token punctuation">,</span> 시각
-  <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>                                    // 요청받은 채널 번호
-  <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"2018-1"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token number">8</span><span class="token punctuation">,</span>
-      <span class="token number">23</span><span class="token punctuation">,</span>
-      <span class="token number">24</span>
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">{
+  &quot;timeBegin&quot;: &quot;2018-01-01T00:00:00+09:00&quot;,     // &#xC694;&#xCCAD;&#xBC1B;&#xC740; &#xCC98;&#xC74C; &#xB0A0;&#xC9DC;, &#xC2DC;&#xAC01;
+  &quot;timeEnd&quot;: &quot;2018-01-31T23:59:59.999+09:00&quot;,   // &#xC694;&#xCCAD;&#xBC1B;&#xC740; &#xB9C8;&#xC9C0;&#xB9C9; &#xB0A0;&#xC9DC;, &#xC2DC;&#xAC01;
+  &quot;chid&quot;: 1,                                    // &#xC694;&#xCCAD;&#xBC1B;&#xC740; &#xCC44;&#xB110; &#xBC88;&#xD638;
+  &quot;result&quot;: {
+    &quot;2018-1&quot;: [
+      8,
+      23,
+      24
+    ]
+  }
+}
 </pre>
 <h2 class="mume-header" id="%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">이벤트 로그 검색</h2>
 
@@ -1202,65 +1202,65 @@ timeEnd     <span class="token comment" spellcheck="true"># 특정 날짜, 시�
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"totalCount"</span><span class="token operator">:</span> <span class="token number">513</span><span class="token punctuation">,</span>    // 서버에 기록된 총 이벤트 로그 개수
-  <span class="token property">"at"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>              // 데이터 오프셋 표시 (<span class="token number">0</span>이므로 첫 번째 위치의 데이터를 의미함<span class="token punctuation">)</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>             // 이벤트 로그 데이터 목록
-    <span class="token punctuation">{</span>
-      <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">518</span><span class="token punctuation">,</span>                        // 이벤트 로그 번호
-      <span class="token property">"type"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>                        // 이벤트 로그 유형 번호
-      <span class="token property">"typeName"</span><span class="token operator">:</span> <span class="token string">"시스템 로그"</span><span class="token punctuation">,</span>         // 이벤트 로그 유형 이름
-      <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">25</span><span class="token punctuation">,</span>                       // 이벤트 로그 코드 번호
-      <span class="token property">"codeName"</span><span class="token operator">:</span> <span class="token string">"저장 장치 준비 완료"</span><span class="token punctuation">,</span>  // 이벤트 로그 코드 이름
-      <span class="token property">"timeRange"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-        <span class="token string">"2018-02-19T18:24:26.002+09:00"</span> // 발생 시각 (일정 기간 연속적으로 발생한 이벤트는 배열의 두 번 째 항목에 종료 시각이 포함됨<span class="token punctuation">)</span>
-      <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token property">"param"</span><span class="token operator">:</span> <span class="token punctuation">{</span>                            // 이벤트 로그 코드별 추가 정보
-        <span class="token property">"storagePath"</span><span class="token operator">:</span> <span class="token string">"E%3A%5CrecData%5C"</span><span class="token punctuation">,</span> // 녹화용으로 사용할 스토리지 경로
-        <span class="token property">"statusCode"</span><span class="token operator">:</span> <span class="token number">0</span>                     // 스토리지 상태 코드
-      <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">,</span>
-    <span class="token punctuation">{</span>
-      <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">517</span><span class="token punctuation">,</span>
-      <span class="token property">"type"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-      <span class="token property">"typeName"</span><span class="token operator">:</span> <span class="token string">"개인 정보"</span><span class="token punctuation">,</span>
-      <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
-      <span class="token property">"codeName"</span><span class="token operator">:</span> <span class="token string">"로그인"</span><span class="token punctuation">,</span>
-      <span class="token property">"timeRange"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-        <span class="token string">"2018-02-19T18:24:20.249+09:00"</span>
-      <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token property">"param"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-        <span class="token property">"uid"</span><span class="token operator">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span>
-        <span class="token property">"autoLogin"</span><span class="token operator">:</span> <span class="token number">1</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      <span class="token property">"comment"</span><span class="token operator">:</span> <span class="token string">"admin: 자동 로그인"</span>
-    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<pre class="language-text">{
+  &quot;totalCount&quot;: 513,    // &#xC11C;&#xBC84;&#xC5D0; &#xAE30;&#xB85D;&#xB41C; &#xCD1D; &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xAC1C;&#xC218;
+  &quot;at&quot;: 0,              // &#xB370;&#xC774;&#xD130; &#xC624;&#xD504;&#xC14B; &#xD45C;&#xC2DC; (0&#xC774;&#xBBC0;&#xB85C; &#xCCAB; &#xBC88;&#xC9F8; &#xC704;&#xCE58;&#xC758; &#xB370;&#xC774;&#xD130;&#xB97C; &#xC758;&#xBBF8;&#xD568;)
+  &quot;data&quot;: [             // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xB370;&#xC774;&#xD130; &#xBAA9;&#xB85D;
+    {
+      &quot;id&quot;: 518,                        // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xBC88;&#xD638;
+      &quot;type&quot;: 0,                        // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xC720;&#xD615; &#xBC88;&#xD638;
+      &quot;typeName&quot;: &quot;&#xC2DC;&#xC2A4;&#xD15C; &#xB85C;&#xADF8;&quot;,         // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xC720;&#xD615; &#xC774;&#xB984;
+      &quot;code&quot;: 25,                       // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xCF54;&#xB4DC; &#xBC88;&#xD638;
+      &quot;codeName&quot;: &quot;&#xC800;&#xC7A5; &#xC7A5;&#xCE58; &#xC900;&#xBE44; &#xC644;&#xB8CC;&quot;,  // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xCF54;&#xB4DC; &#xC774;&#xB984;
+      &quot;timeRange&quot;: [
+        &quot;2018-02-19T18:24:26.002+09:00&quot; // &#xBC1C;&#xC0DD; &#xC2DC;&#xAC01; (&#xC77C;&#xC815; &#xAE30;&#xAC04; &#xC5F0;&#xC18D;&#xC801;&#xC73C;&#xB85C; &#xBC1C;&#xC0DD;&#xD55C; &#xC774;&#xBCA4;&#xD2B8;&#xB294; &#xBC30;&#xC5F4;&#xC758; &#xB450; &#xBC88; &#xC9F8; &#xD56D;&#xBAA9;&#xC5D0; &#xC885;&#xB8CC; &#xC2DC;&#xAC01;&#xC774; &#xD3EC;&#xD568;&#xB428;)
+      ],
+      &quot;param&quot;: {                            // &#xC774;&#xBCA4;&#xD2B8; &#xB85C;&#xADF8; &#xCF54;&#xB4DC;&#xBCC4; &#xCD94;&#xAC00; &#xC815;&#xBCF4;
+        &quot;storagePath&quot;: &quot;E%3A%5CrecData%5C&quot;, // &#xB179;&#xD654;&#xC6A9;&#xC73C;&#xB85C; &#xC0AC;&#xC6A9;&#xD560; &#xC2A4;&#xD1A0;&#xB9AC;&#xC9C0; &#xACBD;&#xB85C;
+        &quot;statusCode&quot;: 0                     // &#xC2A4;&#xD1A0;&#xB9AC;&#xC9C0; &#xC0C1;&#xD0DC; &#xCF54;&#xB4DC;
+      }
+    },
+    {
+      &quot;id&quot;: 517,
+      &quot;type&quot;: 1,
+      &quot;typeName&quot;: &quot;&#xAC1C;&#xC778; &#xC815;&#xBCF4;&quot;,
+      &quot;code&quot;: 4,
+      &quot;codeName&quot;: &quot;&#xB85C;&#xADF8;&#xC778;&quot;,
+      &quot;timeRange&quot;: [
+        &quot;2018-02-19T18:24:20.249+09:00&quot;
+      ],
+      &quot;param&quot;: {
+        &quot;uid&quot;: &quot;admin&quot;,
+        &quot;autoLogin&quot;: 1
+      },
+      &quot;comment&quot;: &quot;admin: &#xC790;&#xB3D9; &#xB85C;&#xADF8;&#xC778;&quot;
+    },
 
-    ...   // 중략
+    ...   // &#xC911;&#xB7B5;
 
-    <span class="token punctuation">{</span>
-      <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">469</span><span class="token punctuation">,</span>
-      <span class="token property">"type"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
-      <span class="token property">"typeName"</span><span class="token operator">:</span> <span class="token string">"시스템 로그"</span><span class="token punctuation">,</span>
-      <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">27</span><span class="token punctuation">,</span>
-      <span class="token property">"codeName"</span><span class="token operator">:</span> <span class="token string">"라이센스 적용"</span><span class="token punctuation">,</span>
-      <span class="token property">"timeRange"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-        <span class="token string">"2018-02-19T12:11:08.680+09:00"</span>
-      <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token property">"param"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-        <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>
-        <span class="token property">"maxChannels"</span><span class="token operator">:</span> <span class="token number">36</span><span class="token punctuation">,</span>
-        <span class="token property">"extension"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-          <span class="token number">1</span><span class="token punctuation">,</span>
-          <span class="token number">0</span><span class="token punctuation">,</span>
-          <span class="token number">0</span>
-        <span class="token punctuation">]</span><span class="token punctuation">,</span>
-        <span class="token property">"mediaType"</span><span class="token operator">:</span> <span class="token string">"USB dongle"</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      <span class="token property">"comment"</span><span class="token operator">:</span> <span class="token string">"정품 라이센스"</span>
-    <span class="token punctuation">}</span>
-  <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+    {
+      &quot;id&quot;: 469,
+      &quot;type&quot;: 0,
+      &quot;typeName&quot;: &quot;&#xC2DC;&#xC2A4;&#xD15C; &#xB85C;&#xADF8;&quot;,
+      &quot;code&quot;: 27,
+      &quot;codeName&quot;: &quot;&#xB77C;&#xC774;&#xC13C;&#xC2A4; &#xC801;&#xC6A9;&quot;,
+      &quot;timeRange&quot;: [
+        &quot;2018-02-19T12:11:08.680+09:00&quot;
+      ],
+      &quot;param&quot;: {
+        &quot;type&quot;: &quot;genuine&quot;,
+        &quot;maxChannels&quot;: 36,
+        &quot;extension&quot;: [
+          1,
+          0,
+          0
+        ],
+        &quot;mediaType&quot;: &quot;USB dongle&quot;
+      },
+      &quot;comment&quot;: &quot;&#xC815;&#xD488; &#xB77C;&#xC774;&#xC13C;&#xC2A4;&quot;
+    }
+  ]
+}
 </pre>
 <p>서버에 기록된 이벤트 로그는 대량의 데이터이므로 모두 한꺼번에 전송하기 적합하지 않습니다. 이 때문에 개수를 명시하지 않을 경우 가장 최근 것부터 최대 50개까지만 로그 항목을 반환합니다.<br>
 <code>totalCount</code>, <code>at</code> 그리고 다음에 언급할 <code>maxCount</code>를 사용하여 검색 결과 페이지 단위로 표현할 수 있습니다.</p>
@@ -1301,87 +1301,87 @@ type        <span class="token comment" spellcheck="true"># 이벤트 로그 유
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"totalCount"</span><span class="token operator">:</span> <span class="token number">64</span><span class="token punctuation">,</span>   // 서버에 기록된 전체 차량 번호 로그 개수
-  <span class="token property">"at"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>            // 데이터 오프셋 표시 (<span class="token number">0</span>이므로 첫 번째 위치의 데이터를 의미함<span class="token punctuation">)</span>
-  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>           // 차량 번호 로그 데이터 목록
-    <span class="token punctuation">{</span>
-      <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">64</span><span class="token punctuation">,</span>                           // 차량 번호 로그 번호
-      <span class="token property">"plateNo"</span><span class="token operator">:</span> <span class="token string">"13다5939"</span><span class="token punctuation">,</span>               // 차량 번호 텍스트
-      <span class="token property">"timeRange"</span><span class="token operator">:</span> <span class="token punctuation">[</span>                      // 차량 번호 인식 날짜<span class="token punctuation">,</span> 시각
-        <span class="token string">"2018-02-21T09:07:29.000+09:00"</span><span class="token punctuation">,</span>  // 시작 시점
-        <span class="token string">"2018-02-21T09:07:34.057+09:00"</span>   // 종료 시점
-      <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token property">"srcCode"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>                 // 차량 번호 인식 장치 (또는 영역<span class="token punctuation">)</span> 코드
-      <span class="token property">"srcName"</span><span class="token operator">:</span> <span class="token string">"정문 입구"</span><span class="token punctuation">,</span>              // 차량 번호 인식 장치 (또는 영역<span class="token punctuation">)</span> 이름
-      <span class="token property">"vod"</span><span class="token operator">:</span> <span class="token punctuation">[</span>  // 인식된 시점의 영상 (연동 채널이 설정된 경우 여러 개가 될 수 있음<span class="token punctuation">)</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"</span>
-        <span class="token punctuation">}</span><span class="token punctuation">,</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=2&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"</span>
-        <span class="token punctuation">}</span><span class="token punctuation">,</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=3&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"</span>
-        <span class="token punctuation">}</span><span class="token punctuation">,</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=4&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"</span>
-        <span class="token punctuation">}</span>
-      <span class="token punctuation">]</span>
-    <span class="token punctuation">}</span><span class="token punctuation">,</span>
-    <span class="token punctuation">{</span>
-      <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">63</span><span class="token punctuation">,</span>
-      <span class="token property">"plateNo"</span><span class="token operator">:</span> <span class="token string">"02루2841"</span><span class="token punctuation">,</span>
-      <span class="token property">"timeRange"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-        <span class="token string">"2018-02-21T08:00:00.915+09:00"</span><span class="token punctuation">,</span>
-        <span class="token string">"2018-02-21T08:00:01.714+09:00"</span>
-      <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token property">"srcCode"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
-      <span class="token property">"srcName"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
-      <span class="token property">"vod"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"</span>
-        <span class="token punctuation">}</span><span class="token punctuation">,</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=2&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"</span>
-        <span class="token punctuation">}</span><span class="token punctuation">,</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=3&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"</span>
-        <span class="token punctuation">}</span><span class="token punctuation">,</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=4&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"</span>
-        <span class="token punctuation">}</span>
-      <span class="token punctuation">]</span>
-    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<pre class="language-text">{
+  &quot;totalCount&quot;: 64,   // &#xC11C;&#xBC84;&#xC5D0; &#xAE30;&#xB85D;&#xB41C; &#xC804;&#xCCB4; &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xB85C;&#xADF8; &#xAC1C;&#xC218;
+  &quot;at&quot;: 0,            // &#xB370;&#xC774;&#xD130; &#xC624;&#xD504;&#xC14B; &#xD45C;&#xC2DC; (0&#xC774;&#xBBC0;&#xB85C; &#xCCAB; &#xBC88;&#xC9F8; &#xC704;&#xCE58;&#xC758; &#xB370;&#xC774;&#xD130;&#xB97C; &#xC758;&#xBBF8;&#xD568;)
+  &quot;data&quot;: [           // &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xB85C;&#xADF8; &#xB370;&#xC774;&#xD130; &#xBAA9;&#xB85D;
+    {
+      &quot;id&quot;: 64,                           // &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xB85C;&#xADF8; &#xBC88;&#xD638;
+      &quot;plateNo&quot;: &quot;13&#xB2E4;5939&quot;,               // &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xD14D;&#xC2A4;&#xD2B8;
+      &quot;timeRange&quot;: [                      // &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xC778;&#xC2DD; &#xB0A0;&#xC9DC;, &#xC2DC;&#xAC01;
+        &quot;2018-02-21T09:07:29.000+09:00&quot;,  // &#xC2DC;&#xC791; &#xC2DC;&#xC810;
+        &quot;2018-02-21T09:07:34.057+09:00&quot;   // &#xC885;&#xB8CC; &#xC2DC;&#xC810;
+      ],
+      &quot;srcCode&quot;: &quot;1-1-1&quot;,                 // &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xC778;&#xC2DD; &#xC7A5;&#xCE58; (&#xB610;&#xB294; &#xC601;&#xC5ED;) &#xCF54;&#xB4DC;
+      &quot;srcName&quot;: &quot;&#xC815;&#xBB38; &#xC785;&#xAD6C;&quot;,              // &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xC778;&#xC2DD; &#xC7A5;&#xCE58; (&#xB610;&#xB294; &#xC601;&#xC5ED;) &#xC774;&#xB984;
+      &quot;vod&quot;: [  // &#xC778;&#xC2DD;&#xB41C; &#xC2DC;&#xC810;&#xC758; &#xC601;&#xC0C1; (&#xC5F0;&#xB3D9; &#xCC44;&#xB110;&#xC774; &#xC124;&#xC815;&#xB41C; &#xACBD;&#xC6B0; &#xC5EC;&#xB7EC; &#xAC1C;&#xAC00; &#xB420; &#xC218; &#xC788;&#xC74C;)
+        {
+          &quot;chid&quot;: 1,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00&quot;
+        },
+        {
+          &quot;chid&quot;: 2,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=2&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00&quot;
+        },
+        {
+          &quot;chid&quot;: 3,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=3&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00&quot;
+        },
+        {
+          &quot;chid&quot;: 4,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=4&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00&quot;
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: 63,
+      &quot;plateNo&quot;: &quot;02&#xB8E8;2841&quot;,
+      &quot;timeRange&quot;: [
+        &quot;2018-02-21T08:00:00.915+09:00&quot;,
+        &quot;2018-02-21T08:00:01.714+09:00&quot;
+      ],
+      &quot;srcCode&quot;: &quot;1-1-1&quot;,
+      &quot;srcName&quot;: &quot;1-1-1&quot;,
+      &quot;vod&quot;: [
+        {
+          &quot;chid&quot;: 1,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00&quot;
+        },
+        {
+          &quot;chid&quot;: 2,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=2&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00&quot;
+        },
+        {
+          &quot;chid&quot;: 3,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=3&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00&quot;
+        },
+        {
+          &quot;chid&quot;: 4,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=4&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00&quot;
+        }
+      ]
+    },
 
-    ... // 중략
+    ... // &#xC911;&#xB7B5;
 
-    <span class="token punctuation">{</span>
-      <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">15</span><span class="token punctuation">,</span>
-      <span class="token property">"plateNo"</span><span class="token operator">:</span> <span class="token string">"64다3736"</span><span class="token punctuation">,</span>
-      <span class="token property">"timeRange"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-        <span class="token string">"2018-02-20T18:12:05.828+09:00"</span><span class="token punctuation">,</span>
-        <span class="token string">"2018-02-20T18:12:06.253+09:00"</span>
-      <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token property">"srcCode"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
-      <span class="token property">"srcName"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
-      <span class="token property">"vod"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-        <span class="token punctuation">{</span>
-          <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-          <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00"</span>
-        <span class="token punctuation">}</span>
-      <span class="token punctuation">]</span>
-    <span class="token punctuation">}</span>
-  <span class="token punctuation">]</span>
-<span class="token punctuation">}</span>
+    {
+      &quot;id&quot;: 15,
+      &quot;plateNo&quot;: &quot;64&#xB2E4;3736&quot;,
+      &quot;timeRange&quot;: [
+        &quot;2018-02-20T18:12:05.828+09:00&quot;,
+        &quot;2018-02-20T18:12:06.253+09:00&quot;
+      ],
+      &quot;srcCode&quot;: &quot;1-1-1&quot;,
+      &quot;srcName&quot;: &quot;1-1-1&quot;,
+      &quot;vod&quot;: [
+        {
+          &quot;chid&quot;: 1,
+          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00&quot;
+        }
+      ]
+    }
+  ]
+}
 </pre>
 <p>서버에 기록된 차량 번호 로그는 대량의 데이터이므로 모두 한꺼번에 전송하기 적합하지 않습니다. 이 때문에 개수를 명시하지 않을 경우 가장 최근 것부터 최대 50개까지만 로그 항목을 반환합니다.<br>
 totalCount, at 그리고 다음에 언급할 maxCount를 사용하여 검색 결과를 페이지 단위로 표현할 수 있습니다.</p>
@@ -1415,26 +1415,26 @@ sort        <span class="token comment" spellcheck="true"># 정렬 방식 (desc:
 </pre>
 <p>검색된 결과 데이터에 있는 동영상을 표시하기 위해서는 <a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81-%ED%91%9C%EC%8B%9C">녹화 영상 표시</a>에서 사용했던 방법을 쓰면 됩니다.</p>
 <p>예를 들어, 검색 결과 중 동영상을 표시하고자 하는 항목이 다음과 같다면</p>
-<pre class="language-json">  ... // 중략
+<pre class="language-text">  ... // &#xC911;&#xB7B5;
 
-  <span class="token punctuation">{</span>
-    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">15</span><span class="token punctuation">,</span>
-    <span class="token property">"plateNo"</span><span class="token operator">:</span> <span class="token string">"64다3736"</span><span class="token punctuation">,</span>
-    <span class="token property">"timeRange"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token string">"2018-02-20T18:12:05.828+09:00"</span><span class="token punctuation">,</span>
-      <span class="token string">"2018-02-20T18:12:06.253+09:00"</span>
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-    <span class="token property">"srcCode"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
-    <span class="token property">"srcName"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
-    <span class="token property">"vod"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token punctuation">{</span>
-        <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
-        <span class="token property">"videoSrc"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00"</span>
-      <span class="token punctuation">}</span>
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>
+  {
+    &quot;id&quot;: 15,
+    &quot;plateNo&quot;: &quot;64&#xB2E4;3736&quot;,
+    &quot;timeRange&quot;: [
+      &quot;2018-02-20T18:12:05.828+09:00&quot;,
+      &quot;2018-02-20T18:12:06.253+09:00&quot;
+    ],
+    &quot;srcCode&quot;: &quot;1-1-1&quot;,
+    &quot;srcName&quot;: &quot;1-1-1&quot;,
+    &quot;vod&quot;: [
+      {
+        &quot;chid&quot;: 1,
+        &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00&quot;
+      }
+    ]
+  }
 
-  ... // 중략
+  ... // &#xC911;&#xB7B5;
 </pre>
 <p>여기서 <code>&quot;vod&quot;</code> 아래 <code>&quot;videoSrc&quot;</code>의 값에 해당하는 <code>http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00</code>을 사용하여 영상을 표시할 수 있습니다.</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># 세션 인증된 경우 그대로 사용</span>
@@ -1453,63 +1453,63 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>vod
 </pre>
 <p>서버는 이에 대해 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
-<pre class="language-json"><span class="token punctuation">[</span> // 각 채널이 배열의 항목으로 구성됨
-  <span class="token punctuation">{</span>
-    <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>                              // 채널 번호
-    <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"Profile1%20%281920x1080%29"</span><span class="token punctuation">,</span>  // 채널 이름 (URL 인코딩<span class="token punctuation">)</span>
-    <span class="token property">"src"</span><span class="token operator">:</span> <span class="token punctuation">[</span>  // 동영상 소스 목록
-              // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨<span class="token punctuation">)</span>
-      <span class="token punctuation">{</span> // 1080p RTMP 스트림
-        <span class="token property">"src"</span><span class="token operator">:</span> <span class="token string">"rtmp://192.168.0.100/live/ch1main"</span><span class="token punctuation">,</span>  // 동영상 주소
-        <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"rtmp/mp4"</span><span class="token punctuation">,</span>     // MIME 형식<span class="token operator">:</span> RTMP 프로토콜 (Adobe Flash 방식<span class="token punctuation">)</span>
-        <span class="token property">"label"</span><span class="token operator">:</span> <span class="token string">"1080p FHD"</span><span class="token punctuation">,</span>   // 해상도 이름
-        <span class="token property">"size"</span><span class="token operator">:</span> <span class="token punctuation">[</span>               // 해상도
-          <span class="token number">1920</span><span class="token punctuation">,</span>                 // 가로 픽셀 수
-          <span class="token number">1080</span>                  // 세로 픽셀 수
-        <span class="token punctuation">]</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      <span class="token punctuation">{</span> // 1080p HLS 스트림
-        <span class="token property">"src"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/hls/ch1main/index.m3u8"</span><span class="token punctuation">,</span> // 동영상 주소
-        <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"application/x-mpegurl"</span><span class="token punctuation">,</span>  // MIME 형식<span class="token operator">:</span> HLS 프로토콜 (HTML5 방식<span class="token punctuation">)</span>
-        <span class="token property">"label"</span><span class="token operator">:</span> <span class="token string">"1080p FHD"</span><span class="token punctuation">,</span>   // 해상도 이름
-        <span class="token property">"size"</span><span class="token operator">:</span> <span class="token punctuation">[</span>               // 해상도
-          <span class="token number">1920</span><span class="token punctuation">,</span>                 // 가로 픽셀 수
-          <span class="token number">1080</span>                  // 세로 픽셀 수
-        <span class="token punctuation">]</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      <span class="token punctuation">{</span> // VGA RTMP 스트림
-        <span class="token property">"src"</span><span class="token operator">:</span> <span class="token string">"rtmp://192.168.0.100/live/ch1sub"</span><span class="token punctuation">,</span>   // RTMP 프로토콜 (Adobe Flash 방식<span class="token punctuation">)</span>
-        <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"rtmp/mp4"</span><span class="token punctuation">,</span>   // MIME 형식<span class="token operator">:</span> RTMP 프로토콜 (Adobe Flash 방식<span class="token punctuation">)</span>
-        <span class="token property">"label"</span><span class="token operator">:</span> <span class="token string">"VGA"</span><span class="token punctuation">,</span>
-        <span class="token property">"size"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-          <span class="token number">640</span><span class="token punctuation">,</span>
-          <span class="token number">480</span>
-        <span class="token punctuation">]</span>
-      <span class="token punctuation">}</span><span class="token punctuation">,</span>
-      <span class="token punctuation">{</span> // VGA HLS 스트림
-        <span class="token property">"src"</span><span class="token operator">:</span> <span class="token string">"http://192.168.0.100/hls/ch1sub/index.m3u8"</span><span class="token punctuation">,</span> // 동영상 주소
-        <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"application/x-mpegurl"</span><span class="token punctuation">,</span>  // MIME 형식<span class="token operator">:</span> HLS 프로토콜 (HTML5 방식<span class="token punctuation">)</span>
-        <span class="token property">"label"</span><span class="token operator">:</span> <span class="token string">"VGA"</span><span class="token punctuation">,</span>       // 해상도 이름
-        <span class="token property">"size"</span><span class="token operator">:</span> <span class="token punctuation">[</span>             // 해상도
-          <span class="token number">640</span><span class="token punctuation">,</span>                // 가로 픽셀 수
-          <span class="token number">480</span>                 // 세로 픽셀 수
-        <span class="token punctuation">]</span>
-      <span class="token punctuation">}</span>
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
-  <span class="token punctuation">{</span>
-    <span class="token property">"chid"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-    <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"192%2E168%2E0%2E106"</span><span class="token punctuation">,</span>
-    <span class="token property">"src"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+<pre class="language-text">[ // &#xAC01; &#xCC44;&#xB110;&#xC774; &#xBC30;&#xC5F4;&#xC758; &#xD56D;&#xBAA9;&#xC73C;&#xB85C; &#xAD6C;&#xC131;&#xB428;
+  {
+    &quot;chid&quot;: 1,                              // &#xCC44;&#xB110; &#xBC88;&#xD638;
+    &quot;title&quot;: &quot;Profile1%20%281920x1080%29&quot;,  // &#xCC44;&#xB110; &#xC774;&#xB984; (URL &#xC778;&#xCF54;&#xB529;)
+    &quot;src&quot;: [  // &#xB3D9;&#xC601;&#xC0C1; &#xC18C;&#xC2A4; &#xBAA9;&#xB85D;
+              // (&#xD504;&#xB85C;&#xD1A0;&#xCF5C; &#xBC0F; &#xD574;&#xC0C1;&#xB3C4;&#xC5D0; &#xB530;&#xB77C; &#xD558;&#xB098;&#xC758; &#xCC44;&#xB110;&#xC5D0; &#xC5EC;&#xB7EC; &#xAC1C;&#xC758; &#xC18C;&#xC2A4;&#xAC00; &#xBC30;&#xC5F4;&#xB85C; &#xAD6C;&#xC131;&#xB428;)
+      { // 1080p RTMP &#xC2A4;&#xD2B8;&#xB9BC;
+        &quot;src&quot;: &quot;rtmp://192.168.0.100/live/ch1main&quot;,  // &#xB3D9;&#xC601;&#xC0C1; &#xC8FC;&#xC18C;
+        &quot;type&quot;: &quot;rtmp/mp4&quot;,     // MIME &#xD615;&#xC2DD;: RTMP &#xD504;&#xB85C;&#xD1A0;&#xCF5C; (Adobe Flash &#xBC29;&#xC2DD;)
+        &quot;label&quot;: &quot;1080p FHD&quot;,   // &#xD574;&#xC0C1;&#xB3C4; &#xC774;&#xB984;
+        &quot;size&quot;: [               // &#xD574;&#xC0C1;&#xB3C4;
+          1920,                 // &#xAC00;&#xB85C; &#xD53D;&#xC140; &#xC218;
+          1080                  // &#xC138;&#xB85C; &#xD53D;&#xC140; &#xC218;
+        ]
+      },
+      { // 1080p HLS &#xC2A4;&#xD2B8;&#xB9BC;
+        &quot;src&quot;: &quot;http://192.168.0.100/hls/ch1main/index.m3u8&quot;, // &#xB3D9;&#xC601;&#xC0C1; &#xC8FC;&#xC18C;
+        &quot;type&quot;: &quot;application/x-mpegurl&quot;,  // MIME &#xD615;&#xC2DD;: HLS &#xD504;&#xB85C;&#xD1A0;&#xCF5C; (HTML5 &#xBC29;&#xC2DD;)
+        &quot;label&quot;: &quot;1080p FHD&quot;,   // &#xD574;&#xC0C1;&#xB3C4; &#xC774;&#xB984;
+        &quot;size&quot;: [               // &#xD574;&#xC0C1;&#xB3C4;
+          1920,                 // &#xAC00;&#xB85C; &#xD53D;&#xC140; &#xC218;
+          1080                  // &#xC138;&#xB85C; &#xD53D;&#xC140; &#xC218;
+        ]
+      },
+      { // VGA RTMP &#xC2A4;&#xD2B8;&#xB9BC;
+        &quot;src&quot;: &quot;rtmp://192.168.0.100/live/ch1sub&quot;,   // RTMP &#xD504;&#xB85C;&#xD1A0;&#xCF5C; (Adobe Flash &#xBC29;&#xC2DD;)
+        &quot;type&quot;: &quot;rtmp/mp4&quot;,   // MIME &#xD615;&#xC2DD;: RTMP &#xD504;&#xB85C;&#xD1A0;&#xCF5C; (Adobe Flash &#xBC29;&#xC2DD;)
+        &quot;label&quot;: &quot;VGA&quot;,
+        &quot;size&quot;: [
+          640,
+          480
+        ]
+      },
+      { // VGA HLS &#xC2A4;&#xD2B8;&#xB9BC;
+        &quot;src&quot;: &quot;http://192.168.0.100/hls/ch1sub/index.m3u8&quot;, // &#xB3D9;&#xC601;&#xC0C1; &#xC8FC;&#xC18C;
+        &quot;type&quot;: &quot;application/x-mpegurl&quot;,  // MIME &#xD615;&#xC2DD;: HLS &#xD504;&#xB85C;&#xD1A0;&#xCF5C; (HTML5 &#xBC29;&#xC2DD;)
+        &quot;label&quot;: &quot;VGA&quot;,       // &#xD574;&#xC0C1;&#xB3C4; &#xC774;&#xB984;
+        &quot;size&quot;: [             // &#xD574;&#xC0C1;&#xB3C4;
+          640,                // &#xAC00;&#xB85C; &#xD53D;&#xC140; &#xC218;
+          480                 // &#xC138;&#xB85C; &#xD53D;&#xC140; &#xC218;
+        ]
+      }
+    ]
+  },
+  {
+    &quot;chid&quot;: 2,
+    &quot;title&quot;: &quot;192%2E168%2E0%2E106&quot;,
+    &quot;src&quot;: [
 
-      ... // 중략
+      ... // &#xC911;&#xB7B5;
 
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    ]
+  },
 
-  ... // 중략
+  ... // &#xC911;&#xB7B5;
 
-<span class="token punctuation">]</span>
+]
 </pre>
 <p>동영상을 재생하는 환경 (전송 선로 속도와 플레이어에서 지원하는 프로토콜)이 다양하기 때문에 호환성을 높이기 위해 위의 예처럼 채널 당 여러 개의 동영상 소스를 제공합니다.<br>
 현재 버전에서는 <code>RTMP</code>와 <code>HLS</code> 두 가지 형식으로 스트리밍하고 있으며, 카메라가 지원하는 경우 고해상도와 저해상도로 이중으로 스트리밍합니다.</p>
