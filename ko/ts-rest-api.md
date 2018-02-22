@@ -63,6 +63,7 @@
 ### 버전
 현재 최신 버전은 **ts-rest-api@0.1.0** 입니다.
 API가 탑재된 제품의 버전은 다음과 같습니다.
+
 제품 | 버전
 -----|--
 TS-CMS | v0.38.0부터 지원
@@ -99,6 +100,7 @@ API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 
 [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색) | X | O | O
 [이벤트 로그 검색](#이벤트-로그-검색)  | O | O | O
 [차량 번호 로그 검색](#차량-번호-로그-검색)  | X | 라이센스에 준함 `[설명]` | O
+
 `[설명]` *TS-NVR은 자체적인 차량 번호 인식 기능이 없어 **차량 번호 로그 검색** 기능을 지원하지 않습니다. 
 하지만 **차량 번호 인식 장치 연동** 부가 기능 라이센스를 사용하는 경우 별도의 차량 번호 인식 장치와 연동하여 차량 번호 로그를 저장하기 때문에 **차량 번호 로그 검색** 기능을 사용할 수 있습니다.*
 
@@ -133,12 +135,15 @@ http://tssolution.ipdisk.co.kr:88/watch?ch=1&auth=d2VidXNlcjoxMjM0YWJjZCs=
 <button onClick="window.open('./examples/ex1.html')">보기</button>
 
 예제에서 사용된 것과 같은 동영상 URL과 `<iframe>` 태그 코드는 다음과 같은 간단한 방법으로 얻을 수 있습니다.
+
 `[방법]` *제품의 웹 페이지에 접속하거나 예제와 같은 방법으로 접속하여 표시되는 **영상 위에서 오른쪽 마우스 버튼을 클릭**하면 (모바일인 경우 1초 정도 화면을 누르면) 팝업 메뉴가 나타납니다.
 여기서 필요한 메뉴 항목을 선택하면 해당 코드가 클립보드에 복사되며 아래 표와 같이 각각의 용도에 맞게 **붙여넣기** 하면 됩니다.*
+
 메뉴 항목 | 용도
 ---------|-----
 동영상 URL 복사 | 웹 브라우저 주소 창에 붙여넣기
 동영상 태그 코드 복사 | HTML 코드의 `<iframe>`부분에 붙어넣기
+
 `[참고]` *보안 상의 이유로 이렇게 복사한 코드에는 `auth=d2VidXNlcjoxMjM0YWJjZCs=` 부분이 빠집니다. 이 부분은 로그인 정보에 해당하는 코드이며 [세션 인증](#세션-인증)에서 설명합니다.
 이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.*
 
@@ -302,10 +307,10 @@ when=today        // 서버의 로컬 타임으로 오늘 00시 00분 00초
 ### URL 인코딩
 URL 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
 
->http://www.convertstring.com/ko/EncodeDecode/UrlEncode
-https://www.urlencoder.org/
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
-https://www.w3schools.com/jsref/jsref_encodeuricomponent.asp
+* http://www.convertstring.com/ko/EncodeDecode/UrlEncode
+* https://www.urlencoder.org/
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
+* https://www.w3schools.com/jsref/jsref_encodeuricomponent.asp
 
 
 매개 변수를 사용하여 영상 위에 표시되는 자막의 언어를 설정할 수 있습니다.
@@ -445,10 +450,10 @@ zu-ZA       # 줄루어, isiZulu, Zulu
 이렇게 한 줄로 길게 나열되어 있어 사람이 읽기에는 다소 불편할 수 있습니다.
 
 이 경우 아래와 같은 도구들을 사용하면 읽기 쉽게 변환해 줍니다.
->http://www.csvjson.com/json_beautifier
-https://codebeautify.org/jsonviewer
-https://jsonformatter.curiousconcept.com/
-https://jsonformatter.org/
+* http://www.csvjson.com/json_beautifier
+* https://codebeautify.org/jsonviewer
+* https://jsonformatter.curiousconcept.com/
+* https://jsonformatter.org/
 
 읽기 쉽게 변환된 JSON 데이터는 다음과 같은 형태입니다.
 ```json
@@ -532,10 +537,10 @@ https://jsonformatter.org/
 
 ### URL 디코딩
 URL 디코딩에 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
->http://www.convertstring.com/ko/EncodeDecode/UrlDecode
-https://www.urldecoder.org/
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
-https://www.w3schools.com/jsref/jsref_decodeuricomponent.asp
+* http://www.convertstring.com/ko/EncodeDecode/UrlDecode
+* https://www.urldecoder.org/
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
+* https://www.w3schools.com/jsref/jsref_decodeuricomponent.asp
 
 
 ### 서버 시간대
