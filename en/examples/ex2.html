@@ -5,51 +5,51 @@
 </head>
 
 <script>
-	function onConnect() {
-		var hostName = document.getElementById('host-name').value;
-		if(hostName == '') {
-			alert('Enter the host.');
-			return;
-		}
-		var userId = document.getElementById('user-id').value;
-		if(userId == '') {
-			alert('Enter your user ID.');
-			return;
-		}
-		var password = document.getElementById('password').value;
-		if(password == '') {
-			alert('Enter the password.');
-			return;
-		}
-		var encodedData = window.btoa(userId + ':' + password);	// base64 encoding
-		var src = (hostName.includes('http://', 0) ? '' : 'http://') +
-		hostName + '/watch?ch=1&auth=' + encodedData;
-		document.getElementById('result').innerText = src;
-		document.getElementById('player').src = src;
-	}
+  function onConnect() {
+    var hostName = document.getElementById('host-name').value;
+    if(hostName == '') {
+      alert('Enter the host.');
+      return;
+    }
+    var userId = document.getElementById('user-id').value;
+    if(userId == '') {
+      alert('Enter your user ID.');
+      return;
+    }
+    var password = document.getElementById('password').value;
+    if(password == '') {
+      alert('Enter the password.');
+      return;
+    }
+    var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    var src = (hostName.includes('http://', 0) ? '' : 'http://') +
+    hostName + '/watch?ch=1&auth=' + encodedData;
+    document.getElementById('result').innerText = src;
+    document.getElementById('player').src = src;
+  }
 </script>
 
 <body>
-	<h2>Example 2. Connecting to a real server</h2>
+  <h2>Example 2. Connecting to a real server</h2>
 
-	<table>
-		<tr>
+  <table>
+    <tr>
       <td>Host</td>
       <td>User ID</td> 
       <td>Password</td>
-		</tr>
-		<tr>
-			<td><input type="text" id="host-name"></td>
-			<td><input type="text" id="user-id"></td> 
-			<td><input type="text" id="password"></td>
-			<td><button type="button" onClick="onConnect()">Connect</button>	</td>
-		</tr>
-		<tr>
-			<td colspan="4" id="result"></td>
-		</tr>
-	</table>
+    </tr>
+    <tr>
+      <td><input type="text" id="host-name"></td>
+      <td><input type="text" id="user-id"></td> 
+      <td><input type="text" id="password"></td>
+      <td><button type="button" onClick="onConnect()">Connect</button>  </td>
+    </tr>
+    <tr>
+      <td colspan="4" id="result"></td>
+    </tr>
+  </table>
 
-	<iframe width="640" height="360" frameborder="0" allowfullscreen id="player" />
+  <iframe width="640" height="360" frameborder="0" allowfullscreen id="player" />
 </body>
 
 
