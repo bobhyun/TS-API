@@ -1,126 +1,42 @@
-# ts-rest-api 프로그래밍 안내서
-
-`[참고]` *이 문서에 포함된 예제 코드 일부는 ts-rest-api.md 파일로 보면 정상적으로 보이지 않을 수 있습니다. 대신 ts-rest-api.html 파일을 다운로드받아 사용하시기 바랍니다.*
-
-## 순서
-
-[개요](#개요)
-1. [버전](#버전)
-2. [피드백](#피드백)
-3. [미리 알아야 할 것](#미리-알아야-할-것)
-4. [제품별 기능 지원 표](#제품별-기능-지원-표)
-
-[시작하기](#시작하기)
-1. [동영상 보기](#동영상-보기)
-2. [웹 페이지에 동영상 삽입하기](#웹-페이지에-동영상-삽입하기)
-
-[실시간 영상 표시](#실시간-영상-표시)
-1. [실제 서버에 접속하기](#실제-서버에-접속하기)
-2. [사용자 인증](#사용자-인증)
-3. [base64 인코딩](#base64-인코딩)
-4. [채널 변경](#채널-변경)
-
-[녹화 영상 표시](#녹화-영상-표시)
-1. [날짜, 시각 표기법](#날짜-시각-표기법)
-2. [URL 인코딩](#url-인코딩)
-3. [지원하는 언어 목록](#지원하는-언어-목록)
-
-[JSON 데이터](#json-데이터)
-
-[세션 인증](#세션-인증)
-1. [로그인](#로그인)
-2. [로그아웃](#로그아웃)
+ts-rest-api 프로그래밍 안내서
+======
 
 
-[서버 정보 요청](#서버-정보-요청)
-1. [API 버전](#api-버전)
-2. [사이트 이름](#사이트-이름)
-3. [URL 디코딩](#url-디코딩)
-4. [서버 시간대](#서버-시간대)
-5. [제품 정보](#제품-정보)
-6. [라이센스 정보](#라이센스-정보)
-7. [사용자 정보](#사용자-정보)
-8. [모두 한 번에 요청](#모두-한-번에-요청)
-
-[각종 목록 요청](#각종-목록-요청)
-1. [채널 목록](#채널-목록)
-2. [차량 번호 인식 장치 목록](#차량-번호-인식-장치-목록)
-3. [이벤트 로그 종류 목록](#이벤트-로그-종류-목록)
-
-[저장 데이터 검색](#저장-데이터-검색)
-1. [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색)
-2. [이벤트 로그 검색](#이벤트-로그-검색)
-3. [차량 번호 로그 검색](#차량-번호-로그-검색)
-
-[동영상 소스 검색](#동영상-소스-검색)
-1. [실시간 영상 소스](#실시간-영상-소스)
-2. [녹화 영상 소스](#녹화-영상-소스)
-
-## 개요
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **ts-rest-api**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
 이 문서를 참고하여 실시간 영상, 녹화 영상 보기, 영상 검색 기능을 간단하게 여러분의 응용 소프트웨어에 포함시킬 수 있습니다.
 
-*이 문서 내에서는 ts-rest-api를 줄여서 **API**로 부르고, 각 제품은 네트워크 프로그램 관점에서 통칭하여 **서버**로 부르겠습니다.*
+API를 사용하기 위해 간단한 `HTML`과 `자바스크립트`를 사용해 본 경험이 있으면 도움이 됩니다.
+그리고 제품 별로 지원하는 기능이 다를 수 있으므로 아래 내용을 참고하시기 바랍니다.
+[제품별 API 지원 버전](#제품별-API-지원-버전)
+[제품별 기능 지원 표](#제품별-기능-지원-표)
 
-### 버전
-현재 최신 버전은 **ts-rest-api@0.1.0** 입니다.
-API가 탑재된 제품의 버전은 다음과 같습니다.
-
-제품 | 버전
------|--
-TS-CMS | v0.38.0부터 지원
-TS-NVR | v0.35.0부터 지원
-TS-LPR | v0.2.0A부터 지원
 
 *API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변경될 수 있습니다.*
 
-
-### 피드백
-보내주시는 피드백은 언제나 환영합니다.
-개발 관련 문의는 물론이고 개선했으면 하는 부분이 있으시면 아래로 보내주시면 고맙겠습니다.
-*bobhyun@gmail.com*
-
-
-
-### 미리 알아야 할 것
-1. 프로그래밍 지식
->* API를 사용하기 위해 간단한 `HTML`과 `자바스크립트`를 사용해 본 경험이 있으면 도움이 됩니다.
-2. 대상 제품
->* API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 일부 기능이 지원되지 않을 수 있습니다. 아래 목록 중에서 사용하는 제품이 어디에 해당하는지 확인하시기 바랍니다.
-
-### 제품별 기능 지원 표
-
-구분 | TS-CMS | TS-NVR | TS-LPR 
-----------------|--------|--------|-------
-[실시간 영상 표시](#실시간-영상-표시) | O | O | O
-[실시간 영상 소스](#실시간-영상-소스) 검색 | O | O | O
-[녹화 영상 표시](#녹화-영상-표시)  | X | O | O
-[녹화 영상 소스](#녹화-영상-소스) 검색 | X | O | O
-[세션 인증](#세션-인증) | O | O | O
-[서버 정보 요청](#서버-정보-요청)  | O | O | O
-[각종 목록 요청](#각종-목록-요청)  | O | O | O
-[녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색) | X | O | O
-[이벤트 로그 검색](#이벤트-로그-검색)  | O | O | O
-[차량 번호 로그 검색](#차량-번호-로그-검색)  | X | 라이센스에 준함 `[설명]` | O
-
-`[설명]` *TS-NVR은 자체적인 차량 번호 인식 기능이 없어 **차량 번호 로그 검색** 기능을 지원하지 않습니다. 
-하지만 **차량 번호 인식 장치 연동** 부가 기능 라이센스를 사용하는 경우 별도의 차량 번호 인식 장치와 연동하여 차량 번호 로그를 저장하기 때문에 **차량 번호 로그 검색** 기능을 사용할 수 있습니다.*
+____
 
 ## 시작하기
-### 동영상 보기
+`[참고]` 이 문서를 온라인 상의 ts-rest-api.md 파일로 보면 포함된 예제들이 실행되지 않을 수 있습니다. 포함된 예제들을 실행해 보시려면 git으로 프로젝트를 내려 받은 후, ts-rest-api.html 파일을 웹 브라우저에서 열어 사용하시기 바랍니다.
+
+이 문서 내에서는 ts-rest-api를 줄여서 **API**로 부르고, 각 제품들은 간단히 **서버**로 부르겠습니다.
+
+____
+
+## 영상 표시
+### 실시간 영상 표시
 웹 브라우저 주소 창에 다음과 같이 입력해 보십시오.
 ```ruby
-http://tssolution.ipdisk.co.kr:88/watch?ch=1&auth=d2VidXNlcjoxMjM0YWJjZCs=
+http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-<button onClick="window.open('http://tssolution.ipdisk.co.kr:88/watch?ch=1&auth=d2VidXNlcjoxMjM0YWJjZCs=')">보기</button>
+<button onClick="window.open('http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=')">보기</button>
 
 
 동영상이 표시되나요?
 
 `[참고]` *이 예제 코드에 사용된 시연용 영상은 현장 상황에 따라 접속되지 않을 수도 있습니다.*
 
-### 웹 페이지에 동영상 삽입하기
-이 번에는 이 동영상을 웹 페이지에 삽입해 봅시다.
+### 웹 페이지에 영상 삽입하기
+이 번에는 이 영상을 웹 페이지에 삽입해 봅시다.
 ```html
 <!DOCTYPE>
 <head>
@@ -130,33 +46,26 @@ http://tssolution.ipdisk.co.kr:88/watch?ch=1&auth=d2VidXNlcjoxMjM0YWJjZCs=
 
 <body>
 <h2>예제1. 동영상 삽입하기</h2>
-<iframe src="http://tssolution.ipdisk.co.kr:88/watch?ch=1&auth=d2VidXNlcjoxMjM0YWJjZCs=" 
+<iframe src="http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=" 
   width="640" height="360" frameborder="0" allowfullscreen />
 </body>
 ```
 <button onClick="window.open('./examples/ex1.html')">보기</button>
 
-예제에서 사용된 것과 같은 동영상 URL과 `<iframe>` 태그 코드는 다음과 같은 간단한 방법으로 얻을 수 있습니다.
+예제에서 사용된 동영상 URL과 `<iframe>` 태그 코드는 표시되는 **영상 위에서 오른쪽 마우스 버튼을 클릭**하면 (모바일인 경우 1초 정도 화면을 누르면) 팝업 메뉴가 나타납니다. 여기서 필요한 메뉴 항목을 선택하면 해당 코드가 클립보드에 복사되며 아래 표와 같이 각각의 용도에 맞게 **붙여넣기** 하면 됩니다.
 
-`[방법]` *제품의 웹 페이지에 접속하거나 예제와 같은 방법으로 접속하여 표시되는 **영상 위에서 오른쪽 마우스 버튼을 클릭**하면 (모바일인 경우 1초 정도 화면을 누르면) 팝업 메뉴가 나타납니다. 여기서 필요한 메뉴 항목을 선택하면 해당 코드가 클립보드에 복사되며 아래 표와 같이 각각의 용도에 맞게 **붙여넣기** 하면 됩니다.*
+| 메뉴 항목        | 용도                          |
+|--------------|-----------------------------|
+| 동영상 URL 복사   | 웹 브라우저 주소 창에 붙여넣기           |
+| 동영상 태그 코드 복사 | HTML 코드의 `<iframe>`부분에 붙여넣기 |
 
-메뉴 항목 | 용도
----------|-----
-동영상 URL 복사 | 웹 브라우저 주소 창에 붙여넣기
-동영상 태그 코드 복사 | HTML 코드의 `<iframe>`부분에 붙여넣기
-
-`[참고]` *보안 상의 이유로 이렇게 복사한 코드에는 `auth=d2VidXNlcjoxMjM0YWJjZCs=` 부분이 빠집니다. 이 부분은 로그인 정보에 해당하는 코드이며 [세션 인증](#세션-인증)에서 설명합니다.
-이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.*
-
-
-## 실시간 영상 표시
-[동영상 보기](#동영상-보기) 예제에서 간단한 실시간 영상 표시 기능을 사용해 보았습니다.
-가장 중요한 부분은 동영상 주소에 해당하는 웹 주소 코드이며, API가 지원하는 기능 중에서 **필요한 기능을 웹 주소 코드로 표현**할 수 있도록 안내하는 것이 이 문서의 목적입니다.
-
-여기서부터는 완전한 HTML 형식 대신 웹 주소 코드만으로 구성된 예제를 사용하겠습니다.
+`[참고]` 보안 상의 이유로 이렇게 복사한 코드에는 `auth=ZGVtbzohMTIzNHF3ZXI=` 부분이 제외됩니다. 이 부분은 로그인에 필요한 코드이며 [세션 인증](#세션-인증)에서 자세히 설명합니다.
+이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.
 
 ### 실제 서버에 접속하기
+이제 데모용 서버가 아닌 실제 서버의 영상을 표시하는 방법을 알아 보겠습니다.
 실제 서버에 접속하려면 기본적으로 아래 두 가지 정보를 알아야 합니다.
+
 1. 서버의 **호스트명** (**IP 주소** 또는 **도메인명**, 80 포트가 아닌 경우 **포트 번호**)
 >* 포트 번호는 사용하시는 제품 설정 창에서 `웹 서비스` 탭의 `HTTP 포트` 항목에서 확인할 수 있습니다.
 2. **원격 접속** 권한이 있는 **사용자 ID**와 **비밀번호**
@@ -164,57 +73,30 @@ http://tssolution.ipdisk.co.kr:88/watch?ch=1&auth=d2VidXNlcjoxMjM0YWJjZCs=
 ### 사용자 인증
 예를 들어, 다음과 같은 접속정보를 사용하는 것으로 가정하면
 
-항목      | 값
-----------|------
-IP 주소   | `192.168.0.100`
-웹 포트   | `80`
-사용자 아이디 | `webuser`
-비밀번호  | `1234abcd+`
+| 항목      | 값                         |
+|---------|---------------------------|
+| IP 주소   | `tssolution.ipdisk.co.kr` |
+| 웹 포트    | `85`                      |
+| 사용자 아이디 | `demo`                    |
+| 비밀번호    | `!1234qwer`               |
 
 위의 예제에서 주소 부분을 다음과 같이 변경하면 됩니다.
 ```html
-<iframe src="http://192.168.0.100/watch?ch=1&auth=d2VidXNlcjoxMjM0YWJjZCs="
+<iframe src="http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI="
   width="640" height="360" frameborder="0" allowfullscreen></iframe>
 ```
-여기서 `auth=` 다음에 있는 `d2VidXNlcjoxMjM0YWJjZCs=` 부분은 **사용자 아이디와 비밀번호를 base64 인코딩**한 부분입니다.
-형식은 `userid:password`와 같이 콜론(`:`) 구분자를 사용하여 사용자 아이디와 비밀번호를 하나의 텍스트로 만든 다음 base64 인코딩합니다.
-위의 예에서는 `webuser:1234abcd+`을 base64 인코딩해서 `d2VidXNlcjoxMjM0YWJjZCs=`가 됩니다.
+여기서 `auth=` 다음에 있는 `ZGVtbzohMTIzNHF3ZXI=` 부분은 사용자 아이디와 비밀번호를 [base64 인코딩](#base64-인코딩)한 부분입니다.
+형식은 `userid:password`와 같이 콜론(`:`) 구분자를 사용하여 사용자 아이디와 비밀번호를 하나의 텍스트로 만든 다음 [base64 인코딩](#base64-인코딩)합니다.
+위의 예에서는 `demo:!1234qwer`을 [base64 인코딩](#base64-인코딩)해서 `ZGVtbzohMTIzNHF3ZXI=`가 됩니다.
 
-### base64 인코딩
-base64 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
-* https://www.base64encode.org/
-* https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding
-* https://www.w3schools.com/jsref/met_win_btoa.asp
 
-이번 예제에서는 자바스크립트로 로그인 정보를 base64 인코딩해서 접속하는 방식으로 개선해 보도록 하겠습니다.
+이번 예제에서는 자바스크립트로 로그인 정보를 [base64 인코딩](#base64-인코딩)해서 접속하는 방식으로 개선해 보도록 하겠습니다.
 ```html
 <!DOCTYPE>
 <head>
   <meta charset="utf-8">
   <title>ex2</title>
 </head>
-
-<body>
-  <h2>예제2. 실제 서버에 접속하기</h2>
-  <table>
-    <tr>
-      <td>호스트</td>
-      <td>사용자 아이디</td> 
-      <td>비밀번호</td>
-    </tr>
-    <tr>
-      <td><input type="text" id="host-name"></td>
-      <td><input type="text" id="user-id"></td> 
-      <td><input type="text" id="password"></td>
-      <td><button type="button" onClick="onConnect()">접속</button>	</td>
-    </tr>
-    <tr>
-      <td colspan="4" id="result"></td>
-    </tr>
-  </table>
-
-  <iframe width="640" height="360" frameborder="0" allowfullscreen id="player" />
-</body>
 
 <script>
   function onConnect() {
@@ -239,6 +121,28 @@ base64 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하
     document.getElementById('player').src = src;
   }
 </script>
+
+<body>
+  <h2>예제2. 실제 서버에 접속하기</h2>
+  <table>
+    <tr>
+      <td>호스트</td>
+      <td>사용자 아이디</td> 
+      <td>비밀번호</td>
+    </tr>
+    <tr>
+      <td><input type="text" id="host-name"></td>
+      <td><input type="text" id="user-id"></td> 
+      <td><input type="text" id="password"></td>
+      <td><button type="button" onClick="onConnect()">접속</button></td>
+    </tr>
+    <tr>
+      <td colspan="4" id="result"></td>
+    </tr>
+  </table>
+
+  <iframe width="640" height="360" frameborder="0" allowfullscreen id="player" />
+</body>
 ```
 <button onClick="window.open('./examples/ex2.html')">보기</button>
 
@@ -247,74 +151,29 @@ base64 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하
 채널 번호는 1부터 시작하는 정수입니다.
 예를 들어, 채널 3번을 보고 싶다면 다음과 같이 수정하면 됩니다.
 ```ruby
-http://tssolution.ipdisk.co.kr:88/watch?ch=3&auth=d2VidXNlcjoxMjM0YWJjZCs=
+http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-<button onClick="window.open('http://tssolution.ipdisk.co.kr:88/watch?ch=3&auth=d2VidXNlcjoxMjM0YWJjZCs=')">보기</button>
+<button onClick="window.open('http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=')">보기</button>
 
-## 녹화 영상 표시
+### 녹화 영상 표시
 녹화된 영상을 표시하기 위해서는 원하는 동영상의 날짜, 시각 정보(타임스탬프)가 필요합니다.
 예를 들어, 위의 예제와 동일한 접속 정보로 `채널 1번`의 `2018년 2월 1일 오후 2시 30분 15초`에 녹화된 영상을 표시하기 위해서는 다음과 같이 `when=2018-02-01T14%3a30%3a15%2b09%3a00` 부분을 추가해야 합니다.
 ```ruby
-http://tssolution.ipdisk.co.kr:88/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGV2MTpkZXZlbG9wZXIhMTIzNA==
+http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
 
-`2018-02-01T14%3a30%3a15%2b09%3a00` 부분은 날짜, 시각 부분을 URL 인코딩한 것입니다.
-
-### 날짜, 시각 표기법
-날짜, 시각은 **ISO 8601** 표기법을 따릅니다.
-```
-YYYY-MM-DDThh:mm:ss.sss±Hh:Mm (로컬 타임 표기)
-또는
-YYYY-MM-DDThh:mm:ss.sssZ (UTC 표기)
-
-여기서,
-  YYYY: 년
-  MM: 월
-  DD: 일
-  hh: 시 (24시 표기)
-  mm: 분
-  ss: 초
-  sss: 1/n 초
-  Hh: UTC 시간 오프셋의 시
-  Mm: UTC 시간 오프셋의 분
-```
-
-위의 예제에 사용했던 `2018년 2월 1일 오후 2시 30분 15초`를 예를 들면,
->1. 날짜 부분의 년, 월, 일은 각각 숫자 4문자, 2문자, 2문자로 표현하며 구분자로 하이픈 문자(`-`)를 사용합니다. 그리고 자릿수가 남는 경우 앞에 `0`으로 채웁니다.
-`예) 2018-02-01`
->2. 시각 부분의 시, 분, 초는 각각 숫자 2문자, 2문자, 2문자로 표현하며 구분자로 콜론 문자(`:`)를 사용합니다. 24시 표기를 사용하며 자릿수가 남는 경우 마찬가지로 앞에 `0`으로 채웁니다.
-`예) 14:30:15`
-동영상은 일반적으로 1초 동안 여러 장면의 이미지로 구성되기 떄문에 초 이하의 단위를 사용해서 정확한 장면을 지정해야 하는 경우도 많습니다. 이 경우 초 단위 미만의 값에 대해 소수점 표기를 사용할 수 있습니다.
-`예) 14:30:15.253 => 14시 30분 15초 253 밀리초(1/1000초)`
->3. 날짜와 시간은 `T` 문자로 구분하여 합칩니다.
-`예) 2018-02-01T14:30:15.253`
->4. 표준 시간대(타임존)를 사용하여 어느 지역의 시각인지 추가로 표현합니다.
-대한민국 서울의 경우 영국 표준 시각(UTC)보다 9시간 빠르므로 다음과 같이 표기합니다.
-`예) +09:00 (또는 간단히 +0900 또는 +09)`
-만약 UTC 시각으로 표기할 경우는 `+00:00` 표기 대신 `Z` 문자를 사용하여 끝마치면 됩니다.
->5. 위의 조각들을 모두 합치면 다음과 같습니다.
-`예) 2018-02-01T14:30:15+09:00  (로컬 타임)`
->6. 이 문자열을 URL 인코딩하면 아래와 같습니다.
-`예) 2018-02-01T14%3a30%3a15%2b09%3a00`
+`2018-02-01T14%3a30%3a15%2b09%3a00` 부분은 [ISO 8601](#ISO-8601-형식으로-날짜-시각-표현하기) 형식의 날짜, 시각을 [URL 인코딩](#url-인코딩)한 것입니다.
 
 실시간 영상을 요청하기 위해서 `when=now`로 요청해도 되지만, `when=`이 없으면 실시간을 의미하므로 생략해도 됩니다.
-
 그리고 사용상 편의를 위해 다음과 같은 팁들을 제공합니다.
 ```
 when=yesterday    // 서버의 로컬 타임으로 어제 00시 00분 00초
 when=today        // 서버의 로컬 타임으로 오늘 00시 00분 00초
 ```
 
-### URL 인코딩
-URL 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
-
-* http://www.convertstring.com/ko/EncodeDecode/UrlEncode
-* https://www.urlencoder.org/
-* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
-* https://www.w3schools.com/jsref/jsref_encodeuricomponent.asp
-
 
 매개변수를 사용하여 영상 위에 표시되는 자막의 언어를 설정할 수 있습니다.
+[지원하는 언어 목록](#지원하는-언어-목록)은 부록을 참고하십시오.
 여기서부터는 `http://host`부분과 `auth=` 부분은 생략하고 표현합니다.
 ```ruby
 # 매개변수
@@ -326,157 +185,16 @@ showPlayTime    # 재생 날짜, 시각 표시 (true, false)
 # 한글로 날짜, 시각 표시
 /watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&lang=ko-KR
 
-# 채널 이름 및 재생 날짜, 시각 표시한함
+# 채널 이름 및 재생 날짜, 시각 표시 안함
 # showTitle과 showPlayTime은 명시하지 않은 경우 true로 간주함
 /watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&showTitle=false&showPlayTime=false
 ```
 
-### 지원하는 언어 목록
-서버는 다음과 같이 총 104개 언어를 지원합니다.
-```ruby
-af-ZA       # 아프리카어, Afrikaans
-sq-AL       # 알바니아어, Shqip, Albanian
-am-ET       # 암하라어, አማርኛ, Amharic
-ar-AE       # 아랍어, العربية, Arabic
-hy-AM       # 아르메니아어, Հայերեն, Armenian
-az-Latn     # 아제르바이잔어, Azərbaycan, Azerbaijani
-eu-ES       # 바스크어, euskara, Basque
-be-BY       # 벨라루스어, беларускі, Belarusian
-bn-BD       # 벵골어, বাংলা, Bengali
-bs-Latn     # 보스니아어, Bosanski, Bosnian
-bg-BG       # 불가리아어, български, Bulgarian
-ca-ES       # 카탈로니아어, Català, Catalan
-ceb         # 세부아노, Cebuano
-ny          # 체와어, Chichewa
-zh-CN       # 중국어 (간체), 简体中国, Chinese (Simplified)
-zh-TW       # 중국어 (번체), 中國傳統, Chinese (Traditional)
-co-FR       # 코르시카어, Corsu, Corsican
-hr-HR       # 크로아티아어, hrvatski, Croatian
-cs-CZ       # 체코어, čeština, Czech
-da-DK       # 덴마크어, dansk, Danish
-nl-NL       # 네덜란드어, Nederlands, Dutch
-en-US       # 영어, English
-eo          # 에스페란토어, Esperanto
-et-EE       # 에스토니아어, Eesti keel, Estonian
-fil-PH      # 필리핀어, Filipino
-fi-FI       # 핀란드어, Suomalainen, Finnish
-fr-FR       # 프랑스어, français, French
-fy-NL       # 프리지아어, Frysk, Frisian
-gl-ES       # 갈리시아어, Galego, Galician
-ka-GE       # 조지아어, ქართული, Georgian
-de-DE       # 독일어, Deutsch, German
-el-GR       # 그리스어, Ελληνικά, Greek
-gu-IN       # 구자라트어, ગુજરાતી, Gujarati
-ht          # 아이티 크리올어, Kreyòl ayisyen, Haitian Creole
-ha          # 하우사어, Hausa
-haw-U       # 하와이어, ʻŌlelo Hawaiʻi, Hawaiian,
-he-IL       # 히브리어, עברית, Hebrew
-hi-IN       # 힌디어, हिन्दी, Hindi
-hmn         # 몽어, Hmong
-hu-HU       # 헝가리어, Magyar, Hungarian
-is-IS       # 아이슬란드어, Íslensku, Icelandic
-ig-NG       # 이그보어, Igbo
-id-ID       # 인도네시아어, bahasa Indonesia, Indonesian
-ga-IE       # 아일랜드어, Gaeilge, Irish
-it-IT       # 이탈리아어, Italiano, Italian
-ja-JP       # 일본어, 日本語, Japanese
-jv-Latn     # 자바어, Jawa, Javanese
-kn-IN       # 칸나다어, ಕನ್ನಡ, Kannada
-kk-KZ       # 카자흐어, Қазақ тілінде, Kazakh
-km-KH       # 크메르어, ភាសាខ្មែរ, Khmer
-ko-KR       # 한국어, Korean
-ku-Arab-IR  # 쿠르드어 (쿠르만지어), Kurdî, Kurdish (Kurmanji)
-ru-KG       # 키르기스어, Кыргызча, Kyrgyz
-lo-LA       # 라오어, ລາວ, Lao
-sr-Latn     # 라틴어, Latine, Latin
-lv-LV       # 라트비아어, Latviešu, Latvian
-lt-LT       # 리투아니아어, Lietuviškai, Lithuanian
-lb-LU       # 룩셈부르크어, Lëtzebuergesch, Luxembourgish
-mk-MK       # 마케도니아어, Македонски, Macedonian
-mg-MG       # 말라가시어, Malagasy
-ms-MY       # 말레이어, Melayu, Malay
-ml-IN       # 말라얄람어, മലയാളം, Malayalam
-mt-MT       # 몰타어, Malti, Maltese
-mi-NZ       # 마오리어, Maori
-mr-IN       # 마라티어, मराठी, Marathi
-mn-MN       # 몽골어, Монгол хэл дээр, Mongolian
-my-MM       # 미얀마어 (버마어), မြန်မာ", Myanmar (Burmese)
-ne-NP       # 네팔어, नेपाली, Nepali
-nb-NO       # 노르웨이어, Norwegian
-ps-AF       # 파슈토어, پښتو, Pashto
-fa-IR       # 페르시아어, فارسی, Persian
-pl-PL       # 폴란드어, Polskie, Polish
-pt-PT       # 포르투갈어, Português, Portuguese
-pa-IN       # 펀자브어, ਪੰਜਾਬੀ, Punjabi
-ro-RO       # 루마니아어, Română, Romanian
-ru-RU       # 러시아어, Русский, Russian
-sm          # 사모아어, Samoan
-gd-GB       # 스코틀랜드 게일어, Gàidhlig, Scots Gaelic
-sr-Cyrl-RS  # 세르비아어, Српски, Serbian
-nso-ZA      # 세소토어, Sesotho
-sn-Latn-ZW  # 쇼나어, Shona
-sd-Arab-PK  # 신디어, سنڌي, Sindhi
-si-LK       # 신할라어, සිංහල, Sinhala
-sk-SK       # 슬로바키아어, slovenský, Slovak
-sl-SI       # 슬로베니아어, Slovenščina, Slovenian
-so-SO       # 소말리아어, Soomaali, Somali
-es-ES       # 스페인어, Español, Spanish
-su          # 순다어, Basa Sunda, Sundanese
-swc-CD      # 스와힐리어, Kiswahili, Swahili
-sv-SE       # 스웨덴어, Svenska, Swedish
-tg-Cyrl-TJ  # 타지크어, Тоҷикистон, Tajik
-ta-IN       # 타밀어, தமிழ், Tamil
-te-IN       # 텔루구어, తెలుగు, Telugu
-th-TH       # 태국어, ไทย, Thai
-tr-TR       # 터키어, Türkçe, Turkish
-uk-UA       # 우크라이나어, Українська, Ukrainian
-ur-PK       # 우르두어, اردو, Urdu
-uz-Latn-UZ  # 우즈베크어, O'zbek, Uzbek
-vi-VN       # 베트남어, Tiếng Việt, Vietnamese
-cy-GB       # 웨일즈어, Cymraeg, Welsh
-xh-ZA       # 코사어, isiXhosa, Xhosa
-yi          # 이디시어, ייִדיש, Yiddish
-yo-NG       # 요루바어, Yorùbá, Yoruba
-zu-ZA       # 줄루어, isiZulu, Zulu
-```
 
-### JSON 데이터
 지금까지는 `/watch` 호출을 통해 영상을 표시하는 방법들을 알아 보았습니다. 여기서부터는 `/api` 호출을 통해 각종 정보를 질의하는 방법을 알아보겠습니다.
-모든 응답 데이터는 JSON 형식이며 텍스트는 `utf8`로 인코딩되어 있습니다.
+모든 응답 데이터는 [JSON](#JSON-데이터-형식) 형식이며 텍스트는 `utf8`로 인코딩되어 있습니다. 실제 전송되는 데이터는 줄바꿈과 공백 문자없이 최적화된 형식을 사용하지만, 이 문서에서는 데이터의 항목들을 쉽게 읽을 수 있도록 변환된 형식을 사용합니다.
 
-서버는 데이터의 전송 속도 향상을 위해 JSON 데이터 내에 줄 바꿈이나 공백 문자를 사용하지 않습니다. 예를 들면 다음과 같은 형태의 텍스트를 사용합니다.
-```json
-{"apiVersion":"ts-rest-api@0.1.0","siteName":"%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84","timezone":{"name":"Asia/Seoul","bias":"+09:00"},"product":{"name":"TS-LPR","version":"v0.2.0A (64-bit)"},"license":{"type":"genuine","maxChannels":16}}
-```
-이렇게 한 줄로 길게 나열되어 있어 사람이 읽기에는 다소 불편할 수 있습니다.
-
-이 경우 아래와 같은 도구들을 사용하면 읽기 쉽게 변환해 줍니다.
-* http://www.csvjson.com/json_beautifier
-* https://codebeautify.org/jsonviewer
-* https://jsonformatter.curiousconcept.com/
-* https://jsonformatter.org/
-
-읽기 쉽게 변환된 JSON 데이터는 다음과 같은 형태입니다.
-```json
-{
-  "apiVersion": "ts-rest-api@0.1.0",
-  "siteName": "%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84",
-  "timezone": {
-    "name": "Asia/Seoul",
-    "bias": "+09:00"
-  },
-  "product": {
-    "name": "TS-LPR",
-    "version": "v0.2.0A (64-bit)"
-  },
-  "license": {
-    "type": "genuine",
-    "maxChannels": 64
-  }
-}
-```
-물론 내용면으로는 둘 다 완전히 같은 데이터입니다.
-이 문서에서는 데이터의 항목들을 설명하기 쉽도록 변환된 형식을 사용합니다.
+____
 
 ## 세션 인증
 서버는 클라이언트 프로그램(웹 브라우저)이 로그인 한 이후부터 로그아웃할 때까지 쿠키를 사용하여 HTTP 세션을 유지합니다. 세션이 유지되는 동안은 인증 정보를 서버가 유지하고 있으므로 클라이언트 프로그램(웹 브라우저)에서는 서버에 어떤 요청을 할 때마다 매번 로그인할 필요가 없습니다.
@@ -485,15 +203,21 @@ zu-ZA       # 줄루어, isiZulu, Zulu
 
 ### 로그인
 여기서는 API를 사용하여 세션 인증하는 방법을 알아봅니다.
+서버에서는 아래 코드와 같이 전통적인 URL 형식으로 로그인하는 Basic authentication 방식도 지원하고 있지만, 대부분의 최신 웹 브라우저에서 로그인 정보가 그대로 노출되는 보안상의 이유로 더 이상 지원하지 않고 있습니다.
+````ruby
+http://userid:password@host/path/to/
+````
+
+이런 이유로 다음과 같이 추가적인 로그인 방식을 제공합니다.
 [사용자 인증](#사용자-인증)에서 사용했던 방법으로 사용자 아이디와 비빌번호를 암호화한 다음, 다음과 같이 `login=` 매개변수에 붙여서 사용합니다.
 ```ruby
-/api/auth?login=d2VidXNlcjoxMjM0YWJjZCs=    # http://host 부분 생략함
+/api/auth?login=ZGVtbzohMTIzNHF3ZXI=    # http://host 부분 생략함
 ```
 로그인이 성공한 경우 서버는 HTTP 응답 코드 200을 반환합니다.
 
 아래와 같이 `auth=`를 사용해도 동일하게 로그인할 수 있습니다.
 ```ruby
-/api/auth?auth=d2VidXNlcjoxMjM0YWJjZCs=
+/api/auth?auth=ZGVtbzohMTIzNHF3ZXI=
 ```
 `auth=` 매개변수는 앞으로 소개할 다양한 API에 사용될 수 있으며, 별도의 로그인 과정을 거치지 않고 서버에 어떤 요청을 하면서 사용자 인증 정보를 한꺼번에 전달하는 용도로 사용할 수 있습니다.
 
@@ -505,8 +229,9 @@ zu-ZA       # 줄루어, isiZulu, Zulu
 ```
 세션이 종료된 상태에서는 서버는 인증이 필요한 요청에 대해 HTTP 응답 코드 401을 반환하여 인증이 필요함을 알립니다.
 
-## 서버 정보 요청
+____
 
+## 서버 정보 요청
 
 ### API 버전
 이 요청은 [세션 인증](#세션-인증) 상태가 아니어도 정상적으로 응답합니다.
@@ -534,14 +259,7 @@ zu-ZA       # 줄루어, isiZulu, Zulu
 }
 ```
 `siteName`에 해당하는 텍스트`"%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84"`는 서버의 웹 서비스 설정 창에 입력한 내용이며 어떤 문자를 사용하더라도 JSON 형식으로 표현하기 위해 URL 인코딩되어 있습니다.
-위의 문자열을 URL 디코딩하면 `"우리집 서버"`로 변환됩니다.
-
-### URL 디코딩
-URL 디코딩에 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
-* http://www.convertstring.com/ko/EncodeDecode/UrlDecode
-* https://www.urldecoder.org/
-* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
-* https://www.w3schools.com/jsref/jsref_decodeuricomponent.asp
+위의 문자열을 [URL 디코딩](#URL-디코딩)하면 `"우리집 서버"`로 변환됩니다.
 
 
 ### 서버 시간대
@@ -556,12 +274,12 @@ URL 디코딩에 관련한 더 자세한 정보는 아래 링크들을 참고하
 ```text
 {
   "timezone": {
-    "name": "Asia/Seoul",   // IANA 타임존 명
-    "bias": "+09:00"        // 영국 표준 시각(UTC 또는 GMT) 오프셋
+    "name": "Asia/Seoul",   // IANA 타임 존 이름
+    "bias": "+09:00"        // UTC 오프셋
   }
 }
 ```
-`Asia/Seoul` 부분은 `IANA` 형식의 타임 존 이름이며, 해당 서버의 운영체제에 따라 IANA 타임 존 이름 대신 `UTC+09:00`로 표기될 수도 있습니다.
+`Asia/Seoul` 부분은 `IANA` 형식의 타임 존 이름이며, 해당 서버의 운영체제에 따라 [IANA 타임 존 이름](#https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 대신 `UTC+09:00`와 같이 UTC 오프셋으로 표기될 수도 있습니다.
 
 ### 제품 정보
 서버의 제품명과 버전 정보를 얻기 위해 사용합니다.
@@ -655,7 +373,7 @@ URL 디코딩에 관련한 더 자세한 정보는 아래 링크들을 참고하
 }
 ```
 
-#### 모두 한 번에 요청
+### 모두 한 번에 요청
 각각 정보를 개별적으로 요청할 수도 있지만, 편의상 모든 정보를 한 번에 요청하는 방법도 제공합니다.
 ```ruby
 /api/info?all
@@ -717,7 +435,7 @@ URL 디코딩에 관련한 더 자세한 정보는 아래 링크들을 참고하
   }     // whoAmI 부분 없음
 }
 ```
-
+____
 
 ## 각종 목록 요청
 다음 요청들은 `auth=`를 사용하여 로그인 정보를 전달하거나 이미 로그인된 세션의 경우는 HTTP 응답 코드 200과 함께 JSON 데이터를 반환하며, 로그인 인증이 되지 않은 경우는 HTTP 응답 코드 401이 반환합니다.
@@ -863,6 +581,7 @@ lang      # 언어
 ]
 ```
 
+____
 
 ## 저장 데이터 검색
 
@@ -932,6 +651,7 @@ timeEnd     # 특정 날짜, 시각 이전 녹화된 날짜 목록
 }
 ```
 
+____
 
 ## 이벤트 로그 검색
 서버에 기록된 이벤트 로그를 검색하기 위해서는 다음과 같이 요청합니다.
@@ -1036,6 +756,7 @@ type        # 이벤트 로그 유형
 
 ```
 
+____
 
 ## 차량 번호 로그 검색
 차량 번호 인식 기능을 사용하는 경우 인식된 차량 번호는 해당 동영상과 함께 저장됩니다. 차량 번호 로그를 조회하기 위해서는 다음과 같이 요청합니다.
@@ -1198,10 +919,12 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00
 http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00&auth=ZGV2MTpkZXZlbG9wZXIhMTIzNA==
 ```
 
-## 동영상 소스 검색
-[동영상 삽입하기](#동영상-삽입하기)에서 사용했던 것처럼 API에서 자체적으로 지원하는 동영상 표시 기능 대신 다른 동영상 재생기나 프로그램에서 동영상 주소 사용할 경우에 이 방법을 사용할 수 있습니다.
+____
 
-이 방법을 사용하면 동영상을 표시하는 것이 아니라 동영상 주소만 요청할 수 있습니다.
+## 동영상 소스 검색
+[웹 페이지에 영상 삽입하기](#웹-페이지에-영상-삽입하기)에서 사용했던 API를 사용한 동영상 표시 기능 대신 응용 프로그램에서 직접 동영상 주소 사용하는 경우 이 방법을 사용할 수 있습니다.
+
+이 방법은 동영상을 표시하는 대신 동영상 주소를 얻을 수 있습니다.
 
 ### 실시간 영상 소스
 아무런 매개변수 없이 다음과 같이 호출하면 서버에서 스트리밍하고 있는 실시간 영상 주소 목록을 요청할 수 있습니다.
@@ -1281,7 +1004,7 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00
 ```ruby
 ch          # 채널 번호 (명시하지 않으면 전체 채널을 의미함)
 protocol    # 스트리밍 프로토콜을 지정 (rtmp, hls)
-stream      # 동영상의 해생도를 지정 (main: 고해상도 영상, sbu:저해상도 영상)
+stream      # 동영상의 해상도를 지정 (main: 고해상도 영상, sbu:저해상도 영상)
 nameonly    # true인 경우 동영상 스트림 데이터 부분 없이 채널 이름만 요청 
 
 # 예제
@@ -1397,3 +1120,249 @@ limit       # 검색 결과의 항목 수를 지정 (명시하지 않으면 기�
   }
 ]
 ```
+
+____
+
+## 부록
+
+### 제품별 API 지원 버전
+
+API를 지원하는 제품들의 버전은 다음과 같습니다.
+
+| 제품     | 버전           |
+|--------|--------------|
+| TS-CMS | v0.38.0부터 지원 |
+| TS-NVR | v0.35.0부터 지원 |
+| TS-LPR | v0.2.0A부터 지원 |
+
+API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 일부 기능이 지원되지 않을 수 있습니다. 아래 목록 중에서 사용하는 제품이 어디에 해당하는지 확인하시기 바랍니다.
+
+### 제품별 기능 지원 표
+
+| 구분                                  | TS-CMS | TS-NVR          | TS-LPR |
+|-------------------------------------|--------|-----------------|--------|
+| [실시간 영상 표시](#실시간-영상-표시)             | O      | O               | O      |
+| [실시간 영상 소스 검색](#실시간-영상-소스)          | O      | O               | O      |
+| [녹화 영상 표시](#녹화-영상-표시)               | X      | O               | O      |
+| [녹화 영상 소스 검색](#녹화-영상-소스)            | X      | O               | O      |
+| [세션 인증](#세션-인증)                     | O      | O               | O      |
+| [서버 정보 요청](#서버-정보-요청)               | O      | O               | O      |
+| [각종 목록 요청](#각종-목록-요청)               | O      | O               | O      |
+| [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색) | X      | O               | O      |
+| [이벤트 로그 검색](#이벤트-로그-검색)             | O      | O               | O      |
+| [차량 번호 로그 검색](#차량-번호-로그-검색)         | X      | 라이센스에 준함 `[설명]` | O      |
+
+`[설명]` TS-NVR은 자체적인 차량 번호 인식 기능이 없어 **차량 번호 로그 검색** 기능을 지원하지 않습니다. 
+하지만 **차량 번호 인식 장치 연동** 부가 기능 라이센스를 사용하는 경우 별도의 차량 번호 인식 장치와 연동하여 차량 번호 로그를 저장하기 때문에 **차량 번호 로그 검색** 기능을 사용할 수 있습니다.
+
+
+### base64 인코딩
+base64 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
+* https://www.base64encode.org/
+* https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding
+* https://www.w3schools.com/jsref/met_win_btoa.asp
+
+
+### URL 인코딩
+URL 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
+
+* http://www.convertstring.com/ko/EncodeDecode/UrlEncode
+* https://www.urlencoder.org/
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
+* https://www.w3schools.com/jsref/jsref_encodeuricomponent.asp
+
+
+### URL 디코딩
+URL 디코딩에 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
+* http://www.convertstring.com/ko/EncodeDecode/UrlDecode
+* https://www.urldecoder.org/
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
+* https://www.w3schools.com/jsref/jsref_decodeuricomponent.asp
+
+
+### ISO 8601 형식으로 날짜 시각 표현하기
+
+```
+YYYY-MM-DDThh:mm:ss.sss±Hh:Mm (로컬 타임 표기)
+또는
+YYYY-MM-DDThh:mm:ss.sssZ (UTC 표기)
+
+여기서,
+  YYYY: 년
+  MM: 월
+  DD: 일
+  hh: 시 (24시 표기)
+  mm: 분
+  ss: 초
+  sss: 1/n 초
+  Hh: UTC 시간 오프셋의 시
+  Mm: UTC 시간 오프셋의 분
+```
+
+예를 들어, `2018년 2월 1일 오후 2시 30분 15초`의 경우
+>1. 날짜 부분의 년, 월, 일은 각각 숫자 4문자, 2문자, 2문자로 표현하며 구분자로 하이픈 문자(`-`)를 사용합니다. 그리고 자릿수가 남는 경우 앞에 `0`으로 채웁니다.
+`예) 2018-02-01`
+>2. 시각 부분의 시, 분, 초는 각각 숫자 2문자, 2문자, 2문자로 표현하며 구분자로 콜론 문자(`:`)를 사용합니다. 24시 표기를 사용하며 자릿수가 남는 경우 마찬가지로 앞에 `0`으로 채웁니다.
+`예) 14:30:15`
+동영상은 일반적으로 1초 동안 여러 장면의 이미지로 구성되기 떄문에 초 이하의 단위를 사용해서 정확한 장면을 지정해야 하는 경우도 많습니다. 이 경우 초 단위 미만의 값에 대해 소수점 표기를 사용할 수 있습니다.
+`예) 14:30:15.253 => 14시 30분 15초 253 밀리초(1/1000초)`
+>3. 날짜와 시간은 `T` 문자로 구분하여 합칩니다.
+`예) 2018-02-01T14:30:15.253`
+>4. 표준 시간대(타임존)를 사용하여 어느 지역의 시각인지 추가로 표현합니다.
+대한민국 서울의 경우 영국 표준 시각(UTC)보다 9시간 빠르므로 다음과 같이 표기합니다.
+`예) +09:00 (또는 간단히 +0900 또는 +09)`
+만약 UTC 시각으로 표기할 경우는 `+00:00` 표기 대신 `Z` 문자를 사용하여 끝마치면 됩니다.
+>5. 위의 조각들을 모두 합치면 다음과 같습니다.
+`예) 2018-02-01T14:30:15+09:00  (로컬 타임)`
+>6. 이 문자열을 URL 인코딩하면 아래와 같습니다.
+`예) 2018-02-01T14%3A30%3A15%2B09%3A00`
+
+
+
+### 지원하는 언어 목록
+서버는 다음과 같이 총 104개 언어를 지원합니다.
+```ruby
+af-ZA       # 아프리카어, Afrikaans
+sq-AL       # 알바니아어, Shqip, Albanian
+am-ET       # 암하라어, አማርኛ, Amharic
+ar-AE       # 아랍어, العربية, Arabic
+hy-AM       # 아르메니아어, Հայերեն, Armenian
+az-Latn     # 아제르바이잔어, Azərbaycan, Azerbaijani
+eu-ES       # 바스크어, Euskara, Basque
+be-BY       # 벨라루스어, беларускі, Belarusian
+bn-BD       # 벵골어, বাংলা, Bengali
+bs-Latn     # 보스니아어, Bosanski, Bosnian
+bg-BG       # 불가리아어, български, Bulgarian
+ca-ES       # 카탈로니아어, Català, Catalan
+ceb         # 세부아노, Cebuano
+ny          # 체와어, Chichewa
+zh-CN       # 중국어 (간체), 简体中国, Chinese (Simplified)
+zh-TW       # 중국어 (번체), 中國傳統, Chinese (Traditional)
+co-FR       # 코르시카어, Corsu, Corsican
+hr-HR       # 크로아티아어, Hrvatski, Croatian
+cs-CZ       # 체코어, Čeština, Czech
+da-DK       # 덴마크어, Dansk, Danish
+nl-NL       # 네덜란드어, Nederlands, Dutch
+en-US       # 영어, English
+eo          # 에스페란토어, Esperanto
+et-EE       # 에스토니아어, Eesti keel, Estonian
+fil-PH      # 필리핀어, Filipino
+fi-FI       # 핀란드어, Suomalainen, Finnish
+fr-FR       # 프랑스어, Français, French
+fy-NL       # 프리지아어, Frysk, Frisian
+gl-ES       # 갈리시아어, Galego, Galician
+ka-GE       # 조지아어, ქართული, Georgian
+de-DE       # 독일어, Deutsch, German
+el-GR       # 그리스어, Ελληνικά, Greek
+gu-IN       # 구자라트어, ગુજરાતી, Gujarati
+ht          # 아이티 크리올어, Kreyòl ayisyen, Haitian Creole
+ha          # 하우사어, Hausa
+haw-U       # 하와이어, ʻŌlelo Hawaiʻi, Hawaiian,
+he-IL       # 히브리어, עברית, Hebrew
+hi-IN       # 힌디어, हिन्दी, Hindi
+hmn         # 몽어, Hmong
+hu-HU       # 헝가리어, Magyar, Hungarian
+is-IS       # 아이슬란드어, Íslensku, Icelandic
+ig-NG       # 이그보어, Igbo
+id-ID       # 인도네시아어, Bahasa Indonesia, Indonesian
+ga-IE       # 아일랜드어, Gaeilge, Irish
+it-IT       # 이탈리아어, Italiano, Italian
+ja-JP       # 일본어, 日本語, Japanese
+jv-Latn     # 자바어, Jawa, Javanese
+kn-IN       # 칸나다어, ಕನ್ನಡ, Kannada
+kk-KZ       # 카자흐어, Қазақ тілінде, Kazakh
+km-KH       # 크메르어, ភាសាខ្មែរ, Khmer
+ko-KR       # 한국어, Korean
+ku-Arab-IR  # 쿠르드어 (쿠르만지어), Kurdî, Kurdish (Kurmanji)
+ru-KG       # 키르기스어, Кыргызча, Kyrgyz
+lo-LA       # 라오어, ລາວ, Lao
+sr-Latn     # 라틴어, Latine, Latin
+lv-LV       # 라트비아어, Latviešu, Latvian
+lt-LT       # 리투아니아어, Lietuviškai, Lithuanian
+lb-LU       # 룩셈부르크어, Lëtzebuergesch, Luxembourgish
+mk-MK       # 마케도니아어, Македонски, Macedonian
+mg-MG       # 말라가시어, Malagasy
+ms-MY       # 말레이어, Melayu, Malay
+ml-IN       # 말라얄람어, മലയാളം, Malayalam
+mt-MT       # 몰타어, Malti, Maltese
+mi-NZ       # 마오리어, Maori
+mr-IN       # 마라티어, मराठी, Marathi
+mn-MN       # 몽골어, Монгол хэл дээр, Mongolian
+my-MM       # 미얀마어 (버마어), မြန်မာ", Myanmar (Burmese)
+ne-NP       # 네팔어, नेपाली, Nepali
+nb-NO       # 노르웨이어, Norwegian
+ps-AF       # 파슈토어, پښتو, Pashto
+fa-IR       # 페르시아어, فارسی, Persian
+pl-PL       # 폴란드어, Polskie, Polish
+pt-PT       # 포르투갈어, Português, Portuguese
+pa-IN       # 펀자브어, ਪੰਜਾਬੀ, Punjabi
+ro-RO       # 루마니아어, Română, Romanian
+ru-RU       # 러시아어, Русский, Russian
+sm          # 사모아어, Samoan
+gd-GB       # 스코틀랜드 게일어, Gàidhlig, Scots Gaelic
+sr-Cyrl-RS  # 세르비아어, Српски, Serbian
+nso-ZA      # 세소토어, Sesotho
+sn-Latn-ZW  # 쇼나어, Shona
+sd-Arab-PK  # 신디어, سنڌي, Sindhi
+si-LK       # 신할라어, සිංහල, Sinhala
+sk-SK       # 슬로바키아어, Slovenský, Slovak
+sl-SI       # 슬로베니아어, Slovenščina, Slovenian
+so-SO       # 소말리아어, Soomaali, Somali
+es-ES       # 스페인어, Español, Spanish
+su          # 순다어, Basa Sunda, Sundanese
+swc-CD      # 스와힐리어, Kiswahili, Swahili
+sv-SE       # 스웨덴어, Svenska, Swedish
+tg-Cyrl-TJ  # 타지크어, Тоҷикистон, Tajik
+ta-IN       # 타밀어, தமிழ், Tamil
+te-IN       # 텔루구어, తెలుగు, Telugu
+th-TH       # 태국어, ไทย, Thai
+tr-TR       # 터키어, Türkçe, Turkish
+uk-UA       # 우크라이나어, Українська, Ukrainian
+ur-PK       # 우르두어, اردو, Urdu
+uz-Latn-UZ  # 우즈베크어, O'zbek, Uzbek
+vi-VN       # 베트남어, Tiếng Việt, Vietnamese
+cy-GB       # 웨일즈어, Cymraeg, Welsh
+xh-ZA       # 코사어, isiXhosa, Xhosa
+yi          # 이디시어, ייִדיש, Yiddish
+yo-NG       # 요루바어, Yorùbá, Yoruba
+zu-ZA       # 줄루어, isiZulu, Zulu
+```
+
+### JSON 데이터 형식
+서버는 데이터의 전송 속도 향상을 위해 JSON 데이터 내에 줄 바꿈이나 공백 문자를 사용하지 않습니다. 예를 들면 다음과 같은 형태의 텍스트를 사용합니다.
+```json
+{"apiVersion":"ts-rest-api@0.1.0","siteName":"%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84","timezone":{"name":"Asia/Seoul","bias":"+09:00"},"product":{"name":"TS-LPR","version":"v0.2.0A (64-bit)"},"license":{"type":"genuine","maxChannels":16}}
+```
+이렇게 한 줄로 길게 나열되어 있어 사람이 읽기에는 다소 불편할 수 있습니다.
+
+이 경우 아래와 같은 도구들을 사용하면 읽기 쉽게 변환해 줍니다.
+* http://www.csvjson.com/json_beautifier
+* https://codebeautify.org/jsonviewer
+* https://jsonformatter.curiousconcept.com/
+* https://jsonformatter.org/
+
+읽기 쉽게 변환된 JSON 데이터는 다음과 같은 형태입니다.
+```json
+{
+  "apiVersion": "ts-rest-api@0.1.0",
+  "siteName": "%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84",
+  "timezone": {
+    "name": "Asia/Seoul",
+    "bias": "+09:00"
+  },
+  "product": {
+    "name": "TS-LPR",
+    "version": "v0.2.0A (64-bit)"
+  },
+  "license": {
+    "type": "genuine",
+    "maxChannels": 64
+  }
+}
+```
+물론 내용면으로는 둘 다 완전히 같은 데이터입니다.
+
+
+### 피드백
+저희는 현장에서 사용자들이 보내주시는 피드백에 항상 귀기울이고 있습니다.
+개발 관련 문의 사항이나 개선할 부분이 있으시면 https://github.com/bobhyun/ts-rest-api/issues 에 남겨주시기 바랍니다.

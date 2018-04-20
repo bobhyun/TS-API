@@ -8,20 +8,20 @@
 	function onConnect() {
 		var hostName = document.getElementById('host-name').value;
 		if(hostName == '') {
-			alert('호스트를 입력하십시오.');
+			alert('Enter the host.');
 			return;
 		}
 		var userId = document.getElementById('user-id').value;
 		if(userId == '') {
-			alert('사용자 아이디를 입력하십시오.');
+			alert('Enter your user ID.');
 			return;
 		}
 		var password = document.getElementById('password').value;
 		if(password == '') {
-			alert('비밀번호를 입력하십시오.');
+			alert('Enter the password.');
 			return;
 		}
-		var encodedData = window.btoa(userId + ':' + password);	// base64 인코딩
+		var encodedData = window.btoa(userId + ':' + password);	// base64 encoding
 		var src = (hostName.includes('http://', 0) ? '' : 'http://') +
 		hostName + '/watch?ch=1&auth=' + encodedData;
 		document.getElementById('result').innerText = src;
@@ -30,19 +30,19 @@
 </script>
 
 <body>
-	<h2>예제2. 실제 서버에 접속하기</h2>
+	<h2>Example 2. Connecting to a real server</h2>
 
 	<table>
 		<tr>
-			<td>호스트</td>
-			<td>사용자 아이디</td> 
-			<td>비밀번호</td>
+      <td>Host</td>
+      <td>User ID</td> 
+      <td>Password</td>
 		</tr>
 		<tr>
 			<td><input type="text" id="host-name"></td>
 			<td><input type="text" id="user-id"></td> 
 			<td><input type="text" id="password"></td>
-			<td><button type="button" onClick="onConnect()">접속</button>	</td>
+			<td><button type="button" onClick="onConnect()">Connect</button>	</td>
 		</tr>
 		<tr>
 			<td colspan="4" id="result"></td>
