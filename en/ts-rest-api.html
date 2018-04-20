@@ -5,15 +5,8 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
-      <link rel="stylesheet" href="file:///C:\Users\bob\.vscode\extensions\jasonroger.markdown-preview-enhanced-fork-0.2.7\node_modules\@shd101wyy\mume\dependencies\katex\katex.min.css">
-      
-
-      
-      
-      
-
       <style> 
-      /**
+/**
  * prism.js Github theme based on GitHub's theme.
  * @author Sam Clarke
  */
@@ -217,12 +210,10 @@ code.language-yaml {
 <a href="#the-api-supported-versions-by-product">The API-supported versions by product</a><br>
 <a href="#the-features-table-by-product">The features table by product</a></p>
 <p><em>The API and this article are subject to change without notice for better development support and improvement.</em></p>
-<hr>
 <h2 class="mume-header" id="getting-started">Getting Started</h2>
 
 <p><code>[Tips]</code> If you look at this <a href="http://ts-rest-api.md">ts-rest-api.md</a> document online, the included examples may not run. We recommend that you download this project using git and open the ts-rest-api.html file in your web browser.</p>
 <p>In this article, ts-rest-api is abbreviated as <strong>API</strong>, and each product is simply called <strong>server</strong>.</p>
-<hr>
 <h2 class="mume-header" id="video-display">Video display</h2>
 
 <h3 class="mume-header" id="real-time-video-display">Real-time video display</h3>
@@ -276,7 +267,7 @@ In this example, we used only minimal code to display the video, so there are mo
 <p>Now, let's see how to display the video of a real server, not a demonstration server.<br>
 To connect to a real server, you need to know the following two things by default:</p>
 <ol>
-<li>The **host name&quot;&quot; of the server (<strong>IP address</strong> or <strong>domain name</strong>, and <strong>port number</strong> when 80 is not used)</li>
+<li>The <strong>host name</strong> of the server (<strong>IP address</strong> or <strong>domain name</strong>, and <strong>port number</strong> when 80 is not used)</li>
 </ol>
 <blockquote>
 <ul>
@@ -414,7 +405,6 @@ showPlayTime    <span class="token comment" spellcheck="true"># Whether the date
 </pre>
 <p>So far, We've seen how to display video using the <code>/watch</code>. Here we will see how to request various information using <code>/api</code>.<br>
 All response data is in the <a href="#json-data-format">JSON format</a> and the text is encoded as <code>utf8</code>. The actual data being transferred uses an optimized format without line breaks and whitespace, but this article uses a format that is easy to read the items in the data.</p>
-<hr>
 <h2 class="mume-header" id="session-authentication">Session authentication</h2>
 
 <p>The server maintains an HTTP session using Cookie until the client software (the web browser) logs in and logs out. Since the server maintains the authentication information while the session is being connected, the client software (web browser) does not need to sign in whenever makes request.</p>
@@ -440,7 +430,6 @@ Using <code>login=</code> parameter after encrypting the user ID and password in
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>auth<span class="token operator">?</span>logout
 </pre>
 <p>At the end of the session, the server returns an HTTP response code of 401 for requests that require authentication, indicating that authentication is required.</p>
-<hr>
 <h2 class="mume-header" id="request-server-information">Request server information</h2>
 
 <h3 class="mume-header" id="api-version">API version</h3>
@@ -477,7 +466,7 @@ It is used to distinguish between the client-side and server-side local time whe
 <pre class="language-text">{
   &quot;timezone&quot;: {
     &quot;name&quot;: &quot;America/New_York&quot;,   // Time zone name as IANA format
-    &quot;bias&quot;: &quot;-05:00&quot;        // UTC offset
+    &quot;bias&quot;: &quot;-05:00&quot;              // UTC offset
   }
 }
 </pre>
@@ -627,7 +616,6 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
   }     // whoAmI is not included
 }
 </pre>
-<hr>
 <h2 class="mume-header" id="request-various-enumeration">Request various enumeration</h2>
 
 <p>The following requests return the JSON data with an HTTP response code of 200 if it is in <a href="#session-authentication">session authenticated</a> state, or an HTTP response code of 401 if the session is not authenticated.</p>
@@ -761,7 +749,6 @@ lang      <span class="token comment" spellcheck="true"># Language</span>
   }
 ]
 </pre>
-<hr>
 <h2 class="mume-header" id="retrieve-recorded-data">Retrieve recorded data</h2>
 
 <p>Use <code>/api/find</code> to search for recorded data.</p>
@@ -824,7 +811,6 @@ timeEnd     <span class="token comment" spellcheck="true"># List of recorded dat
   }
 }
 </pre>
-<hr>
 <h2 class="mume-header" id="search-event-log">Search event log</h2>
 
 <p>To retrieve the event log recorded on the server, request the following.</p>
@@ -924,7 +910,6 @@ type        <span class="token comment" spellcheck="true"># Event log type</span
 <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog<span class="token operator">&amp;</span>type<span class="token operator">=</span><span class="token number">0</span>
 
 </pre>
-<hr>
 <h2 class="mume-header" id="vehicle-number-log-search">Vehicle number log search</h2>
 
 <p>If you use the car number recognition function, the recognized car number is saved with the video. To retrieve the car number log you will request as follows:</p>
@@ -1073,7 +1058,6 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 <span class="token comment" spellcheck="true"># If the session is not authenticated, add the auth parameter</span>
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.100</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">%</span>2D02<span class="token operator">%</span>2D20T18<span class="token operator">%</span>3A12<span class="token operator">%</span>3A05<span class="token operator">%</span><span class="token number">2E828</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span>3A00<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<hr>
 <h2 class="mume-header" id="search-for-video-sources">Search for video sources</h2>
 
 <p>You can use this method if your application uses the video address directly instead of the video display feature using the API you used in <a href="#inserting-video-into-web-page">Inserting video into web page</a>.</p>
@@ -1263,7 +1247,6 @@ limit       <span class="token comment" spellcheck="true"># Specify the number o
   }
 ]
 </pre>
-<hr>
 <h2 class="mume-header" id="appendix">Appendix</h2>
 
 <h3 class="mume-header" id="the-api-supported-versions-by-product">The API-supported versions by product</h3>

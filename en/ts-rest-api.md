@@ -14,14 +14,12 @@ Please refer to the following, as the features supported by each product may dif
 
 *The API and this article are subject to change without notice for better development support and improvement.*
 
-____
 
 ## Getting Started
 `[Tips]` If you look at this ts-rest-api.md document online, the included examples may not run. We recommend that you download this project using git and open the ts-rest-api.html file in your web browser.
 
 In this article, ts-rest-api is abbreviated as **API**, and each product is simply called **server**.
 
-____
 
 ## Video display
 ### Real-time video display
@@ -68,7 +66,7 @@ In this example, we used only minimal code to display the video, so there are mo
 Now, let's see how to display the video of a real server, not a demonstration server.
 To connect to a real server, you need to know the following two things by default:
 
-1. The **host name"" of the server (**IP address** or **domain name**, and **port number** when 80 is not used)
+1. The **host name** of the server (**IP address** or **domain name**, and **port number** when 80 is not used)
 >* The port number can be found in the `HTTP Port` item in the `Web Service` tab in your product Settings window.
 2. **User ID** and **password** with **remote access privileges**
 
@@ -197,7 +195,6 @@ showPlayTime    # Whether the date and time are displayed (true, false)
 So far, We've seen how to display video using the `/watch`. Here we will see how to request various information using `/api`.
 All response data is in the [JSON format](#json-data-format) and the text is encoded as `utf8`. The actual data being transferred uses an optimized format without line breaks and whitespace, but this article uses a format that is easy to read the items in the data.
 
-____
 
 ## Session authentication
 The server maintains an HTTP session using Cookie until the client software (the web browser) logs in and logs out. Since the server maintains the authentication information while the session is being connected, the client software (web browser) does not need to sign in whenever makes request.
@@ -231,7 +228,6 @@ After the session is connected, the following request can be used to terminate i
 ```
 At the end of the session, the server returns an HTTP response code of 401 for requests that require authentication, indicating that authentication is required.
 
-____
 
 ## Request server information
 
@@ -277,7 +273,7 @@ For the request, the server returns JSON data in the following format with an HT
 {
   "timezone": {
     "name": "America/New_York",   // Time zone name as IANA format
-    "bias": "-05:00"        // UTC offset
+    "bias": "-05:00"              // UTC offset
   }
 }
 ```
@@ -438,7 +434,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
   }     // whoAmI is not included
 }
 ```
-____
+
 
 ## Request various enumeration
 The following requests return the JSON data with an HTTP response code of 200 if it is in [session authenticated](#session-authentication) state, or an HTTP response code of 401 if the session is not authenticated.
@@ -583,7 +579,6 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
-____
 
 ## Retrieve recorded data
 
@@ -654,7 +649,6 @@ If you specify a condition using parameters such as `ch`,`timeBegin`, or `timeEn
 }
 ```
 
-____
 
 ## Search event log
 To retrieve the event log recorded on the server, request the following.
@@ -759,7 +753,6 @@ type        # Event log type
 
 ```
 
-____
 
 ## Vehicle number log search
 If you use the car number recognition function, the recognized car number is saved with the video. To retrieve the car number log you will request as follows:
@@ -920,7 +913,6 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00
 http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
 
-____
 
 ## Search for video sources
 You can use this method if your application uses the video address directly instead of the video display feature using the API you used in [Inserting video into web page](#inserting-video-into-web-page).
@@ -1125,7 +1117,6 @@ When this request is made, the server returns JSON data in the following format 
 ]
 ```
 
-____
 
 ## Appendix
 
