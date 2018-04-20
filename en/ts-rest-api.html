@@ -4,7 +4,6 @@
       <title>ts-rest-api</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      
       <style> 
 /**
  * prism.js Github theme based on GitHub's theme.
@@ -758,24 +757,24 @@ lang      <span class="token comment" spellcheck="true"># Language</span>
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays      <span class="token operator">/</span><span class="token operator">/</span> <span class="token constant">Request</span> all dates with recorded video
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-    <span class="token property">"2018-1"</span><span class="token operator">:</span> <span class="token punctuation">[</span> // Displays the date in which the data exists in year-month format as an array
-      <span class="token number">8</span><span class="token punctuation">,</span>        // The recorded data of <span class="token number">2018</span>-<span class="token number">1</span>-<span class="token number">1</span> exists.
-      <span class="token number">23</span><span class="token punctuation">,</span>       // The recorded data of <span class="token number">2018</span>-<span class="token number">1</span>-<span class="token number">23</span> exists.
-      <span class="token number">24</span>        // The recorded data of <span class="token number">2018</span>-<span class="token number">1</span>-<span class="token number">24</span> exists.
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-    <span class="token property">"2018-2"</span><span class="token operator">:</span> <span class="token punctuation">[</span> // and so on.
-      <span class="token number">5</span><span class="token punctuation">,</span>
-      <span class="token number">6</span><span class="token punctuation">,</span>
-      <span class="token number">7</span><span class="token punctuation">,</span>
-      <span class="token number">9</span><span class="token punctuation">,</span>
-      <span class="token number">13</span><span class="token punctuation">,</span>
-      <span class="token number">14</span><span class="token punctuation">,</span>
-      <span class="token number">19</span>
-    <span class="token punctuation">]</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<pre class="language-text">{
+  &quot;result&quot;: {
+    &quot;2018-1&quot;: [ // Displays the date in which the data exists in year-month format as an array
+      8,        // The recorded data of 2018-1-1 exists.
+      23,       // The recorded data of 2018-1-23 exists.
+      24        // The recorded data of 2018-1-24 exists.
+    ],
+    &quot;2018-2&quot;: [ // and so on.
+      5,
+      6,
+      7,
+      9,
+      13,
+      14,
+      19
+    ]
+  }
+}
 </pre>
 <p>You can request to meet certain criteria by adding the following parameters:</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># Parameters</span>
@@ -1049,9 +1048,9 @@ sort        <span class="token comment" spellcheck="true"># Sorting method (desc
     ]
   }
 
-  ... // &#xC911;&#xB7B5;
+  ... // omitted
 </pre>
-<p>여기서 <code>&quot;vod&quot;</code> 아래 <code>&quot;videoSrc&quot;</code>의 값에 해당하는 <code>http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00</code>을 사용하여 영상을 표시할 수 있습니다.</p>
+<p>In here, you can display video using  <code>http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00</code> corresponding to the value of <code>&quot;videoSrc&quot;</code> in <code>&quot;vod&quot;</code>.</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># If the session is authenticated, use it as it is</span>
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.100</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">%</span>2D02<span class="token operator">%</span>2D20T18<span class="token operator">%</span>3A12<span class="token operator">%</span>3A05<span class="token operator">%</span><span class="token number">2E828</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span>3A00
 
@@ -1394,7 +1393,7 @@ In here,
   Hh: Hour part of UTC time offset
   Mm: Minutes part of UTC time offset
 </pre>
-<p>FOr example, In the case of <code>February 1, 2018 at 2:30:15</code></p>
+<p>For example, In the case of <code>February 1, 2018 at 2:30:15</code></p>
 <blockquote>
 <ol>
 <li>The year, month, and day of the date part are each represented by four digits, two digits, or two digits, and the hyphen character (<code>-</code>) is used as a delimiter. If any digits remain, '0' is prefilled.<br>

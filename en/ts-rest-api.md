@@ -591,7 +591,7 @@ To get a list of dates with recorded images, request the following:
 /api/find?what=recDays      // Request all dates with recorded video
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```json
+```text
 {
   "result": {
     "2018-1": [ // Displays the date in which the data exists in year-month format as an array
@@ -901,9 +901,9 @@ For example, if you want to display a video of the following search results
     ]
   }
 
-  ... // 중략
+  ... // omitted
 ```
-여기서 `"vod"` 아래 `"videoSrc"`의 값에 해당하는 `http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00`을 사용하여 영상을 표시할 수 있습니다.
+In here, you can display video using  `http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00` corresponding to the value of `"videoSrc"` in `"vod"`.
 
 ```ruby
 # If the session is authenticated, use it as it is
@@ -1192,7 +1192,7 @@ In here,
   Mm: Minutes part of UTC time offset
 ```
 
-FOr example, In the case of `February 1, 2018 at 2:30:15`
+For example, In the case of `February 1, 2018 at 2:30:15`
 >1. The year, month, and day of the date part are each represented by four digits, two digits, or two digits, and the hyphen character (`-`) is used as a delimiter. If any digits remain, '0' is prefilled.
 `eg: 2018-02-01`
 >2. The hour, minute, and second of the time portion are each represented by two numbers, two characters, and two characters, is used as a delimiter. If any digits remain, '0' is prefilled.
