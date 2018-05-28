@@ -1,7 +1,7 @@
-ts-rest-api Programmer's Guide
+TS-API Programmer's Guide
 ======
 
-This article is a programming guide for those who develop application software using **ts-rest-api**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Co.,Ltd.
+This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Co.,Ltd.
 
 You can easily embed the real-time video, recorded video, and video search functions into your application software with the API. 
 
@@ -15,10 +15,10 @@ Please refer to the following, as the features supported by each product may dif
 *The API and this article are subject to change without notice for better development support and improvement.*
 
 
-## Getting Started
-`[Tips]` If you look at this ts-rest-api.md document online, the included examples may not run. We recommend that you download this project using git and open the ts-rest-api.html file in your web browser.
+## Get Started
+`[Tips]` If you look at this TS-API.en.md document online, the included examples may not run. We recommend that you download this project using git and open the TS-API.en.html file in your web browser.
 
-In this article, ts-rest-api is abbreviated as **API**, and each product is simply called **server**.
+In this article, TS-API is abbreviated as **API**, and each product is simply called **server**.
 
 
 ## Video display
@@ -27,7 +27,7 @@ Try to type the following in the Web browser address window.
 ```ruby
 http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-<button onClick="window.open('http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=')">Show</button>
+<button onClick=]window.open("http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=")'>Show</button>
 
 
 Do you see the video?
@@ -39,17 +39,17 @@ Now let's insert the video into the web page.
 ```html
 <!DOCTYPE>
 <head>
-  <meta charset="utf-8">
+  <meta charset='utf-8'>
   <title>ex1</title>
 </head>
 
 <body>
 <h2>Example 1. Insert video</h2>
-<iframe src="http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=" 
-  width="640" height="360" frameborder="0" allowfullscreen />
+<iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=' 
+  width='640' height='360' frameborder='0' allowfullscreen />
 </body>
 ```
-<button onClick="window.open('./examples/ex1.html')">Show</button>
+<button onClick='window.open("./examples/ex1.html")'>Show</button>
 
 The video URL and the `<iframe>` tag code used in the example are provided as a pop-up menu when you **right-click on the video** of the webpage (or long-press on the video in case of a smartphone).
 Select the menu item you are to use, the code will be copied to the clipboard and then you can **paste** them into your code.
@@ -82,8 +82,8 @@ For example, assuming that you use the following connection information;
 
 In the above example, you can change the address part as follows:
 ```html
-<iframe src="http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI="
-  width="640" height="360" frameborder="0" allowfullscreen></iframe>
+<iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI='
+  width='640' height='360' frameborder='0' allowfullscreen></iframe>
 ```
 Here `ZGVtbzohMTIzNHF3ZXI=` following `auth=` is the [base64 encoded](#base64-encoding) part of user ID and password.
 
@@ -95,7 +95,7 @@ In this example, we will improve the way we access the login information using J
 ```html
 <!DOCTYPE>
 <head>
-  <meta charset="utf-8">
+  <meta charset='utf-8'>
   <title>ex2</title>
 </head>
 
@@ -132,20 +132,20 @@ In this example, we will improve the way we access the login information using J
       <td>Password</td>
     </tr>
     <tr>
-      <td><input type="text" id="host-name"></td>
-      <td><input type="text" id="user-id"></td> 
-      <td><input type="text" id="password"></td>
-      <td><button type="button" onClick="onConnect()">Connect</button></td>
+      <td><input type='text' id='host-name'></td>
+      <td><input type='text' id='user-id'></td> 
+      <td><input type='text' id='password'></td>
+      <td><button type='button' onClick='onConnect()'>Connect</button></td>
     </tr>
     <tr>
-      <td colspan="4" id="result"></td>
+      <td colspan='4' id='result'></td>
     </tr>
   </table>
 
-  <iframe width="640" height="360" frameborder="0" allowfullscreen id="player" />
+  <iframe width='640' height='360' frameborder='0' allowfullscreen id='player' />
 </body>
 ```
-<button onClick="window.open('./examples/ex2.html')">Show</button>
+<button onClick='window.open("./examples/ex2.html")'>Show</button>
 
 ### Change channel
 If you change the `ch=` part of the video source to the desired channel number as shown below, the video of that channel will be displayed.
@@ -154,7 +154,7 @@ For example, if you want to see channel 3, you can modify it like this:
 ```ruby
 http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-<button onClick="window.open('http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=')">Show</button>
+<button onClick='window.open("http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=")'>Show</button>
 
 ### Display recorded video
 To display the recorded video, you need the date and time information (time stamp) of the desired video.
@@ -239,7 +239,7 @@ This request works, even if it is not in [session suthenticated](#session-authen
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```json
 {
-  "apiVersion": "ts-rest-api@0.1.0"
+  "apiVersion": "TS-API@0.2.0"
 }
 ```
 
@@ -251,7 +251,7 @@ This request works, even if it is not in [session suthenticated](#session-authen
 /api/info?siteName
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 {
   "siteName": "My%20home%20server"  // (URL encoded)
 }
@@ -269,7 +269,7 @@ This request works, even if it is not in [session suthenticated](#session-authen
 /api/info?timezone
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 {
   "timezone": {
     "name": "America/New_York",   // Time zone name as IANA format
@@ -287,7 +287,7 @@ This request works, even if it is not in [session suthenticated](#session-authen
 /api/info?product
 ````
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 // for TS-CMS:
 {
   "product": {
@@ -321,7 +321,7 @@ This request works, even if it is not in [session suthenticated](#session-authen
 /api/info?license
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 // for a genuine lincense:
 {
   "license": {
@@ -354,7 +354,7 @@ From here on, the `auth =` part of [session authentication](#session-authenticat
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 If it is not in [session authenticated](#session-authentication) state, the server sends an HTTP response code 401 error.
 
-```text
+```jsx
 {
   "whoAmI": {
     "uid":"admin",      // User ID (URL encoded)
@@ -378,10 +378,10 @@ You can request information individually, but we also provide a way to request a
 /api/info?all
 ```
 This request returns JSON data with an HTTP response code of 200 if the session is authenticated, or JSON data with an HTTP response code of 401 with no `whoAmI` entries if it is not authenticated.
-```text
+```jsx
 // Session authenticated state (HTTP response code: 200):
 {
-  "apiVersion": "ts-rest-api@0.1.0",
+  "apiVersion": "TS-API@0.2.0",
   "siteName": "My%20home%20server",
   "timezone": {
     "name": "America/New_York",
@@ -389,7 +389,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
   },
   "product": {
     "name": "TS-LPR",
-    "version": "v0.2.0A (64-bit)"
+    "version": "v0.5.0A (64-bit)"
   },
   "license": {
     "type": "genuine",
@@ -415,7 +415,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 
 // Session unauthenticated state (HTTP response code: 401):
 {
-  "apiVersion": "ts-rest-api@0.1.0",
+  "apiVersion": "TS-API@0.2.0",
   "siteName": "My%20home%20server",
   "timezone": {
     "name": "America/New_York",
@@ -423,7 +423,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
   },
   "product": {
     "name": "TS-LPR",
-    "version": "v0.2.0A (64-bit)"
+    "version": "v0.5.0A (64-bit)"
   },
   "license": {
     "type": "genuine",
@@ -435,6 +435,49 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 }
 ```
 
+## Request system informatoin
+Requests system information from the server.
+```ruby
+/api/sysinfo
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+{
+  "cpu": {
+    "name": "Intel(R) Core(TM) i7-4712MQ CPU @ 2.30GHz",
+    "cores": 8
+  },
+  "systemMemory": "12 GB",
+  "displayAdapter": [
+    {
+      "model": "Intel(R) HD Graphics 4600",
+      "monitor": [
+        "Generic PnP Monitor",
+        "Generic PnP Monitor"
+      ]
+    }
+  ],
+  "hdd": [
+    {
+      "model": "SanDisk SD7SB6S256G1122",
+      "serialNo": "150608401947",
+      "capacity": "256 GB"
+    },
+    {
+      "model": "ST1000LM024 HN-M101MBB",
+      "serialNo": "S2R8J9BC700641",
+      "capacity": "1 TB"
+    }
+  ],
+  "networkAdapter": [
+    {
+      "name": "Realtek PCIe GBE Family Controller",
+      "mac": "80-FA-5B-03-79-5E",
+      "ipAddress": "192.168.0.43"
+    },
+  ]
+}
+```
 
 ## Request various enumeration
 The following requests return the JSON data with an HTTP response code of 200 if it is in [session authenticated](#session-authentication) state, or an HTTP response code of 401 if the session is not authenticated.
@@ -445,7 +488,7 @@ To get a list of channels in use, request the following:
 /api/enum?what=channel
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 [
   {
     "chid": 1,              // Channel number
@@ -466,7 +509,7 @@ The vehicle number recognition device list includes used devices when an externa
 /api/enum?what=lprSrc
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 [
   // Information received from the interworked car number recognition devices
   {
@@ -501,12 +544,12 @@ For the request, the server returns JSON data in the following format with an HT
   }
 ]
 
-For the rectangle coordinates of each zone,
-instead of the actual video pixel coordinates,
-the logical coordinate system of 8K (7680x4320) resolution is used.
-For example, if the video is 1920x1080 resolution and the zone is (480, 270, 1440, 810),
-the abscissas are multiplied by 7680/1920, and the ordinates are multiplied by 4320/1080, 
-then be calculated as (1920, 1080, 5760, 3240).
+// For the rectangle coordinates of each zone,
+// instead of the actual video pixel coordinates,
+// the logical coordinate system of 8K (7680x4320) resolution is used.
+// For example, if the video is 1920x1080 resolution and the zone is (480, 270, 1440, 810),
+// the abscissas are multiplied by 7680/1920, and the ordinates are multiplied by 4320/1080, 
+// then be calculated as (1920, 1080, 5760, 3240).
 ```
 
 ### Event log type list
@@ -515,7 +558,7 @@ To get a list of supported event log types, request the following:
 /api/enum?what=eventType
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 [
   {
     "id": 0,                  // Event log type number
@@ -529,8 +572,7 @@ For the request, the server returns JSON data in the following format with an HT
         "id": 2,
         "name": "System shutdown"
       },
-
-      ... // omitted
+      // ... omitted
   },
   {
     "id": 6,
@@ -551,7 +593,7 @@ lang      # Language
 /api/enum?what=eventType&lang=es-ES
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 [
   {
     "id": 0,
@@ -569,8 +611,7 @@ For the request, the server returns JSON data in the following format with an HT
         "id": 3,
         "name": "Apagado anormal"
       },
-
-      ... // omitted
+      // ... omitted
   },
   {
     "id": 6,
@@ -584,14 +625,14 @@ For the request, the server returns JSON data in the following format with an HT
 
 Use `/api/find` to search for recorded data.
 
-### Search date with recorded video
-To get a list of dates with recorded images, request the following:
+### Search dates with recorded video
+To get a list of dates with recorded videos, request the following:
 
 ```ruby
 /api/find?what=recDays      // Request all dates with recorded video
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 {
   "result": {
     "2018-1": [ // Displays the date in which the data exists in year-month format as an array
@@ -614,13 +655,18 @@ For the request, the server returns JSON data in the following format with an HT
 You can request to meet certain criteria by adding the following parameters:
 ```ruby
 # Parameters
-ch          # List of dates on which a specific channel was recorded
+ch          # List of dates on which a specific channel was recorded 
+            # (Multiple channels are listed using commas)
 timeBegin   # List of dates recorded after a specific date and time
 timeEnd     # List of recorded dates before a specific date and time
+            # (If the request is made in UTC time, the date based on UTC is returned, 
+            # otherwise the date based on the server's local time is returned.)
 
 # Examples
-# Request list of the date on which channel 1 was recorded
+# Request date list of channels 1 recorded
 /api/find?what=recDays&ch=1
+# Request date list of channels 1,2,3 recorded 
+/api/find?what=recDays&ch=1,2,3
 
 # List of recorded dates since February 2018 (2018-02-01T00: 00:00-05:00)
 /api/find?what=recDays&timeBegin=2018-02-01T00%3A00%3A00-05%3A00
@@ -634,21 +680,55 @@ timeEnd     # List of recorded dates before a specific date and time
 ```
 
 If you specify a condition using parameters such as `ch`,`timeBegin`, or `timeEnd`, the result is returned, including the requested condition, as shown below.
-```text
+```jsx
 {
   "timeBegin": "2018-01-01T00:00:00-05:00",     // First date and time requested
   "timeEnd": "2018-01-31T23:59:59.999-05:00",   // Last date and time requested
-  "chid": 1,                                    // Requested channel number
-  "result": {
-    "2018-1": [
-      8,
-      23,
-      24
-    ]
-  }
+  "result": [
+    {
+      "chid": 1,   // channel number
+      "2018-1": [
+        8,
+        23,
+        24
+      ]
+    }
+  ]
 }
 ```
 
+### Search minutes with recorded video
+To get a list of minutes with recorded videod, request the following:
+In the case of minute search, you can not request all of them because the amount of response data can be large, unlike date search.
+Specifying only one of timeBegin or timeEnd returns the results of one day's search from the specified date. The date range you can specify is limited to a maximum of 3 days.
+The available parameters are the same as `/api/find?what=recDays`.
+```ruby
+# When using local time
+/api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00-05%3A00&timeEnd=2018-02-02T00%3A00%3A00-05%3A00
+
+# When using UTC time
+/api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00Z&timeEnd=2018-05-26T00%3A00%3A00Z
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jdx
+{
+  "timeBegin": "2018-05-25T00:00:00.000-05:00",
+  "timeEnd": "2018-05-26T00:00:00.000-05:00",
+  "result": [
+    {
+      "chid": 1,
+      // Recording data is expressed in minute unit by hour in "YYYYMMDD" format
+      "2018052510": [ 44, 45, 46, 47, 48 ],
+      "2018052518": [ 1, 2, 3, 4, 16, 17, 18 ]       
+     },
+    {
+      "chid": 2,
+      "2018052517": [ 29, 30, 31, 32, 33, 34, 35, 36 ],
+      "2018052518": [ 1, 2, 3, 4, 5, 6 ]
+    }
+  ]
+}
+```
 
 ## Search event log
 To retrieve the event log recorded on the server, request the following.
@@ -656,7 +736,7 @@ To retrieve the event log recorded on the server, request the following.
 /api/find?what=eventLog
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 {
   "totalCount": 513,    // Total number of event logs recorded on the server
   "at": 0,              // Current data offset (0 means the first data)
@@ -690,9 +770,7 @@ For the request, the server returns JSON data in the following format with an HT
       },
       "comment": "admin: Auto-login"
     },
-
-    ...   // omitted
-
+    // ... omitted
     {
       "id": 469,
       "type": 0,
@@ -761,7 +839,7 @@ If you use the car number recognition function, the recognized car number is sav
 /api/find?what=carNo
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 {
   "totalCount": 64,   // Total number of vehicles number recognition logs on the server
   "at": 0,            // Current data offset (0 means the first data)
@@ -822,9 +900,7 @@ For the request, the server returns JSON data in the following format with an HT
         }
       ]
     },
-
-    ... // omitted
-
+    // ... omitted
     {
       "id": 15,
       "plateNo": "L647AN",
@@ -881,9 +957,8 @@ sort        # Sorting method (desc: Latest data order (default), asc: Oldest dat
 To display the video in the retrieved result data, use the method used in [Display recorded video](#display-recorded-video).
 
 For example, if you want to display a video of the following search results
-```text
-  ... // omitted
-
+```jsx
+  // ... omitted
   {
     "id": 15,
     "plateNo": "55EV96",
@@ -900,8 +975,7 @@ For example, if you want to display a video of the following search results
       }
     ]
   }
-
-  ... // omitted
+  // ... omitted
 ```
 In here, you can display video using  `http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00` corresponding to the value of `"videoSrc"` in `"vod"`.
 
@@ -925,7 +999,7 @@ You can request a list of real-time video addresses that the server is streaming
 /api/vod
 ```
 The server returns JSON data in the following format with an HTTP response code of 200:
-```text
+```jsx
 [ // Each channel consists of an array of items
   {
     "chid": 1,                              // Channel number
@@ -974,14 +1048,10 @@ The server returns JSON data in the following format with an HTTP response code 
     "chid": 2,
     "title": "192%2E168%2E0%2E106",
     "src": [
-
-      ... // omitted
-
+      // ... omitted
     ]
   },
-
-  ... // omitted
-
+  // ... omitted
 ]
 ```
 
@@ -1069,7 +1139,7 @@ limit       # Specify the number of items in the search results (default 10, max
 
 When this request is made, the server returns JSON data in the following format with the HTTP response code 200:
 
-```text
+```jsx
 [ // Consists of an array of recorded video file units
   {
     "chid": 1,                        // Channel number
@@ -1091,9 +1161,7 @@ When this request is made, the server returns JSON data in the following format 
       }
     ]
   },
-
-  ... // omitted
-
+  // ... omitted
   {
     "chid": 1,
     "title": "192%2E168%2E0%2E111",
@@ -1117,6 +1185,20 @@ When this request is made, the server returns JSON data in the following format 
 ]
 ```
 
+## Requesting video using video source
+For video request using video source without using `/watch` provided by API, authentication is supported by each protocol as follows.
+```ruby 
+# RTMP (auth= parameter supported)
+rtmp://host/path/to&auth=YWRtaW46YWRtaW4=
+
+# HTTP (Only basic authentication is supported for file-based resources such as m3u8, JPG, and MP4)
+http://userid:password@host/path/to
+
+# HTTP (The resources of sub path /api/ are supported in both ways)
+http://userid:passwordn@host/api/path/to
+http://host/api/path/to&auth=YWRtaW46YWRtaW4=
+```
+
 
 ## Appendix
 
@@ -1124,11 +1206,11 @@ When this request is made, the server returns JSON data in the following format 
 
 The versions of the products that support the API are as follows.
 
-| Product | Version          |
-|---------|------------------|
-| TS-CMS  | v0.38.0 or later |
-| TS-NVR  | v0.35.0 or later |
-| TS-LPR  | v0.2.0A or later |
+| API version |    TS-CMS   |    TS-NVR    |   TS-LPR     |
+|---------|--------------|--------------|--------------|
+| 0.1.0   | v0.38.0 or later | v0.35.0 or later | v0.2.0A or later  |
+| 0.2.0   | v0.41.0 or later | v0.40.0 or later | v0.7.0A or later  |
+
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
@@ -1179,6 +1261,8 @@ For more information on URL decoding, see the links below.
 YYYY-MM-DDThh:mm:ss.sss±Hh:Mm (Local time representation)
 or
 YYYY-MM-DDThh:mm:ss.sssZ (UTC time representation)
+or, yet another
+YYYY-MM-DDThh:mm:ss.sss (The server's Local time)
 
 In here,
   YYYY: year
@@ -1324,7 +1408,7 @@ zu-ZA       # isiZulu, Zulu
 ### JSON data format
 The server does not use line breaks or white space characters in JSON data for data optimization. For example, use the following form of text:
 ```json
-{"apiVersion":"ts-rest-api@0.1.0","siteName":"My%20home%20server","timezone":{"name":"America/New_York","bias":"-05:00"},"product":{"name":"TS-LPR","version":"v0.2.0A (64-bit)"},"license":{"type":"genuine","maxChannels":16}}
+{"apiVersion":"TS-API@0.2.0","siteName":"My%20home%20server","timezone":{"name":"America/New_York","bias":"-05:00"},"product":{"name":"TS-LPR","version":"v0.5.0A (64-bit)"},"license":{"type":"genuine","maxChannels":16}}
 ```
 This is a long line, so it can be a little uncomfortable for the human to read.
 
@@ -1337,7 +1421,7 @@ In this case, use the following tools to convert easily readable.
 The readable JSON data has the following form:
 ```json
 {
-  "apiVersion": "ts-rest-api@0.1.0",
+  "apiVersion": "TS-API@0.2.0",
   "siteName": "My%20home%20server",
   "timezone": {
     "name": "America/New_York",
@@ -1345,7 +1429,7 @@ The readable JSON data has the following form:
   },
   "product": {
     "name": "TS-LPR",
-    "version": "v0.2.0A (64-bit)"
+    "version": "v0.5.0A (64-bit)"
   },
   "license": {
     "type": "genuine",
@@ -1358,4 +1442,4 @@ Of course, both are completely the same data in terms of content.
 
 ### Feedback
 We are always listening to feedback from our users in the field.
-If you have any questions or improvements regarding development, please leave them at https://github.com/bobhyun/ts-rest-api/issues.
+If you have any questions or improvements regarding development, please leave them at https://github.com/bobhyun/TS-API/issues.

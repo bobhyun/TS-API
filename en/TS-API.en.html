@@ -1,11 +1,19 @@
 <!DOCTYPE html>
   <html>
     <head>
-      <title>ts-rest-api</title>
+      <title>TS-API.en</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:///C:\Users\bob\.vscode\extensions\jasonroger.markdown-preview-enhanced-fork-0.2.7\node_modules\@shd101wyy\mume\dependencies\katex\katex.min.css">
+      
+
+      
+      
+      
+
       <style> 
-/**
+      /**
  * prism.js Github theme based on GitHub's theme.
  * @author Sam Clarke
  */
@@ -201,18 +209,18 @@ code.language-yaml {
     </head>
     <body for="html-export">
       <div class="mume markdown-preview   ">
-      <h1>ts-rest-api Programmer's Guide</h1>
-<p>This article is a programming guide for those who develop application software using <strong>ts-rest-api</strong>, which is built in <strong>TS-CMS</strong>, <strong>TS-NVR</strong>, <strong>TS-LPR</strong> of TS Solution Co.,Ltd.</p>
+      <h1>TS-API Programmer's Guide</h1>
+<p>This article is a programming guide for those who develop application software using <strong>TS-API</strong>, which is built in <strong>TS-CMS</strong>, <strong>TS-NVR</strong>, <strong>TS-LPR</strong> of TS Solution Co.,Ltd.</p>
 <p>You can easily embed the real-time video, recorded video, and video search functions into your application software with the API.</p>
 <p>It would be helpful if you have experience using simple <code>HTML</code> and <code>JavaScript</code> to use the API.</p>
 <p>Please refer to the following, as the features supported by each product may differ.<br>
 <a href="#the-api-supported-versions-by-product">The API-supported versions by product</a><br>
 <a href="#the-features-table-by-product">The features table by product</a></p>
 <p><em>The API and this article are subject to change without notice for better development support and improvement.</em></p>
-<h2 class="mume-header" id="getting-started">Getting Started</h2>
+<h2 class="mume-header" id="get-started">Get Started</h2>
 
-<p><code>[Tips]</code> If you look at this <a href="http://ts-rest-api.md">ts-rest-api.md</a> document online, the included examples may not run. We recommend that you download this project using git and open the ts-rest-api.html file in your web browser.</p>
-<p>In this article, ts-rest-api is abbreviated as <strong>API</strong>, and each product is simply called <strong>server</strong>.</p>
+<p><code>[Tips]</code> If you look at this <a href="http://TS-API.en.md">TS-API.en.md</a> document online, the included examples may not run. We recommend that you download this project using git and open the TS-API.en.html file in your web browser.</p>
+<p>In this article, TS-API is abbreviated as <strong>API</strong>, and each product is simply called <strong>server</strong>.</p>
 <h2 class="mume-header" id="video-display">Video display</h2>
 
 <h3 class="mume-header" id="real-time-video-display">Real-time video display</h3>
@@ -220,7 +228,7 @@ code.language-yaml {
 <p>Try to type the following in the Web browser address window.</p>
 <pre class="language-ruby">http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tssolution<span class="token punctuation">.</span>ipdisk<span class="token punctuation">.</span>co<span class="token punctuation">.</span>kr<span class="token punctuation">:</span><span class="token number">85</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<p><button onClick="window.open(&apos;http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=&apos;)">Show</button></p>
+<p>&lt;button onClick=]window.open(&quot;<a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=">http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=</a>&quot;)'&gt;Show</p>
 <p>Do you see the video?</p>
 <p><code>[Tips]</code> <em>The demonstration video used in this sample code may not be connected depending on the situation in the field.</em></p>
 <h3 class="mume-header" id="inserting-video-into-web-page">Inserting video into web page</h3>
@@ -228,17 +236,17 @@ code.language-yaml {
 <p>Now let's insert the video into the web page.</p>
 <pre class="language-html"><span class="token doctype">&lt;!DOCTYPE>
 &lt;head></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>utf-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>utf-8<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>ex1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
 
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h2</span><span class="token punctuation">></span></span>Example 1. Insert video<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h2</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://tssolution.ipdisk.co.kr:85/watch?ch<span class="token punctuation">=</span>1&amp;auth<span class="token punctuation">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token punctuation">=</span><span class="token punctuation">"</span></span> 
-  <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>640<span class="token punctuation">"</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>360<span class="token punctuation">"</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>0<span class="token punctuation">"</span></span> <span class="token attr-name">allowfullscreen</span> <span class="token punctuation">/></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>http://tssolution.ipdisk.co.kr:85/watch?ch<span class="token punctuation">=</span>1&amp;auth<span class="token punctuation">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token punctuation">=</span><span class="token punctuation">'</span></span> 
+  <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>640<span class="token punctuation">'</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>360<span class="token punctuation">'</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>0<span class="token punctuation">'</span></span> <span class="token attr-name">allowfullscreen</span> <span class="token punctuation">/></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
 </pre>
-<p><button onClick="window.open(&apos;./examples/ex1.html&apos;)">Show</button></p>
+<p><button onClick="window.open(&quot;./examples/ex1.html&quot;)">Show</button></p>
 <p>The video URL and the <code>&lt;iframe&gt;</code> tag code used in the example are provided as a pop-up menu when you <strong>right-click on the video</strong> of the webpage (or long-press on the video in case of a smartphone).<br>
 Select the menu item you are to use, the code will be copied to the clipboard and then you can <strong>paste</strong> them into your code.</p>
 <table>
@@ -306,8 +314,8 @@ To connect to a real server, you need to know the following two things by defaul
 </tbody>
 </table>
 <p>In the above example, you can change the address part as follows:</p>
-<pre class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>http://tssolution.ipdisk.co.kr:85/watch?ch<span class="token punctuation">=</span>1&amp;auth<span class="token punctuation">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token punctuation">=</span><span class="token punctuation">"</span></span>
-  <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>640<span class="token punctuation">"</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>360<span class="token punctuation">"</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>0<span class="token punctuation">"</span></span> <span class="token attr-name">allowfullscreen</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">></span></span>
+<pre class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>http://tssolution.ipdisk.co.kr:85/watch?ch<span class="token punctuation">=</span>1&amp;auth<span class="token punctuation">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token punctuation">=</span><span class="token punctuation">'</span></span>
+  <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>640<span class="token punctuation">'</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>360<span class="token punctuation">'</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>0<span class="token punctuation">'</span></span> <span class="token attr-name">allowfullscreen</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>iframe</span><span class="token punctuation">></span></span>
 </pre>
 <p>Here <code>ZGVtbzohMTIzNHF3ZXI=</code> following <code>auth=</code> is the <a href="#base64-encoding">base64 encoded</a> part of user ID and password.</p>
 <p>The format is to use a colon (<code>:</code>) delimiter, such as <code>userid: password</code>, to create a username and password as a single text and then <a href="#base64-encoding">base64 encoded</a>.<br>
@@ -315,7 +323,7 @@ In the above example, <code>demo:!1234qwer</code> is <a href="#base64-encoding">
 <p>In this example, we will improve the way we access the login information using JavaScript <a href="#base64-encoding">base64 encoding</a> function.</p>
 <pre class="language-html"><span class="token doctype">&lt;!DOCTYPE>
 &lt;head></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>utf-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>utf-8<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>ex2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
 
@@ -352,20 +360,20 @@ In the above example, <code>demo:!1234qwer</code> is <a href="#base64-encoding">
       <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span>Password<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tr</span><span class="token punctuation">></span></span>
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tr</span><span class="token punctuation">></span></span>
-      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>host-name<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
-      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>user-id<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span> 
-      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>password<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
-      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>button<span class="token punctuation">"</span></span> <span class="token attr-name">onClick</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>onConnect()<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Connect<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>host-name<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>user-id<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span> 
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>password<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>button<span class="token punctuation">'</span></span> <span class="token attr-name">onClick</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>onConnect()<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>Connect<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tr</span><span class="token punctuation">></span></span>
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tr</span><span class="token punctuation">></span></span>
-      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">colspan</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>4<span class="token punctuation">"</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>result<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">colspan</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>4<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>result<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tr</span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>table</span><span class="token punctuation">></span></span>
 
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>640<span class="token punctuation">"</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>360<span class="token punctuation">"</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>0<span class="token punctuation">"</span></span> <span class="token attr-name">allowfullscreen</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>player<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>640<span class="token punctuation">'</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>360<span class="token punctuation">'</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>0<span class="token punctuation">'</span></span> <span class="token attr-name">allowfullscreen</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>player<span class="token punctuation">'</span></span> <span class="token punctuation">/></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
 </pre>
-<p><button onClick="window.open(&apos;./examples/ex2.html&apos;)">Show</button></p>
+<p><button onClick="window.open(&quot;./examples/ex2.html&quot;)">Show</button></p>
 <h3 class="mume-header" id="change-channel">Change channel</h3>
 
 <p>If you change the <code>ch=</code> part of the video source to the desired channel number as shown below, the video of that channel will be displayed.<br>
@@ -373,7 +381,7 @@ Channel numbers are integers starting at 1.<br>
 For example, if you want to see channel 3, you can modify it like this:</p>
 <pre class="language-ruby">http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tssolution<span class="token punctuation">.</span>ipdisk<span class="token punctuation">.</span>co<span class="token punctuation">.</span>kr<span class="token punctuation">:</span><span class="token number">85</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">3</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<p><button onClick="window.open(&apos;http://tssolution.ipdisk.co.kr:85/watch?ch=3&amp;auth=ZGVtbzohMTIzNHF3ZXI=&apos;)">Show</button></p>
+<p><button onClick="window.open(&quot;http://tssolution.ipdisk.co.kr:85/watch?ch=3&amp;auth=ZGVtbzohMTIzNHF3ZXI=&quot;)">Show</button></p>
 <h3 class="mume-header" id="display-recorded-video">Display recorded video</h3>
 
 <p>To display the recorded video, you need the date and time information (time stamp) of the desired video.<br>
@@ -438,7 +446,7 @@ Using <code>login=</code> parameter after encrypting the user ID and password in
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"ts-rest-api@0.1.0"</span>
+  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"TS-API@0.2.0"</span>
 <span class="token punctuation">}</span>
 </pre>
 <h3 class="mume-header" id="site-name">Site name</h3>
@@ -448,9 +456,9 @@ Using <code>login=</code> parameter after encrypting the user ID and password in
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>siteName
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">{
-  &quot;siteName&quot;: &quot;My%20home%20server&quot;  // (URL encoded)
-}
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"siteName"</span><span class="token punctuation">:</span> <span class="token string">"My%20home%20server"</span>  <span class="token comment" spellcheck="true">// (URL encoded)</span>
+<span class="token punctuation">}</span>
 </pre>
 <p>The value of <code>siteName</code>, <code>&quot;My%20home%20server&quot;</code>, is what you entered in the web service tab of the Settings window on the server, and it is <a href="#url-decoding">URL-encoded</a> to present in JSON format.<br>
 Decoding the above<a href="#url-decoding">URL-encoded</a> code will convert it to <code>&quot;My home server&quot;</code>.</p>
@@ -462,12 +470,12 @@ It is used to distinguish between the client-side and server-side local time whe
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>timezone
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">{
-  &quot;timezone&quot;: {
-    &quot;name&quot;: &quot;America/New_York&quot;,   // Time zone name as IANA format
-    &quot;bias&quot;: &quot;-05:00&quot;              // UTC offset
-  }
-}
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timezone"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"America/New_York"</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// Time zone name as IANA format</span>
+    <span class="token string">"bias"</span><span class="token punctuation">:</span> <span class="token string">"-05:00"</span>              <span class="token comment" spellcheck="true">// UTC offset</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </pre>
 <p>UTC offset, for example, <code>UTC-05:00</code>, may be used instead of <a href="#https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">IANA time zone name</a>.</p>
 <h3 class="mume-header" id="product-information">Product information</h3>
@@ -477,29 +485,29 @@ It is used to distinguish between the client-side and server-side local time whe
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>product
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">// for TS-CMS:
-{
-  &quot;product&quot;: {
-    &quot;name&quot;: &quot;TS-CMS&quot;,               // Product name
-    &quot;version&quot;: &quot;v0.38.0 (64-bit)&quot;   // Version information
-  }
-}
+<pre class="language-jsx"><span class="token comment" spellcheck="true">// for TS-CMS:</span>
+<span class="token punctuation">{</span>
+  <span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"TS-CMS"</span><span class="token punctuation">,</span>               <span class="token comment" spellcheck="true">// Product name</span>
+    <span class="token string">"version"</span><span class="token punctuation">:</span> <span class="token string">"v0.38.0 (64-bit)"</span>   <span class="token comment" spellcheck="true">// Version information</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-// for TS-NVR:
-{
-  &quot;product&quot;: {
-    &quot;name&quot;: &quot;TS-NVR&quot;,               // Product name
-    &quot;version&quot;: &quot;v0.35.0 (64-bit)&quot;   // Version information
-  }
-}
+<span class="token comment" spellcheck="true">// for TS-NVR:</span>
+<span class="token punctuation">{</span>
+  <span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"TS-NVR"</span><span class="token punctuation">,</span>               <span class="token comment" spellcheck="true">// Product name</span>
+    <span class="token string">"version"</span><span class="token punctuation">:</span> <span class="token string">"v0.35.0 (64-bit)"</span>   <span class="token comment" spellcheck="true">// Version information</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-// for TS-LPR:
-{
-  &quot;product&quot;: {
-    &quot;name&quot;: &quot;TS-LPR&quot;,               // Product name
-    &quot;version&quot;: &quot;v0.2.0A (64-bit)&quot;   // Version information
-  }
-}
+<span class="token comment" spellcheck="true">// for TS-LPR:</span>
+<span class="token punctuation">{</span>
+  <span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"TS-LPR"</span><span class="token punctuation">,</span>               <span class="token comment" spellcheck="true">// Product name</span>
+    <span class="token string">"version"</span><span class="token punctuation">:</span> <span class="token string">"v0.2.0A (64-bit)"</span>   <span class="token comment" spellcheck="true">// Version information</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </pre>
 <h3 class="mume-header" id="license-information">License information</h3>
 
@@ -508,26 +516,26 @@ It is used to distinguish between the client-side and server-side local time whe
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>license
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">// for a genuine lincense:
-{
-  &quot;license&quot;: {
-    &quot;type&quot;: &quot;genuine&quot;,    // Genuine lincense
-    &quot;maxChannels&quot;: 36,    // Maximum channels available
-    &quot;extension&quot;: [        // Add-ons
-      &quot;lprExt&quot;            // Interworking the vehicle number recognition
-    ]
-  }
-}
+<pre class="language-jsx"><span class="token comment" spellcheck="true">// for a genuine lincense:</span>
+<span class="token punctuation">{</span>
+  <span class="token string">"license"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>    <span class="token comment" spellcheck="true">// Genuine lincense</span>
+    <span class="token string">"maxChannels"</span><span class="token punctuation">:</span> <span class="token number">36</span><span class="token punctuation">,</span>    <span class="token comment" spellcheck="true">// Maximum channels available</span>
+    <span class="token string">"extension"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>        <span class="token comment" spellcheck="true">// Add-ons</span>
+      <span class="token string">"lprExt"</span>            <span class="token comment" spellcheck="true">// Interworking the vehicle number recognition</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-// for a free trial:
-{
-  &quot;license&quot;: {
-    &quot;type&quot;: &quot;trial&quot;,    // Free trial
-    &quot;maxChannels&quot;: 16,  // Maximum channels available
-    &quot;trialDays&quot;: 30,    // 30 days free trial
-    &quot;leftDays&quot;: 15      // 15 days left
-  }
-}
+<span class="token comment" spellcheck="true">// for a free trial:</span>
+<span class="token punctuation">{</span>
+  <span class="token string">"license"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"trial"</span><span class="token punctuation">,</span>    <span class="token comment" spellcheck="true">// Free trial</span>
+    <span class="token string">"maxChannels"</span><span class="token punctuation">:</span> <span class="token number">16</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// Maximum channels available</span>
+    <span class="token string">"trialDays"</span><span class="token punctuation">:</span> <span class="token number">30</span><span class="token punctuation">,</span>    <span class="token comment" spellcheck="true">// 30 days free trial</span>
+    <span class="token string">"leftDays"</span><span class="token punctuation">:</span> <span class="token number">15</span>      <span class="token comment" spellcheck="true">// 15 days left</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </pre>
 <h3 class="mume-header" id="user-information">User information</h3>
 
@@ -538,21 +546,21 @@ From here on, the <code>auth =</code> part of <a href="#session-authentication">
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:<br>
 If it is not in <a href="#session-authentication">session authenticated</a> state, the server sends an HTTP response code 401 error.</p>
-<pre class="language-text">{
-  &quot;whoAmI&quot;: {
-    &quot;uid&quot;:&quot;admin&quot;,      // User ID (URL encoded)
-    &quot;name&quot;:&quot;admin&quot;,     // User name (URL encoded)
-    &quot;accessRights&quot;: [   // Permissions
-      &quot;DataExport&quot;,     // Export images, videos
-      &quot;Control&quot;,        // Pan tilt, relay control
-      &quot;Settings&quot;,       // Change settings
-      &quot;Playback&quot;,       // Play saved videos
-      &quot;LPR&quot;,            // Vehicle number search
-      &quot;SearchEdit&quot;,     // Edit search data
-      &quot;Remote&quot;          // Eemote access
-    ]
-  }
-}
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"whoAmI"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"uid"</span><span class="token punctuation">:</span><span class="token string">"admin"</span><span class="token punctuation">,</span>      <span class="token comment" spellcheck="true">// User ID (URL encoded)</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span><span class="token string">"admin"</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">// User name (URL encoded)</span>
+    <span class="token string">"accessRights"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>   <span class="token comment" spellcheck="true">// Permissions</span>
+      <span class="token string">"DataExport"</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">// Export images, videos</span>
+      <span class="token string">"Control"</span><span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// Pan tilt, relay control</span>
+      <span class="token string">"Settings"</span><span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">// Change settings</span>
+      <span class="token string">"Playback"</span><span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">// Play saved videos</span>
+      <span class="token string">"LPR"</span><span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// Vehicle number search</span>
+      <span class="token string">"SearchEdit"</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">// Edit search data</span>
+      <span class="token string">"Remote"</span>          <span class="token comment" spellcheck="true">// Eemote access</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </pre>
 <h3 class="mume-header" id="request-all-at-once">Request all at once</h3>
 
@@ -560,60 +568,102 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>all
 </pre>
 <p>This request returns JSON data with an HTTP response code of 200 if the session is authenticated, or JSON data with an HTTP response code of 401 with no <code>whoAmI</code> entries if it is not authenticated.</p>
-<pre class="language-text">// Session authenticated state (HTTP response code: 200):
-{
-  &quot;apiVersion&quot;: &quot;ts-rest-api@0.1.0&quot;,
-  &quot;siteName&quot;: &quot;My%20home%20server&quot;,
-  &quot;timezone&quot;: {
-    &quot;name&quot;: &quot;America/New_York&quot;,
-    &quot;bias&quot;: &quot;-05:00&quot;
-  },
-  &quot;product&quot;: {
-    &quot;name&quot;: &quot;TS-LPR&quot;,
-    &quot;version&quot;: &quot;v0.2.0A (64-bit)&quot;
-  },
-  &quot;license&quot;: {
-    &quot;type&quot;: &quot;genuine&quot;,
-    &quot;maxChannels&quot;: 36,
-    &quot;extension&quot;: [
-      &quot;lprExt&quot;
-    ]
-  },
-  &quot;whoAmI&quot;: {
-    &quot;uid&quot;: &quot;admin&quot;,
-    &quot;name&quot;: &quot;admin&quot;,
-    &quot;accessRights&quot;: [
-      &quot;DataExport&quot;,
-      &quot;Control&quot;,
-      &quot;Settings&quot;,
-      &quot;Playback&quot;,
-      &quot;LPR&quot;,
-      &quot;SearchEdit&quot;,
-      &quot;Remote&quot;
-    ]
-  }
-}
+<pre class="language-jsx"><span class="token comment" spellcheck="true">// Session authenticated state (HTTP response code: 200):</span>
+<span class="token punctuation">{</span>
+  <span class="token string">"apiVersion"</span><span class="token punctuation">:</span> <span class="token string">"TS-API@0.2.0"</span><span class="token punctuation">,</span>
+  <span class="token string">"siteName"</span><span class="token punctuation">:</span> <span class="token string">"My%20home%20server"</span><span class="token punctuation">,</span>
+  <span class="token string">"timezone"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"America/New_York"</span><span class="token punctuation">,</span>
+    <span class="token string">"bias"</span><span class="token punctuation">:</span> <span class="token string">"-05:00"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"TS-LPR"</span><span class="token punctuation">,</span>
+    <span class="token string">"version"</span><span class="token punctuation">:</span> <span class="token string">"v0.5.0A (64-bit)"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">"license"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>
+    <span class="token string">"maxChannels"</span><span class="token punctuation">:</span> <span class="token number">36</span><span class="token punctuation">,</span>
+    <span class="token string">"extension"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token string">"lprExt"</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">"whoAmI"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"uid"</span><span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span>
+    <span class="token string">"accessRights"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token string">"DataExport"</span><span class="token punctuation">,</span>
+      <span class="token string">"Control"</span><span class="token punctuation">,</span>
+      <span class="token string">"Settings"</span><span class="token punctuation">,</span>
+      <span class="token string">"Playback"</span><span class="token punctuation">,</span>
+      <span class="token string">"LPR"</span><span class="token punctuation">,</span>
+      <span class="token string">"SearchEdit"</span><span class="token punctuation">,</span>
+      <span class="token string">"Remote"</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-// Session unauthenticated state (HTTP response code: 401):
-{
-  &quot;apiVersion&quot;: &quot;ts-rest-api@0.1.0&quot;,
-  &quot;siteName&quot;: &quot;My%20home%20server&quot;,
-  &quot;timezone&quot;: {
-    &quot;name&quot;: &quot;America/New_York&quot;,
-    &quot;bias&quot;: &quot;-05:00&quot;
-  },
-  &quot;product&quot;: {
-    &quot;name&quot;: &quot;TS-LPR&quot;,
-    &quot;version&quot;: &quot;v0.2.0A (64-bit)&quot;
-  },
-  &quot;license&quot;: {
-    &quot;type&quot;: &quot;genuine&quot;,
-    &quot;maxChannels&quot;: 36,
-    &quot;extension&quot;: [
-      &quot;lprExt&quot;
-    ]
-  }     // whoAmI is not included
-}
+<span class="token comment" spellcheck="true">// Session unauthenticated state (HTTP response code: 401):</span>
+<span class="token punctuation">{</span>
+  <span class="token string">"apiVersion"</span><span class="token punctuation">:</span> <span class="token string">"TS-API@0.2.0"</span><span class="token punctuation">,</span>
+  <span class="token string">"siteName"</span><span class="token punctuation">:</span> <span class="token string">"My%20home%20server"</span><span class="token punctuation">,</span>
+  <span class="token string">"timezone"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"America/New_York"</span><span class="token punctuation">,</span>
+    <span class="token string">"bias"</span><span class="token punctuation">:</span> <span class="token string">"-05:00"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">"product"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"TS-LPR"</span><span class="token punctuation">,</span>
+    <span class="token string">"version"</span><span class="token punctuation">:</span> <span class="token string">"v0.5.0A (64-bit)"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">"license"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>
+    <span class="token string">"maxChannels"</span><span class="token punctuation">:</span> <span class="token number">36</span><span class="token punctuation">,</span>
+    <span class="token string">"extension"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token string">"lprExt"</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>     <span class="token comment" spellcheck="true">// whoAmI is not included</span>
+<span class="token punctuation">}</span>
+</pre>
+<h2 class="mume-header" id="request-system-informatoin">Request system informatoin</h2>
+
+<p>Requests system information from the server.</p>
+<pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>sysinfo
+</pre>
+<p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"cpu"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"Intel(R) Core(TM) i7-4712MQ CPU @ 2.30GHz"</span><span class="token punctuation">,</span>
+    <span class="token string">"cores"</span><span class="token punctuation">:</span> <span class="token number">8</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">"systemMemory"</span><span class="token punctuation">:</span> <span class="token string">"12 GB"</span><span class="token punctuation">,</span>
+  <span class="token string">"displayAdapter"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"model"</span><span class="token punctuation">:</span> <span class="token string">"Intel(R) HD Graphics 4600"</span><span class="token punctuation">,</span>
+      <span class="token string">"monitor"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"Generic PnP Monitor"</span><span class="token punctuation">,</span>
+        <span class="token string">"Generic PnP Monitor"</span>
+      <span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">"hdd"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"model"</span><span class="token punctuation">:</span> <span class="token string">"SanDisk SD7SB6S256G1122"</span><span class="token punctuation">,</span>
+      <span class="token string">"serialNo"</span><span class="token punctuation">:</span> <span class="token string">"150608401947"</span><span class="token punctuation">,</span>
+      <span class="token string">"capacity"</span><span class="token punctuation">:</span> <span class="token string">"256 GB"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"model"</span><span class="token punctuation">:</span> <span class="token string">"ST1000LM024 HN-M101MBB"</span><span class="token punctuation">,</span>
+      <span class="token string">"serialNo"</span><span class="token punctuation">:</span> <span class="token string">"S2R8J9BC700641"</span><span class="token punctuation">,</span>
+      <span class="token string">"capacity"</span><span class="token punctuation">:</span> <span class="token string">"1 TB"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">"networkAdapter"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"Realtek PCIe GBE Family Controller"</span><span class="token punctuation">,</span>
+      <span class="token string">"mac"</span><span class="token punctuation">:</span> <span class="token string">"80-FA-5B-03-79-5E"</span><span class="token punctuation">,</span>
+      <span class="token string">"ipAddress"</span><span class="token punctuation">:</span> <span class="token string">"192.168.0.43"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
 </pre>
 <h2 class="mume-header" id="request-various-enumeration">Request various enumeration</h2>
 
@@ -624,16 +674,16 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>channel
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">[
-  {
-    &quot;chid&quot;: 1,              // Channel number
-    &quot;title&quot;: &quot;Front%20door&quot; // Channel name (URL encoded)
-  },
-  {
-    &quot;chid&quot;: 2,              // Channel number
-    &quot;title&quot;: &quot;Garage&quot;       // Channel name (URL encoded)
-  }
-]
+<pre class="language-jsx"><span class="token punctuation">[</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>              <span class="token comment" spellcheck="true">// Channel number</span>
+    <span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"Front%20door"</span> <span class="token comment" spellcheck="true">// Channel name (URL encoded)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>              <span class="token comment" spellcheck="true">// Channel number</span>
+    <span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"Garage"</span>       <span class="token comment" spellcheck="true">// Channel name (URL encoded)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">]</span>
 </pre>
 <h3 class="mume-header" id="vehicle-number-recognition-device-list">Vehicle number recognition device list</h3>
 
@@ -642,46 +692,46 @@ The vehicle number recognition device list includes used devices when an externa
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>lprSrc
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">[
-  // Information received from the interworked car number recognition devices
-  {
-    &quot;id&quot;: 1,                  // Device number
-    &quot;code&quot;: &quot;F00001&quot;,         // Device code (URL encoded)
-    &quot;name&quot;: &quot;F00001&quot;,         // Device name (URL encoded)
-    &quot;linkedChannel&quot;: [        // List of channels that are linked when trigger occurs
-      1,
-      2
-    ],
-    &quot;tag&quot;: &quot;Normal&quot;           // Usage (Normal: Channel in use, NotUsed: Channel not in use, ReadOnly: Read-only channel)
-  },
+<pre class="language-jsx"><span class="token punctuation">[</span>
+  <span class="token comment" spellcheck="true">// Information received from the interworked car number recognition devices</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>                  <span class="token comment" spellcheck="true">// Device number</span>
+    <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"F00001"</span><span class="token punctuation">,</span>         <span class="token comment" spellcheck="true">// Device code (URL encoded)</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"F00001"</span><span class="token punctuation">,</span>         <span class="token comment" spellcheck="true">// Device name (URL encoded)</span>
+    <span class="token string">"linkedChannel"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>        <span class="token comment" spellcheck="true">// List of channels that are linked when trigger occurs</span>
+      <span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token number">2</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token string">"tag"</span><span class="token punctuation">:</span> <span class="token string">"Normal"</span>           <span class="token comment" spellcheck="true">// Usage (Normal: Channel in use, NotUsed: Channel not in use, ReadOnly: Read-only channel)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
 
-  // In the case of TS-LPR, the information recognized by the car number recognition zone
-  {
-    &quot;id&quot;: 2,                  // Device number
-    &quot;code&quot;: &quot;1%2D1%2D1&quot;,      // Device code (URL encoded)
-    &quot;name&quot;: &quot;1%2D1%2D1&quot;,      // Device name (URL encoded)
-    &quot;linkedChannel&quot;: [],      // List of channels that are linked when trigger occurs (Empty if there is no linked channel)
-    &quot;tag&quot;: &quot;Normal&quot;,          // Usage (Normal: Channel in use, NotUsed: Channel not in use, ReadOnly: Read-only channel)
-    &quot;zone&quot;: {                 // Recognition zone
-      &quot;id&quot;: 0,                // Zone number
-      &quot;chid&quot;: 1,              // Channel number
-      &quot;rect&quot;: [               // Zone coordinates
-        2622, 1499,           // Top-left corner of the rectangle (x0,y0) 
-        4297, 4297            // Lower-right corner of the rectangle (x1,y1) 
-      ],
-      &quot;mode&quot;: &quot;driving&quot;,      // Number recognition operation mode (driving: Driving mode, parking: Parking mode)
-      &quot;disabledOnly&quot;: false,  // True if the zone is Disabled parking, false otherwise
-      &quot;noParkingAllowed&quot;: false // True if the zone is prohibited for parking, false otherwise
-    }
-  }
-]
+  <span class="token comment" spellcheck="true">// In the case of TS-LPR, the information recognized by the car number recognition zone</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>                  <span class="token comment" spellcheck="true">// Device number</span>
+    <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token string">"1%2D1%2D1"</span><span class="token punctuation">,</span>      <span class="token comment" spellcheck="true">// Device code (URL encoded)</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"1%2D1%2D1"</span><span class="token punctuation">,</span>      <span class="token comment" spellcheck="true">// Device name (URL encoded)</span>
+    <span class="token string">"linkedChannel"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span>      <span class="token comment" spellcheck="true">// List of channels that are linked when trigger occurs (Empty if there is no linked channel)</span>
+    <span class="token string">"tag"</span><span class="token punctuation">:</span> <span class="token string">"Normal"</span><span class="token punctuation">,</span>          <span class="token comment" spellcheck="true">// Usage (Normal: Channel in use, NotUsed: Channel not in use, ReadOnly: Read-only channel)</span>
+    <span class="token string">"zone"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>                 <span class="token comment" spellcheck="true">// Recognition zone</span>
+      <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>                <span class="token comment" spellcheck="true">// Zone number</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>              <span class="token comment" spellcheck="true">// Channel number</span>
+      <span class="token string">"rect"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>               <span class="token comment" spellcheck="true">// Zone coordinates</span>
+        <span class="token number">2622</span><span class="token punctuation">,</span> <span class="token number">1499</span><span class="token punctuation">,</span>           <span class="token comment" spellcheck="true">// Top-left corner of the rectangle (x0,y0) </span>
+        <span class="token number">4297</span><span class="token punctuation">,</span> <span class="token number">4297</span>            <span class="token comment" spellcheck="true">// Lower-right corner of the rectangle (x1,y1) </span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token string">"mode"</span><span class="token punctuation">:</span> <span class="token string">"driving"</span><span class="token punctuation">,</span>      <span class="token comment" spellcheck="true">// Number recognition operation mode (driving: Driving mode, parking: Parking mode)</span>
+      <span class="token string">"disabledOnly"</span><span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// True if the zone is Disabled parking, false otherwise</span>
+      <span class="token string">"noParkingAllowed"</span><span class="token punctuation">:</span> <span class="token boolean">false</span> <span class="token comment" spellcheck="true">// True if the zone is prohibited for parking, false otherwise</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">]</span>
 
-For the rectangle coordinates of each zone,
-instead of the actual video pixel coordinates,
-the logical coordinate system of 8K (7680x4320) resolution is used.
-For example, if the video is 1920x1080 resolution and the zone is (480, 270, 1440, 810),
-the abscissas are multiplied by 7680/1920, and the ordinates are multiplied by 4320/1080, 
-then be calculated as (1920, 1080, 5760, 3240).
+<span class="token comment" spellcheck="true">// For the rectangle coordinates of each zone,</span>
+<span class="token comment" spellcheck="true">// instead of the actual video pixel coordinates,</span>
+<span class="token comment" spellcheck="true">// the logical coordinate system of 8K (7680x4320) resolution is used.</span>
+<span class="token comment" spellcheck="true">// For example, if the video is 1920x1080 resolution and the zone is (480, 270, 1440, 810),</span>
+<span class="token comment" spellcheck="true">// the abscissas are multiplied by 7680/1920, and the ordinates are multiplied by 4320/1080, </span>
+<span class="token comment" spellcheck="true">// then be calculated as (1920, 1080, 5760, 3240).</span>
 </pre>
 <h3 class="mume-header" id="event-log-type-list">Event log type list</h3>
 
@@ -689,27 +739,26 @@ then be calculated as (1920, 1080, 5760, 3240).
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>eventType
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">[
-  {
-    &quot;id&quot;: 0,                  // Event log type number
-    &quot;name&quot;: &quot;System log&quot;,     // Event log type name
-    &quot;code&quot;: [                 // List of event log codes
-      {
-        &quot;id&quot;: 1,              // Event log code number
-        &quot;name&quot;: &quot;System startup&quot;  // Event log code name
-      },
-      {
-        &quot;id&quot;: 2,
-        &quot;name&quot;: &quot;System shutdown&quot;
-      },
-
-      ... // omitted
-  },
-  {
-    &quot;id&quot;: 6,
-    &quot;name&quot;: &quot;User-defined event&quot;
-  }
-]
+<pre class="language-jsx"><span class="token punctuation">[</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>                  <span class="token comment" spellcheck="true">// Event log type number</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"System log"</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">// Event log type name</span>
+    <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>                 <span class="token comment" spellcheck="true">// List of event log codes</span>
+      <span class="token punctuation">{</span>
+        <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>              <span class="token comment" spellcheck="true">// Event log code number</span>
+        <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"System startup"</span>  <span class="token comment" spellcheck="true">// Event log code name</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span>
+        <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+        <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"System shutdown"</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token comment" spellcheck="true">// ... omitted</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">6</span><span class="token punctuation">,</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"User-defined event"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">]</span>
 </pre>
 <p>The list of event log codes is defined by each type.</p>
 <p>If you do not specify a language, the default is to return results based on the server's language setting.<br>
@@ -722,69 +771,73 @@ lang      <span class="token comment" spellcheck="true"># Language</span>
 <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>eventType<span class="token operator">&amp;</span>lang<span class="token operator">=</span>es<span class="token operator">-</span><span class="token constant">ES</span>
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">[
-  {
-    &quot;id&quot;: 0,
-    &quot;name&quot;: &quot;Registro del sistema&quot;,
-    &quot;code&quot;: [
-      {
-        &quot;id&quot;: 1,
-        &quot;name&quot;: &quot;Inicio del sistema&quot;
-      },
-      {
-        &quot;id&quot;: 2,
-        &quot;name&quot;: &quot;Apagado del sistema&quot;
-      },
-      {
-        &quot;id&quot;: 3,
-        &quot;name&quot;: &quot;Apagado anormal&quot;
-      },
-
-      ... // omitted
-  },
-  {
-    &quot;id&quot;: 6,
-    &quot;name&quot;: &quot;Evento definido por el usuario&quot;
-  }
-]
+<pre class="language-jsx"><span class="token punctuation">[</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"Registro del sistema"</span><span class="token punctuation">,</span>
+    <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"Inicio del sistema"</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span>
+        <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+        <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"Apagado del sistema"</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span>
+        <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+        <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"Apagado anormal"</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token comment" spellcheck="true">// ... omitted</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">6</span><span class="token punctuation">,</span>
+    <span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"Evento definido por el usuario"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">]</span>
 </pre>
 <h2 class="mume-header" id="retrieve-recorded-data">Retrieve recorded data</h2>
 
 <p>Use <code>/api/find</code> to search for recorded data.</p>
-<h3 class="mume-header" id="search-date-with-recorded-video">Search date with recorded video</h3>
+<h3 class="mume-header" id="search-dates-with-recorded-video">Search dates with recorded video</h3>
 
-<p>To get a list of dates with recorded images, request the following:</p>
+<p>To get a list of dates with recorded videos, request the following:</p>
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays      <span class="token operator">/</span><span class="token operator">/</span> <span class="token constant">Request</span> all dates with recorded video
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">{
-  &quot;result&quot;: {
-    &quot;2018-1&quot;: [ // Displays the date in which the data exists in year-month format as an array
-      8,        // The recorded data of 2018-1-1 exists.
-      23,       // The recorded data of 2018-1-23 exists.
-      24        // The recorded data of 2018-1-24 exists.
-    ],
-    &quot;2018-2&quot;: [ // and so on.
-      5,
-      6,
-      7,
-      9,
-      13,
-      14,
-      19
-    ]
-  }
-}
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"2018-1"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// Displays the date in which the data exists in year-month format as an array</span>
+      <span class="token number">8</span><span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// The recorded data of 2018-1-1 exists.</span>
+      <span class="token number">23</span><span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">// The recorded data of 2018-1-23 exists.</span>
+      <span class="token number">24</span>        <span class="token comment" spellcheck="true">// The recorded data of 2018-1-24 exists.</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token string">"2018-2"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// and so on.</span>
+      <span class="token number">5</span><span class="token punctuation">,</span>
+      <span class="token number">6</span><span class="token punctuation">,</span>
+      <span class="token number">7</span><span class="token punctuation">,</span>
+      <span class="token number">9</span><span class="token punctuation">,</span>
+      <span class="token number">13</span><span class="token punctuation">,</span>
+      <span class="token number">14</span><span class="token punctuation">,</span>
+      <span class="token number">19</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 </pre>
 <p>You can request to meet certain criteria by adding the following parameters:</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># Parameters</span>
-ch          <span class="token comment" spellcheck="true"># List of dates on which a specific channel was recorded</span>
+ch          <span class="token comment" spellcheck="true"># List of dates on which a specific channel was recorded </span>
+            <span class="token comment" spellcheck="true"># (Multiple channels are listed using commas)</span>
 timeBegin   <span class="token comment" spellcheck="true"># List of dates recorded after a specific date and time</span>
 timeEnd     <span class="token comment" spellcheck="true"># List of recorded dates before a specific date and time</span>
+            <span class="token comment" spellcheck="true"># (If the request is made in UTC time, the date based on UTC is returned, </span>
+            <span class="token comment" spellcheck="true"># otherwise the date based on the server's local time is returned.)</span>
 
 <span class="token comment" spellcheck="true"># Examples</span>
-<span class="token comment" spellcheck="true"># Request list of the date on which channel 1 was recorded</span>
+<span class="token comment" spellcheck="true"># Request date list of channels 1 recorded</span>
 <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span>
+<span class="token comment" spellcheck="true"># Request date list of channels 1,2,3 recorded </span>
+<span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span>
 
 <span class="token comment" spellcheck="true"># List of recorded dates since February 2018 (2018-02-01T00: 00:00-05:00)</span>
 <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">02</span><span class="token operator">-</span>01T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00<span class="token number">-05</span><span class="token operator">%</span>3A00
@@ -797,17 +850,50 @@ timeEnd     <span class="token comment" spellcheck="true"># List of recorded dat
 <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>01T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00<span class="token number">-05</span><span class="token operator">%</span>3A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>31T23<span class="token operator">%</span>3A59<span class="token operator">%</span>3A59<span class="token number">.999</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span>3A00
 </pre>
 <p>If you specify a condition using parameters such as <code>ch</code>,<code>timeBegin</code>, or <code>timeEnd</code>, the result is returned, including the requested condition, as shown below.</p>
-<pre class="language-text">{
-  &quot;timeBegin&quot;: &quot;2018-01-01T00:00:00-05:00&quot;,     // First date and time requested
-  &quot;timeEnd&quot;: &quot;2018-01-31T23:59:59.999-05:00&quot;,   // Last date and time requested
-  &quot;chid&quot;: 1,                                    // Requested channel number
-  &quot;result&quot;: {
-    &quot;2018-1&quot;: [
-      8,
-      23,
-      24
-    ]
-  }
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timeBegin"</span><span class="token punctuation">:</span> <span class="token string">"2018-01-01T00:00:00-05:00"</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">// First date and time requested</span>
+  <span class="token string">"timeEnd"</span><span class="token punctuation">:</span> <span class="token string">"2018-01-31T23:59:59.999-05:00"</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// Last date and time requested</span>
+  <span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// channel number</span>
+      <span class="token string">"2018-1"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token number">8</span><span class="token punctuation">,</span>
+        <span class="token number">23</span><span class="token punctuation">,</span>
+        <span class="token number">24</span>
+      <span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</pre>
+<h3 class="mume-header" id="search-minutes-with-recorded-video">Search minutes with recorded video</h3>
+
+<p>To get a list of minutes with recorded videod, request the following:<br>
+In the case of minute search, you can not request all of them because the amount of response data can be large, unlike date search.<br>
+Specifying only one of timeBegin or timeEnd returns the results of one day's search from the specified date. The date range you can specify is limited to a maximum of 3 days.<br>
+The available parameters are the same as <code>/api/find?what=recDays</code>.</p>
+<pre class="language-ruby"><span class="token comment" spellcheck="true"># When using local time</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recMinutes<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span>25T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00<span class="token number">-05</span><span class="token operator">%</span>3A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">02</span><span class="token operator">-</span>02T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00<span class="token number">-05</span><span class="token operator">%</span>3A00
+
+<span class="token comment" spellcheck="true"># When using UTC time</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recMinutes<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span>25T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00Z<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span>26T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00Z
+</pre>
+<p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
+<pre class="language-jdx">{
+  &quot;timeBegin&quot;: &quot;2018-05-25T00:00:00.000-05:00&quot;,
+  &quot;timeEnd&quot;: &quot;2018-05-26T00:00:00.000-05:00&quot;,
+  &quot;result&quot;: [
+    {
+      &quot;chid&quot;: 1,
+      // Recording data is expressed in minute unit by hour in &quot;YYYYMMDD&quot; format
+      &quot;2018052510&quot;: [ 44, 45, 46, 47, 48 ],
+      &quot;2018052518&quot;: [ 1, 2, 3, 4, 16, 17, 18 ]       
+     },
+    {
+      &quot;chid&quot;: 2,
+      &quot;2018052517&quot;: [ 29, 30, 31, 32, 33, 34, 35, 36 ],
+      &quot;2018052518&quot;: [ 1, 2, 3, 4, 5, 6 ]
+    }
+  ]
 }
 </pre>
 <h2 class="mume-header" id="search-event-log">Search event log</h2>
@@ -816,65 +902,63 @@ timeEnd     <span class="token comment" spellcheck="true"># List of recorded dat
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">{
-  &quot;totalCount&quot;: 513,    // Total number of event logs recorded on the server
-  &quot;at&quot;: 0,              // Current data offset (0 means the first data)
-  &quot;data&quot;: [             // Event log data list
-    {
-      &quot;id&quot;: 518,                        // Event log number
-      &quot;type&quot;: 0,                        // Event log type number
-      &quot;typeName&quot;: &quot;System log&quot;,         // Event log type name
-      &quot;code&quot;: 25,                       // Event log code number
-      &quot;codeName&quot;: &quot;Storage ready&quot;,      // Event log code name
-      &quot;timeRange&quot;: [
-        &quot;2018-02-19T18:24:26.002-05:00&quot; // Occurrence time (events occurring consecutively for a certain period of time include the end time in the second item in the array)
-      ],
-      &quot;param&quot;: {                            // Additional information by event log code
-        &quot;storagePath&quot;: &quot;E%3A%5CrecData%5C&quot;, // Storage path for recording
-        &quot;statusCode&quot;: 0                     // Storage status codes
-      }
-    },
-    {
-      &quot;id&quot;: 517,
-      &quot;type&quot;: 1,
-      &quot;typeName&quot;: &quot;Privacy&quot;,
-      &quot;code&quot;: 4,
-      &quot;codeName&quot;: &quot;Sign in&quot;,
-      &quot;timeRange&quot;: [
-        &quot;2018-02-19T18:24:20.249-05:00&quot;
-      ],
-      &quot;param&quot;: {
-        &quot;uid&quot;: &quot;admin&quot;,
-        &quot;autoLogin&quot;: 1
-      },
-      &quot;comment&quot;: &quot;admin: Auto-login&quot;
-    },
-
-    ...   // omitted
-
-    {
-      &quot;id&quot;: 469,
-      &quot;type&quot;: 0,
-      &quot;typeName&quot;: &quot;System log&quot;,
-      &quot;code&quot;: 27,
-      &quot;codeName&quot;: &quot;License applied&quot;,
-      &quot;timeRange&quot;: [
-        &quot;2018-02-19T12:11:08.680-05:00&quot;
-      ],
-      &quot;param&quot;: {
-        &quot;type&quot;: &quot;genuine&quot;,
-        &quot;maxChannels&quot;: 36,
-        &quot;extension&quot;: [
-          1,
-          0,
-          0
-        ],
-        &quot;mediaType&quot;: &quot;USB dongle&quot;
-      },
-      &quot;comment&quot;: &quot;Genuine license&quot;
-    }
-  ]
-}
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"totalCount"</span><span class="token punctuation">:</span> <span class="token number">513</span><span class="token punctuation">,</span>    <span class="token comment" spellcheck="true">// Total number of event logs recorded on the server</span>
+  <span class="token string">"at"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>              <span class="token comment" spellcheck="true">// Current data offset (0 means the first data)</span>
+  <span class="token string">"data"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>             <span class="token comment" spellcheck="true">// Event log data list</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">518</span><span class="token punctuation">,</span>                        <span class="token comment" spellcheck="true">// Event log number</span>
+      <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>                        <span class="token comment" spellcheck="true">// Event log type number</span>
+      <span class="token string">"typeName"</span><span class="token punctuation">:</span> <span class="token string">"System log"</span><span class="token punctuation">,</span>         <span class="token comment" spellcheck="true">// Event log type name</span>
+      <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token number">25</span><span class="token punctuation">,</span>                       <span class="token comment" spellcheck="true">// Event log code number</span>
+      <span class="token string">"codeName"</span><span class="token punctuation">:</span> <span class="token string">"Storage ready"</span><span class="token punctuation">,</span>      <span class="token comment" spellcheck="true">// Event log code name</span>
+      <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"2018-02-19T18:24:26.002-05:00"</span> <span class="token comment" spellcheck="true">// Occurrence time (events occurring consecutively for a certain period of time include the end time in the second item in the array)</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token string">"param"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>                            <span class="token comment" spellcheck="true">// Additional information by event log code</span>
+        <span class="token string">"storagePath"</span><span class="token punctuation">:</span> <span class="token string">"E%3A%5CrecData%5C"</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// Storage path for recording</span>
+        <span class="token string">"statusCode"</span><span class="token punctuation">:</span> <span class="token number">0</span>                     <span class="token comment" spellcheck="true">// Storage status codes</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">517</span><span class="token punctuation">,</span>
+      <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token string">"typeName"</span><span class="token punctuation">:</span> <span class="token string">"Privacy"</span><span class="token punctuation">,</span>
+      <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+      <span class="token string">"codeName"</span><span class="token punctuation">:</span> <span class="token string">"Sign in"</span><span class="token punctuation">,</span>
+      <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"2018-02-19T18:24:20.249-05:00"</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token string">"param"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token string">"uid"</span><span class="token punctuation">:</span> <span class="token string">"admin"</span><span class="token punctuation">,</span>
+        <span class="token string">"autoLogin"</span><span class="token punctuation">:</span> <span class="token number">1</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token string">"comment"</span><span class="token punctuation">:</span> <span class="token string">"admin: Auto-login"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">// ... omitted</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">469</span><span class="token punctuation">,</span>
+      <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+      <span class="token string">"typeName"</span><span class="token punctuation">:</span> <span class="token string">"System log"</span><span class="token punctuation">,</span>
+      <span class="token string">"code"</span><span class="token punctuation">:</span> <span class="token number">27</span><span class="token punctuation">,</span>
+      <span class="token string">"codeName"</span><span class="token punctuation">:</span> <span class="token string">"License applied"</span><span class="token punctuation">,</span>
+      <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"2018-02-19T12:11:08.680-05:00"</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token string">"param"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>
+        <span class="token string">"maxChannels"</span><span class="token punctuation">:</span> <span class="token number">36</span><span class="token punctuation">,</span>
+        <span class="token string">"extension"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          <span class="token number">1</span><span class="token punctuation">,</span>
+          <span class="token number">0</span><span class="token punctuation">,</span>
+          <span class="token number">0</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"mediaType"</span><span class="token punctuation">:</span> <span class="token string">"USB dongle"</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token string">"comment"</span><span class="token punctuation">:</span> <span class="token string">"Genuine license"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
 </pre>
 <p>The event log recorded on the server is a lot of data, so it is not suitable to send all at once. Therefore, if you do not specify the count, only the log entries from the most recent to the maximum 50 items are returned.<br>
 You can use <code>totalCount</code>,<code>at</code>, and <code>maxCount</code> to refer to each page of search results.</p>
@@ -915,87 +999,85 @@ type        <span class="token comment" spellcheck="true"># Event log type</span
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">{
-  &quot;totalCount&quot;: 64,   // Total number of vehicles number recognition logs on the server
-  &quot;at&quot;: 0,            // Current data offset (0 means the first data)
-  &quot;data&quot;: [           // List of vehicle number log data
-    {
-      &quot;id&quot;: 64,                           // Vehicle number log number
-      &quot;plateNo&quot;: &quot;55EV96&quot;,                // Vehicle number text
-      &quot;timeRange&quot;: [                      // Date and time the vehicle number was recognized
-        &quot;2018-02-21T09:07:29.000-05:00&quot;,  // Starting timestamp
-        &quot;2018-02-21T09:07:34.057-05:00&quot;   // Ending timestamp
-      ],
-      &quot;srcCode&quot;: &quot;1-1-1&quot;,                 // Vehicle number recognition device (or zone) code
-      &quot;srcName&quot;: &quot;The%20Empire%20State&quot;,  // Vehicle number recognition device (or zone) name
-      &quot;vod&quot;: [  // The Video at the recognized point (may be several if linked channels are set)
-        {
-          &quot;chid&quot;: 1,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00&quot;
-        },
-        {
-          &quot;chid&quot;: 2,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=2&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00&quot;
-        },
-        {
-          &quot;chid&quot;: 3,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=3&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00&quot;
-        },
-        {
-          &quot;chid&quot;: 4,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=4&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00&quot;
-        }
-      ]
-    },
-    {
-      &quot;id&quot;: 63,
-      &quot;plateNo&quot;: &quot;DSP963&quot;,
-      &quot;timeRange&quot;: [
-        &quot;2018-02-21T08:00:00.915-05:00&quot;,
-        &quot;2018-02-21T08:00:01.714-05:00&quot;
-      ],
-      &quot;srcCode&quot;: &quot;1-1-1&quot;,
-      &quot;srcName&quot;: &quot;1-1-1&quot;,
-      &quot;vod&quot;: [
-        {
-          &quot;chid&quot;: 1,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00&quot;
-        },
-        {
-          &quot;chid&quot;: 2,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=2&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00&quot;
-        },
-        {
-          &quot;chid&quot;: 3,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=3&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00&quot;
-        },
-        {
-          &quot;chid&quot;: 4,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=4&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00&quot;
-        }
-      ]
-    },
-
-    ... // omitted
-
-    {
-      &quot;id&quot;: 15,
-      &quot;plateNo&quot;: &quot;L647AN&quot;,
-      &quot;timeRange&quot;: [
-        &quot;2018-02-20T18:12:05.828-05:00&quot;,
-        &quot;2018-02-20T18:12:06.253-05:00&quot;
-      ],
-      &quot;srcCode&quot;: &quot;1-1-1&quot;,
-      &quot;srcName&quot;: &quot;1-1-1&quot;,
-      &quot;vod&quot;: [
-        {
-          &quot;chid&quot;: 1,
-          &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&quot;
-        }
-      ]
-    }
-  ]
-}
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"totalCount"</span><span class="token punctuation">:</span> <span class="token number">64</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// Total number of vehicles number recognition logs on the server</span>
+  <span class="token string">"at"</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">// Current data offset (0 means the first data)</span>
+  <span class="token string">"data"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>           <span class="token comment" spellcheck="true">// List of vehicle number log data</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">64</span><span class="token punctuation">,</span>                           <span class="token comment" spellcheck="true">// Vehicle number log number</span>
+      <span class="token string">"plateNo"</span><span class="token punctuation">:</span> <span class="token string">"55EV96"</span><span class="token punctuation">,</span>                <span class="token comment" spellcheck="true">// Vehicle number text</span>
+      <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>                      <span class="token comment" spellcheck="true">// Date and time the vehicle number was recognized</span>
+        <span class="token string">"2018-02-21T09:07:29.000-05:00"</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// Starting timestamp</span>
+        <span class="token string">"2018-02-21T09:07:34.057-05:00"</span>   <span class="token comment" spellcheck="true">// Ending timestamp</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token string">"srcCode"</span><span class="token punctuation">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>                 <span class="token comment" spellcheck="true">// Vehicle number recognition device (or zone) code</span>
+      <span class="token string">"srcName"</span><span class="token punctuation">:</span> <span class="token string">"The%20Empire%20State"</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// Vehicle number recognition device (or zone) name</span>
+      <span class="token string">"vod"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>  <span class="token comment" spellcheck="true">// The Video at the recognized point (may be several if linked channels are set)</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=2&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=3&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=4&amp;when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">]</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">63</span><span class="token punctuation">,</span>
+      <span class="token string">"plateNo"</span><span class="token punctuation">:</span> <span class="token string">"DSP963"</span><span class="token punctuation">,</span>
+      <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"2018-02-21T08:00:00.915-05:00"</span><span class="token punctuation">,</span>
+        <span class="token string">"2018-02-21T08:00:01.714-05:00"</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token string">"srcCode"</span><span class="token punctuation">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
+      <span class="token string">"srcName"</span><span class="token punctuation">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
+      <span class="token string">"vod"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=2&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=3&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=4&amp;when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">]</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">// ... omitted</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">15</span><span class="token punctuation">,</span>
+      <span class="token string">"plateNo"</span><span class="token punctuation">:</span> <span class="token string">"L647AN"</span><span class="token punctuation">,</span>
+      <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"2018-02-20T18:12:05.828-05:00"</span><span class="token punctuation">,</span>
+        <span class="token string">"2018-02-20T18:12:06.253-05:00"</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token string">"srcCode"</span><span class="token punctuation">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
+      <span class="token string">"srcName"</span><span class="token punctuation">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
+      <span class="token string">"vod"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+          <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+          <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00"</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
 </pre>
 <p>The vehicle number log recorded on the server is not suitable for sending all at once because it is a large amount of data. Therefore, if you do not specify the count, only the log entries from the most recent to the maximum 50 items are returned.<br>
 You can use <code>totalCount</code>,<code>at</code>, and <code>maxCount</code> to refer to each page of search results.</p>
@@ -1029,26 +1111,24 @@ sort        <span class="token comment" spellcheck="true"># Sorting method (desc
 </pre>
 <p>To display the video in the retrieved result data, use the method used in <a href="#display-recorded-video">Display recorded video</a>.</p>
 <p>For example, if you want to display a video of the following search results</p>
-<pre class="language-text">  ... // omitted
-
-  {
-    &quot;id&quot;: 15,
-    &quot;plateNo&quot;: &quot;55EV96&quot;,
-    &quot;timeRange&quot;: [
-      &quot;2018-02-20T18:12:05.828-05:00&quot;,
-      &quot;2018-02-20T18:12:06.253-05:00&quot;
-    ],
-    &quot;srcCode&quot;: &quot;1-1-1&quot;,
-    &quot;srcName&quot;: &quot;1-1-1&quot;,
-    &quot;vod&quot;: [
-      {
-        &quot;chid&quot;: 1,
-        &quot;videoSrc&quot;: &quot;http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&quot;
-      }
-    ]
-  }
-
-  ... // omitted
+<pre class="language-jsx">  <span class="token comment" spellcheck="true">// ... omitted</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token number">15</span><span class="token punctuation">,</span>
+    <span class="token string">"plateNo"</span><span class="token punctuation">:</span> <span class="token string">"55EV96"</span><span class="token punctuation">,</span>
+    <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token string">"2018-02-20T18:12:05.828-05:00"</span><span class="token punctuation">,</span>
+      <span class="token string">"2018-02-20T18:12:06.253-05:00"</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token string">"srcCode"</span><span class="token punctuation">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
+    <span class="token string">"srcName"</span><span class="token punctuation">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
+    <span class="token string">"vod"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token string">"videoSrc"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00"</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment" spellcheck="true">// ... omitted</span>
 </pre>
 <p>In here, you can display video using  <code>http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00</code> corresponding to the value of <code>&quot;videoSrc&quot;</code> in <code>&quot;vod&quot;</code>.</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># If the session is authenticated, use it as it is</span>
@@ -1067,63 +1147,59 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>vod
 </pre>
 <p>The server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-text">[ // Each channel consists of an array of items
-  {
-    &quot;chid&quot;: 1,                              // Channel number
-    &quot;title&quot;: &quot;Profile1%20%281920x1080%29&quot;,  // Channel name (URL encoded)
-    &quot;src&quot;: [  // List of video sources
-              // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
-      { // 1080p RTMP stream
-        &quot;src&quot;: &quot;rtmp://192.168.0.100/live/ch1main&quot;,  // Video address
-        &quot;type&quot;: &quot;rtmp/mp4&quot;,     // MIME type: RTMP protocol (Adobe Flash)
-        &quot;label&quot;: &quot;1080p FHD&quot;,   // Resolution name
-        &quot;size&quot;: [               // Resolution
-          1920,                 // Number of horizontal pixels
-          1080                  // Number of vertical pixels
-        ]
-      },
-      { // 1080p HLS stream
-        &quot;src&quot;: &quot;http://192.168.0.100/hls/ch1main/index.m3u8&quot;, // Video address
-        &quot;type&quot;: &quot;application/x-mpegurl&quot;,  // MIME type: HLS protocol (HTML5)
-        &quot;label&quot;: &quot;1080p FHD&quot;,   // Resolution name
-        &quot;size&quot;: [               // Resolution
-          1920,                 // Number of horizontal pixels
-          1080                  // Number of vertical pixels
-        ]
-      },
-      { // VGA RTMP stream
-        &quot;src&quot;: &quot;rtmp://192.168.0.100/live/ch1sub&quot;,   // RTMP protocol (Adobe Flash)
-        &quot;type&quot;: &quot;rtmp/mp4&quot;,   // MIME type: RTMP protocol (Adobe Flash)
-        &quot;label&quot;: &quot;VGA&quot;,
-        &quot;size&quot;: [
-          640,
-          480
-        ]
-      },
-      { // VGA HLS stream
-        &quot;src&quot;: &quot;http://192.168.0.100/hls/ch1sub/index.m3u8&quot;, // Video address
-        &quot;type&quot;: &quot;application/x-mpegurl&quot;,  // MIME type: HLS protocol (HTML5)
-        &quot;label&quot;: &quot;VGA&quot;,       // Resolution name
-        &quot;size&quot;: [             // Resolution
-          640,                // Number of horizontal pixels
-          480                 // Number of vertical pixels
-        ]
-      }
-    ]
-  },
-  {
-    &quot;chid&quot;: 2,
-    &quot;title&quot;: &quot;192%2E168%2E0%2E106&quot;,
-    &quot;src&quot;: [
-
-      ... // omitted
-
-    ]
-  },
-
-  ... // omitted
-
-]
+<pre class="language-jsx"><span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// Each channel consists of an array of items</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>                              <span class="token comment" spellcheck="true">// Channel number</span>
+    <span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"Profile1%20%281920x1080%29"</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// Channel name (URL encoded)</span>
+    <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>  <span class="token comment" spellcheck="true">// List of video sources</span>
+              <span class="token comment" spellcheck="true">// (Multiple sources are organized into an array in one channel, depending on protocol and resolution)</span>
+      <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// 1080p RTMP stream</span>
+        <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token string">"rtmp://192.168.0.100/live/ch1main"</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// Video address</span>
+        <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"rtmp/mp4"</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true">// MIME type: RTMP protocol (Adobe Flash)</span>
+        <span class="token string">"label"</span><span class="token punctuation">:</span> <span class="token string">"1080p FHD"</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// Resolution name</span>
+        <span class="token string">"size"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>               <span class="token comment" spellcheck="true">// Resolution</span>
+          <span class="token number">1920</span><span class="token punctuation">,</span>                 <span class="token comment" spellcheck="true">// Number of horizontal pixels</span>
+          <span class="token number">1080</span>                  <span class="token comment" spellcheck="true">// Number of vertical pixels</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// 1080p HLS stream</span>
+        <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/hls/ch1main/index.m3u8"</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// Video address</span>
+        <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"application/x-mpegurl"</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// MIME type: HLS protocol (HTML5)</span>
+        <span class="token string">"label"</span><span class="token punctuation">:</span> <span class="token string">"1080p FHD"</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// Resolution name</span>
+        <span class="token string">"size"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>               <span class="token comment" spellcheck="true">// Resolution</span>
+          <span class="token number">1920</span><span class="token punctuation">,</span>                 <span class="token comment" spellcheck="true">// Number of horizontal pixels</span>
+          <span class="token number">1080</span>                  <span class="token comment" spellcheck="true">// Number of vertical pixels</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// VGA RTMP stream</span>
+        <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token string">"rtmp://192.168.0.100/live/ch1sub"</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// RTMP protocol (Adobe Flash)</span>
+        <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"rtmp/mp4"</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// MIME type: RTMP protocol (Adobe Flash)</span>
+        <span class="token string">"label"</span><span class="token punctuation">:</span> <span class="token string">"VGA"</span><span class="token punctuation">,</span>
+        <span class="token string">"size"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          <span class="token number">640</span><span class="token punctuation">,</span>
+          <span class="token number">480</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// VGA HLS stream</span>
+        <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/hls/ch1sub/index.m3u8"</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// Video address</span>
+        <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"application/x-mpegurl"</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// MIME type: HLS protocol (HTML5)</span>
+        <span class="token string">"label"</span><span class="token punctuation">:</span> <span class="token string">"VGA"</span><span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">// Resolution name</span>
+        <span class="token string">"size"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>             <span class="token comment" spellcheck="true">// Resolution</span>
+          <span class="token number">640</span><span class="token punctuation">,</span>                <span class="token comment" spellcheck="true">// Number of horizontal pixels</span>
+          <span class="token number">480</span>                 <span class="token comment" spellcheck="true">// Number of vertical pixels</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+    <span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"192%2E168%2E0%2E106"</span><span class="token punctuation">,</span>
+    <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token comment" spellcheck="true">// ... omitted</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token comment" spellcheck="true">// ... omitted</span>
+<span class="token punctuation">]</span>
 </pre>
 <p>Because of the variety of environments (network bandwidth and protocol supported by the player) in which the video is played, we provide multiple video sources per channel as shown in the example above for compatibility.<br>
 In the current version, it is streamed in two formats <code>RTMP</code> and<code>HLS</code>, and if the camera supports it, it can be dual-stream in high resolution and low resolution.</p>
@@ -1200,51 +1276,62 @@ limit       <span class="token comment" spellcheck="true"># Specify the number o
 <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>08T09<span class="token operator">%</span>3A30<span class="token operator">%</span>3A00<span class="token number">-05</span><span class="token operator">%</span>3A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span>1h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span>
 </pre>
 <p>When this request is made, the server returns JSON data in the following format with the HTTP response code 200:</p>
-<pre class="language-text">[ // Consists of an array of recorded video file units
-  {
-    &quot;chid&quot;: 1,                        // Channel number
-    &quot;title&quot;: &quot;192%2E168%2E0%2E111&quot;,   // Channel name
-    &quot;fileId&quot;: 100,                    // File ID
-    &quot;src&quot;: [  // Video source
-      {
-        &quot;src&quot;: &quot;http://192.168.0.100/storage/e/0/0/0/0/100.mp4&quot;,  // Video address
-        &quot;type&quot;: &quot;video/mp4&quot;,    // MIME type (mp4 file)
-        &quot;label&quot;: &quot;1080p FHD&quot;,   // Resolution name
-        &quot;size&quot;: [               // Resolution
-          1920,                 // Number of horizontal pixels
-          1080                  // Number of vertical pixels
-        ],
-        &quot;timeRange&quot;: [
-          &quot;2018-02-05T17:57:12.935-05:00&quot;,  // Date and time of the beginning of the video file
-          &quot;2018-02-05T17:57:20.036-05:00&quot;   // Date and time of the end of the video file
-        ]
-      }
-    ]
-  },
+<pre class="language-jsx"><span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// Consists of an array of recorded video file units</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>                        <span class="token comment" spellcheck="true">// Channel number</span>
+    <span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"192%2E168%2E0%2E111"</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// Channel name</span>
+    <span class="token string">"fileId"</span><span class="token punctuation">:</span> <span class="token number">100</span><span class="token punctuation">,</span>                    <span class="token comment" spellcheck="true">// File ID</span>
+    <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>  <span class="token comment" spellcheck="true">// Video source</span>
+      <span class="token punctuation">{</span>
+        <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/storage/e/0/0/0/0/100.mp4"</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// Video address</span>
+        <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"video/mp4"</span><span class="token punctuation">,</span>    <span class="token comment" spellcheck="true">// MIME type (mp4 file)</span>
+        <span class="token string">"label"</span><span class="token punctuation">:</span> <span class="token string">"1080p FHD"</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// Resolution name</span>
+        <span class="token string">"size"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>               <span class="token comment" spellcheck="true">// Resolution</span>
+          <span class="token number">1920</span><span class="token punctuation">,</span>                 <span class="token comment" spellcheck="true">// Number of horizontal pixels</span>
+          <span class="token number">1080</span>                  <span class="token comment" spellcheck="true">// Number of vertical pixels</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          <span class="token string">"2018-02-05T17:57:12.935-05:00"</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// Date and time of the beginning of the video file</span>
+          <span class="token string">"2018-02-05T17:57:20.036-05:00"</span>   <span class="token comment" spellcheck="true">// Date and time of the end of the video file</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token comment" spellcheck="true">// ... omitted</span>
+  <span class="token punctuation">{</span>
+    <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    <span class="token string">"title"</span><span class="token punctuation">:</span> <span class="token string">"192%2E168%2E0%2E111"</span><span class="token punctuation">,</span>
+    <span class="token string">"fileId"</span><span class="token punctuation">:</span> <span class="token number">104</span><span class="token punctuation">,</span>
+    <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token string">"src"</span><span class="token punctuation">:</span> <span class="token string">"http://192.168.0.100/storage/e/0/0/0/0/104.mp4"</span><span class="token punctuation">,</span>
+        <span class="token string">"type"</span><span class="token punctuation">:</span> <span class="token string">"video/mp4"</span><span class="token punctuation">,</span>
+        <span class="token string">"label"</span><span class="token punctuation">:</span> <span class="token string">"1080p FHD"</span><span class="token punctuation">,</span>
+        <span class="token string">"size"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          <span class="token number">1920</span><span class="token punctuation">,</span>
+          <span class="token number">1080</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"timeRange"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          <span class="token string">"2018-02-05T18:05:12.147-05:00"</span><span class="token punctuation">,</span>
+          <span class="token string">"2018-02-05T18:05:12.229-05:00"</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">]</span>
+</pre>
+<h2 class="mume-header" id="requesting-video-using-video-source">Requesting video using video source</h2>
 
-  ... // omitted
+<p>For video request using video source without using <code>/watch</code> provided by API, authentication is supported by each protocol as follows.</p>
+<pre class="language-ruby"><span class="token comment" spellcheck="true"># RTMP (auth= parameter supported)</span>
+rtmp<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
 
-  {
-    &quot;chid&quot;: 1,
-    &quot;title&quot;: &quot;192%2E168%2E0%2E111&quot;,
-    &quot;fileId&quot;: 104,
-    &quot;src&quot;: [
-      {
-        &quot;src&quot;: &quot;http://192.168.0.100/storage/e/0/0/0/0/104.mp4&quot;,
-        &quot;type&quot;: &quot;video/mp4&quot;,
-        &quot;label&quot;: &quot;1080p FHD&quot;,
-        &quot;size&quot;: [
-          1920,
-          1080
-        ],
-        &quot;timeRange&quot;: [
-          &quot;2018-02-05T18:05:12.147-05:00&quot;,
-          &quot;2018-02-05T18:05:12.229-05:00&quot;
-        ]
-      }
-    ]
-  }
-]
+<span class="token comment" spellcheck="true"># HTTP (Only basic authentication is supported for file-based resources such as m3u8, JPG, and MP4)</span>
+http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>userid<span class="token symbol">:password</span><span class="token variable">@host</span><span class="token operator">/</span>path<span class="token operator">/</span>to
+
+<span class="token comment" spellcheck="true"># HTTP (The resources of sub path /api/ are supported in both ways)</span>
+http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>userid<span class="token symbol">:passwordn</span><span class="token variable">@host</span><span class="token operator">/</span>api<span class="token operator">/</span>path<span class="token operator">/</span>to
+http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
 </pre>
 <h2 class="mume-header" id="appendix">Appendix</h2>
 
@@ -1254,22 +1341,24 @@ limit       <span class="token comment" spellcheck="true"># Specify the number o
 <table>
 <thead>
 <tr>
-<th>Product</th>
-<th>Version</th>
+<th>API version</th>
+<th>TS-CMS</th>
+<th>TS-NVR</th>
+<th>TS-LPR</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>TS-CMS</td>
+<td>0.1.0</td>
 <td>v0.38.0 or later</td>
-</tr>
-<tr>
-<td>TS-NVR</td>
 <td>v0.35.0 or later</td>
+<td>v0.2.0A or later</td>
 </tr>
 <tr>
-<td>TS-LPR</td>
-<td>v0.2.0A or later</td>
+<td>0.2.0</td>
+<td>v0.41.0 or later</td>
+<td>v0.40.0 or later</td>
+<td>v0.7.0A or later</td>
 </tr>
 </tbody>
 </table>
@@ -1381,6 +1470,8 @@ However, if you use the add-on license of <strong>vehicle number recognition int
 <pre class="language-">YYYY-MM-DDThh:mm:ss.sss&#xB1;Hh:Mm (Local time representation)
 or
 YYYY-MM-DDThh:mm:ss.sssZ (UTC time representation)
+or, yet another
+YYYY-MM-DDThh:mm:ss.sss (The server&apos;s Local time)
 
 In here,
   YYYY: year
@@ -1525,7 +1616,7 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <h3 class="mume-header" id="json-data-format">JSON data format</h3>
 
 <p>The server does not use line breaks or white space characters in JSON data for data optimization. For example, use the following form of text:</p>
-<pre class="language-json"><span class="token punctuation">{</span><span class="token property">"apiVersion"</span><span class="token operator">:</span><span class="token string">"ts-rest-api@0.1.0"</span><span class="token punctuation">,</span><span class="token property">"siteName"</span><span class="token operator">:</span><span class="token string">"My%20home%20server"</span><span class="token punctuation">,</span><span class="token property">"timezone"</span><span class="token operator">:</span><span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"America/New_York"</span><span class="token punctuation">,</span><span class="token property">"bias"</span><span class="token operator">:</span><span class="token string">"-05:00"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"product"</span><span class="token operator">:</span><span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"TS-LPR"</span><span class="token punctuation">,</span><span class="token property">"version"</span><span class="token operator">:</span><span class="token string">"v0.2.0A (64-bit)"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"license"</span><span class="token operator">:</span><span class="token punctuation">{</span><span class="token property">"type"</span><span class="token operator">:</span><span class="token string">"genuine"</span><span class="token punctuation">,</span><span class="token property">"maxChannels"</span><span class="token operator">:</span><span class="token number">16</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
+<pre class="language-json"><span class="token punctuation">{</span><span class="token property">"apiVersion"</span><span class="token operator">:</span><span class="token string">"TS-API@0.2.0"</span><span class="token punctuation">,</span><span class="token property">"siteName"</span><span class="token operator">:</span><span class="token string">"My%20home%20server"</span><span class="token punctuation">,</span><span class="token property">"timezone"</span><span class="token operator">:</span><span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"America/New_York"</span><span class="token punctuation">,</span><span class="token property">"bias"</span><span class="token operator">:</span><span class="token string">"-05:00"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"product"</span><span class="token operator">:</span><span class="token punctuation">{</span><span class="token property">"name"</span><span class="token operator">:</span><span class="token string">"TS-LPR"</span><span class="token punctuation">,</span><span class="token property">"version"</span><span class="token operator">:</span><span class="token string">"v0.5.0A (64-bit)"</span><span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"license"</span><span class="token operator">:</span><span class="token punctuation">{</span><span class="token property">"type"</span><span class="token operator">:</span><span class="token string">"genuine"</span><span class="token punctuation">,</span><span class="token property">"maxChannels"</span><span class="token operator">:</span><span class="token number">16</span><span class="token punctuation">}</span><span class="token punctuation">}</span>
 </pre>
 <p>This is a long line, so it can be a little uncomfortable for the human to read.</p>
 <p>In this case, use the following tools to convert easily readable.</p>
@@ -1537,7 +1628,7 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 </ul>
 <p>The readable JSON data has the following form:</p>
 <pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"ts-rest-api@0.1.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"TS-API@0.2.0"</span><span class="token punctuation">,</span>
   <span class="token property">"siteName"</span><span class="token operator">:</span> <span class="token string">"My%20home%20server"</span><span class="token punctuation">,</span>
   <span class="token property">"timezone"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
     <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"America/New_York"</span><span class="token punctuation">,</span>
@@ -1545,7 +1636,7 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token property">"product"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
     <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"TS-LPR"</span><span class="token punctuation">,</span>
-    <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"v0.2.0A (64-bit)"</span>
+    <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"v0.5.0A (64-bit)"</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token property">"license"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
     <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"genuine"</span><span class="token punctuation">,</span>
@@ -1557,11 +1648,11 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <h3 class="mume-header" id="feedback">Feedback</h3>
 
 <p>We are always listening to feedback from our users in the field.<br>
-If you have any questions or improvements regarding development, please leave them at <a href="https://github.com/bobhyun/ts-rest-api/issues">https://github.com/bobhyun/ts-rest-api/issues</a>.</p>
+If you have any questions or improvements regarding development, please leave them at <a href="https://github.com/bobhyun/TS-API/issues">https://github.com/bobhyun/TS-API/issues</a>.</p>
 
       </div>
       <div class="md-sidebar-toc"><ul>
-<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#get-started">Get Started</a></li>
 <li><a href="#video-display">Video display</a>
 <ul>
 <li><a href="#real-time-video-display">Real-time video display</a></li>
@@ -1589,6 +1680,7 @@ If you have any questions or improvements regarding development, please leave th
 <li><a href="#request-all-at-once">Request all at once</a></li>
 </ul>
 </li>
+<li><a href="#request-system-informatoin">Request system informatoin</a></li>
 <li><a href="#request-various-enumeration">Request various enumeration</a>
 <ul>
 <li><a href="#channel-list">Channel list</a></li>
@@ -1598,7 +1690,8 @@ If you have any questions or improvements regarding development, please leave th
 </li>
 <li><a href="#retrieve-recorded-data">Retrieve recorded data</a>
 <ul>
-<li><a href="#search-date-with-recorded-video">Search date with recorded video</a></li>
+<li><a href="#search-dates-with-recorded-video">Search dates with recorded video</a></li>
+<li><a href="#search-minutes-with-recorded-video">Search minutes with recorded video</a></li>
 </ul>
 </li>
 <li><a href="#search-event-log">Search event log</a></li>
@@ -1609,6 +1702,7 @@ If you have any questions or improvements regarding development, please leave th
 <li><a href="#recorded-video-source">Recorded video source</a></li>
 </ul>
 </li>
+<li><a href="#requesting-video-using-video-source">Requesting video using video source</a></li>
 <li><a href="#appendix">Appendix</a>
 <ul>
 <li><a href="#the-api-supported-versions-by-product">The API-supported versions by product</a></li>
@@ -1640,7 +1734,7 @@ If you have any questions or improvements regarding development, please leave th
       li.classList.add('task-list-item')
     }
   }
-	document.body.setAttribute('html-show-sidebar-toc', true);
+	document.body.setAttribute('html-show-sidebar-toc', true)
 }())    
 </script>
     
