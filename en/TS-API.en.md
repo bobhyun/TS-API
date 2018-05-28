@@ -634,21 +634,25 @@ To get a list of dates with recorded videos, request the following:
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
 {
-  "result": {
-    "2018-1": [ // Displays the date in which the data exists in year-month format as an array
-      8,        // The recorded data of 2018-1-1 exists.
-      23,       // The recorded data of 2018-1-23 exists.
-      24        // The recorded data of 2018-1-24 exists.
-    ],
-    "2018-2": [ // and so on.
-      5,
-      6,
-      7,
-      9,
-      13,
-      14,
-      19
-    ]
+  "result": [
+    {
+      "yearMonth": {
+        "2018-01": [ // Displays the date in which the data exists in YYYY-MM format as an array
+          8,        // The recorded data of 2018-1-1 exists.
+          23,       // The recorded data of 2018-1-23 exists.
+          24        // The recorded data of 2018-1-24 exists.
+        ],
+        "2018-02": [ // and so on.
+          5,
+          6,
+          7,
+          9,
+          13,
+          14,
+          19
+        ]
+      }
+    }
   }
 }
 ```
@@ -687,11 +691,13 @@ If you specify a condition using parameters such as `ch`,`timeBegin`, or `timeEn
   "result": [
     {
       "chid": 1,   // channel number
-      "2018-1": [
-        8,
-        23,
-        24
-      ]
+      "yearMonth":{
+        "2018-01": [
+          8,
+          23,
+          24
+        ]
+      }
     }
   ]
 }
@@ -710,21 +716,25 @@ The available parameters are the same as `/api/find?what=recDays`.
 /api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00Z&timeEnd=2018-05-26T00%3A00%3A00Z
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
-```jdx
+```jsx
 {
   "timeBegin": "2018-05-25T00:00:00.000-05:00",
   "timeEnd": "2018-05-26T00:00:00.000-05:00",
   "result": [
     {
       "chid": 1,
-      // Recording data is expressed in minute unit by hour in "YYYYMMDD" format
-      "2018052510": [ 44, 45, 46, 47, 48 ],
-      "2018052518": [ 1, 2, 3, 4, 16, 17, 18 ]       
-     },
+      "dateHour": {
+        // Recording data is expressed in minute unit by hour in "YYYYMMDD-hh" format
+        "20180525-10": [ 44, 45, 46, 47, 48 ],
+        "20180525-18": [ 1, 2, 3, 4, 16, 17, 18 ]
+      }     
+    },
     {
       "chid": 2,
-      "2018052517": [ 29, 30, 31, 32, 33, 34, 35, 36 ],
-      "2018052518": [ 1, 2, 3, 4, 5, 6 ]
+      "dateHour": {
+        "20180525-17": [ 29, 30, 31, 32, 33, 34, 35, 36 ],
+        "20180525-18": [ 1, 2, 3, 4, 5, 6 ]
+      }
     }
   ]
 }

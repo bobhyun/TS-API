@@ -806,21 +806,25 @@ lang      <span class="token comment" spellcheck="true"># Language</span>
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre class="language-jsx"><span class="token punctuation">{</span>
-  <span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
-    <span class="token string">"2018-1"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// Displays the date in which the data exists in year-month format as an array</span>
-      <span class="token number">8</span><span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// The recorded data of 2018-1-1 exists.</span>
-      <span class="token number">23</span><span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">// The recorded data of 2018-1-23 exists.</span>
-      <span class="token number">24</span>        <span class="token comment" spellcheck="true">// The recorded data of 2018-1-24 exists.</span>
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-    <span class="token string">"2018-2"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// and so on.</span>
-      <span class="token number">5</span><span class="token punctuation">,</span>
-      <span class="token number">6</span><span class="token punctuation">,</span>
-      <span class="token number">7</span><span class="token punctuation">,</span>
-      <span class="token number">9</span><span class="token punctuation">,</span>
-      <span class="token number">13</span><span class="token punctuation">,</span>
-      <span class="token number">14</span><span class="token punctuation">,</span>
-      <span class="token number">19</span>
-    <span class="token punctuation">]</span>
+  <span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"yearMonth"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token string">"2018-01"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// Displays the date in which the data exists in YYYY-MM format as an array</span>
+          <span class="token number">8</span><span class="token punctuation">,</span>        <span class="token comment" spellcheck="true">// The recorded data of 2018-1-1 exists.</span>
+          <span class="token number">23</span><span class="token punctuation">,</span>       <span class="token comment" spellcheck="true">// The recorded data of 2018-1-23 exists.</span>
+          <span class="token number">24</span>        <span class="token comment" spellcheck="true">// The recorded data of 2018-1-24 exists.</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"2018-02"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// and so on.</span>
+          <span class="token number">5</span><span class="token punctuation">,</span>
+          <span class="token number">6</span><span class="token punctuation">,</span>
+          <span class="token number">7</span><span class="token punctuation">,</span>
+          <span class="token number">9</span><span class="token punctuation">,</span>
+          <span class="token number">13</span><span class="token punctuation">,</span>
+          <span class="token number">14</span><span class="token punctuation">,</span>
+          <span class="token number">19</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </pre>
@@ -856,11 +860,13 @@ timeEnd     <span class="token comment" spellcheck="true"># List of recorded dat
   <span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
     <span class="token punctuation">{</span>
       <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>   <span class="token comment" spellcheck="true">// channel number</span>
-      <span class="token string">"2018-1"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
-        <span class="token number">8</span><span class="token punctuation">,</span>
-        <span class="token number">23</span><span class="token punctuation">,</span>
-        <span class="token number">24</span>
-      <span class="token punctuation">]</span>
+      <span class="token string">"yearMonth"</span><span class="token punctuation">:</span><span class="token punctuation">{</span>
+        <span class="token string">"2018-01"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+          <span class="token number">8</span><span class="token punctuation">,</span>
+          <span class="token number">23</span><span class="token punctuation">,</span>
+          <span class="token number">24</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
@@ -878,23 +884,27 @@ The available parameters are the same as <code>/api/find?what=recDays</code>.</p
 <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recMinutes<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span>25T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00Z<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span>26T00<span class="token operator">%</span>3A00<span class="token operator">%</span>3A00Z
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
-<pre class="language-jdx">{
-  &quot;timeBegin&quot;: &quot;2018-05-25T00:00:00.000-05:00&quot;,
-  &quot;timeEnd&quot;: &quot;2018-05-26T00:00:00.000-05:00&quot;,
-  &quot;result&quot;: [
-    {
-      &quot;chid&quot;: 1,
-      // Recording data is expressed in minute unit by hour in &quot;YYYYMMDD&quot; format
-      &quot;2018052510&quot;: [ 44, 45, 46, 47, 48 ],
-      &quot;2018052518&quot;: [ 1, 2, 3, 4, 16, 17, 18 ]       
-     },
-    {
-      &quot;chid&quot;: 2,
-      &quot;2018052517&quot;: [ 29, 30, 31, 32, 33, 34, 35, 36 ],
-      &quot;2018052518&quot;: [ 1, 2, 3, 4, 5, 6 ]
-    }
-  ]
-}
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timeBegin"</span><span class="token punctuation">:</span> <span class="token string">"2018-05-25T00:00:00.000-05:00"</span><span class="token punctuation">,</span>
+  <span class="token string">"timeEnd"</span><span class="token punctuation">:</span> <span class="token string">"2018-05-26T00:00:00.000-05:00"</span><span class="token punctuation">,</span>
+  <span class="token string">"result"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token string">"dateHour"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// Recording data is expressed in minute unit by hour in "YYYYMMDD-hh" format</span>
+        <span class="token string">"20180525-10"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token number">44</span><span class="token punctuation">,</span> <span class="token number">45</span><span class="token punctuation">,</span> <span class="token number">46</span><span class="token punctuation">,</span> <span class="token number">47</span><span class="token punctuation">,</span> <span class="token number">48</span> <span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"20180525-18"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">,</span> <span class="token number">17</span><span class="token punctuation">,</span> <span class="token number">18</span> <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>     
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+      <span class="token string">"dateHour"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token string">"20180525-17"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token number">29</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">,</span> <span class="token number">31</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">,</span> <span class="token number">33</span><span class="token punctuation">,</span> <span class="token number">34</span><span class="token punctuation">,</span> <span class="token number">35</span><span class="token punctuation">,</span> <span class="token number">36</span> <span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token string">"20180525-18"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">6</span> <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
 </pre>
 <h2 class="mume-header" id="search-event-log">Search event log</h2>
 
