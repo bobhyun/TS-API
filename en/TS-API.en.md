@@ -1106,6 +1106,7 @@ when        # Specify the timestamp of recorded video
 duration    # The time period to search from the time specified by when
 id          # The file ID of recorded video
 next        # If true, the next video of the specified one
+prev        # If true, the previous video of the specified one
 limit       # Specify the number of items in the search results (default 10, maximum 50)
 
 
@@ -1142,6 +1143,12 @@ limit       # Specify the number of items in the search results (default 10, max
 /api/vod?ch=1&id=1304&next=true
 # Or simply
 /api/vod?ch=1&id=1304&next
+
+# If the current file ID of channel 1 is 1034, it requests the previous file
+# of the same channel (useful for continuous backward playback)
+/api/vod?ch=1&id=1304&prev=true
+# Or simply
+/api/vod?ch=1&id=1304&prev
 
 # Receive 30 searched video sources
 /api/vod?ch=1&when=2018-01-08T09%3A30%3A00-05%3A00&duration=1h&limit=30
