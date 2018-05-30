@@ -1147,6 +1147,27 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 <span class="token comment" spellcheck="true"># If the session is not authenticated, add the auth parameter</span>
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.100</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">%</span>2D02<span class="token operator">%</span>2D20T18<span class="token operator">%</span>3A12<span class="token operator">%</span>3A05<span class="token operator">%</span><span class="token number">2E828</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span>3A00<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
+<h2 class="mume-header" id="search-for-similar-vehicle-numbers">Search for similar vehicle numbers</h2>
+
+<p>Can be used to verify that a similar vehicle number exists.<br>
+To retrieve similar vehicle numbers from the log, request the following:</p>
+<pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>similarCarNo<span class="token operator">&amp;</span>keyword<span class="token operator">=</span><span class="token number">1234</span>
+
+<span class="token comment" spellcheck="true"># Parameters</span>
+keyword     <span class="token comment" spellcheck="true"># Vehicle number text to search (or some characters)</span>
+maxCount    <span class="token comment" spellcheck="true"># Maximum number of items</span>
+
+<span class="token comment" spellcheck="true"># Examples</span>
+<span class="token comment" spellcheck="true"># Request up to 10 results</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>similarCarNo<span class="token operator">&amp;</span>keyword<span class="token operator">=</span><span class="token number">123</span><span class="token operator">&amp;</span>maxCount<span class="token operator">=</span><span class="token number">10</span>
+</pre>
+<p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
+<pre class="language-jsx"><span class="token punctuation">[</span>
+  <span class="token string">"AVF4123"</span><span class="token punctuation">,</span>
+  <span class="token string">"123MTB"</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">// ... omitted</span>
+<span class="token punctuation">]</span>
+</pre>
 <h2 class="mume-header" id="search-for-video-sources">Search for video sources</h2>
 
 <p>You can use this method if your application uses the video address directly instead of the video display feature using the API you used in <a href="#inserting-video-into-web-page">Inserting video into web page</a>.</p>
@@ -1245,6 +1266,7 @@ nameonly    <span class="token comment" spellcheck="true"># If true, only the ch
 duration    <span class="token comment" spellcheck="true"># The time period to search from the time specified by when</span>
 id          <span class="token comment" spellcheck="true"># The file ID of recorded video</span>
 <span class="token keyword">next</span>        <span class="token comment" spellcheck="true"># If true, the next video of the specified one</span>
+prev        <span class="token comment" spellcheck="true"># If true, the previous video of the specified one</span>
 limit       <span class="token comment" spellcheck="true"># Specify the number of items in the search results (default 10, maximum 50)</span>
 
 
@@ -1281,6 +1303,12 @@ limit       <span class="token comment" spellcheck="true"># Specify the number o
 <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>id<span class="token operator">=</span><span class="token number">1304</span><span class="token operator">&amp;</span><span class="token keyword">next</span><span class="token operator">=</span><span class="token keyword">true</span>
 <span class="token comment" spellcheck="true"># Or simply</span>
 <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>id<span class="token operator">=</span><span class="token number">1304</span><span class="token operator">&amp;</span><span class="token keyword">next</span>
+
+<span class="token comment" spellcheck="true"># If the current file ID of channel 1 is 1034, it requests the previous file</span>
+<span class="token comment" spellcheck="true"># of the same channel (useful for continuous backward playback)</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>id<span class="token operator">=</span><span class="token number">1304</span><span class="token operator">&amp;</span>prev<span class="token operator">=</span><span class="token keyword">true</span>
+<span class="token comment" spellcheck="true"># Or simply</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>id<span class="token operator">=</span><span class="token number">1304</span><span class="token operator">&amp;</span>prev
 
 <span class="token comment" spellcheck="true"># Receive 30 searched video sources</span>
 <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>08T09<span class="token operator">%</span>3A30<span class="token operator">%</span>3A00<span class="token number">-05</span><span class="token operator">%</span>3A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span>1h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span>
@@ -1706,6 +1734,7 @@ If you have any questions or improvements regarding development, please leave th
 </li>
 <li><a href="#search-event-log">Search event log</a></li>
 <li><a href="#vehicle-number-log-search">Vehicle number log search</a></li>
+<li><a href="#search-for-similar-vehicle-numbers">Search for similar vehicle numbers</a></li>
 <li><a href="#search-for-video-sources">Search for video sources</a>
 <ul>
 <li><a href="#real-time-video-source">Real-time video source</a></li>

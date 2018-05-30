@@ -998,6 +998,30 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&a
 ```
 
 
+## Search for similar vehicle numbers
+Can be used to verify that a similar vehicle number exists.
+To retrieve similar vehicle numbers from the log, request the following:
+```ruby
+/api/find?what=similarCarNo&keyword=1234
+
+# Parameters
+keyword     # Vehicle number text to search (or some characters)
+maxCount    # Maximum number of items
+
+# Examples
+# Request up to 10 results
+/api/find?what=similarCarNo&keyword=123&maxCount=10
+```
+
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  "AVF4123",
+  "123MTB",
+    // ... omitted
+]
+```
+
 ## Search for video sources
 You can use this method if your application uses the video address directly instead of the video display feature using the API you used in [Inserting video into web page](#inserting-video-into-web-page).
 
