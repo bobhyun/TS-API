@@ -1132,7 +1132,9 @@ id          # The file ID of recorded video
 next        # If true, the next video of the specified one
 prev        # If true, the previous video of the specified one
 limit       # Specify the number of items in the search results (default 10, maximum 50)
-
+otherwise   # If there is no search result,
+            # If requested with 'nearBefore', near recorded video before the search time period will be returned.
+            # If requested with 'nearAfter', near recorded video after the search time period will be returned.
 
 # Examples
 # The channel 1 video source on channel 1 ecorded on January 8, 2018 at 9:30 PM EST
@@ -1176,6 +1178,12 @@ limit       # Specify the number of items in the search results (default 10, max
 
 # Receive 30 searched video sources
 /api/vod?ch=1&when=2018-01-08T09%3A30%3A00-05%3A00&duration=1h&limit=30
+
+# If there is no search result,
+# request near recorded video before the search time period
+/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearBefore
+# request near recorded video after the search time period
+/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearAfter
 ```
 
 When this request is made, the server returns JSON data in the following format with the HTTP response code 200:

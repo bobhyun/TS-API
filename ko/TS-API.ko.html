@@ -1267,7 +1267,9 @@ id          <span class="token comment" spellcheck="true"># 녹화 동영상 파
 <span class="token keyword">next</span>        <span class="token comment" spellcheck="true"># true이면 지정한 영상의 다음 영상</span>
 prev        <span class="token comment" spellcheck="true"># true이면 지정한 영상의 이전 영상</span>
 limit       <span class="token comment" spellcheck="true"># 검색 결과의 항목 수를 지정 (명시하지 않으면 기본값 10개, 최대 50개)</span>
-
+otherwise   <span class="token comment" spellcheck="true"># 검색 결과가 없을 경우, </span>
+            <span class="token comment" spellcheck="true"># 'nearBefore'로 요청하면 검색  구간보다 이전에 녹화된 영상 중 가까운 것을 반환</span>
+            <span class="token comment" spellcheck="true"># 'nearAfter'로 요청하면 검색 구간보다 이후에 녹화된 영상 중 가까운 것을 반환</span>
 
 <span class="token comment" spellcheck="true"># 예제</span>
 <span class="token comment" spellcheck="true"># 1번 채널에 대한민국 시각 2018년 1월 8일 오후 9시 30분 00초에 녹화된 영상 소스</span>
@@ -1307,6 +1309,12 @@ limit       <span class="token comment" spellcheck="true"># 검색 결과의 항
 
 <span class="token comment" spellcheck="true"># 검색된 영상 소스를 30개 받기</span>
 <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>08T09<span class="token operator">%</span>3A30<span class="token operator">%</span>3A00<span class="token operator">%</span>2B09<span class="token operator">%</span>3A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span>1h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span>
+
+<span class="token comment" spellcheck="true"># 검색 결과 해당 시간에 영상이 존재하지 않을 경우:</span>
+<span class="token comment" spellcheck="true"># 검색 구간보다 이전에 녹화된 영상 중 가까운 것을 반환</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>08T09<span class="token operator">%</span>3A30<span class="token operator">%</span>3A00<span class="token operator">%</span>2B09<span class="token operator">%</span>3A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span>1h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span><span class="token operator">&amp;</span>otherwise<span class="token operator">=</span>nearBefore
+<span class="token comment" spellcheck="true"># 검색 구간보다 이후에 녹화된 영상 중 가까운 것을 반환</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>08T09<span class="token operator">%</span>3A30<span class="token operator">%</span>3A00<span class="token operator">%</span>2B09<span class="token operator">%</span>3A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span>1h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span><span class="token operator">&amp;</span>otherwise<span class="token operator">=</span>nearAfter
 </pre>
 <p>이와 같은 방식으로 요청하면 서버는 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
 <pre class="language-jsx"><span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// 녹화된 동영상 파일 단위의 배열로 구성됨</span>

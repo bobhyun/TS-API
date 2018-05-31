@@ -1268,7 +1268,9 @@ id          <span class="token comment" spellcheck="true"># The file ID of recor
 <span class="token keyword">next</span>        <span class="token comment" spellcheck="true"># If true, the next video of the specified one</span>
 prev        <span class="token comment" spellcheck="true"># If true, the previous video of the specified one</span>
 limit       <span class="token comment" spellcheck="true"># Specify the number of items in the search results (default 10, maximum 50)</span>
-
+otherwise   <span class="token comment" spellcheck="true"># If there is no search result,</span>
+            <span class="token comment" spellcheck="true"># If requested with 'nearBefore', near recorded video before the search time period will be returned.</span>
+            <span class="token comment" spellcheck="true"># If requested with 'nearAfter', near recorded video after the search time period will be returned.</span>
 
 <span class="token comment" spellcheck="true"># Examples</span>
 <span class="token comment" spellcheck="true"># The channel 1 video source on channel 1 ecorded on January 8, 2018 at 9:30 PM EST</span>
@@ -1312,6 +1314,12 @@ limit       <span class="token comment" spellcheck="true"># Specify the number o
 
 <span class="token comment" spellcheck="true"># Receive 30 searched video sources</span>
 <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>08T09<span class="token operator">%</span>3A30<span class="token operator">%</span>3A00<span class="token number">-05</span><span class="token operator">%</span>3A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span>1h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span>
+
+<span class="token comment" spellcheck="true"># If there is no search result,</span>
+<span class="token comment" spellcheck="true"># request near recorded video before the search time period</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>08T09<span class="token operator">%</span>3A30<span class="token operator">%</span>3A00<span class="token operator">%</span>2B09<span class="token operator">%</span>3A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span>1h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span><span class="token operator">&amp;</span>otherwise<span class="token operator">=</span>nearBefore
+<span class="token comment" spellcheck="true"># request near recorded video after the search time period</span>
+<span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span>08T09<span class="token operator">%</span>3A30<span class="token operator">%</span>3A00<span class="token operator">%</span>2B09<span class="token operator">%</span>3A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span>1h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span><span class="token operator">&amp;</span>otherwise<span class="token operator">=</span>nearAfter
 </pre>
 <p>When this request is made, the server returns JSON data in the following format with the HTTP response code 200:</p>
 <pre class="language-jsx"><span class="token punctuation">[</span> <span class="token comment" spellcheck="true">// Consists of an array of recorded video file units</span>
