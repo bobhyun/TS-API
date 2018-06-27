@@ -24,3 +24,7 @@ like this...
 For more information, refer to the following **TS-API Programmer's Guide**:
 [English](./en/TS-API.en.md)
 [Korean](./ko/TS-API.ko.md)
+
+License
+------
+MIT, Copyright (c) 2018 TS Solution Corp.
