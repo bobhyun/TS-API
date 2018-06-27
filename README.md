@@ -19,8 +19,8 @@ like this...
   width='640' height='360' frameborder='0' allowfullscreen />
 </body>
 ```
-* Demo: http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
+[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=)
 
-For more details, refer to following articles.
->* en/TS-API.en.md, in English
->* ko/TS-API.ko.md, in Korean
+For more information, refer to the following **TS-API Programmer's Guide**:
+[English](./en/TS-API.en.md)
+[Korean](./ko/TS-API.ko.md)
