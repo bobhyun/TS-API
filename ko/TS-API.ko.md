@@ -1,22 +1,74 @@
 TS-API 프로그래밍 안내서
 ======
 
+TS-API@0.3.0
+-----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
 이 문서를 참고하여 실시간 영상, 녹화 영상 보기, 영상 검색 기능을 간단하게 여러분의 응용 소프트웨어에 포함시킬 수 있습니다.
 
 API를 사용하기 위해 간단한 `HTML`과 `자바스크립트`를 사용해 본 경험이 있으면 도움이 됩니다.
-그리고 제품 별로 지원하는 기능이 다를 수 있으므로 아래 내용을 참고하시기 바랍니다.
-[제품별 API 지원 버전](#제품별-API-지원-버전)
-[제품별 기능 지원 표](#제품별-기능-지원-표)
+그리고 제품 별로 지원하는 기능이 다를 수 있으므로 [부록](#부록)의  
+[제품별 API 지원 버전](#제품별-API-지원-버전)와 [제품별 기능 지원 표](#제품별-기능-지원-표) 부분을 참고하시기 바랍니다.
 
 
-*API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변경될 수 있습니다.*
+`[참고]` *API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변경될 수 있습니다.*
 
+목차
+-----
+<!-- TOC -->
+
+- [시작하기](#시작하기)
+- [영상 표시](#영상-표시)
+  - [실시간 영상 표시](#실시간-영상-표시)
+  - [웹 페이지에 영상 삽입하기](#웹-페이지에-영상-삽입하기)
+  - [실제 서버에 접속하기](#실제-서버에-접속하기)
+  - [사용자 인증](#사용자-인증)
+  - [채널 변경](#채널-변경)
+  - [녹화 영상 표시](#녹화-영상-표시)
+- [세션 인증](#세션-인증)
+  - [로그인](#로그인)
+  - [로그아웃](#로그아웃)
+- [서버 정보 요청](#서버-정보-요청)
+  - [API 버전](#api-버전)
+  - [사이트 이름](#사이트-이름)
+  - [서버 시간대](#서버-시간대)
+  - [제품 정보](#제품-정보)
+  - [라이센스 정보](#라이센스-정보)
+  - [사용자 정보](#사용자-정보)
+  - [모두 한 번에 요청](#모두-한-번에-요청)
+- [시스템 정보 요청 `@0.2.0`](#시스템-정보-요청-020)
+- [각종 목록 요청](#각종-목록-요청)
+  - [채널 목록](#채널-목록)
+  - [차량 번호 인식 장치 목록](#차량-번호-인식-장치-목록)
+  - [이벤트 로그 종류 목록](#이벤트-로그-종류-목록)
+- [저장 데이터 검색](#저장-데이터-검색)
+  - [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색)
+  - [녹화 영상이 있는 분 단위 검색 `@0.2.0`](#녹화-영상이-있는-분-단위-검색-020)
+- [이벤트 로그 검색](#이벤트-로그-검색)
+- [차량 번호 로그 검색](#차량-번호-로그-검색)
+- [유사 차량 번호 검색 `@0.2.0`](#유사-차량-번호-검색-020)
+- [동영상 소스 검색](#동영상-소스-검색)
+  - [실시간 영상 소스](#실시간-영상-소스)
+  - [녹화 영상 소스](#녹화-영상-소스)
+- [비디오 소스를 사용하여 영상 요청 `@0.3.0`](#비디오-소스를-사용하여-영상-요청-030)
+- [실시간 이벤트 모니터링 `@0.3.0`](#실시간-이벤트-모니터링-030)
+  - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
+  - [비상 호출 이벤트](#비상-호출-이벤트)
+- [부록](#부록)
+  - [제품별 API 지원 버전](#제품별-api-지원-버전)
+  - [제품별 기능 지원 표](#제품별-기능-지원-표)
+  - [base64 인코딩](#base64-인코딩)
+  - [URL 인코딩](#url-인코딩)
+  - [URL 디코딩](#url-디코딩)
+  - [ISO 8601 형식으로 날짜 시각 표현하기](#iso-8601-형식으로-날짜-시각-표현하기)
+  - [지원하는 언어 목록](#지원하는-언어-목록)
+  - [JSON 데이터 형식](#json-데이터-형식)
+  - [피드백](#피드백)
+
+<!-- /TOC -->
 
 ## 시작하기
-`[참고]` 이 문서를 온라인 상의 TS-API.ko.md 파일로 보면 포함된 예제들이 실행되지 않을 수 있습니다. 포함된 예제들을 실행해 보시려면 git으로 프로젝트를 내려 받은 후, TS-API.ko.html 파일을 웹 브라우저에서 열어 사용하시기 바랍니다.
-
 이 문서 내에서는 TS-API를 줄여서 **API**로 부르고, 각 제품들은 간단히 **서버**로 부르겠습니다.
 
 
@@ -26,7 +78,7 @@ API를 사용하기 위해 간단한 `HTML`과 `자바스크립트`를 사용해
 ```ruby
 http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-<button onClick="window.open('http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=')">보기</button>
+[실행하기](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=)
 
 
 동영상이 표시되나요?
@@ -48,7 +100,7 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
   width="640" height="360" frameborder="0" allowfullscreen />
 </body>
 ```
-<button onClick="window.open('./examples/ex1.html')">보기</button>
+[실행하기](./examples/ex1.html)
 
 예제에서 사용된 동영상 URL과 `<iframe>` 태그 코드는 표시되는 **영상 위에서 오른쪽 마우스 버튼을 클릭**하면 (모바일인 경우 1초 정도 화면을 누르면) 팝업 메뉴가 나타납니다. 여기서 필요한 메뉴 항목을 선택하면 해당 코드가 클립보드에 복사되며 아래 표와 같이 각각의 용도에 맞게 **붙여넣기** 하면 됩니다.
 
@@ -57,8 +109,8 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 | 동영상 URL 복사   | 웹 브라우저 주소 창에 붙여넣기           |
 | 동영상 태그 코드 복사 | HTML 코드의 `<iframe>`부분에 붙여넣기 |
 
-`[참고]` 보안 상의 이유로 이렇게 복사한 코드에는 `auth=ZGVtbzohMTIzNHF3ZXI=` 부분이 제외됩니다. 이 부분은 로그인에 필요한 코드이며 [세션 인증](#세션-인증)에서 자세히 설명합니다.
-이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.
+`[참고]` *보안 상의 이유로 이렇게 복사한 코드에는 `auth=ZGVtbzohMTIzNHF3ZXI=` 부분이 제외됩니다. 이 부분은 로그인에 필요한 코드이며 [세션 인증](#세션-인증)에서 자세히 설명합니다.
+이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.*
 
 ### 실제 서버에 접속하기
 이제 데모용 서버가 아닌 실제 서버의 영상을 표시하는 방법을 알아 보겠습니다.
@@ -142,7 +194,7 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
   <iframe width="640" height="360" frameborder="0" allowfullscreen id="player" />
 </body>
 ```
-<button onClick="window.open('./examples/ex2.html')">보기</button>
+[실행하기](./examples/ex2.html)
 
 ### 채널 변경
 아래와 같이 동영상 소스의 `ch=` 부분을 원하는 채널 번호로 변경하면 해당 채널의 동영상이 표시됩니다.
@@ -151,7 +203,8 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 ```ruby
 http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-<button onClick="window.open('http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=')">보기</button>
+실행하기: [채널1](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=) [채널2](http://tssolution.ipdisk.co.kr:85/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI=) [채널3](http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=)
+
 
 ### 녹화 영상 표시
 녹화된 영상을 표시하기 위해서는 원하는 동영상의 날짜, 시각 정보(타임스탬프)가 필요합니다.
@@ -159,6 +212,8 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=
 ```ruby
 http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
+[실행하기](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=)
+`[참고]` *오래된 날짜의 녹화 영상은 저장장치의 용량에 따라 이미 덮어쓰기 되어 존재하지 않을 수 있습니다.*
 
 `2018-02-01T14%3a30%3a15%2b09%3a00` 부분은 [ISO 8601](#ISO-8601-형식으로-날짜-시각-표현하기) 형식의 날짜, 시각을 [URL 인코딩](#url-인코딩)한 것입니다.
 
@@ -168,7 +223,7 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3
 when=yesterday    // 서버의 로컬 타임으로 어제 00시 00분 00초
 when=today        // 서버의 로컬 타임으로 오늘 00시 00분 00초
 ```
-
+실행하기: [어제 영상](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI=) [오늘 영상](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI=)
 
 매개변수를 사용하여 영상 위에 표시되는 자막의 언어를 설정할 수 있습니다.
 [지원하는 언어 목록](#지원하는-언어-목록)은 부록을 참고하십시오.
@@ -237,7 +292,7 @@ http://userid:password@host/path/to/
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```json
 {
-  "apiVersion": "TS-API@0.2.0"
+  "apiVersion": "TS-API@0.3.0"
 }
 ```
 
@@ -432,7 +487,7 @@ http://userid:password@host/path/to/
 }
 ```
 
-## 시스템 정보 요청
+## 시스템 정보 요청 `@0.2.0`
 서버의 시스템 정보를 요청합니다.
 ```ruby
 /api/sysinfo
@@ -700,7 +755,7 @@ timeEnd     # 특정 날짜, 시각 이전 녹화된 날짜 목록
 }
 ```
 
-### 녹화 영상이 있는 분 단위 검색
+### 녹화 영상이 있는 분 단위 검색 `@0.2.0`
 녹화된 영상이 있는 분 단위 목록을 얻기 위해 다음과 같이 요청합니다.
 분 단위 검색 경우는 날짜 검색과 달리 응답 데이터량이 클 수 있으므로 전체를 모두 요청할 수 없으며 반드시 시간을 명시해야 합니다.
 timeBegin 또는 timeEnd 중 하나만 지정하면 저정한 날짜로 부터 하루 동안의 검색 결과를 반환합니다. 지정할 수 있는 날짜 범위는 최대 3일로 제한됩니다.
@@ -997,7 +1052,7 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00
 http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00&auth=ZGV2MTpkZXZlbG9wZXIhMTIzNA==
 ```
 
-## 유사 차량 번호 검색
+## 유사 차량 번호 검색 `@0.2.0`
 유사한 차량 번호가 존재하는지 확인하기 위해 사용할 수 있습니다. 인식된 차량 번호 로그에서 유사한 차량 번호를 조회하기 위해서는 다음과 같이 요청합니다.
 
 ```ruby
@@ -1132,7 +1187,7 @@ next        # true이면 지정한 영상의 다음 영상
 prev        # true이면 지정한 영상의 이전 영상
 limit       # 검색 결과의 항목 수를 지정 (명시하지 않으면 기본값 10개, 최대 50개)
 otherwise   # 검색 결과가 없을 경우, 
-            # 'nearBefore'로 요청하면 검색  구간보다 이전에 녹화된 영상 중 가까운 것을 반환
+            # 'nearBefore'로 요청하면 검색 구간보다 이전에 녹화된 영상 중 가까운 것을 반환
             # 'nearAfter'로 요청하면 검색 구간보다 이후에 녹화된 영상 중 가까운 것을 반환
 
 # 예제
@@ -1228,13 +1283,13 @@ otherwise   # 검색 결과가 없을 경우,
 ]
 ```
 
-## 비디오 소스를 사용하여 영상 요청
+## 비디오 소스를 사용하여 영상 요청 `@0.3.0`
 API로 제공되는 `/watch`를 사용하지 않고 영상 소스를 사용하여 영상을 요청하는 경우에 대해, 각 프로토콜 별로 다음과 같은 방식으로 인증을 지원합니다.
 ```ruby 
 # RTMP (auth= 매개변수가 지원됩니다.)
 rtmp://host/path/to&auth=YWRtaW46YWRtaW4=
 
-# HTTP (m3u8, JPG, MP4 와 같은 파일 기반 리소스들은 Basic Authentication만 지원됩니다.)
+# HTTP (m3u8, JPG, MP4 와 같은 정적인 파일 기반 리소스들은 Basic Authentication만 지원됩니다.)
 http://userid:password@host/path/to
 
 # HTTP (/api/ 하위 경로는 두 가지 방법이 모두 지원됩니다.)
@@ -1242,19 +1297,260 @@ http://userid:password@host/api/path/to
 http://host/api/path/to&auth=YWRtaW46YWRtaW4=
 ```
 
-*draft >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*
-## 외부 장치에서 트리거 입력
-외부 장치로부터 트리거를 입력받는 인터페이스이며 TS-API@0.2.0부터 지원합니다.
-외부 장치로부터 트리거가 입력되면 OSD 표시 및 알람과 같은 실시간 대응 기능이 동작하고 해당 시점의 영상이 녹화되며, 추후 저장된 데이터로부터 트리거 검색 및 각 트리거가 발생한 시점의 영상을 조회해 볼 수 있는 기능이 제공됩니다.
+## 실시간 이벤트 모니터링 `@0.3.0`
+**웹 소켓** `(RFC6455)`으로 실시간 이벤트 데이터를 수신할 수 있는 기능을 지원합니다.
+서버와 클라이언트가 접속 상태를 유지하며 이벤트가 발생하면 서버가 클라이언트에게 메시지를 송신하는 방식으로 동작합니다.
 
-이 기능은 아래 두 조건 하에서 동작합니다.
-1. 장치에서 사용하는 사용자 계정이 `외부 트리거 입력` 권한이 있어야 합니다.
->* 서버에서 설정 창의 사용자 탭에서 장치에서 사용할 계정을 생성하고 `외부 트리거 입력` 권한을 할당하면 됩니다.
-2. 외부 장치 연동 라이센스가 서버에 설치되어 있어야 합니다.
->* 정품 라이센스는 기본적으로 외부 장치 연동 라이센스를 포함하고 있지 않으며 외부 장치 연동 라이센스는 별도로 구매해야 합니다.
+단계별 통신 절차는 다음과 같습니다.
+>1. 클라이언트가 웹 소켓으로 서버에 접속
+>2. 서버에 인증에 성공하면 구독자 ID를 발급
+>3. 이후 클라이언트는 접속을 유지하며 메시지 대기 상태로 들어감
+>4. 이벤트 발생시 서버는 클라이언트에게 메시지를 송신
+>5. 클라이언트 스스로 접속을 종료하기 전까지 위의 3번에서 4번 과정을 반복
 
-`GET`과 `POST` 방식을 모두 지원하며 `GET` 방식은 간단한 트리거 입력용으로 사용될 수 있으며, `POST` 방식은 `GET` 방식에서 지원하지 않는 상대적으로 내용이 많거나 첨부 데이터가 있는 트리거 입력용으로 사용될 수 있습니다.
-*draft <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+지원하는 이벤트 토픽은 다음과 같습니다.
+```
+LPR             # 차량 번호 인식
+emergencyCall   # 비상 호출
+```
+
+웹 소켓 접속 경로와 매개변수들은 다음과 같습니다.
+```ruby
+/api/subscribeEvents
+
+# 필수 매개 변수들
+auth    # 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)
+topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
+
+# 사용 예
+# 차량 번호 인식 이벤트 요청
+ws://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+
+# 비상 호출 이벤트 요청
+ws://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+
+# 두 이벤트를 모두 요청
+ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+```
+
+서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
+만약 인증 정보가 올바르지 않거나 지원하는 토픽이 아니면 즉시 접속을 끊습니다.
+```jsx
+{
+  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", # 구독자 ID (웹 소켓 접속 당 유일한 ID를 발급)
+  "topics": [   # 요청한 토픽에 대한 응답 (두 이벤트를 모두 지원한다는 의미임)
+    "LPR",
+    "emergencyCall"
+  ]
+}
+```
+
+### 차량 번호 인식 이벤트
+`topics=LPR`를 요청하면 실시간으로 차량 번호 인식 이벤트를 수신할 수 있습니다.
+차량 번호 이벤트는 웹 소켓 메시지를 통해 아래와 같이 JSON형식으로 수신됩니다.
+```jsx
+{
+  "timestamp":"2018-06-27T10:42:06.575+09:00",  # 차량 번호 인식 시점
+  "chid": {                                     # 차량 번호 인식 채널
+    "chid":1,
+    "title":"카메라1",
+    "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"  # 차량 번호 인식 시점의 영상
+  },
+  "deviceCode":"1-1-7",                         # 차량 번호 인식 장치(영역) 코드
+  "deviceName":"B1주차장",                       # 차량 번호 인식 장치(영역) 이름
+  "linkedChannel": [                            # 연동된 채널
+    {
+      "chid":2,
+      "title":"카메라2",
+      "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00" # 차량 번호 인식 시점의 영상
+    }
+  ],
+  "plateNo":"11가1432",                         # 차량 번호
+  "timeBegin":"2018-06-27T10:42:02.573+09:00",  # 동일 차량 번호 최초 인식 시점 
+  "topic":"LPR"                                 # 토픽 이름
+}
+```
+
+### 비상 호출 이벤트
+`topics=emergencyCall`을 요청하면 실시간으로 비상 호출에 의한 통화 시작과 종료 시점에  이벤트 메시지를 수신할 수 있습니다.
+비상 호출 이벤트 메시지는 웹 소켓 메시지를 통해 아래와 같이 JSON형식으로 수신됩니다.
+
+통화 시작 메시지
+```jsx
+{
+  "timestamp":"2018-06-27T10:56:16.316+09:00",  # 통화 시작 시점
+  "caller":"0000002",                           # 비상 호출 장치 위치 코드
+  "device":"Sammul/Vizufon",                    # 비상 호출 장치 이름
+  "event":"callStart",                          # 통화 시작 이벤트
+  "linkedChannel":[                             # 연동된 채널
+    {
+      "chid":1,
+      "title":"카메라1",
+      "src":"http://host/watch?ch=1"
+    },
+    {
+      "chid":2,
+      "title":"카메라2",
+      "src":"http://host/watch?ch=2"
+    }
+  ],
+  "name":"지하1층 계단",                         # 비상 호출 장치 위치 이름
+  "topic":"emergencyCall"                       # 토픽 이름
+}
+```
+
+통화 종료 메시지
+```jsx
+{
+  "timestamp":"2018-06-27T10:59:26.322+09:00",  # 통화 종료 시점
+  "caller":"0000002",                           # 비상 호출 장치 위치 코드
+  "device":"Sammul/Vizufon",                    # 비상 호출 장치 이름
+  "event":"callEnd",                            # 통화 종료 이벤트
+  "linkedChannel":[                             # 연동된 채널
+    {
+      "chid":1,
+      "title":"카메라1",
+      "src":"http://host/watch?ch=1"
+    },
+    {
+      "chid":2,
+      "title":"카메라2",
+      "src":"http://host/watch?ch=2"
+    }
+  ],
+  "name":"비상벨2",                             # 비상 호출 장치 위치 이름
+  "topic":"emergencyCall"                      # 토픽 이름
+}
+```
+비상 호출 메시지는 실시간 통화를 위한 용도로 사용되므로 연동된 채널의 영상 주소는 차량 번호 인식의 경우와 달리 실시간 영상으로 링크되어 있습니다.
+
+
+이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
+```html
+<!DOCTYPE>
+<head>
+  <meta charset='utf-8'>
+  <title>ex3</title>
+  <style>
+    body {font-family:Arial, Helvetica, sans-serif}
+    div {padding:5px}
+    #control {background-color:beige}
+    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
+    li.open, li.close {color:blue}
+    li.error {color:red}
+  </style>
+</head>
+<body>
+  <h2>예제3. 웹 소켓 메시지 수신하기</h2>
+  <div id='control'>
+    <div>
+      <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
+      <input type='text' id='user-id' placeholder='사용자 ID'> 
+      <input type='password' id='password' placeholder='비밀번호'>
+    </div>
+    <div>
+      토픽:
+      <input type='checkbox' id="LPR" value="LPR" checked>차량 번호 인식 
+      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>비상 호출 
+      <button type='button' onClick='onConnect()'>접속</button>
+      <button type='button' onClick='onDisconnect()'>접속 종료</button>
+    </div>
+    <div id='url'>
+    </div>
+  </div>
+
+  <div>
+    <ul id='messages'></ul>
+  </div>
+</body>
+<script type='text/javascript'>
+  (function() {
+    window.myApp = { ws: null };
+  })();
+
+  function getURL() {
+    var url = '';
+
+    if (!('WebSocket' in window)) {
+      alert('웹 소켓을 지원하지 않는 웹 브라우저입니다.');
+      return url;
+    }
+
+    var hostName = document.getElementById('host-name').value;
+    if(hostName == '') {
+      alert('호스트를 입력하십시오.');
+      return url;
+    }
+    var userId = document.getElementById('user-id').value;
+    if(userId == '') {
+      alert('사용자 아이디를 입력하십시오.');
+      return url;
+    }
+    var password = document.getElementById('password').value;
+    if(password == '') {
+      alert('비밀번호를 입력하십시오.');
+      return url;
+    }
+
+    var topics = '';
+    if(document.getElementById('LPR').checked)
+      topics += 'LPR';
+    if(document.getElementById('emergencyCall').checked) {
+      if(topics.length > 0)
+        topics += ',';
+      topics += 'emergencyCall';
+    }
+    if(topics.length == 0) {
+      alert('하나 이상의 토픽을 선택하십시오.');
+      return url;
+    }
+
+    var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
+    url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
+      hostName + '/api/subscribeEvents?topics=' + topics + 
+      '&auth=' + encodedData;
+
+    return url;
+  }
+
+  function addItem(tagClass, msg) {    
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(msg));
+    li.classList.add(tagClass); 
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function onConnect() {
+    var url = getURL();
+    if(url.length == 0)
+      return;
+
+    document.getElementById('url').innerText = url;
+
+    // 웹 소켓 인스턴스와 핸들러 함수들
+    var ws = new WebSocket(url);
+    ws.onopen = function() {
+      addItem('open', '접속 성공');
+    };
+    ws.onclose = function(e) {
+      addItem('close', '접속 종료: ' + e.code);
+    };
+    ws.onerror = function(e) {
+      addItem('error', '오류: ' + e.code);
+    };
+    ws.onmessage = function(e) {
+      addItem('data', e.data);
+    };
+    window.myApp.ws = ws;
+  }
+
+  function onDisconnect() {
+    window.myApp.ws.close();
+  }
+</script>
+```
+[실행하기](./examples/ex3.html)
+
 
 ## 부록
 
@@ -1266,6 +1562,7 @@ API를 지원하는 제품들의 버전은 다음과 같습니다.
 |---------|--------------|--------------|--------------|
 | 0.1.0   | v0.38.0 이상 | v0.35.0 이상 | v0.2.0A 이상  |
 | 0.2.0   | v0.41.0 이상 | v0.40.0 이상 | v0.7.0A 이상  |
+| 0.3.0   | v0.42.1 이상 | v0.41.1 이상 | v0.8.2A 이상  |
 
 API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 일부 기능이 지원되지 않을 수 있습니다. 아래 목록 중에서 사용하는 제품이 어디에 해당하는지 확인하시기 바랍니다.
 
@@ -1498,5 +1795,5 @@ zu-ZA       # 줄루어, isiZulu, Zulu
 
 
 ### 피드백
-저희는 현장에서 사용자들이 보내주시는 피드백에 항상 귀기울이고 있습니다.
+우리는 항상 고객의 의견에 항상 귀기울이고 있습니다.
 개발 관련 문의 사항이나 개선할 부분이 있으시면 https://github.com/bobhyun/TS-API/issues 에 남겨주시기 바랍니다.

@@ -1,23 +1,75 @@
 TS-API Programmer's Guide
 ======
 
+TS-API@0.3.0
+-----
+
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Co.,Ltd.
 
 You can easily embed the real-time video, recorded video, and video search functions into your application software with the API. 
 
-It would be helpful if you have experience using simple `HTML` and `JavaScript` to use the API.
+It would be helpful if you have some experience using simple `HTML` and `JavaScript` to use the API.
 
-Please refer to the following, as the features supported by each product may differ.
-[The API-supported versions by product](#the-api-supported-versions-by-product)
-[The features table by product](#the-features-table-by-product)
+Please refer to [The API-supported versions by product](#the-api-supported-versions-by-product) and 
+[The features table by product](#the-features-table-by-product) portion of [Appendix](#appendix), as the features supported by each product may differ.
+ 
+`[Tips]` *The API and this article are subject to change without notice for better development support and improvement.*
 
+Table of contents
+-----
+<!-- TOC -->
 
-*The API and this article are subject to change without notice for better development support and improvement.*
+- [Get Started](#get-started)
+- [Video display](#video-display)
+  - [Real-time video display](#real-time-video-display)
+  - [Inserting video into web page](#inserting-video-into-web-page)
+  - [Connecting to a real server](#connecting-to-a-real-server)
+  - [User authentication](#user-authentication)
+  - [Change channel](#change-channel)
+  - [Display recorded video](#display-recorded-video)
+- [Session authentication](#session-authentication)
+  - [Sign in](#sign-in)
+  - [Sign out](#sign-out)
+- [Request server information](#request-server-information)
+  - [API version](#api-version)
+  - [Site name](#site-name)
+  - [Server-side time zone](#server-side-time-zone)
+  - [Product information](#product-information)
+  - [License information](#license-information)
+  - [User information](#user-information)
+  - [Request all at once](#request-all-at-once)
+- [Request system informatoin `@0.2.0`](#request-system-informatoin-020)
+- [Request various enumeration](#request-various-enumeration)
+  - [Channel list](#channel-list)
+  - [Vehicle number recognition device list](#vehicle-number-recognition-device-list)
+  - [Event log type list](#event-log-type-list)
+- [Retrieve recorded data](#retrieve-recorded-data)
+  - [Search dates with recorded video](#search-dates-with-recorded-video)
+  - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
+- [Search event log](#search-event-log)
+- [Vehicle number log search](#vehicle-number-log-search)
+- [Search for similar vehicle numbers `@0.2.0`](#search-for-similar-vehicle-numbers-020)
+- [Search for video sources](#search-for-video-sources)
+  - [Real-time video source](#real-time-video-source)
+  - [Recorded video source](#recorded-video-source)
+- [Requesting video using video source `@0.3.0`](#requesting-video-using-video-source-030)
+- [Real-time event monitoring `@0.3.0`](#real-time-event-monitoring-030)
+  - [Car number recognition event](#car-number-recognition-event)
+  - [Emergency Call Event](#emergency-call-event)
+- [Appendix](#appendix)
+  - [The API-supported versions by product](#the-api-supported-versions-by-product)
+  - [The features table by product](#the-features-table-by-product)
+  - [base64 Encoding](#base64-encoding)
+  - [URL Encoding](#url-encoding)
+  - [URL decoding](#url-decoding)
+  - [Date and time notation in ISO 8601 format](#date-and-time-notation-in-iso-8601-format)
+  - [List of languages supported](#list-of-languages-supported)
+  - [JSON data format](#json-data-format)
+  - [Feedback](#feedback)
 
+<!-- /TOC -->
 
 ## Get Started
-`[Tips]` If you look at this TS-API.en.md document online, the included examples may not run. We recommend that you download this project using git and open the TS-API.en.html file in your web browser.
-
 In this article, TS-API is abbreviated as **API**, and each product is simply called **server**.
 
 
@@ -27,7 +79,7 @@ Try to type the following in the Web browser address window.
 ```ruby
 http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-<button onClick=]window.open("http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=")'>Show</button>
+[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=)
 
 
 Do you see the video?
@@ -49,7 +101,7 @@ Now let's insert the video into the web page.
   width='640' height='360' frameborder='0' allowfullscreen />
 </body>
 ```
-<button onClick='window.open("./examples/ex1.html")'>Show</button>
+[Run](./examples/ex1.html)
 
 The video URL and the `<iframe>` tag code used in the example are provided as a pop-up menu when you **right-click on the video** of the webpage (or long-press on the video in case of a smartphone).
 Select the menu item you are to use, the code will be copied to the clipboard and then you can **paste** them into your code.
@@ -145,7 +197,7 @@ In this example, we will improve the way we access the login information using J
   <iframe width='640' height='360' frameborder='0' allowfullscreen id='player' />
 </body>
 ```
-<button onClick='window.open("./examples/ex2.html")'>Show</button>
+[Run](./examples/ex2.html)
 
 ### Change channel
 If you change the `ch=` part of the video source to the desired channel number as shown below, the video of that channel will be displayed.
@@ -154,7 +206,7 @@ For example, if you want to see channel 3, you can modify it like this:
 ```ruby
 http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-<button onClick='window.open("http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=")'>Show</button>
+Run: [Channel1](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=) [Channel2](http://tssolution.ipdisk.co.kr:85/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI=) [Channel3](http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=)
 
 ### Display recorded video
 To display the recorded video, you need the date and time information (time stamp) of the desired video.
@@ -162,8 +214,8 @@ For example, to display a video recorded on `Channel 1` at 2:30:15 pm on Februar
 ```ruby
 http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
-
-`2018-02-01T14% 3a30% 3a15% 2b09% 3a00` is the date and time in the format [ISO 8601] (# ISO-8601-format-date-time- - encoding).
+[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=&lang=en-US)
+`[Tips]` *The recorded video of the old date may already be overwritten depending on the capacity of the storage device.*
 
 `2018-02-01T14%3a30%3a15%2b09%3a00` is the date and time in the format [ISO 8601](#date-and-time-notation-in-iso-8601-format).
 
@@ -172,11 +224,12 @@ You can use `when=now` to request real-time video, but if omitted, it means real
 when=yesterday    // Local time on server yesterday 00:00:00
 when=today        // Local time on server today 00:00:00
 ```
+Run: [Yesterday](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI=&lang=en-US) [Today](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI=&lang=en-US)
 
 You can use the parameters to set the language of the subtitles displayed on the video.
 For a [list of supported languages](#list-of-languages-supported), refer to the appendix.
 
-From here, we will omit the `http://host` part and the`auth=`part.
+From here, we will omit the `http://host` and the`auth=`part.
 ```ruby
 # Parameters
 lang            # Specify subtitle language
@@ -239,7 +292,7 @@ This request works, even if it is not in [session suthenticated](#session-authen
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```json
 {
-  "apiVersion": "TS-API@0.2.0"
+  "apiVersion": "TS-API@0.3.0"
 }
 ```
 
@@ -435,7 +488,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 }
 ```
 
-## Request system informatoin
+## Request system informatoin `@0.2.0`
 Requests system information from the server.
 ```ruby
 /api/sysinfo
@@ -703,7 +756,7 @@ If you specify a condition using parameters such as `ch`,`timeBegin`, or `timeEn
 }
 ```
 
-### Search minutes with recorded video
+### Search minutes with recorded video `@0.2.0`
 To get a list of minutes with recorded videod, request the following:
 In the case of minute search, you can not request all of them because the amount of response data can be large, unlike date search.
 Specifying only one of timeBegin or timeEnd returns the results of one day's search from the specified date. The date range you can specify is limited to a maximum of 3 days.
@@ -998,7 +1051,7 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&a
 ```
 
 
-## Search for similar vehicle numbers
+## Search for similar vehicle numbers `@0.2.0`
 Can be used to verify that a similar vehicle number exists.
 To retrieve similar vehicle numbers from the log, request the following:
 ```ruby
@@ -1234,7 +1287,7 @@ When this request is made, the server returns JSON data in the following format 
 ]
 ```
 
-## Requesting video using video source
+## Requesting video using video source `@0.3.0`
 For video request using video source without using `/watch` provided by API, authentication is supported by each protocol as follows.
 ```ruby 
 # RTMP (auth= parameter supported)
@@ -1248,6 +1301,260 @@ http://userid:passwordn@host/api/path/to
 http://host/api/path/to&auth=YWRtaW46YWRtaW4=
 ```
 
+## Real-time event monitoring `@0.3.0`
+You can receive real-time event data via **Web socket** `(RFC6455)`.
+Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
+
+The step-by-step communication procedure is as follows:
+>1. Client connects to the server via Web socket.
+>2. If the authentication to the server succeeds, the subscriber ID is issued.
+>3. The client then remains connected and enters the message waiting state.
+>4. When an event occurs, the server sends a message to the client.
+>5. Repeat steps 3 through 4 until the client ends the connection itself.
+
+The following event topics are supported:
+```
+LPR             # Car number recognition
+emergencyCall   # Emergency call
+```
+
+The web socket connection path and parameters are as follows.
+```ruby
+/api/subscribeEvents
+
+# Required parameters
+auth    # Authentication Information (Requires authentication per individual web socket, independent of session authentication)
+topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
+
+# Example
+# Request car number recognition event
+ws://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+
+# Request emergency call event
+ws://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+
+# Request both events
+ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+```
+
+The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
+If the authentication information is incorrect or is not a supported topic, it will be disconnected immediately.
+```jsx
+{
+  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", # subscriber ID (Unique ID per each Web socket connection)
+  "topics": [   # Reply to requested topics (Both events are supported)
+    "LPR",
+    "emergencyCall"
+  ]
+}
+```
+
+### Car number recognition event
+If you request `topics=LPR`, you can receive the car number recognition event in real time.
+Car number recognition events are received in JSON format via Web socket messages as shown below.
+```jsx
+{
+  "timestamp":"2018-06-27T10:42:06.575-05:00",  # Vehicle number recognition time
+  "chid": {                                     # Car number recognition channel
+    "chid":1,
+    "title":"Camera1",
+    "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00"  # The video at vehicle identification time
+  },
+  "deviceCode":"1-1-7",                         # Car number identification device (zone) code
+  "deviceName":"B1 Parking Lot",                # Car number identification device (zone) name
+  "linkedChannel": [                            # Linked channels
+    {
+      "chid":2,
+      "title":"Camera2",
+      "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" # The video at vehicle identification time
+    }
+  ],
+  "plateNo":"DSP963",                           # Car plate number
+  "timeBegin":"2018-06-27T10:42:02.573-05:00",  # First recognized time of the car
+  "topic":"LPR"                                 # Topic name
+}
+```
+
+### Emergency Call Event
+If you request `topics=emergencyCall`, you can receive the event messages at the start and end of the emergency call in real time.
+Emergency call event messages are received in JSON format via Web socket messages as shown below.
+
+Call start message
+```jsx
+{
+  "timestamp":"2018-06-27T10:56:16.316-05:00",  # Start time of the call
+  "caller":"0000002",                           # Emergency call device location code
+  "device":"Sammul/Vizufon",                    # Emergency call device name
+  "event":"callStart",                          # Call start event
+  "linkedChannel":[                             # Linked channels
+    {
+      "chid":1,
+      "title":"Camera1",
+      "src":"http://host/watch?ch=1"
+    },
+    {
+      "chid":2,
+      "title":"Camera2",
+      "src":"http://host/watch?ch=2"
+    }
+  ],
+  "name":"B1 Stairs",                           # Emergency call device location name
+  "topic":"emergencyCall"                       # Topic name
+}
+```
+
+Call end message
+```jsx
+{
+  "timestamp":"2018-06-27T10:59:26.322-05:00",  # End time of then call
+  "caller":"0000002",                           # Emergency call device location code
+  "device":"Sammul/Vizufon",                    # Emergency call device name
+  "event":"callEnd",                            # Call end event
+  "linkedChannel":[                             # Linked channels
+    {
+      "chid":1,
+      "title":"Camera1",
+      "src":"http://host/watch?ch=1"
+    },
+    {
+      "chid":2,
+      "title":"Camera2",
+      "src":"http://host/watch?ch=2"
+    }
+  ],
+  "name":"B1 Stairs",                          # Emergency call device location name
+  "topic":"emergencyCall"                      # Topic name
+}
+```
+Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.
+
+
+Now, let's create an example that uses the Web socket to receive event messages.
+```html
+<!DOCTYPE>
+<head>
+  <meta charset='utf-8'>
+  <title>ex3</title>
+  <style>
+    body {font-family:Arial, Helvetica, sans-serif}
+    div {padding:5px}
+    #control {background-color:beige}
+    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
+    li.open, li.close {color:blue}
+    li.error {color:red}
+  </style>
+</head>
+<body>
+  <h2>Ex3. Receiving web socket messages</h2>
+  <div id='control'>
+    <div>
+      <input type='text' id='host-name' placeholder='Server IP address:port'>
+      <input type='text' id='user-id' placeholder='User ID'> 
+      <input type='password' id='password' placeholder='Password'>
+    </div>
+    <div>
+      Topics:
+      <input type='checkbox' id="LPR" value="LPR" checked>LPR 
+      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>emergencyCall 
+      <button type='button' onClick='onConnect()'>Connect</button>
+      <button type='button' onClick='onDisconnect()'>Disconnect</button>
+    </div>
+    <div id='url'>
+    </div>
+  </div>
+
+  <div>
+    <ul id='messages'></ul>
+  </div>
+</body>
+<script type='text/javascript'>
+  (function() {
+    window.myApp = { ws: null };
+  })();
+
+  function getURL() {
+    var url = '';
+
+    if (!('WebSocket' in window)) {
+      alert('Your web browser does\'nt support web socket');
+      return url;
+    }
+
+    var hostName = document.getElementById('host-name').value;
+    if(hostName == '') {
+      alert('Please enter the host.');
+      return url;
+    }
+    var userId = document.getElementById('user-id').value;
+    if(userId == '') {
+      alert('Please enter your user ID.');
+      return url;
+    }
+    var password = document.getElementById('password').value;
+    if(password == '') {
+      alert('Please enter your password.');
+      return url;
+    }
+
+    var topics = '';
+    if(document.getElementById('LPR').checked)
+      topics += 'LPR';
+    if(document.getElementById('emergencyCall').checked) {
+      if(topics.length > 0)
+        topics += ',';
+      topics += 'emergencyCall';
+    }
+    if(topics.length == 0) {
+      alert('Please select at least one topic.');
+      return url;
+    }
+
+    var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
+      hostName + '/api/subscribeEvents?topics=' + topics + 
+      '&auth=' + encodedData;
+
+    return url;
+  }
+
+  function addItem(tagClass, msg) {    
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(msg));
+    li.classList.add(tagClass); 
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function onConnect() {
+    var url = getURL();
+    if(url.length == 0)
+      return;
+
+    document.getElementById('url').innerText = url;
+
+    // WebSocket instanecs and it's handlers functions
+    var ws = new WebSocket(url);
+    ws.onopen = function() {
+      addItem('open', 'Connected');
+    };
+    ws.onclose = function(e) {
+      addItem('close', 'Disconnected: ' + e.code);
+    };
+    ws.onerror = function(e) {
+      addItem('error', 'Error: ' + e.code);
+    };
+    ws.onmessage = function(e) {
+      addItem('data', e.data);
+    };
+    window.myApp.ws = ws;
+  }
+
+  function onDisconnect() {
+    window.myApp.ws.close();
+  }
+</script>
+```
+[Run](./examples/ex3.html)
+
 
 ## Appendix
 
@@ -1259,7 +1566,7 @@ The versions of the products that support the API are as follows.
 |---------|--------------|--------------|--------------|
 | 0.1.0   | v0.38.0 or later | v0.35.0 or later | v0.2.0A or later  |
 | 0.2.0   | v0.41.0 or later | v0.40.0 or later | v0.7.0A or later  |
-
+| 0.3.0   | v0.42.1 or later | v0.41.1 or later | v0.8.2A or later  |
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
@@ -1490,5 +1797,5 @@ Of course, both are completely the same data in terms of content.
 
 
 ### Feedback
-We are always listening to feedback from our users in the field.
-If you have any questions or improvements regarding development, please leave them at https://github.com/bobhyun/TS-API/issues.
+We are always listening to your feedback.
+If you have any development questions or want to improve, please leave them at https://github.com/bobhyun/TS-API/issues.

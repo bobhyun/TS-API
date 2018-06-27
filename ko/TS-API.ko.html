@@ -210,16 +210,89 @@ code.language-yaml {
     <body for="html-export">
       <div class="mume markdown-preview   ">
       <h1>TS-API 프로그래밍 안내서</h1>
+<h2>TS-API@0.3.0</h2>
 <p>이 문서는 <strong>(주)티에스 솔루션</strong>의 <strong>TS-CMS</strong>, <strong>TS-NVR</strong>, <strong>TS-LPR</strong>에 내장된 <strong>TS-API</strong>를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.<br>
 이 문서를 참고하여 실시간 영상, 녹화 영상 보기, 영상 검색 기능을 간단하게 여러분의 응용 소프트웨어에 포함시킬 수 있습니다.</p>
 <p>API를 사용하기 위해 간단한 <code>HTML</code>과 <code>자바스크립트</code>를 사용해 본 경험이 있으면 도움이 됩니다.<br>
-그리고 제품 별로 지원하는 기능이 다를 수 있으므로 아래 내용을 참고하시기 바랍니다.<br>
-<a href="#%EC%A0%9C%ED%92%88%EB%B3%84-API-%EC%A7%80%EC%9B%90-%EB%B2%84%EC%A0%84">제품별 API 지원 버전</a><br>
-<a href="#%EC%A0%9C%ED%92%88%EB%B3%84-%EA%B8%B0%EB%8A%A5-%EC%A7%80%EC%9B%90-%ED%91%9C">제품별 기능 지원 표</a></p>
-<p><em>API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변경될 수 있습니다.</em></p>
+그리고 제품 별로 지원하는 기능이 다를 수 있으므로 <a href="#%EB%B6%80%EB%A1%9D">부록</a>의<br>
+<a href="#%EC%A0%9C%ED%92%88%EB%B3%84-API-%EC%A7%80%EC%9B%90-%EB%B2%84%EC%A0%84">제품별 API 지원 버전</a>와 <a href="#%EC%A0%9C%ED%92%88%EB%B3%84-%EA%B8%B0%EB%8A%A5-%EC%A7%80%EC%9B%90-%ED%91%9C">제품별 기능 지원 표</a> 부분을 참고하시기 바랍니다.</p>
+<p><code>[참고]</code> <em>API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변경될 수 있습니다.</em></p>
+<h2>목차</h2>
+<ul>
+<li><a href="#%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0">시작하기</a></li>
+<li><a href="#%EC%98%81%EC%83%81-%ED%91%9C%EC%8B%9C">영상 표시</a>
+<ul>
+<li><a href="#%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%98%81%EC%83%81-%ED%91%9C%EC%8B%9C">실시간 영상 표시</a></li>
+<li><a href="#%EC%9B%B9-%ED%8E%98%EC%9D%B4%EC%A7%80%EC%97%90-%EC%98%81%EC%83%81-%EC%82%BD%EC%9E%85%ED%95%98%EA%B8%B0">웹 페이지에 영상 삽입하기</a></li>
+<li><a href="#%EC%8B%A4%EC%A0%9C-%EC%84%9C%EB%B2%84%EC%97%90-%EC%A0%91%EC%86%8D%ED%95%98%EA%B8%B0">실제 서버에 접속하기</a></li>
+<li><a href="#%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%9D%B8%EC%A6%9D">사용자 인증</a></li>
+<li><a href="#%EC%B1%84%EB%84%90-%EB%B3%80%EA%B2%BD">채널 변경</a></li>
+<li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81-%ED%91%9C%EC%8B%9C">녹화 영상 표시</a></li>
+</ul>
+</li>
+<li><a href="#%EC%84%B8%EC%85%98-%EC%9D%B8%EC%A6%9D">세션 인증</a>
+<ul>
+<li><a href="#%EB%A1%9C%EA%B7%B8%EC%9D%B8">로그인</a></li>
+<li><a href="#%EB%A1%9C%EA%B7%B8%EC%95%84%EC%9B%83">로그아웃</a></li>
+</ul>
+</li>
+<li><a href="#%EC%84%9C%EB%B2%84-%EC%A0%95%EB%B3%B4-%EC%9A%94%EC%B2%AD">서버 정보 요청</a>
+<ul>
+<li><a href="#api-%EB%B2%84%EC%A0%84">API 버전</a></li>
+<li><a href="#%EC%82%AC%EC%9D%B4%ED%8A%B8-%EC%9D%B4%EB%A6%84">사이트 이름</a></li>
+<li><a href="#%EC%84%9C%EB%B2%84-%EC%8B%9C%EA%B0%84%EB%8C%80">서버 시간대</a></li>
+<li><a href="#%EC%A0%9C%ED%92%88-%EC%A0%95%EB%B3%B4">제품 정보</a></li>
+<li><a href="#%EB%9D%BC%EC%9D%B4%EC%84%BC%EC%8A%A4-%EC%A0%95%EB%B3%B4">라이센스 정보</a></li>
+<li><a href="#%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%A0%95%EB%B3%B4">사용자 정보</a></li>
+<li><a href="#%EB%AA%A8%EB%91%90-%ED%95%9C-%EB%B2%88%EC%97%90-%EC%9A%94%EC%B2%AD">모두 한 번에 요청</a></li>
+</ul>
+</li>
+<li><a href="#%EC%8B%9C%EC%8A%A4%ED%85%9C-%EC%A0%95%EB%B3%B4-%EC%9A%94%EC%B2%AD-020">시스템 정보 요청 <code>@0.2.0</code></a></li>
+<li><a href="#%EA%B0%81%EC%A2%85-%EB%AA%A9%EB%A1%9D-%EC%9A%94%EC%B2%AD">각종 목록 요청</a>
+<ul>
+<li><a href="#%EC%B1%84%EB%84%90-%EB%AA%A9%EB%A1%9D">채널 목록</a></li>
+<li><a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EC%9D%B8%EC%8B%9D-%EC%9E%A5%EC%B9%98-%EB%AA%A9%EB%A1%9D">차량 번호 인식 장치 목록</a></li>
+<li><a href="#%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EC%A2%85%EB%A5%98-%EB%AA%A9%EB%A1%9D">이벤트 로그 종류 목록</a></li>
+</ul>
+</li>
+<li><a href="#%EC%A0%80%EC%9E%A5-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EA%B2%80%EC%83%89">저장 데이터 검색</a>
+<ul>
+<li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%82%A0%EC%A7%9C-%EA%B2%80%EC%83%89">녹화 영상이 있는 날짜 검색</a></li>
+<li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%B6%84-%EB%8B%A8%EC%9C%84-%EA%B2%80%EC%83%89-020">녹화 영상이 있는 분 단위 검색 <code>@0.2.0</code></a></li>
+</ul>
+</li>
+<li><a href="#%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">이벤트 로그 검색</a></li>
+<li><a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">차량 번호 로그 검색</a></li>
+<li><a href="#%EC%9C%A0%EC%82%AC-%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EA%B2%80%EC%83%89-020">유사 차량 번호 검색 <code>@0.2.0</code></a></li>
+<li><a href="#%EB%8F%99%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4-%EA%B2%80%EC%83%89">동영상 소스 검색</a>
+<ul>
+<li><a href="#%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4">실시간 영상 소스</a></li>
+<li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4">녹화 영상 소스</a></li>
+</ul>
+</li>
+<li><a href="#%EB%B9%84%EB%94%94%EC%98%A4-%EC%86%8C%EC%8A%A4%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%EC%98%81%EC%83%81-%EC%9A%94%EC%B2%AD-030">비디오 소스를 사용하여 영상 요청 <code>@0.3.0</code></a></li>
+<li><a href="#%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81-030">실시간 이벤트 모니터링 <code>@0.3.0</code></a>
+<ul>
+<li><a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EC%9D%B8%EC%8B%9D-%EC%9D%B4%EB%B2%A4%ED%8A%B8">차량 번호 인식 이벤트</a></li>
+<li><a href="#%EB%B9%84%EC%83%81-%ED%98%B8%EC%B6%9C-%EC%9D%B4%EB%B2%A4%ED%8A%B8">비상 호출 이벤트</a></li>
+</ul>
+</li>
+<li><a href="#%EB%B6%80%EB%A1%9D">부록</a>
+<ul>
+<li><a href="#%EC%A0%9C%ED%92%88%EB%B3%84-api-%EC%A7%80%EC%9B%90-%EB%B2%84%EC%A0%84">제품별 API 지원 버전</a></li>
+<li><a href="#%EC%A0%9C%ED%92%88%EB%B3%84-%EA%B8%B0%EB%8A%A5-%EC%A7%80%EC%9B%90-%ED%91%9C">제품별 기능 지원 표</a></li>
+<li><a href="#base64-%EC%9D%B8%EC%BD%94%EB%94%A9">base64 인코딩</a></li>
+<li><a href="#url-%EC%9D%B8%EC%BD%94%EB%94%A9">URL 인코딩</a></li>
+<li><a href="#url-%EB%94%94%EC%BD%94%EB%94%A9">URL 디코딩</a></li>
+<li><a href="#iso-8601-%ED%98%95%EC%8B%9D%EC%9C%BC%EB%A1%9C-%EB%82%A0%EC%A7%9C-%EC%8B%9C%EA%B0%81-%ED%91%9C%ED%98%84%ED%95%98%EA%B8%B0">ISO 8601 형식으로 날짜 시각 표현하기</a></li>
+<li><a href="#%EC%A7%80%EC%9B%90%ED%95%98%EB%8A%94-%EC%96%B8%EC%96%B4-%EB%AA%A9%EB%A1%9D">지원하는 언어 목록</a></li>
+<li><a href="#json-%EB%8D%B0%EC%9D%B4%ED%84%B0-%ED%98%95%EC%8B%9D">JSON 데이터 형식</a></li>
+<li><a href="#%ED%94%BC%EB%93%9C%EB%B0%B1">피드백</a></li>
+</ul>
+</li>
+</ul>
 <h2 class="mume-header" id="&#xC2DC;&#xC791;&#xD558;&#xAE30;">시작하기</h2>
 
-<p><code>[참고]</code> 이 문서를 온라인 상의 <a href="http://TS-API.ko.md">TS-API.ko.md</a> 파일로 보면 포함된 예제들이 실행되지 않을 수 있습니다. 포함된 예제들을 실행해 보시려면 git으로 프로젝트를 내려 받은 후, TS-API.ko.html 파일을 웹 브라우저에서 열어 사용하시기 바랍니다.</p>
 <p>이 문서 내에서는 TS-API를 줄여서 <strong>API</strong>로 부르고, 각 제품들은 간단히 <strong>서버</strong>로 부르겠습니다.</p>
 <h2 class="mume-header" id="&#xC601;&#xC0C1;-&#xD45C;&#xC2DC;">영상 표시</h2>
 
@@ -228,7 +301,7 @@ code.language-yaml {
 <p>웹 브라우저 주소 창에 다음과 같이 입력해 보십시오.</p>
 <pre class="language-ruby">http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tssolution<span class="token punctuation">.</span>ipdisk<span class="token punctuation">.</span>co<span class="token punctuation">.</span>kr<span class="token punctuation">:</span><span class="token number">85</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<p><button onClick="window.open(&apos;http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=&apos;)">보기</button></p>
+<p><a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=">실행하기</a></p>
 <p>동영상이 표시되나요?</p>
 <p><code>[참고]</code> <em>이 예제 코드에 사용된 시연용 영상은 현장 상황에 따라 접속되지 않을 수도 있습니다.</em></p>
 <h3 class="mume-header" id="&#xC6F9;-&#xD398;&#xC774;&#xC9C0;&#xC5D0;-&#xC601;&#xC0C1;-&#xC0BD;&#xC785;&#xD558;&#xAE30;">웹 페이지에 영상 삽입하기</h3>
@@ -246,7 +319,7 @@ code.language-yaml {
   <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>640<span class="token punctuation">"</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>360<span class="token punctuation">"</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>0<span class="token punctuation">"</span></span> <span class="token attr-name">allowfullscreen</span> <span class="token punctuation">/></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
 </pre>
-<p><button onClick="window.open(&apos;./examples/ex1.html&apos;)">보기</button></p>
+<p><a href="./examples/ex1.html">실행하기</a></p>
 <p>예제에서 사용된 동영상 URL과 <code>&lt;iframe&gt;</code> 태그 코드는 표시되는 <strong>영상 위에서 오른쪽 마우스 버튼을 클릭</strong>하면 (모바일인 경우 1초 정도 화면을 누르면) 팝업 메뉴가 나타납니다. 여기서 필요한 메뉴 항목을 선택하면 해당 코드가 클립보드에 복사되며 아래 표와 같이 각각의 용도에 맞게 <strong>붙여넣기</strong> 하면 됩니다.</p>
 <table>
 <thead>
@@ -266,8 +339,8 @@ code.language-yaml {
 </tr>
 </tbody>
 </table>
-<p><code>[참고]</code> 보안 상의 이유로 이렇게 복사한 코드에는 <code>auth=ZGVtbzohMTIzNHF3ZXI=</code> 부분이 제외됩니다. 이 부분은 로그인에 필요한 코드이며 <a href="#%EC%84%B8%EC%85%98-%EC%9D%B8%EC%A6%9D">세션 인증</a>에서 자세히 설명합니다.<br>
-이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.</p>
+<p><code>[참고]</code> <em>보안 상의 이유로 이렇게 복사한 코드에는 <code>auth=ZGVtbzohMTIzNHF3ZXI=</code> 부분이 제외됩니다. 이 부분은 로그인에 필요한 코드이며 <a href="#%EC%84%B8%EC%85%98-%EC%9D%B8%EC%A6%9D">세션 인증</a>에서 자세히 설명합니다.<br>
+이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.</em></p>
 <h3 class="mume-header" id="&#xC2E4;&#xC81C;-&#xC11C;&#xBC84;&#xC5D0;-&#xC811;&#xC18D;&#xD558;&#xAE30;">실제 서버에 접속하기</h3>
 
 <p>이제 데모용 서버가 아닌 실제 서버의 영상을 표시하는 방법을 알아 보겠습니다.<br>
@@ -372,7 +445,7 @@ code.language-yaml {
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>640<span class="token punctuation">"</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>360<span class="token punctuation">"</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>0<span class="token punctuation">"</span></span> <span class="token attr-name">allowfullscreen</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>player<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
 </pre>
-<p><button onClick="window.open(&apos;./examples/ex2.html&apos;)">보기</button></p>
+<p><a href="./examples/ex2.html">실행하기</a></p>
 <h3 class="mume-header" id="&#xCC44;&#xB110;-&#xBCC0;&#xACBD;">채널 변경</h3>
 
 <p>아래와 같이 동영상 소스의 <code>ch=</code> 부분을 원하는 채널 번호로 변경하면 해당 채널의 동영상이 표시됩니다.<br>
@@ -380,19 +453,22 @@ code.language-yaml {
 예를 들어, 채널 3번을 보고 싶다면 다음과 같이 수정하면 됩니다.</p>
 <pre class="language-ruby">http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tssolution<span class="token punctuation">.</span>ipdisk<span class="token punctuation">.</span>co<span class="token punctuation">.</span>kr<span class="token punctuation">:</span><span class="token number">85</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">3</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<p><button onClick="window.open(&apos;http://tssolution.ipdisk.co.kr:85/watch?ch=3&amp;auth=ZGVtbzohMTIzNHF3ZXI=&apos;)">보기</button></p>
+<p>실행하기: <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=">채널1</a> <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=2&amp;auth=ZGVtbzohMTIzNHF3ZXI=">채널2</a> <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=3&amp;auth=ZGVtbzohMTIzNHF3ZXI=">채널3</a></p>
 <h3 class="mume-header" id="&#xB179;&#xD654;-&#xC601;&#xC0C1;-&#xD45C;&#xC2DC;">녹화 영상 표시</h3>
 
 <p>녹화된 영상을 표시하기 위해서는 원하는 동영상의 날짜, 시각 정보(타임스탬프)가 필요합니다.<br>
 예를 들어, 위의 예제와 동일한 접속 정보로 <code>채널 1번</code>의 <code>2018년 2월 1일 오후 2시 30분 15초</code>에 녹화된 영상을 표시하기 위해서는 다음과 같이 <code>when=2018-02-01T14%3a30%3a15%2b09%3a00</code> 부분을 추가해야 합니다.</p>
 <pre class="language-ruby">http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tssolution<span class="token punctuation">.</span>ipdisk<span class="token punctuation">.</span>co<span class="token punctuation">.</span>kr<span class="token punctuation">:</span><span class="token number">85</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">02</span><span class="token operator">-</span>01T14<span class="token operator">%</span>3a30<span class="token operator">%</span>3a15<span class="token operator">%</span>2b09<span class="token operator">%</span>3a00<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
+<p><a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;when=2018-02-01T14%3a30%3a15%2b09%3a00&amp;auth=ZGVtbzohMTIzNHF3ZXI=">실행하기</a><br>
+<code>[참고]</code> <em>오래된 날짜의 녹화 영상은 저장장치의 용량에 따라 이미 덮어쓰기 되어 존재하지 않을 수 있습니다.</em></p>
 <p><code>2018-02-01T14%3a30%3a15%2b09%3a00</code> 부분은 <a href="#ISO-8601-%ED%98%95%EC%8B%9D%EC%9C%BC%EB%A1%9C-%EB%82%A0%EC%A7%9C-%EC%8B%9C%EA%B0%81-%ED%91%9C%ED%98%84%ED%95%98%EA%B8%B0">ISO 8601</a> 형식의 날짜, 시각을 <a href="#url-%EC%9D%B8%EC%BD%94%EB%94%A9">URL 인코딩</a>한 것입니다.</p>
 <p>실시간 영상을 요청하기 위해서 <code>when=now</code>로 요청해도 되지만, <code>when=</code>이 없으면 실시간을 의미하므로 생략해도 됩니다.<br>
 그리고 사용상 편의를 위해 다음과 같은 팁들을 제공합니다.</p>
 <pre class="language-">when=yesterday    // &#xC11C;&#xBC84;&#xC758; &#xB85C;&#xCEEC; &#xD0C0;&#xC784;&#xC73C;&#xB85C; &#xC5B4;&#xC81C; 00&#xC2DC; 00&#xBD84; 00&#xCD08;
 when=today        // &#xC11C;&#xBC84;&#xC758; &#xB85C;&#xCEEC; &#xD0C0;&#xC784;&#xC73C;&#xB85C; &#xC624;&#xB298; 00&#xC2DC; 00&#xBD84; 00&#xCD08;
 </pre>
+<p>실행하기: <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;when=yesterday&amp;auth=ZGVtbzohMTIzNHF3ZXI=">어제 영상</a> <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;when=today&amp;auth=ZGVtbzohMTIzNHF3ZXI=">오늘 영상</a></p>
 <p>매개변수를 사용하여 영상 위에 표시되는 자막의 언어를 설정할 수 있습니다.<br>
 <a href="#%EC%A7%80%EC%9B%90%ED%95%98%EB%8A%94-%EC%96%B8%EC%96%B4-%EB%AA%A9%EB%A1%9D">지원하는 언어 목록</a>은 부록을 참고하십시오.<br>
 여기서부터는 <code>http://host</code>부분과 <code>auth=</code> 부분은 생략하고 표현합니다.</p>
@@ -445,7 +521,7 @@ showPlayTime    <span class="token comment" spellcheck="true"># 재생 날짜, �
 </pre>
 <p>요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.</p>
 <pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"TS-API@0.2.0"</span>
+  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"TS-API@0.3.0"</span>
 <span class="token punctuation">}</span>
 </pre>
 <h3 class="mume-header" id="&#xC0AC;&#xC774;&#xD2B8;-&#xC774;&#xB984;">사이트 이름</h3>
@@ -622,7 +698,7 @@ showPlayTime    <span class="token comment" spellcheck="true"># 재생 날짜, �
   <span class="token punctuation">}</span>     <span class="token comment" spellcheck="true">// whoAmI 부분 없음</span>
 <span class="token punctuation">}</span>
 </pre>
-<h2 class="mume-header" id="&#xC2DC;&#xC2A4;&#xD15C;-&#xC815;&#xBCF4;-&#xC694;&#xCCAD;">시스템 정보 요청</h2>
+<h2 class="mume-header" id="&#xC2DC;&#xC2A4;&#xD15C;-&#xC815;&#xBCF4;-&#xC694;&#xCCAD;-020">시스템 정보 요청 <code>@0.2.0</code></h2>
 
 <p>서버의 시스템 정보를 요청합니다.</p>
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>sysinfo
@@ -871,7 +947,7 @@ timeEnd     <span class="token comment" spellcheck="true"># 특정 날짜, 시�
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
 </pre>
-<h3 class="mume-header" id="&#xB179;&#xD654;-&#xC601;&#xC0C1;&#xC774;-&#xC788;&#xB294;-&#xBD84;-&#xB2E8;&#xC704;-&#xAC80;&#xC0C9;">녹화 영상이 있는 분 단위 검색</h3>
+<h3 class="mume-header" id="&#xB179;&#xD654;-&#xC601;&#xC0C1;&#xC774;-&#xC788;&#xB294;-&#xBD84;-&#xB2E8;&#xC704;-&#xAC80;&#xC0C9;-020">녹화 영상이 있는 분 단위 검색 <code>@0.2.0</code></h3>
 
 <p>녹화된 영상이 있는 분 단위 목록을 얻기 위해 다음과 같이 요청합니다.<br>
 분 단위 검색 경우는 날짜 검색과 달리 응답 데이터량이 클 수 있으므로 전체를 모두 요청할 수 없으며 반드시 시간을 명시해야 합니다.<br>
@@ -1147,7 +1223,7 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 <span class="token comment" spellcheck="true"># 세션 인증된 안된 경우는 auth 매개변수를 추가</span>
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.100</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">%</span>2D02<span class="token operator">%</span>2D20T18<span class="token operator">%</span>3A12<span class="token operator">%</span>3A05<span class="token operator">%</span><span class="token number">2E828</span><span class="token operator">%</span>2B09<span class="token operator">%</span>3A00<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGV2MTpkZXZlbG9wZXIhMTIzNA</span><span class="token operator">==</span>
 </pre>
-<h2 class="mume-header" id="&#xC720;&#xC0AC;-&#xCC28;&#xB7C9;-&#xBC88;&#xD638;-&#xAC80;&#xC0C9;">유사 차량 번호 검색</h2>
+<h2 class="mume-header" id="&#xC720;&#xC0AC;-&#xCC28;&#xB7C9;-&#xBC88;&#xD638;-&#xAC80;&#xC0C9;-020">유사 차량 번호 검색 <code>@0.2.0</code></h2>
 
 <p>유사한 차량 번호가 존재하는지 확인하기 위해 사용할 수 있습니다. 인식된 차량 번호 로그에서 유사한 차량 번호를 조회하기 위해서는 다음과 같이 요청합니다.</p>
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>similarCarNo<span class="token operator">&amp;</span>keyword<span class="token operator">=</span><span class="token number">1234</span>
@@ -1268,7 +1344,7 @@ id          <span class="token comment" spellcheck="true"># 녹화 동영상 파
 prev        <span class="token comment" spellcheck="true"># true이면 지정한 영상의 이전 영상</span>
 limit       <span class="token comment" spellcheck="true"># 검색 결과의 항목 수를 지정 (명시하지 않으면 기본값 10개, 최대 50개)</span>
 otherwise   <span class="token comment" spellcheck="true"># 검색 결과가 없을 경우, </span>
-            <span class="token comment" spellcheck="true"># 'nearBefore'로 요청하면 검색  구간보다 이전에 녹화된 영상 중 가까운 것을 반환</span>
+            <span class="token comment" spellcheck="true"># 'nearBefore'로 요청하면 검색 구간보다 이전에 녹화된 영상 중 가까운 것을 반환</span>
             <span class="token comment" spellcheck="true"># 'nearAfter'로 요청하면 검색 구간보다 이후에 녹화된 영상 중 가까운 것을 반환</span>
 
 <span class="token comment" spellcheck="true"># 예제</span>
@@ -1361,43 +1437,262 @@ otherwise   <span class="token comment" spellcheck="true"># 검색 결과가 없
   <span class="token punctuation">}</span>
 <span class="token punctuation">]</span>
 </pre>
-<h2 class="mume-header" id="&#xBE44;&#xB514;&#xC624;-&#xC18C;&#xC2A4;&#xB97C;-&#xC0AC;&#xC6A9;&#xD558;&#xC5EC;-&#xC601;&#xC0C1;-&#xC694;&#xCCAD;">비디오 소스를 사용하여 영상 요청</h2>
+<h2 class="mume-header" id="&#xBE44;&#xB514;&#xC624;-&#xC18C;&#xC2A4;&#xB97C;-&#xC0AC;&#xC6A9;&#xD558;&#xC5EC;-&#xC601;&#xC0C1;-&#xC694;&#xCCAD;-030">비디오 소스를 사용하여 영상 요청 <code>@0.3.0</code></h2>
 
 <p>API로 제공되는 <code>/watch</code>를 사용하지 않고 영상 소스를 사용하여 영상을 요청하는 경우에 대해, 각 프로토콜 별로 다음과 같은 방식으로 인증을 지원합니다.</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># RTMP (auth= 매개변수가 지원됩니다.)</span>
 rtmp<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
 
-<span class="token comment" spellcheck="true"># HTTP (m3u8, JPG, MP4 와 같은 파일 기반 리소스들은 Basic Authentication만 지원됩니다.)</span>
+<span class="token comment" spellcheck="true"># HTTP (m3u8, JPG, MP4 와 같은 정적인 파일 기반 리소스들은 Basic Authentication만 지원됩니다.)</span>
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>userid<span class="token symbol">:password</span><span class="token variable">@host</span><span class="token operator">/</span>path<span class="token operator">/</span>to
 
 <span class="token comment" spellcheck="true"># HTTP (/api/ 하위 경로는 두 가지 방법이 모두 지원됩니다.)</span>
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>userid<span class="token symbol">:password</span><span class="token variable">@host</span><span class="token operator">/</span>api<span class="token operator">/</span>path<span class="token operator">/</span>to
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
 </pre>
-<p><em>draft &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</em></p>
-<h2 class="mume-header" id="&#xC678;&#xBD80;-&#xC7A5;&#xCE58;&#xC5D0;&#xC11C;-&#xD2B8;&#xB9AC;&#xAC70;-&#xC785;&#xB825;">외부 장치에서 트리거 입력</h2>
+<h2 class="mume-header" id="&#xC2E4;&#xC2DC;&#xAC04;-&#xC774;&#xBCA4;&#xD2B8;-&#xBAA8;&#xB2C8;&#xD130;&#xB9C1;-030">실시간 이벤트 모니터링 <code>@0.3.0</code></h2>
 
-<p>외부 장치로부터 트리거를 입력받는 인터페이스이며 TS-API@0.2.0부터 지원합니다.<br>
-외부 장치로부터 트리거가 입력되면 OSD 표시 및 알람과 같은 실시간 대응 기능이 동작하고 해당 시점의 영상이 녹화되며, 추후 저장된 데이터로부터 트리거 검색 및 각 트리거가 발생한 시점의 영상을 조회해 볼 수 있는 기능이 제공됩니다.</p>
-<p>이 기능은 아래 두 조건 하에서 동작합니다.</p>
+<p><strong>웹 소켓</strong> <code>(RFC6455)</code>으로 실시간 이벤트 데이터를 수신할 수 있는 기능을 지원합니다.<br>
+서버와 클라이언트가 접속 상태를 유지하며 이벤트가 발생하면 서버가 클라이언트에게 메시지를 송신하는 방식으로 동작합니다.</p>
+<p>단계별 통신 절차는 다음과 같습니다.</p>
+<blockquote>
 <ol>
-<li>장치에서 사용하는 사용자 계정이 <code>외부 트리거 입력</code> 권한이 있어야 합니다.</li>
+<li>클라이언트가 웹 소켓으로 서버에 접속</li>
+<li>서버에 인증에 성공하면 구독자 ID를 발급</li>
+<li>이후 클라이언트는 접속을 유지하며 메시지 대기 상태로 들어감</li>
+<li>이벤트 발생시 서버는 클라이언트에게 메시지를 송신</li>
+<li>클라이언트 스스로 접속을 종료하기 전까지 위의 3번에서 4번 과정을 반복</li>
 </ol>
-<blockquote>
-<ul>
-<li>서버에서 설정 창의 사용자 탭에서 장치에서 사용할 계정을 생성하고 <code>외부 트리거 입력</code> 권한을 할당하면 됩니다.</li>
-</ul>
 </blockquote>
-<ol start="2">
-<li>외부 장치 연동 라이센스가 서버에 설치되어 있어야 합니다.</li>
-</ol>
-<blockquote>
-<ul>
-<li>정품 라이센스는 기본적으로 외부 장치 연동 라이센스를 포함하고 있지 않으며 외부 장치 연동 라이센스는 별도로 구매해야 합니다.</li>
-</ul>
-</blockquote>
-<p><code>GET</code>과 <code>POST</code> 방식을 모두 지원하며 <code>GET</code> 방식은 간단한 트리거 입력용으로 사용될 수 있으며, <code>POST</code> 방식은 <code>GET</code> 방식에서 지원하지 않는 상대적으로 내용이 많거나 첨부 데이터가 있는 트리거 입력용으로 사용될 수 있습니다.<br>
-<em>draft &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</em></p>
+<p>지원하는 이벤트 토픽은 다음과 같습니다.</p>
+<pre class="language-">LPR             # &#xCC28;&#xB7C9; &#xBC88;&#xD638; &#xC778;&#xC2DD;
+emergencyCall   # &#xBE44;&#xC0C1; &#xD638;&#xCD9C;
+</pre>
+<p>웹 소켓 접속 경로와 매개변수들은 다음과 같습니다.</p>
+<pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents
+
+<span class="token comment" spellcheck="true"># 필수 매개 변수들</span>
+auth    <span class="token comment" spellcheck="true"># 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)</span>
+topics  <span class="token comment" spellcheck="true"># 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)</span>
+
+<span class="token comment" spellcheck="true"># 사용 예</span>
+<span class="token comment" spellcheck="true"># 차량 번호 인식 이벤트 요청</span>
+ws<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span><span class="token constant">LPR</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
+
+<span class="token comment" spellcheck="true"># 비상 호출 이벤트 요청</span>
+ws<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>emergencyCall<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
+
+<span class="token comment" spellcheck="true"># 두 이벤트를 모두 요청</span>
+ws<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span><span class="token constant">LPR</span><span class="token punctuation">,</span>emergencyCall<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
+</pre>
+<p>서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.<br>
+만약 인증 정보가 올바르지 않거나 지원하는 토픽이 아니면 즉시 접속을 끊습니다.</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"subscriberId"</span><span class="token punctuation">:</span> <span class="token string">"cd57c82b-7e8c-4b04-91eb-520f6a9773ce"</span><span class="token punctuation">,</span> # 구독자 ID <span class="token punctuation">(</span>웹 소켓 접속 당 유일한 ID를 발급<span class="token punctuation">)</span>
+  <span class="token string">"topics"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>   # 요청한 토픽에 대한 응답 <span class="token punctuation">(</span>두 이벤트를 모두 지원한다는 의미임<span class="token punctuation">)</span>
+    <span class="token string">"LPR"</span><span class="token punctuation">,</span>
+    <span class="token string">"emergencyCall"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</pre>
+<h3 class="mume-header" id="&#xCC28;&#xB7C9;-&#xBC88;&#xD638;-&#xC778;&#xC2DD;-&#xC774;&#xBCA4;&#xD2B8;">차량 번호 인식 이벤트</h3>
+
+<p><code>topics=LPR</code>를 요청하면 실시간으로 차량 번호 인식 이벤트를 수신할 수 있습니다.<br>
+차량 번호 이벤트는 웹 소켓 메시지를 통해 아래와 같이 JSON형식으로 수신됩니다.</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timestamp"</span><span class="token punctuation">:</span><span class="token string">"2018-06-27T10:42:06.575+09:00"</span><span class="token punctuation">,</span>  # 차량 번호 인식 시점
+  <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>                                     # 차량 번호 인식 채널
+    <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">,</span>
+    <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"카메라1"</span><span class="token punctuation">,</span>
+    <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=1&amp;when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"</span>  # 차량 번호 인식 시점의 영상
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">"deviceCode"</span><span class="token punctuation">:</span><span class="token string">"1-1-7"</span><span class="token punctuation">,</span>                         # 차량 번호 인식 <span class="token function">장치</span><span class="token punctuation">(</span>영역<span class="token punctuation">)</span> 코드
+  <span class="token string">"deviceName"</span><span class="token punctuation">:</span><span class="token string">"B1주차장"</span><span class="token punctuation">,</span>                       # 차량 번호 인식 <span class="token function">장치</span><span class="token punctuation">(</span>영역<span class="token punctuation">)</span> 이름
+  <span class="token string">"linkedChannel"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>                            # 연동된 채널
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"카메라2"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=2&amp;when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"</span> # 차량 번호 인식 시점의 영상
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">"plateNo"</span><span class="token punctuation">:</span><span class="token string">"11가1432"</span><span class="token punctuation">,</span>                         # 차량 번호
+  <span class="token string">"timeBegin"</span><span class="token punctuation">:</span><span class="token string">"2018-06-27T10:42:02.573+09:00"</span><span class="token punctuation">,</span>  # 동일 차량 번호 최초 인식 시점 
+  <span class="token string">"topic"</span><span class="token punctuation">:</span><span class="token string">"LPR"</span>                                 # 토픽 이름
+<span class="token punctuation">}</span>
+</pre>
+<h3 class="mume-header" id="&#xBE44;&#xC0C1;-&#xD638;&#xCD9C;-&#xC774;&#xBCA4;&#xD2B8;">비상 호출 이벤트</h3>
+
+<p><code>topics=emergencyCall</code>을 요청하면 실시간으로 비상 호출에 의한 통화 시작과 종료 시점에  이벤트 메시지를 수신할 수 있습니다.<br>
+비상 호출 이벤트 메시지는 웹 소켓 메시지를 통해 아래와 같이 JSON형식으로 수신됩니다.</p>
+<p>통화 시작 메시지</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timestamp"</span><span class="token punctuation">:</span><span class="token string">"2018-06-27T10:56:16.316+09:00"</span><span class="token punctuation">,</span>  # 통화 시작 시점
+  <span class="token string">"caller"</span><span class="token punctuation">:</span><span class="token string">"0000002"</span><span class="token punctuation">,</span>                           # 비상 호출 장치 위치 코드
+  <span class="token string">"device"</span><span class="token punctuation">:</span><span class="token string">"Sammul/Vizufon"</span><span class="token punctuation">,</span>                    # 비상 호출 장치 이름
+  <span class="token string">"event"</span><span class="token punctuation">:</span><span class="token string">"callStart"</span><span class="token punctuation">,</span>                          # 통화 시작 이벤트
+  <span class="token string">"linkedChannel"</span><span class="token punctuation">:</span><span class="token punctuation">[</span>                             # 연동된 채널
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"카메라1"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=1"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"카메라2"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=2"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">"name"</span><span class="token punctuation">:</span><span class="token string">"지하1층 계단"</span><span class="token punctuation">,</span>                         # 비상 호출 장치 위치 이름
+  <span class="token string">"topic"</span><span class="token punctuation">:</span><span class="token string">"emergencyCall"</span>                       # 토픽 이름
+<span class="token punctuation">}</span>
+</pre>
+<p>통화 종료 메시지</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timestamp"</span><span class="token punctuation">:</span><span class="token string">"2018-06-27T10:59:26.322+09:00"</span><span class="token punctuation">,</span>  # 통화 종료 시점
+  <span class="token string">"caller"</span><span class="token punctuation">:</span><span class="token string">"0000002"</span><span class="token punctuation">,</span>                           # 비상 호출 장치 위치 코드
+  <span class="token string">"device"</span><span class="token punctuation">:</span><span class="token string">"Sammul/Vizufon"</span><span class="token punctuation">,</span>                    # 비상 호출 장치 이름
+  <span class="token string">"event"</span><span class="token punctuation">:</span><span class="token string">"callEnd"</span><span class="token punctuation">,</span>                            # 통화 종료 이벤트
+  <span class="token string">"linkedChannel"</span><span class="token punctuation">:</span><span class="token punctuation">[</span>                             # 연동된 채널
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"카메라1"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=1"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"카메라2"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=2"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">"name"</span><span class="token punctuation">:</span><span class="token string">"비상벨2"</span><span class="token punctuation">,</span>                             # 비상 호출 장치 위치 이름
+  <span class="token string">"topic"</span><span class="token punctuation">:</span><span class="token string">"emergencyCall"</span>                      # 토픽 이름
+<span class="token punctuation">}</span>
+</pre>
+<p>비상 호출 메시지는 실시간 통화를 위한 용도로 사용되므로 연동된 채널의 영상 주소는 차량 번호 인식의 경우와 달리 실시간 영상으로 링크되어 있습니다.</p>
+<p>이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.</p>
+<pre class="language-html"><span class="token doctype">&lt;!DOCTYPE>
+&lt;head></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>utf-8<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>ex3<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style language-css">
+    <span class="token selector">body </span><span class="token punctuation">{</span><span class="token property">font-family</span><span class="token punctuation">:</span>Arial, Helvetica, sans-serif<span class="token punctuation">}</span>
+    <span class="token selector">div </span><span class="token punctuation">{</span><span class="token property">padding</span><span class="token punctuation">:</span><span class="token number">5</span>px<span class="token punctuation">}</span>
+    <span class="token selector"><span class="token id">#control</span> </span><span class="token punctuation">{</span><span class="token property">background-color</span><span class="token punctuation">:</span>beige<span class="token punctuation">}</span>
+    <span class="token selector"><span class="token id">#url</span>, <span class="token id">#messages</span> </span><span class="token punctuation">{</span><span class="token property">font-size</span><span class="token punctuation">:</span><span class="token number">0.8</span>em<span class="token punctuation">;</span><span class="token property">font-family</span><span class="token punctuation">:</span><span class="token string">'Courier New'</span>, Courier, monospace<span class="token punctuation">}</span>
+    <span class="token selector">li<span class="token class">.open</span>, li<span class="token class">.close</span> </span><span class="token punctuation">{</span><span class="token property">color</span><span class="token punctuation">:</span>blue<span class="token punctuation">}</span>
+    <span class="token selector">li<span class="token class">.error</span> </span><span class="token punctuation">{</span><span class="token property">color</span><span class="token punctuation">:</span>red<span class="token punctuation">}</span>
+  </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h2</span><span class="token punctuation">></span></span>예제3. 웹 소켓 메시지 수신하기<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h2</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>control<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>host-name<span class="token punctuation">'</span></span> <span class="token attr-name">placeholder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>서버 IP주소:포트<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>user-id<span class="token punctuation">'</span></span> <span class="token attr-name">placeholder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>사용자 ID<span class="token punctuation">'</span></span><span class="token punctuation">></span></span> 
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>password<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>password<span class="token punctuation">'</span></span> <span class="token attr-name">placeholder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>비밀번호<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+      토픽:
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>checkbox<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>LPR<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>LPR<span class="token punctuation">"</span></span> <span class="token attr-name">checked</span><span class="token punctuation">></span></span>차량 번호 인식 
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>checkbox<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>emergencyCall<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>emergencyCall<span class="token punctuation">"</span></span> <span class="token attr-name">checked</span><span class="token punctuation">></span></span>비상 호출 
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>button<span class="token punctuation">'</span></span> <span class="token attr-name">onClick</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>onConnect()<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>접속<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>button<span class="token punctuation">'</span></span> <span class="token attr-name">onClick</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>onDisconnect()<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>접속 종료<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>url<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ul</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>messages<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ul</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text/javascript<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token script language-javascript">
+  <span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    window<span class="token punctuation">.</span>myApp <span class="token operator">=</span> <span class="token punctuation">{</span> ws<span class="token punctuation">:</span> <span class="token keyword">null</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">function</span> <span class="token function">getURL</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> url <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span><span class="token string">'WebSocket'</span> <span class="token keyword">in</span> window<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'웹 소켓을 지원하지 않는 웹 브라우저입니다.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">var</span> hostName <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'host-name'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>hostName <span class="token operator">==</span> <span class="token string">''</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'호스트를 입력하십시오.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">var</span> userId <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'user-id'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>userId <span class="token operator">==</span> <span class="token string">''</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'사용자 아이디를 입력하십시오.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">var</span> password <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'password'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>password <span class="token operator">==</span> <span class="token string">''</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'비밀번호를 입력하십시오.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">var</span> topics <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'LPR'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>checked<span class="token punctuation">)</span>
+      topics <span class="token operator">+=</span> <span class="token string">'LPR'</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'emergencyCall'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>checked<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>topics<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+        topics <span class="token operator">+=</span> <span class="token string">','</span><span class="token punctuation">;</span>
+      topics <span class="token operator">+=</span> <span class="token string">'emergencyCall'</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>topics<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'하나 이상의 토픽을 선택하십시오.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">var</span> encodedData <span class="token operator">=</span> window<span class="token punctuation">.</span><span class="token function">btoa</span><span class="token punctuation">(</span>userId <span class="token operator">+</span> <span class="token string">':'</span> <span class="token operator">+</span> password<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// base64 인코딩</span>
+    url <span class="token operator">=</span> <span class="token punctuation">(</span>hostName<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span><span class="token string">'ws://'</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token string">''</span> <span class="token punctuation">:</span> <span class="token string">'ws://'</span><span class="token punctuation">)</span> <span class="token operator">+</span>
+      hostName <span class="token operator">+</span> <span class="token string">'/api/subscribeEvents?topics='</span> <span class="token operator">+</span> topics <span class="token operator">+</span> 
+      <span class="token string">'&amp;auth='</span> <span class="token operator">+</span> encodedData<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token function">addItem</span><span class="token punctuation">(</span>tagClass<span class="token punctuation">,</span> msg<span class="token punctuation">)</span> <span class="token punctuation">{</span>    
+    <span class="token keyword">var</span> li <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'li'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    li<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">createTextNode</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    li<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>tagClass<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+    document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'messages'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>li<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token function">onConnect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> url <span class="token operator">=</span> <span class="token function">getURL</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>url<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'url'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>innerText <span class="token operator">=</span> url<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 웹 소켓 인스턴스와 핸들러 함수들</span>
+    <span class="token keyword">var</span> ws <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WebSocket</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    ws<span class="token punctuation">.</span>onopen <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">addItem</span><span class="token punctuation">(</span><span class="token string">'open'</span><span class="token punctuation">,</span> <span class="token string">'접속 성공'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    ws<span class="token punctuation">.</span>onclose <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">addItem</span><span class="token punctuation">(</span><span class="token string">'close'</span><span class="token punctuation">,</span> <span class="token string">'접속 종료: '</span> <span class="token operator">+</span> e<span class="token punctuation">.</span>code<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    ws<span class="token punctuation">.</span>onerror <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">addItem</span><span class="token punctuation">(</span><span class="token string">'error'</span><span class="token punctuation">,</span> <span class="token string">'오류: '</span> <span class="token operator">+</span> e<span class="token punctuation">.</span>code<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    ws<span class="token punctuation">.</span>onmessage <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">addItem</span><span class="token punctuation">(</span><span class="token string">'data'</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    window<span class="token punctuation">.</span>myApp<span class="token punctuation">.</span>ws <span class="token operator">=</span> ws<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token function">onDisconnect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    window<span class="token punctuation">.</span>myApp<span class="token punctuation">.</span>ws<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+</pre>
+<p><a href="./examples/ex3.html">실행하기</a></p>
 <h2 class="mume-header" id="&#xBD80;&#xB85D;">부록</h2>
 
 <h3 class="mume-header" id="&#xC81C;&#xD488;&#xBCC4;-api-&#xC9C0;&#xC6D0;-&#xBC84;&#xC804;">제품별 API 지원 버전</h3>
@@ -1424,6 +1719,12 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 <td>v0.41.0 이상</td>
 <td>v0.40.0 이상</td>
 <td>v0.7.0A 이상</td>
+</tr>
+<tr>
+<td>0.3.0</td>
+<td>v0.42.1 이상</td>
+<td>v0.41.1 이상</td>
+<td>v0.8.2A 이상</td>
 </tr>
 </tbody>
 </table>
@@ -1712,7 +2013,7 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <p>물론 내용면으로는 둘 다 완전히 같은 데이터입니다.</p>
 <h3 class="mume-header" id="&#xD53C;&#xB4DC;&#xBC31;">피드백</h3>
 
-<p>저희는 현장에서 사용자들이 보내주시는 피드백에 항상 귀기울이고 있습니다.<br>
+<p>우리는 항상 고객의 의견에 항상 귀기울이고 있습니다.<br>
 개발 관련 문의 사항이나 개선할 부분이 있으시면 <a href="https://github.com/bobhyun/TS-API/issues">https://github.com/bobhyun/TS-API/issues</a> 에 남겨주시기 바랍니다.</p>
 
       </div>
@@ -1745,7 +2046,7 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <li><a href="#%EB%AA%A8%EB%91%90-%ED%95%9C-%EB%B2%88%EC%97%90-%EC%9A%94%EC%B2%AD">모두 한 번에 요청</a></li>
 </ul>
 </li>
-<li><a href="#%EC%8B%9C%EC%8A%A4%ED%85%9C-%EC%A0%95%EB%B3%B4-%EC%9A%94%EC%B2%AD">시스템 정보 요청</a></li>
+<li><a href="#%EC%8B%9C%EC%8A%A4%ED%85%9C-%EC%A0%95%EB%B3%B4-%EC%9A%94%EC%B2%AD-020">시스템 정보 요청 <code>@0.2.0</code></a></li>
 <li><a href="#%EA%B0%81%EC%A2%85-%EB%AA%A9%EB%A1%9D-%EC%9A%94%EC%B2%AD">각종 목록 요청</a>
 <ul>
 <li><a href="#%EC%B1%84%EB%84%90-%EB%AA%A9%EB%A1%9D">채널 목록</a></li>
@@ -1756,20 +2057,25 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <li><a href="#%EC%A0%80%EC%9E%A5-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EA%B2%80%EC%83%89">저장 데이터 검색</a>
 <ul>
 <li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%82%A0%EC%A7%9C-%EA%B2%80%EC%83%89">녹화 영상이 있는 날짜 검색</a></li>
-<li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%B6%84-%EB%8B%A8%EC%9C%84-%EA%B2%80%EC%83%89">녹화 영상이 있는 분 단위 검색</a></li>
+<li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81%EC%9D%B4-%EC%9E%88%EB%8A%94-%EB%B6%84-%EB%8B%A8%EC%9C%84-%EA%B2%80%EC%83%89-020">녹화 영상이 있는 분 단위 검색 <code>@0.2.0</code></a></li>
 </ul>
 </li>
 <li><a href="#%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">이벤트 로그 검색</a></li>
 <li><a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EB%A1%9C%EA%B7%B8-%EA%B2%80%EC%83%89">차량 번호 로그 검색</a></li>
-<li><a href="#%EC%9C%A0%EC%82%AC-%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EA%B2%80%EC%83%89">유사 차량 번호 검색</a></li>
+<li><a href="#%EC%9C%A0%EC%82%AC-%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EA%B2%80%EC%83%89-020">유사 차량 번호 검색 <code>@0.2.0</code></a></li>
 <li><a href="#%EB%8F%99%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4-%EA%B2%80%EC%83%89">동영상 소스 검색</a>
 <ul>
 <li><a href="#%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4">실시간 영상 소스</a></li>
 <li><a href="#%EB%85%B9%ED%99%94-%EC%98%81%EC%83%81-%EC%86%8C%EC%8A%A4">녹화 영상 소스</a></li>
 </ul>
 </li>
-<li><a href="#%EB%B9%84%EB%94%94%EC%98%A4-%EC%86%8C%EC%8A%A4%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%EC%98%81%EC%83%81-%EC%9A%94%EC%B2%AD">비디오 소스를 사용하여 영상 요청</a></li>
-<li><a href="#%EC%99%B8%EB%B6%80-%EC%9E%A5%EC%B9%98%EC%97%90%EC%84%9C-%ED%8A%B8%EB%A6%AC%EA%B1%B0-%EC%9E%85%EB%A0%A5">외부 장치에서 트리거 입력</a></li>
+<li><a href="#%EB%B9%84%EB%94%94%EC%98%A4-%EC%86%8C%EC%8A%A4%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%EC%98%81%EC%83%81-%EC%9A%94%EC%B2%AD-030">비디오 소스를 사용하여 영상 요청 <code>@0.3.0</code></a></li>
+<li><a href="#%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81-030">실시간 이벤트 모니터링 <code>@0.3.0</code></a>
+<ul>
+<li><a href="#%EC%B0%A8%EB%9F%89-%EB%B2%88%ED%98%B8-%EC%9D%B8%EC%8B%9D-%EC%9D%B4%EB%B2%A4%ED%8A%B8">차량 번호 인식 이벤트</a></li>
+<li><a href="#%EB%B9%84%EC%83%81-%ED%98%B8%EC%B6%9C-%EC%9D%B4%EB%B2%A4%ED%8A%B8">비상 호출 이벤트</a></li>
+</ul>
+</li>
 <li><a href="#%EB%B6%80%EB%A1%9D">부록</a>
 <ul>
 <li><a href="#%EC%A0%9C%ED%92%88%EB%B3%84-api-%EC%A7%80%EC%9B%90-%EB%B2%84%EC%A0%84">제품별 API 지원 버전</a></li>

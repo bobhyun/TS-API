@@ -210,16 +210,89 @@ code.language-yaml {
     <body for="html-export">
       <div class="mume markdown-preview   ">
       <h1>TS-API Programmer's Guide</h1>
+<h2>TS-API@0.3.0</h2>
 <p>This article is a programming guide for those who develop application software using <strong>TS-API</strong>, which is built in <strong>TS-CMS</strong>, <strong>TS-NVR</strong>, <strong>TS-LPR</strong> of TS Solution Co.,Ltd.</p>
 <p>You can easily embed the real-time video, recorded video, and video search functions into your application software with the API.</p>
-<p>It would be helpful if you have experience using simple <code>HTML</code> and <code>JavaScript</code> to use the API.</p>
-<p>Please refer to the following, as the features supported by each product may differ.<br>
-<a href="#the-api-supported-versions-by-product">The API-supported versions by product</a><br>
-<a href="#the-features-table-by-product">The features table by product</a></p>
-<p><em>The API and this article are subject to change without notice for better development support and improvement.</em></p>
+<p>It would be helpful if you have some experience using simple <code>HTML</code> and <code>JavaScript</code> to use the API.</p>
+<p>Please refer to <a href="#the-api-supported-versions-by-product">The API-supported versions by product</a> and<br>
+<a href="#the-features-table-by-product">The features table by product</a> portion of <a href="#appendix">Appendix</a>, as the features supported by each product may differ.</p>
+<p><code>[Tips]</code> <em>The API and this article are subject to change without notice for better development support and improvement.</em></p>
+<h2>Table of contents</h2>
+<ul>
+<li><a href="#get-started">Get Started</a></li>
+<li><a href="#video-display">Video display</a>
+<ul>
+<li><a href="#real-time-video-display">Real-time video display</a></li>
+<li><a href="#inserting-video-into-web-page">Inserting video into web page</a></li>
+<li><a href="#connecting-to-a-real-server">Connecting to a real server</a></li>
+<li><a href="#user-authentication">User authentication</a></li>
+<li><a href="#change-channel">Change channel</a></li>
+<li><a href="#display-recorded-video">Display recorded video</a></li>
+</ul>
+</li>
+<li><a href="#session-authentication">Session authentication</a>
+<ul>
+<li><a href="#sign-in">Sign in</a></li>
+<li><a href="#sign-out">Sign out</a></li>
+</ul>
+</li>
+<li><a href="#request-server-information">Request server information</a>
+<ul>
+<li><a href="#api-version">API version</a></li>
+<li><a href="#site-name">Site name</a></li>
+<li><a href="#server-side-time-zone">Server-side time zone</a></li>
+<li><a href="#product-information">Product information</a></li>
+<li><a href="#license-information">License information</a></li>
+<li><a href="#user-information">User information</a></li>
+<li><a href="#request-all-at-once">Request all at once</a></li>
+</ul>
+</li>
+<li><a href="#request-system-informatoin-020">Request system informatoin <code>@0.2.0</code></a></li>
+<li><a href="#request-various-enumeration">Request various enumeration</a>
+<ul>
+<li><a href="#channel-list">Channel list</a></li>
+<li><a href="#vehicle-number-recognition-device-list">Vehicle number recognition device list</a></li>
+<li><a href="#event-log-type-list">Event log type list</a></li>
+</ul>
+</li>
+<li><a href="#retrieve-recorded-data">Retrieve recorded data</a>
+<ul>
+<li><a href="#search-dates-with-recorded-video">Search dates with recorded video</a></li>
+<li><a href="#search-minutes-with-recorded-video-020">Search minutes with recorded video <code>@0.2.0</code></a></li>
+</ul>
+</li>
+<li><a href="#search-event-log">Search event log</a></li>
+<li><a href="#vehicle-number-log-search">Vehicle number log search</a></li>
+<li><a href="#search-for-similar-vehicle-numbers-020">Search for similar vehicle numbers <code>@0.2.0</code></a></li>
+<li><a href="#search-for-video-sources">Search for video sources</a>
+<ul>
+<li><a href="#real-time-video-source">Real-time video source</a></li>
+<li><a href="#recorded-video-source">Recorded video source</a></li>
+</ul>
+</li>
+<li><a href="#requesting-video-using-video-source-030">Requesting video using video source <code>@0.3.0</code></a></li>
+<li><a href="#real-time-event-monitoring-030">Real-time event monitoring <code>@0.3.0</code></a>
+<ul>
+<li><a href="#car-number-recognition-event">Car number recognition event</a></li>
+<li><a href="#emergency-call-event">Emergency Call Event</a></li>
+</ul>
+</li>
+<li><a href="#appendix">Appendix</a>
+<ul>
+<li><a href="#the-api-supported-versions-by-product">The API-supported versions by product</a></li>
+<li><a href="#the-features-table-by-product">The features table by product</a></li>
+<li><a href="#base64-encoding">base64 Encoding</a></li>
+<li><a href="#url-encoding">URL Encoding</a></li>
+<li><a href="#url-decoding">URL decoding</a></li>
+<li><a href="#date-and-time-notation-in-iso-8601-format">Date and time notation in ISO 8601 format</a></li>
+<li><a href="#list-of-languages-supported">List of languages supported</a></li>
+<li><a href="#json-data-format">JSON data format</a></li>
+<li><a href="#feedback">Feedback</a></li>
+</ul>
+</li>
+</ul>
 <h2 class="mume-header" id="get-started">Get Started</h2>
 
-<p><code>[Tips]</code> If you look at this <a href="http://TS-API.en.md">TS-API.en.md</a> document online, the included examples may not run. We recommend that you download this project using git and open the TS-API.en.html file in your web browser.</p>
 <p>In this article, TS-API is abbreviated as <strong>API</strong>, and each product is simply called <strong>server</strong>.</p>
 <h2 class="mume-header" id="video-display">Video display</h2>
 
@@ -228,7 +301,7 @@ code.language-yaml {
 <p>Try to type the following in the Web browser address window.</p>
 <pre class="language-ruby">http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tssolution<span class="token punctuation">.</span>ipdisk<span class="token punctuation">.</span>co<span class="token punctuation">.</span>kr<span class="token punctuation">:</span><span class="token number">85</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<p>&lt;button onClick=]window.open(&quot;<a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=">http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=</a>&quot;)'&gt;Show</p>
+<p><a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=">Run</a></p>
 <p>Do you see the video?</p>
 <p><code>[Tips]</code> <em>The demonstration video used in this sample code may not be connected depending on the situation in the field.</em></p>
 <h3 class="mume-header" id="inserting-video-into-web-page">Inserting video into web page</h3>
@@ -246,7 +319,7 @@ code.language-yaml {
   <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>640<span class="token punctuation">'</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>360<span class="token punctuation">'</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>0<span class="token punctuation">'</span></span> <span class="token attr-name">allowfullscreen</span> <span class="token punctuation">/></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
 </pre>
-<p><button onClick="window.open(&quot;./examples/ex1.html&quot;)">Show</button></p>
+<p><a href="./examples/ex1.html">Run</a></p>
 <p>The video URL and the <code>&lt;iframe&gt;</code> tag code used in the example are provided as a pop-up menu when you <strong>right-click on the video</strong> of the webpage (or long-press on the video in case of a smartphone).<br>
 Select the menu item you are to use, the code will be copied to the clipboard and then you can <strong>paste</strong> them into your code.</p>
 <table>
@@ -373,7 +446,7 @@ In the above example, <code>demo:!1234qwer</code> is <a href="#base64-encoding">
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>iframe</span> <span class="token attr-name">width</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>640<span class="token punctuation">'</span></span> <span class="token attr-name">height</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>360<span class="token punctuation">'</span></span> <span class="token attr-name">frameborder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>0<span class="token punctuation">'</span></span> <span class="token attr-name">allowfullscreen</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>player<span class="token punctuation">'</span></span> <span class="token punctuation">/></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
 </pre>
-<p><button onClick="window.open(&quot;./examples/ex2.html&quot;)">Show</button></p>
+<p><a href="./examples/ex2.html">Run</a></p>
 <h3 class="mume-header" id="change-channel">Change channel</h3>
 
 <p>If you change the <code>ch=</code> part of the video source to the desired channel number as shown below, the video of that channel will be displayed.<br>
@@ -381,22 +454,24 @@ Channel numbers are integers starting at 1.<br>
 For example, if you want to see channel 3, you can modify it like this:</p>
 <pre class="language-ruby">http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tssolution<span class="token punctuation">.</span>ipdisk<span class="token punctuation">.</span>co<span class="token punctuation">.</span>kr<span class="token punctuation">:</span><span class="token number">85</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">3</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<p><button onClick="window.open(&quot;http://tssolution.ipdisk.co.kr:85/watch?ch=3&amp;auth=ZGVtbzohMTIzNHF3ZXI=&quot;)">Show</button></p>
+<p>Run: <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;auth=ZGVtbzohMTIzNHF3ZXI=">Channel1</a> <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=2&amp;auth=ZGVtbzohMTIzNHF3ZXI=">Channel2</a> <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=3&amp;auth=ZGVtbzohMTIzNHF3ZXI=">Channel3</a></p>
 <h3 class="mume-header" id="display-recorded-video">Display recorded video</h3>
 
 <p>To display the recorded video, you need the date and time information (time stamp) of the desired video.<br>
 For example, to display a video recorded on <code>Channel 1</code> at 2:30:15 pm on February 1, 2018, you would need to add <code>when=2018-02-01T14%3a30%3a15%2b09%3a00</code>.</p>
 <pre class="language-ruby">http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>tssolution<span class="token punctuation">.</span>ipdisk<span class="token punctuation">.</span>co<span class="token punctuation">.</span>kr<span class="token punctuation">:</span><span class="token number">85</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">02</span><span class="token operator">-</span>01T14<span class="token operator">%</span>3a30<span class="token operator">%</span>3a15<span class="token operator">%</span>2b09<span class="token operator">%</span>3a00<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<p><code>2018-02-01T14% 3a30% 3a15% 2b09% 3a00</code> is the date and time in the format [ISO 8601] (# ISO-8601-format-date-time- - encoding).</p>
+<p><a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;when=2018-02-01T14%3a30%3a15%2b09%3a00&amp;auth=ZGVtbzohMTIzNHF3ZXI=&amp;lang=en-US">Run</a><br>
+<code>[Tips]</code> <em>The recorded video of the old date may already be overwritten depending on the capacity of the storage device.</em></p>
 <p><code>2018-02-01T14%3a30%3a15%2b09%3a00</code> is the date and time in the format <a href="#date-and-time-notation-in-iso-8601-format">ISO 8601</a>.</p>
 <p>You can use <code>when=now</code> to request real-time video, but if omitted, it means real-time video, and the following tips are provided for ease of use.</p>
 <pre class="language-">when=yesterday    // Local time on server yesterday 00:00:00
 when=today        // Local time on server today 00:00:00
 </pre>
+<p>Run: <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;when=yesterday&amp;auth=ZGVtbzohMTIzNHF3ZXI=&amp;lang=en-US">Yesterday</a> <a href="http://tssolution.ipdisk.co.kr:85/watch?ch=1&amp;when=today&amp;auth=ZGVtbzohMTIzNHF3ZXI=&amp;lang=en-US">Today</a></p>
 <p>You can use the parameters to set the language of the subtitles displayed on the video.<br>
 For a <a href="#list-of-languages-supported">list of supported languages</a>, refer to the appendix.</p>
-<p>From here, we will omit the <code>http://host</code> part and the<code>auth=</code>part.</p>
+<p>From here, we will omit the <code>http://host</code> and the<code>auth=</code>part.</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># Parameters</span>
 lang            <span class="token comment" spellcheck="true"># Specify subtitle language</span>
 showTitle       <span class="token comment" spellcheck="true"># Whether channel name is displayed (true, false)</span>
@@ -446,7 +521,7 @@ Using <code>login=</code> parameter after encrypting the user ID and password in
 </pre>
 <p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre class="language-json"><span class="token punctuation">{</span>
-  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"TS-API@0.2.0"</span>
+  <span class="token property">"apiVersion"</span><span class="token operator">:</span> <span class="token string">"TS-API@0.3.0"</span>
 <span class="token punctuation">}</span>
 </pre>
 <h3 class="mume-header" id="site-name">Site name</h3>
@@ -623,7 +698,7 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
   <span class="token punctuation">}</span>     <span class="token comment" spellcheck="true">// whoAmI is not included</span>
 <span class="token punctuation">}</span>
 </pre>
-<h2 class="mume-header" id="request-system-informatoin">Request system informatoin</h2>
+<h2 class="mume-header" id="request-system-informatoin-020">Request system informatoin <code>@0.2.0</code></h2>
 
 <p>Requests system information from the server.</p>
 <pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>sysinfo
@@ -871,7 +946,7 @@ timeEnd     <span class="token comment" spellcheck="true"># List of recorded dat
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
 </pre>
-<h3 class="mume-header" id="search-minutes-with-recorded-video">Search minutes with recorded video</h3>
+<h3 class="mume-header" id="search-minutes-with-recorded-video-020">Search minutes with recorded video <code>@0.2.0</code></h3>
 
 <p>To get a list of minutes with recorded videod, request the following:<br>
 In the case of minute search, you can not request all of them because the amount of response data can be large, unlike date search.<br>
@@ -1147,7 +1222,7 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 <span class="token comment" spellcheck="true"># If the session is not authenticated, add the auth parameter</span>
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.100</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">%</span>2D02<span class="token operator">%</span>2D20T18<span class="token operator">%</span>3A12<span class="token operator">%</span>3A05<span class="token operator">%</span><span class="token number">2E828</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span>3A00<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">ZGVtbzohMTIzNHF3ZXI</span><span class="token operator">=</span>
 </pre>
-<h2 class="mume-header" id="search-for-similar-vehicle-numbers">Search for similar vehicle numbers</h2>
+<h2 class="mume-header" id="search-for-similar-vehicle-numbers-020">Search for similar vehicle numbers <code>@0.2.0</code></h2>
 
 <p>Can be used to verify that a similar vehicle number exists.<br>
 To retrieve similar vehicle numbers from the log, request the following:</p>
@@ -1366,7 +1441,7 @@ otherwise   <span class="token comment" spellcheck="true"># If there is no searc
   <span class="token punctuation">}</span>
 <span class="token punctuation">]</span>
 </pre>
-<h2 class="mume-header" id="requesting-video-using-video-source">Requesting video using video source</h2>
+<h2 class="mume-header" id="requesting-video-using-video-source-030">Requesting video using video source <code>@0.3.0</code></h2>
 
 <p>For video request using video source without using <code>/watch</code> provided by API, authentication is supported by each protocol as follows.</p>
 <pre class="language-ruby"><span class="token comment" spellcheck="true"># RTMP (auth= parameter supported)</span>
@@ -1379,6 +1454,249 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>userid<span class="token symbol">:passwordn</span><span class="token variable">@host</span><span class="token operator">/</span>api<span class="token operator">/</span>path<span class="token operator">/</span>to
 http<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
 </pre>
+<h2 class="mume-header" id="real-time-event-monitoring-030">Real-time event monitoring <code>@0.3.0</code></h2>
+
+<p>You can receive real-time event data via <strong>Web socket</strong> <code>(RFC6455)</code>.<br>
+Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.</p>
+<p>The step-by-step communication procedure is as follows:</p>
+<blockquote>
+<ol>
+<li>Client connects to the server via Web socket.</li>
+<li>If the authentication to the server succeeds, the subscriber ID is issued.</li>
+<li>The client then remains connected and enters the message waiting state.</li>
+<li>When an event occurs, the server sends a message to the client.</li>
+<li>Repeat steps 3 through 4 until the client ends the connection itself.</li>
+</ol>
+</blockquote>
+<p>The following event topics are supported:</p>
+<pre class="language-">LPR             # Car number recognition
+emergencyCall   # Emergency call
+</pre>
+<p>The web socket connection path and parameters are as follows.</p>
+<pre class="language-ruby"><span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents
+
+<span class="token comment" spellcheck="true"># Required parameters</span>
+auth    <span class="token comment" spellcheck="true"># Authentication Information (Requires authentication per individual web socket, independent of session authentication)</span>
+topics  <span class="token comment" spellcheck="true"># Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)</span>
+
+<span class="token comment" spellcheck="true"># Example</span>
+<span class="token comment" spellcheck="true"># Request car number recognition event</span>
+ws<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span><span class="token constant">LPR</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
+
+<span class="token comment" spellcheck="true"># Request emergency call event</span>
+ws<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>emergencyCall<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
+
+<span class="token comment" spellcheck="true"># Request both events</span>
+ws<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span><span class="token constant">LPR</span><span class="token punctuation">,</span>emergencyCall<span class="token operator">&amp;</span>auth<span class="token operator">=</span><span class="token constant">YWRtaW46YWRtaW4</span><span class="token operator">=</span>
+</pre>
+<p>The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.<br>
+If the authentication information is incorrect or is not a supported topic, it will be disconnected immediately.</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"subscriberId"</span><span class="token punctuation">:</span> <span class="token string">"cd57c82b-7e8c-4b04-91eb-520f6a9773ce"</span><span class="token punctuation">,</span> # subscriber ID <span class="token punctuation">(</span>Unique ID per each Web socket connection<span class="token punctuation">)</span>
+  <span class="token string">"topics"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>   # Reply to requested topics <span class="token punctuation">(</span>Both events are supported<span class="token punctuation">)</span>
+    <span class="token string">"LPR"</span><span class="token punctuation">,</span>
+    <span class="token string">"emergencyCall"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</pre>
+<h3 class="mume-header" id="car-number-recognition-event">Car number recognition event</h3>
+
+<p>If you request <code>topics=LPR</code>, you can receive the car number recognition event in real time.<br>
+Car number recognition events are received in JSON format via Web socket messages as shown below.</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timestamp"</span><span class="token punctuation">:</span><span class="token string">"2018-06-27T10:42:06.575-05:00"</span><span class="token punctuation">,</span>  # Vehicle number recognition time
+  <span class="token string">"chid"</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>                                     # Car number recognition channel
+    <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">,</span>
+    <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"Camera1"</span><span class="token punctuation">,</span>
+    <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=1&amp;when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00"</span>  # The video at vehicle identification time
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string">"deviceCode"</span><span class="token punctuation">:</span><span class="token string">"1-1-7"</span><span class="token punctuation">,</span>                         # Car number identification device <span class="token punctuation">(</span>zone<span class="token punctuation">)</span> code
+  <span class="token string">"deviceName"</span><span class="token punctuation">:</span><span class="token string">"B1 Parking Lot"</span><span class="token punctuation">,</span>                # Car number identification device <span class="token punctuation">(</span>zone<span class="token punctuation">)</span> name
+  <span class="token string">"linkedChannel"</span><span class="token punctuation">:</span> <span class="token punctuation">[</span>                            # Linked channels
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"Camera2"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=2&amp;when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00"</span> # The video at vehicle identification time
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">"plateNo"</span><span class="token punctuation">:</span><span class="token string">"DSP963"</span><span class="token punctuation">,</span>                           # Car plate number
+  <span class="token string">"timeBegin"</span><span class="token punctuation">:</span><span class="token string">"2018-06-27T10:42:02.573-05:00"</span><span class="token punctuation">,</span>  # First recognized time <span class="token keyword">of</span> the car
+  <span class="token string">"topic"</span><span class="token punctuation">:</span><span class="token string">"LPR"</span>                                 # Topic name
+<span class="token punctuation">}</span>
+</pre>
+<h3 class="mume-header" id="emergency-call-event">Emergency Call Event</h3>
+
+<p>If you request <code>topics=emergencyCall</code>, you can receive the event messages at the start and end of the emergency call in real time.<br>
+Emergency call event messages are received in JSON format via Web socket messages as shown below.</p>
+<p>Call start message</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timestamp"</span><span class="token punctuation">:</span><span class="token string">"2018-06-27T10:56:16.316-05:00"</span><span class="token punctuation">,</span>  # Start time <span class="token keyword">of</span> the call
+  <span class="token string">"caller"</span><span class="token punctuation">:</span><span class="token string">"0000002"</span><span class="token punctuation">,</span>                           # Emergency call device location code
+  <span class="token string">"device"</span><span class="token punctuation">:</span><span class="token string">"Sammul/Vizufon"</span><span class="token punctuation">,</span>                    # Emergency call device name
+  <span class="token string">"event"</span><span class="token punctuation">:</span><span class="token string">"callStart"</span><span class="token punctuation">,</span>                          # Call start event
+  <span class="token string">"linkedChannel"</span><span class="token punctuation">:</span><span class="token punctuation">[</span>                             # Linked channels
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"Camera1"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=1"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"Camera2"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=2"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">"name"</span><span class="token punctuation">:</span><span class="token string">"B1 Stairs"</span><span class="token punctuation">,</span>                           # Emergency call device location name
+  <span class="token string">"topic"</span><span class="token punctuation">:</span><span class="token string">"emergencyCall"</span>                       # Topic name
+<span class="token punctuation">}</span>
+</pre>
+<p>Call end message</p>
+<pre class="language-jsx"><span class="token punctuation">{</span>
+  <span class="token string">"timestamp"</span><span class="token punctuation">:</span><span class="token string">"2018-06-27T10:59:26.322-05:00"</span><span class="token punctuation">,</span>  # End time <span class="token keyword">of</span> then call
+  <span class="token string">"caller"</span><span class="token punctuation">:</span><span class="token string">"0000002"</span><span class="token punctuation">,</span>                           # Emergency call device location code
+  <span class="token string">"device"</span><span class="token punctuation">:</span><span class="token string">"Sammul/Vizufon"</span><span class="token punctuation">,</span>                    # Emergency call device name
+  <span class="token string">"event"</span><span class="token punctuation">:</span><span class="token string">"callEnd"</span><span class="token punctuation">,</span>                            # Call end event
+  <span class="token string">"linkedChannel"</span><span class="token punctuation">:</span><span class="token punctuation">[</span>                             # Linked channels
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"Camera1"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=1"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"chid"</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">,</span>
+      <span class="token string">"title"</span><span class="token punctuation">:</span><span class="token string">"Camera2"</span><span class="token punctuation">,</span>
+      <span class="token string">"src"</span><span class="token punctuation">:</span><span class="token string">"http://host/watch?ch=2"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token string">"name"</span><span class="token punctuation">:</span><span class="token string">"B1 Stairs"</span><span class="token punctuation">,</span>                          # Emergency call device location name
+  <span class="token string">"topic"</span><span class="token punctuation">:</span><span class="token string">"emergencyCall"</span>                      # Topic name
+<span class="token punctuation">}</span>
+</pre>
+<p>Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.</p>
+<p>Now, let's create an example that uses the Web socket to receive event messages.</p>
+<pre class="language-html"><span class="token doctype">&lt;!DOCTYPE>
+&lt;head></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>utf-8<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>ex3<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style language-css">
+    <span class="token selector">body </span><span class="token punctuation">{</span><span class="token property">font-family</span><span class="token punctuation">:</span>Arial, Helvetica, sans-serif<span class="token punctuation">}</span>
+    <span class="token selector">div </span><span class="token punctuation">{</span><span class="token property">padding</span><span class="token punctuation">:</span><span class="token number">5</span>px<span class="token punctuation">}</span>
+    <span class="token selector"><span class="token id">#control</span> </span><span class="token punctuation">{</span><span class="token property">background-color</span><span class="token punctuation">:</span>beige<span class="token punctuation">}</span>
+    <span class="token selector"><span class="token id">#url</span>, <span class="token id">#messages</span> </span><span class="token punctuation">{</span><span class="token property">font-size</span><span class="token punctuation">:</span><span class="token number">0.8</span>em<span class="token punctuation">;</span><span class="token property">font-family</span><span class="token punctuation">:</span><span class="token string">'Courier New'</span>, Courier, monospace<span class="token punctuation">}</span>
+    <span class="token selector">li<span class="token class">.open</span>, li<span class="token class">.close</span> </span><span class="token punctuation">{</span><span class="token property">color</span><span class="token punctuation">:</span>blue<span class="token punctuation">}</span>
+    <span class="token selector">li<span class="token class">.error</span> </span><span class="token punctuation">{</span><span class="token property">color</span><span class="token punctuation">:</span>red<span class="token punctuation">}</span>
+  </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h2</span><span class="token punctuation">></span></span>Ex3. Receiving web socket messages<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h2</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>control<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>host-name<span class="token punctuation">'</span></span> <span class="token attr-name">placeholder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>Server IP address:port<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>user-id<span class="token punctuation">'</span></span> <span class="token attr-name">placeholder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>User ID<span class="token punctuation">'</span></span><span class="token punctuation">></span></span> 
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>password<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>password<span class="token punctuation">'</span></span> <span class="token attr-name">placeholder</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>Password<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+      Topics:
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>checkbox<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>LPR<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>LPR<span class="token punctuation">"</span></span> <span class="token attr-name">checked</span><span class="token punctuation">></span></span>LPR 
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>checkbox<span class="token punctuation">'</span></span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>emergencyCall<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>emergencyCall<span class="token punctuation">"</span></span> <span class="token attr-name">checked</span><span class="token punctuation">></span></span>emergencyCall 
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>button<span class="token punctuation">'</span></span> <span class="token attr-name">onClick</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>onConnect()<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>Connect<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>button<span class="token punctuation">'</span></span> <span class="token attr-name">onClick</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>onDisconnect()<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>Disconnect<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>url<span class="token punctuation">'</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ul</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>messages<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ul</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">'</span>text/javascript<span class="token punctuation">'</span></span><span class="token punctuation">></span></span><span class="token script language-javascript">
+  <span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    window<span class="token punctuation">.</span>myApp <span class="token operator">=</span> <span class="token punctuation">{</span> ws<span class="token punctuation">:</span> <span class="token keyword">null</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">function</span> <span class="token function">getURL</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> url <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span><span class="token string">'WebSocket'</span> <span class="token keyword">in</span> window<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'Your web browser does\'nt support web socket'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">var</span> hostName <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'host-name'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>hostName <span class="token operator">==</span> <span class="token string">''</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'Please enter the host.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">var</span> userId <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'user-id'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>userId <span class="token operator">==</span> <span class="token string">''</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'Please enter your user ID.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">var</span> password <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'password'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>value<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>password <span class="token operator">==</span> <span class="token string">''</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'Please enter your password.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">var</span> topics <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'LPR'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>checked<span class="token punctuation">)</span>
+      topics <span class="token operator">+=</span> <span class="token string">'LPR'</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'emergencyCall'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>checked<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>topics<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+        topics <span class="token operator">+=</span> <span class="token string">','</span><span class="token punctuation">;</span>
+      topics <span class="token operator">+=</span> <span class="token string">'emergencyCall'</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>topics<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'Please select at least one topic.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">var</span> encodedData <span class="token operator">=</span> window<span class="token punctuation">.</span><span class="token function">btoa</span><span class="token punctuation">(</span>userId <span class="token operator">+</span> <span class="token string">':'</span> <span class="token operator">+</span> password<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// base64 encoding</span>
+    url <span class="token operator">=</span> <span class="token punctuation">(</span>hostName<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span><span class="token string">'ws://'</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token string">''</span> <span class="token punctuation">:</span> <span class="token string">'ws://'</span><span class="token punctuation">)</span> <span class="token operator">+</span>
+      hostName <span class="token operator">+</span> <span class="token string">'/api/subscribeEvents?topics='</span> <span class="token operator">+</span> topics <span class="token operator">+</span> 
+      <span class="token string">'&amp;auth='</span> <span class="token operator">+</span> encodedData<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> url<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token function">addItem</span><span class="token punctuation">(</span>tagClass<span class="token punctuation">,</span> msg<span class="token punctuation">)</span> <span class="token punctuation">{</span>    
+    <span class="token keyword">var</span> li <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'li'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    li<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">createTextNode</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    li<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>tagClass<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+    document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'messages'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>li<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token function">onConnect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> url <span class="token operator">=</span> <span class="token function">getURL</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>url<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'url'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>innerText <span class="token operator">=</span> url<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// WebSocket instanecs and it's handlers functions</span>
+    <span class="token keyword">var</span> ws <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WebSocket</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    ws<span class="token punctuation">.</span>onopen <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">addItem</span><span class="token punctuation">(</span><span class="token string">'open'</span><span class="token punctuation">,</span> <span class="token string">'Connected'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    ws<span class="token punctuation">.</span>onclose <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">addItem</span><span class="token punctuation">(</span><span class="token string">'close'</span><span class="token punctuation">,</span> <span class="token string">'Disconnected: '</span> <span class="token operator">+</span> e<span class="token punctuation">.</span>code<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    ws<span class="token punctuation">.</span>onerror <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">addItem</span><span class="token punctuation">(</span><span class="token string">'error'</span><span class="token punctuation">,</span> <span class="token string">'Error: '</span> <span class="token operator">+</span> e<span class="token punctuation">.</span>code<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    ws<span class="token punctuation">.</span>onmessage <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">addItem</span><span class="token punctuation">(</span><span class="token string">'data'</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+    window<span class="token punctuation">.</span>myApp<span class="token punctuation">.</span>ws <span class="token operator">=</span> ws<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">function</span> <span class="token function">onDisconnect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    window<span class="token punctuation">.</span>myApp<span class="token punctuation">.</span>ws<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+</pre>
+<p><a href="./examples/ex3.html">Run</a></p>
 <h2 class="mume-header" id="appendix">Appendix</h2>
 
 <h3 class="mume-header" id="the-api-supported-versions-by-product">The API-supported versions by product</h3>
@@ -1405,6 +1723,12 @@ http<span class="token punctuation">:</span><span class="token operator">/</span
 <td>v0.41.0 or later</td>
 <td>v0.40.0 or later</td>
 <td>v0.7.0A or later</td>
+</tr>
+<tr>
+<td>0.3.0</td>
+<td>v0.42.1 or later</td>
+<td>v0.41.1 or later</td>
+<td>v0.8.2A or later</td>
 </tr>
 </tbody>
 </table>
@@ -1693,8 +2017,8 @@ zu<span class="token operator">-</span><span class="token constant">ZA</span>   
 <p>Of course, both are completely the same data in terms of content.</p>
 <h3 class="mume-header" id="feedback">Feedback</h3>
 
-<p>We are always listening to feedback from our users in the field.<br>
-If you have any questions or improvements regarding development, please leave them at <a href="https://github.com/bobhyun/TS-API/issues">https://github.com/bobhyun/TS-API/issues</a>.</p>
+<p>We are always listening to your feedback.<br>
+If you have any development questions or want to improve, please leave them at <a href="https://github.com/bobhyun/TS-API/issues">https://github.com/bobhyun/TS-API/issues</a>.</p>
 
       </div>
       <div class="md-sidebar-toc"><ul>
@@ -1726,7 +2050,7 @@ If you have any questions or improvements regarding development, please leave th
 <li><a href="#request-all-at-once">Request all at once</a></li>
 </ul>
 </li>
-<li><a href="#request-system-informatoin">Request system informatoin</a></li>
+<li><a href="#request-system-informatoin-020">Request system informatoin <code>@0.2.0</code></a></li>
 <li><a href="#request-various-enumeration">Request various enumeration</a>
 <ul>
 <li><a href="#channel-list">Channel list</a></li>
@@ -1737,19 +2061,25 @@ If you have any questions or improvements regarding development, please leave th
 <li><a href="#retrieve-recorded-data">Retrieve recorded data</a>
 <ul>
 <li><a href="#search-dates-with-recorded-video">Search dates with recorded video</a></li>
-<li><a href="#search-minutes-with-recorded-video">Search minutes with recorded video</a></li>
+<li><a href="#search-minutes-with-recorded-video-020">Search minutes with recorded video <code>@0.2.0</code></a></li>
 </ul>
 </li>
 <li><a href="#search-event-log">Search event log</a></li>
 <li><a href="#vehicle-number-log-search">Vehicle number log search</a></li>
-<li><a href="#search-for-similar-vehicle-numbers">Search for similar vehicle numbers</a></li>
+<li><a href="#search-for-similar-vehicle-numbers-020">Search for similar vehicle numbers <code>@0.2.0</code></a></li>
 <li><a href="#search-for-video-sources">Search for video sources</a>
 <ul>
 <li><a href="#real-time-video-source">Real-time video source</a></li>
 <li><a href="#recorded-video-source">Recorded video source</a></li>
 </ul>
 </li>
-<li><a href="#requesting-video-using-video-source">Requesting video using video source</a></li>
+<li><a href="#requesting-video-using-video-source-030">Requesting video using video source <code>@0.3.0</code></a></li>
+<li><a href="#real-time-event-monitoring-030">Real-time event monitoring <code>@0.3.0</code></a>
+<ul>
+<li><a href="#car-number-recognition-event">Car number recognition event</a></li>
+<li><a href="#emergency-call-event">Emergency Call Event</a></li>
+</ul>
+</li>
 <li><a href="#appendix">Appendix</a>
 <ul>
 <li><a href="#the-api-supported-versions-by-product">The API-supported versions by product</a></li>
