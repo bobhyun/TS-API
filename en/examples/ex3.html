@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h2>Ex3. Receiving web socket messages</h2>
+  <h2>Ex3. Receiving Events (Server-Sent Events)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='Server IP address:port'>
@@ -36,17 +36,22 @@
 </body>
 <script type='text/javascript'>
   (function() {
-    window.myApp = { ws: null };
+    window.myApp = { es: null };
   })();
 
   function getURL() {
     var url = '';
 
-    if (!('WebSocket' in window)) {
-      alert('Your web browser does\'nt support web socket');
+    if (typeof(EventSource) === 'undefined') {
+			alert('Your web browser does\'nt support Server-Sent Events.');
       return url;
     }
 
+		if(window.myApp.es !== null) {
+			alert('Already connected');
+			return url;
+		}
+			
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('Please enter the host.');
@@ -77,9 +82,9 @@
     }
 
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
-    url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-      hostName + '/api/subscribeEvents?topics=' + topics + 
-      '&auth=' + encodedData;
+    url = (hostName.includes('http://', 0) ? '' : 'http://') +
+			hostName + '/api/subscribeEvents?topics=' + topics + 
+			'&auth=' + encodedData;
 
     return url;
   }
@@ -98,24 +103,28 @@
 
     document.getElementById('url').innerText = url;
 
-    // WebSocket instanecs and it's handlers functions
-    var ws = new WebSocket(url);
-    ws.onopen = function() {
-      addItem('open', 'Connected');
-    };
-    ws.onclose = function(e) {
-      addItem('close', 'Disconnected: ' + e.code);
-    };
-    ws.onerror = function(e) {
-      addItem('error', 'Error: ' + e.code);
-    };
-    ws.onmessage = function(e) {
-      addItem('data', e.data);
-    };
-    window.myApp.ws = ws;
+    // EventSource instance and it's handler functions
+		var es = new EventSource(url);
+		es.onopen = function() {
+			addItem('open', 'Connected');
+		};
+		es.onerror = function() {
+			addItem('error', 'Error');
+			onDisconnect();
+		};
+		es.onmessage = function(e) {
+			var data = JSON.parse(e.data);
+			addItem('data', e.data);
+		}
+		window.myApp.es = es;
   }
 
   function onDisconnect() {
-    window.myApp.ws.close();
+		if(	window.myApp.es !== null) {
+	    window.myApp.es.close();
+			window.myApp.es = null;
+			addItem('close', 'Disconnected');
+			document.getElementById('url').innerText = '';
+		}
   }
 </script>

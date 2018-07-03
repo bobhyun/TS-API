@@ -1,7 +1,7 @@
 <!DOCTYPE>
 <head>
   <meta charset='utf-8'>
-  <title>ex3</title>
+  <title>ex4</title>
   <style>
     body {font-family:Arial, Helvetica, sans-serif}
     div {padding:5px}
@@ -12,19 +12,19 @@
   </style>
 </head>
 <body>
-  <h2>예제3. 이벤트 수신하기 (Server-Sent Events)</h2>
+  <h2>Ex4. Receiving Events (Web Socket)</h2>
   <div id='control'>
     <div>
-      <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
-      <input type='text' id='user-id' placeholder='사용자 ID'> 
-      <input type='password' id='password' placeholder='비밀번호'>
+      <input type='text' id='host-name' placeholder='Server IP address:port'>
+      <input type='text' id='user-id' placeholder='User ID'> 
+      <input type='password' id='password' placeholder='Password'>
     </div>
     <div>
-      토픽:
-      <input type='checkbox' id="LPR" value="LPR" checked>차량 번호 인식 
-      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>비상 호출 
-      <button type='button' onClick='onConnect()'>접속</button>
-      <button type='button' onClick='onDisconnect()'>접속 종료</button>
+      Topics:
+      <input type='checkbox' id="LPR" value="LPR" checked>LPR 
+      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>emergencyCall 
+      <button type='button' onClick='onConnect()'>Connect</button>
+      <button type='button' onClick='onDisconnect()'>Disconnect</button>
     </div>
     <div id='url'>
     </div>
@@ -36,35 +36,35 @@
 </body>
 <script type='text/javascript'>
   (function() {
-    window.myApp = { es: null };
+    window.myApp = { ws: null };
   })();
 
   function getURL() {
     var url = '';
 
-    if (typeof(EventSource) === 'undefined') {
-      alert('Server-Sent Events를 지원하지 않는 웹 브라우저입니다.');
+    if (typeof(WebSocket) === 'undefined') {
+      alert('Your web browser does\'nt support Web Socket.');
       return url;
     }
 
-		if(window.myApp.es !== null) {
-			alert('이미 접속 중입니다.');
+		if(window.myApp.ws !== null) {
+			alert('Already connected');
 			return url;
 		}
 			
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
-      alert('호스트를 입력하십시오.');
+      alert('Please enter the host.');
       return url;
     }
     var userId = document.getElementById('user-id').value;
     if(userId == '') {
-      alert('사용자 아이디를 입력하십시오.');
+      alert('Please enter your user ID.');
       return url;
     }
     var password = document.getElementById('password').value;
     if(password == '') {
-      alert('비밀번호를 입력하십시오.');
+      alert('Please enter your password.');
       return url;
     }
 
@@ -77,12 +77,12 @@
       topics += 'emergencyCall';
     }
     if(topics.length == 0) {
-      alert('하나 이상의 토픽을 선택하십시오.');
+      alert('Please select at least one topic.');
       return url;
     }
 
-    var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
-    url = (hostName.includes('http://', 0) ? '' : 'http://') +
+    var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
     	hostName + '/api/subscribeEvents?topics=' + topics + 
 			'&auth=' + encodedData;
 
@@ -103,27 +103,28 @@
 
     document.getElementById('url').innerText = url;
 
-    // 이벤트 소스 인스턴스와 핸들러 함수들
-		var es = new EventSource(url);
-		es.onopen = function() {
-			addItem('open', '접속 성공');
-		};
-		es.onerror = function() {
-			addItem('error', '오류');
+    // WebSocket instance and it's handler functions
+    var ws = new WebSocket(url);
+    ws.onopen = function() {
+      addItem('open', 'Connected');
+    };
+    ws.onclose = function(e) {
+      addItem('close', 'Disconnected: ' + e.code);
 			onDisconnect();
-		};
-		es.onmessage = function(e) {
-			var data = JSON.parse(e.data);
-			addItem('data', e.data);
-		}
-		window.myApp.es = es;
+    };
+    ws.onerror = function(e) {
+      addItem('error', 'Error: ' + e.code);
+    };
+    ws.onmessage = function(e) {
+      addItem('data', e.data);
+    };
+    window.myApp.ws = ws;
   }
 
   function onDisconnect() {
-		if(	window.myApp.es !== null) {
-	    window.myApp.es.close();
-			window.myApp.es = null;
-			addItem('close', '접속 종료');
+		if(window.myApp.ws !== null) {
+	    window.myApp.ws.close();
+			window.myApp.ws = null;
 			document.getElementById('url').innerText = '';
 		}
   }

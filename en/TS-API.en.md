@@ -54,8 +54,10 @@ Table of contents
   - [Recorded video source](#recorded-video-source)
 - [Requesting video using video source `@0.3.0`](#requesting-video-using-video-source-030)
 - [Real-time event monitoring `@0.3.0`](#real-time-event-monitoring-030)
+  - [Server-Sent Events (SSE)](#server-sent-events-sse)
   - [Car number recognition event](#car-number-recognition-event)
-  - [Emergency Call Event](#emergency-call-event)
+  - [Emergency call event](#emergency-call-event)
+  - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
 - [Appendix](#appendix)
   - [The API-supported versions by product](#the-api-supported-versions-by-product)
   - [The features table by product](#the-features-table-by-product)
@@ -687,24 +689,30 @@ To get a list of dates with recorded videos, request the following:
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
 {
-  "result": [
+  "timeBegin": "2018-01-01T00:00:00-05:00",     // The first date time requested (local time of the server)
+  "timeEnd": "2018-02-28T23:59:59.999-05:00",   //  The last date time requested (local time of the server)
+  "data": [
     {
-      "yearMonth": {
-        "2018-01": [ // Displays the date in which the data exists in YYYY-MM format as an array
-          8,        // The recorded data of 2018-1-1 exists.
-          23,       // The recorded data of 2018-1-23 exists.
-          24        // The recorded data of 2018-1-24 exists.
-        ],
-        "2018-02": [ // and so on.
-          5,
-          6,
-          7,
-          9,
-          13,
-          14,
-          19
-        ]
-      }
+      "year": 2018,
+      "month": 1,
+      "days": [ // Displays the date in which the data exists in YYYY-MM format as an array
+        8,        // The recorded data of 2018-1-1 exists.
+        23,       // The recorded data of 2018-1-23 exists.
+        24        // The recorded data of 2018-1-24 exists.
+      ],
+    },
+    {
+      "year": 2018,
+      "month": 2,
+      "days": [
+        5,
+        6,
+        7,
+        9,
+        13,
+        14,
+        19
+      ]
     }
   }
 }
@@ -741,16 +749,21 @@ If you specify a condition using parameters such as `ch`,`timeBegin`, or `timeEn
 {
   "timeBegin": "2018-01-01T00:00:00-05:00",     // First date and time requested
   "timeEnd": "2018-01-31T23:59:59.999-05:00",   // Last date and time requested
-  "result": [
+  "data": [
     {
       "chid": 1,   // channel number
-      "yearMonth":{
-        "2018-01": [
-          8,
-          23,
-          24
-        ]
-      }
+      "data": [
+        {
+          "year": 2018,
+          "month": 1,
+          "days": [
+            8,
+            23,
+            24
+          ]
+        },
+        // ... omitted
+      ]
     }
   ]
 }
@@ -773,21 +786,44 @@ For the request, the server returns JSON data in the following format with an HT
 {
   "timeBegin": "2018-05-25T00:00:00.000-05:00",
   "timeEnd": "2018-05-26T00:00:00.000-05:00",
-  "result": [
+  "data": [
     {
       "chid": 1,
-      "dateHour": {
-        // Recording data is expressed in minute unit by hour in "YYYYMMDD-hh" format
-        "20180525-10": [ 44, 45, 46, 47, 48 ],
-        "20180525-18": [ 1, 2, 3, 4, 16, 17, 18 ]
-      }     
+      "data": [
+        {
+          "year": 2018,
+          "month": 5,
+          "day": 25,
+          "hour": 10,
+          "minutes": [ 44, 45, 46, 47, 48 ]
+        },
+        {
+          "year": 2018,
+          "month": 5,
+          "day": 25,
+          "hour": 18,
+          "minutes": [ 1, 2, 3, 4, 16, 17, 18 ]
+        }
+      ]
     },
     {
       "chid": 2,
-      "dateHour": {
-        "20180525-17": [ 29, 30, 31, 32, 33, 34, 35, 36 ],
-        "20180525-18": [ 1, 2, 3, 4, 5, 6 ]
-      }
+      "data": [
+        {
+          "year": 2018,
+          "month": 5,
+          "day": 25,
+          "hour": 17,
+          "minutes": [ 29, 30, 31, 32, 33, 34, 35, 36 ]
+        },
+        {
+          "year": 2018,
+          "month": 5,
+          "day": 25,
+          "hour": 18,
+          "minutes": [ 1, 2, 3, 4, 5, 6 ]
+        }
+      ]
     }
   ]
 }
@@ -1302,15 +1338,21 @@ http://host/api/path/to&auth=YWRtaW46YWRtaW4=
 ```
 
 ## Real-time event monitoring `@0.3.0`
-You can receive real-time event data via **Web socket** `(RFC6455)`.
+### Server-Sent Events (SSE)
+Supports the ability to receive real-time event messsage using HTML5 Server-Sent Events (SSE) method.
 Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
 
 The step-by-step communication procedure is as follows:
->1. Client connects to the server via Web socket.
+>1. Client connects to the server.
 >2. If the authentication to the server succeeds, the subscriber ID is issued.
 >3. The client then remains connected and enters the message waiting state.
+>>* The server sends a ping message every 30 seconds to keep the connection even if there is no message to send.
 >4. When an event occurs, the server sends a message to the client.
 >5. Repeat steps 3 through 4 until the client ends the connection itself.
+
+`[Tips]` *Microsoft Internet Explorer and Microsoft Edge do not support the SSE standard. If you need to work with Microsoft browsers, use the Web socket (RFC6455).*
+*https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events*
+
 
 The following event topics are supported:
 ```
@@ -1318,30 +1360,30 @@ LPR             # Car number recognition
 emergencyCall   # Emergency call
 ```
 
-The web socket connection path and parameters are as follows.
+SSE connection paths and parameters are as follows.
 ```ruby
 /api/subscribeEvents
 
 # Required parameters
-auth    # Authentication Information (Requires authentication per individual web socket, independent of session authentication)
+auth    # Authentication Information
 topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
 
-# Example
+# Examples
 # Request car number recognition event
-ws://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
 
 # Request emergency call event
-ws://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # Request both events
-ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 ```
 
 The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
 If the authentication information is incorrect or is not a supported topic, it will be disconnected immediately.
 ```jsx
 {
-  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", # subscriber ID (Unique ID per each Web socket connection)
+  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", # subscriber ID (Unique ID per each connection)
   "topics": [   # Reply to requested topics (Both events are supported)
     "LPR",
     "emergencyCall"
@@ -1351,7 +1393,7 @@ If the authentication information is incorrect or is not a supported topic, it w
 
 ### Car number recognition event
 If you request `topics=LPR`, you can receive the car number recognition event in real time.
-Car number recognition events are received in JSON format via Web socket messages as shown below.
+The car number event message is received in JSON format as shown below.
 ```jsx
 {
   "timestamp":"2018-06-27T10:42:06.575-05:00",  # Vehicle number recognition time
@@ -1375,11 +1417,11 @@ Car number recognition events are received in JSON format via Web socket message
 }
 ```
 
-### Emergency Call Event
+### Emergency call event
 If you request `topics=emergencyCall`, you can receive the event messages at the start and end of the emergency call in real time.
-Emergency call event messages are received in JSON format via Web socket messages as shown below.
+Emergency call event messages are received in JSON format as shown below.
 
-Call start message
+**Call start message**
 ```jsx
 {
   "timestamp":"2018-06-27T10:56:16.316-05:00",  # Start time of the call
@@ -1403,7 +1445,7 @@ Call start message
 }
 ```
 
-Call end message
+**Call end message**
 ```jsx
 {
   "timestamp":"2018-06-27T10:59:26.322-05:00",  # End time of then call
@@ -1429,7 +1471,7 @@ Call end message
 Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.
 
 
-Now, let's create an example that uses the Web socket to receive event messages.
+Now, l et's create an example that uses SSE to receive event messages.
 ```html
 <!DOCTYPE>
 <head>
@@ -1445,7 +1487,179 @@ Now, let's create an example that uses the Web socket to receive event messages.
   </style>
 </head>
 <body>
-  <h2>Ex3. Receiving web socket messages</h2>
+  <h2>Ex3. Receiving Events (Server-Sent Events)</h2>
+  <div id='control'>
+    <div>
+      <input type='text' id='host-name' placeholder='Server IP address:port'>
+      <input type='text' id='user-id' placeholder='User ID'> 
+      <input type='password' id='password' placeholder='Password'>
+    </div>
+    <div>
+      Topics:
+      <input type='checkbox' id="LPR" value="LPR" checked>LPR 
+      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>emergencyCall 
+      <button type='button' onClick='onConnect()'>Connect</button>
+      <button type='button' onClick='onDisconnect()'>Disconnect</button>
+    </div>
+    <div id='url'>
+    </div>
+  </div>
+
+  <div>
+    <ul id='messages'></ul>
+  </div>
+</body>
+<script type='text/javascript'>
+  (function() {
+    window.myApp = { es: null };
+  })();
+
+  function getURL() {
+    var url = '';
+
+    if (typeof(EventSource) === 'undefined') {
+			alert('Your web browser does\'nt support Server-Sent Events.');
+      return url;
+    }
+
+		if(window.myApp.es !== null) {
+			alert('Already connected');
+			return url;
+		}
+			
+    var hostName = document.getElementById('host-name').value;
+    if(hostName == '') {
+      alert('Please enter the host.');
+      return url;
+    }
+    var userId = document.getElementById('user-id').value;
+    if(userId == '') {
+      alert('Please enter your user ID.');
+      return url;
+    }
+    var password = document.getElementById('password').value;
+    if(password == '') {
+      alert('Please enter your password.');
+      return url;
+    }
+
+    var topics = '';
+    if(document.getElementById('LPR').checked)
+      topics += 'LPR';
+    if(document.getElementById('emergencyCall').checked) {
+      if(topics.length > 0)
+        topics += ',';
+      topics += 'emergencyCall';
+    }
+    if(topics.length == 0) {
+      alert('Please select at least one topic.');
+      return url;
+    }
+
+    var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    url = (hostName.includes('http://', 0) ? '' : 'http://') +
+			hostName + '/api/subscribeEvents?topics=' + topics + 
+			'&auth=' + encodedData;
+
+    return url;
+  }
+
+  function addItem(tagClass, msg) {    
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(msg));
+    li.classList.add(tagClass); 
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function onConnect() {
+    var url = getURL();
+    if(url.length == 0)
+      return;
+
+    document.getElementById('url').innerText = url;
+
+    // EventSource instance and it's handler functions
+		var es = new EventSource(url);
+		es.onopen = function() {
+			addItem('open', 'Connected');
+		};
+		es.onerror = function() {
+			addItem('error', 'Error');
+			onDisconnect();
+		};
+		es.onmessage = function(e) {
+			var data = JSON.parse(e.data);
+			addItem('data', e.data);
+		}
+		window.myApp.es = es;
+  }
+
+  function onDisconnect() {
+		if(	window.myApp.es !== null) {
+	    window.myApp.es.close();
+			window.myApp.es = null;
+			addItem('close', 'Disconnected');
+			document.getElementById('url').innerText = '';
+		}
+  }
+</script>
+```
+[Run](./examples/ex3.html)
+
+
+### Web Sockets (RFC6455)
+Supports the ability to receive real-time event messsage using HTML5 Web sockets (RFC6455) method.
+Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
+
+The step-by-step communication procedure is as follows:
+>1. Client connects to the server via Web Sockets.
+>2. If the authentication to the server succeeds, the subscriber ID is issued.
+>3. The client then remains connected and enters the message waiting state.
+>>* The server sends a ping message every 30 seconds to keep the connection even if there is no message to send.
+>4. When an event occurs, the server sends a message to the client.
+>5. Repeat steps 3 through 4 until the client ends the connection itself.
+
+`[참고]` *The web socket method is supported by all web browsers including Microsoft web browsers.*
+ *https://developer.mozilla.org/en-US/docs/Web/API/WebSocket*
+
+The web socket connection path and parameters are as follows.
+```ruby
+/wsapi/subscribeEvents
+
+# Required parameters
+auth    # Authentication Information (Requires authentication per individual web socket, independent of session authentication)
+topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
+
+# Example
+# Request car number recognition event
+ws://host/wsapi/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+
+# Request emergency call event
+ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+
+# Request both events
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+```
+
+The event data format received after a Web socket connection is exactly the same as Server-Sent Events (SSE).
+
+Now, let's create an example that uses the Web socket to receive event messages.
+```html
+<!DOCTYPE>
+<head>
+  <meta charset='utf-8'>
+  <title>ex4</title>
+  <style>
+    body {font-family:Arial, Helvetica, sans-serif}
+    div {padding:5px}
+    #control {background-color:beige}
+    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
+    li.open, li.close {color:blue}
+    li.error {color:red}
+  </style>
+</head>
+<body>
+  <h2>Ex4. Receiving Events (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='Server IP address:port'>
@@ -1475,11 +1689,16 @@ Now, let's create an example that uses the Web socket to receive event messages.
   function getURL() {
     var url = '';
 
-    if (!('WebSocket' in window)) {
-      alert('Your web browser does\'nt support web socket');
+    if (typeof(WebSocket) === 'undefined') {
+      alert('Your web browser does\'nt support Web Socket.');
       return url;
     }
 
+		if(window.myApp.ws !== null) {
+			alert('Already connected');
+			return url;
+		}
+			
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('Please enter the host.');
@@ -1511,8 +1730,8 @@ Now, let's create an example that uses the Web socket to receive event messages.
 
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-      hostName + '/api/subscribeEvents?topics=' + topics + 
-      '&auth=' + encodedData;
+    	hostName + '/api/subscribeEvents?topics=' + topics + 
+			'&auth=' + encodedData;
 
     return url;
   }
@@ -1531,13 +1750,14 @@ Now, let's create an example that uses the Web socket to receive event messages.
 
     document.getElementById('url').innerText = url;
 
-    // WebSocket instanecs and it's handlers functions
+    // WebSocket instance and it's handler functions
     var ws = new WebSocket(url);
     ws.onopen = function() {
       addItem('open', 'Connected');
     };
     ws.onclose = function(e) {
       addItem('close', 'Disconnected: ' + e.code);
+			onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', 'Error: ' + e.code);
@@ -1549,12 +1769,15 @@ Now, let's create an example that uses the Web socket to receive event messages.
   }
 
   function onDisconnect() {
-    window.myApp.ws.close();
+		if(window.myApp.ws !== null) {
+	    window.myApp.ws.close();
+			window.myApp.ws = null;
+			document.getElementById('url').innerText = '';
+		}
   }
 </script>
 ```
-[Run](./examples/ex3.html)
-
+[Run](./examples/ex4.html)
 
 ## Appendix
 
@@ -1657,20 +1880,20 @@ The server supports a total of 104 languages as follows:
 ```ruby
 af-ZA       # Afrikaans
 sq-AL       # Shqip, Albanian
-am-ET       # አማርኛ, Amharic
-ar-AE       # العربية, Arabic
-hy-AM       # Հայերեն, Armenian
-az-Latn     # Azərbaycan, Azerbaijani
+am-ET       # ?�ማ??��, Amharic
+ar-AE       # ا?عرب?ة, Arabic
+hy-AM       # ?այե?են, Armenian
+az-Latn     # Az?rbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
-be-BY       # беларускі, Belarusian
-bn-BD       # বাংলা, Bengali
+be-BY       # бела???к?, Belarusian
+bn-BD       # বাংল�? Bengali
 bs-Latn     # Bosanski, Bosnian
-bg-BG       # български, Bulgarian
+bg-BG       # б?лга??ки, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
-zh-CN       # 简体中国, Chinese (Simplified)
-zh-TW       # 中國傳統, Chinese (Traditional)
+zh-CN       # 简体中?? Chinese (Simplified)
+zh-TW       # �?��?�統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -1684,15 +1907,15 @@ fi-FI       # Suomalainen, Finnish
 fr-FR       # Français, French
 fy-NL       # Frysk, Frisian
 gl-ES       # Galego, Galician
-ka-GE       # ქართული, Georgian
+ka-GE       # ?�ა?�თ?�ლ?? Georgian
 de-DE       # Deutsch, German
-el-GR       # Ελληνικά, Greek
+el-GR       # ?λληνικά, Greek
 gu-IN       # ગુજરાતી, Gujarati
 ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
-he-IL       # עברית, Hebrew
-hi-IN       # हिन्दी, Hindi
+he-IL       # ע?ר?ת, Hebrew
+hi-IN       # हिन्द�?, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -1700,44 +1923,44 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # 日本語, Japanese
+ja-JP       # ?�本�? Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನಡ, Kannada
-kk-KZ       # Қазақ тілінде, Kazakh
-km-KH       # ភាសាខ្មែរ, Khmer
+kn-IN       # ಕನ್ನ�? Kannada
+kk-KZ       # ?аза? ??л?нде, Kazakh
+km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
 ko-KR       # Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
-ru-KG       # Кыргызча, Kyrgyz
-lo-LA       # ລາວ, Lao
+ru-KG       # ???г?з?а, Kyrgyz
+lo-LA       # �?���? Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
 lb-LU       # Lëtzebuergesch, Luxembourgish
-mk-MK       # Македонски, Macedonian
+mk-MK       # ?акедон?ки, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # മലയാളം, Malayalam
+ml-IN       # �?���?��ളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # मराठी, Marathi
-mn-MN       # Монгол хэл дээр, Mongolian
-my-MM       # မြန်မာ", Myanmar (Burmese)
-ne-NP       # नेपाली, Nepali
+mr-IN       # �?��ाठी, Marathi
+mn-MN       # ?онгол ??л д???, Mongolian
+my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
+ne-NP       # नेपाल�?, Nepali
 nb-NO       # Norwegian
-ps-AF       # پښتو, Pashto
-fa-IR       # فارسی, Persian
+ps-AF       # پ?ت?, Pashto
+fa-IR       # ?ارس?, Persian
 pl-PL       # Polskie, Polish
 pt-PT       # Português, Portuguese
-pa-IN       # ਪੰਜਾਬੀ, Punjabi
+pa-IN       # ਪੰਜਾਬ�?, Punjabi
 ro-RO       # Română, Romanian
-ru-RU       # Русский, Russian
+ru-RU       # ????кий, Russian
 sm          # Samoan
 gd-GB       # Gàidhlig, Scots Gaelic
-sr-Cyrl-RS  # Српски, Serbian
+sr-Cyrl-RS  # С?п?ки, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
-sd-Arab-PK  # سنڌي, Sindhi
-si-LK       # සිංහල, Sinhala
+sd-Arab-PK  # س???, Sindhi
+si-LK       # සිංහ�? Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -1745,18 +1968,18 @@ es-ES       # Español, Spanish
 su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
-tg-Cyrl-TJ  # Тоҷикистон, Tajik
-ta-IN       # தமிழ், Tamil
+tg-Cyrl-TJ  # Тоҷики??он, Tajik
+ta-IN       # த�?ி�?�? Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไทย, Thai
+th-TH       # ไท�? Thai
 tr-TR       # Türkçe, Turkish
-uk-UA       # Українська, Ukrainian
-ur-PK       # اردو, Urdu
+uk-UA       # Ук?а?н??ка, Ukrainian
+ur-PK       # ارد?, Urdu
 uz-Latn-UZ  # O'zbek, Uzbek
 vi-VN       # Tiếng Việt, Vietnamese
 cy-GB       # Cymraeg, Welsh
 xh-ZA       # isiXhosa, Xhosa
-yi          # ייִדיש, Yiddish
+yi          # ??ִ??ש, Yiddish
 yo-NG       # Yorùbá, Yoruba
 zu-ZA       # isiZulu, Zulu
 ```

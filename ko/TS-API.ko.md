@@ -53,8 +53,10 @@ API를 사용하기 위해 간단한 `HTML`과 `자바스크립트`를 사용해
   - [녹화 영상 소스](#녹화-영상-소스)
 - [비디오 소스를 사용하여 영상 요청 `@0.3.0`](#비디오-소스를-사용하여-영상-요청-030)
 - [실시간 이벤트 모니터링 `@0.3.0`](#실시간-이벤트-모니터링-030)
+  - [Server-Sent Events (SSE)](#server-sent-events-sse)
   - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
   - [비상 호출 이벤트](#비상-호출-이벤트)
+  - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
 - [부록](#부록)
   - [제품별 API 지원 버전](#제품별-api-지원-버전)
   - [제품별 기능 지원 표](#제품별-기능-지원-표)
@@ -686,24 +688,30 @@ lang      # 언어
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
 {
-  "result": [
+  "timeBegin": "2018-01-01T00:00:00+09:00",     // 처음 날짜, 시각 (서버의 로컬 타임)
+  "timeEnd": "2018-02-28T23:59:59.999+09:00",   //  마지막 날짜, 시각 (서버의 로컬 타임)
+  "data": [
     {
-      "yearMonth": {
-        "2018-01": [ // YYYY-MM 형식으로 데이터가 존재하는 날짜를 배열로 표시
-          8,        // 2018-1-18  녹화 데이터 있음
-          23,       // 2018-1-23  녹화 데이터 있음
-          24        // 2018-1-24  녹화 데이터 있음
-        ],
-        "2018-02": [
-          5,
-          6,
-          7,
-          9,
-          13,
-          14,
-          19
-        ]
-      }
+      "year": 2018,
+      "month": 1,
+      "days": [ // YYYY-MM 형식으로 데이터가 존재하는 날짜를 배열로 표시
+        8,        // 2018-1-18  녹화 데이터 있음
+        23,       // 2018-1-23  녹화 데이터 있음
+        24        // 2018-1-24  녹화 데이터 있음
+      ],
+    },
+    {
+      "year": 2018,
+      "month": 2,
+      "days": [
+        5,
+        6,
+        7,
+        9,
+        13,
+        14,
+        19
+      ]
     }
   ]
 }
@@ -740,16 +748,21 @@ timeEnd     # 특정 날짜, 시각 이전 녹화된 날짜 목록
 {
   "timeBegin": "2018-01-01T00:00:00+09:00",     // 처음 날짜, 시각 (서버의 로컬 타임)
   "timeEnd": "2018-01-31T23:59:59.999+09:00",   //  마지막 날짜, 시각 (서버의 로컬 타임)
-  "result": [
+  "data": [
     {
       "chid": 1,   // 채널 번호
-      "yearMonth":{
-        "2018-01": [
-          8,
-          23,
-          24
-        ]
-      }
+      "data": [
+        {
+          "year": 2018,
+          "month": 1,
+          "days": [
+            8,
+            23,
+            24
+          ]
+        },
+        // ... 중략
+      ]
     }
   ]
 }
@@ -773,21 +786,44 @@ timeBegin 또는 timeEnd 중 하나만 지정하면 저정한 날짜로 부터 �
 {
   "timeBegin": "2018-05-25T00:00:00.000+09:00",
   "timeEnd": "2018-05-26T00:00:00.000+09:00",
-  "result": [
+  "data": [
     {
       "chid": 1,
-      "dateHour": {
-        // "YYYYMMDD-hh" 형식으로 한 시간 단위로 녹화 데이터가 분 단위 배열로 표현됨
-        "20180525-10": [ 44, 45, 46, 47, 48 ],
-        "20180525-18": [ 1, 2, 3, 4, 16, 17, 18 ]
-      }
+      "data": [
+        {
+          "year": 2018,
+          "month": 5,
+          "day": 25,
+          "hour": 10,
+          "minutes": [ 44, 45, 46, 47, 48 ]
+        },
+        {
+          "year": 2018,
+          "month": 5,
+          "day": 25,
+          "hour": 18,
+          "minutes": [ 1, 2, 3, 4, 16, 17, 18 ]
+        }
+      ]
     },
     {
       "chid": 2,
-      "dateHour": {
-        "20180525-17": [ 29, 30, 31, 32, 33, 34, 35, 36 ],
-        "20180525-18": [ 1, 2, 3, 4, 5, 6 ]
-      }
+      "data": [
+        {
+          "year": 2018,
+          "month": 5,
+          "day": 25,
+          "hour": 17,
+          "minutes": [ 29, 30, 31, 32, 33, 34, 35, 36 ]
+        },
+        {
+          "year": 2018,
+          "month": 5,
+          "day": 25,
+          "hour": 18,
+          "minutes": [ 1, 2, 3, 4, 5, 6 ]
+        }
+      ]
     }
   ]
 }
@@ -1298,15 +1334,21 @@ http://host/api/path/to&auth=YWRtaW46YWRtaW4=
 ```
 
 ## 실시간 이벤트 모니터링 `@0.3.0`
-**웹 소켓** `(RFC6455)`으로 실시간 이벤트 데이터를 수신할 수 있는 기능을 지원합니다.
+### Server-Sent Events (SSE)
+HTML5 Server-Sent Events (SSE) 방식으로 실시간 이벤트 메시지를 수신할 수 있는 기능을 지원합니다.
 서버와 클라이언트가 접속 상태를 유지하며 이벤트가 발생하면 서버가 클라이언트에게 메시지를 송신하는 방식으로 동작합니다.
 
 단계별 통신 절차는 다음과 같습니다.
->1. 클라이언트가 웹 소켓으로 서버에 접속
+>1. 클라이언트가 서버에 접속
 >2. 서버에 인증에 성공하면 구독자 ID를 발급
 >3. 이후 클라이언트는 접속을 유지하며 메시지 대기 상태로 들어감
+>>* 서버는 전송할 메시지가 없더라도 접속을 유지하기 위해 30초에 한번씩 ping 메시지를 송신함
 >4. 이벤트 발생시 서버는 클라이언트에게 메시지를 송신
 >5. 클라이언트 스스로 접속을 종료하기 전까지 위의 3번에서 4번 과정을 반복
+
+`[참고]` *Microsoft Internet Explorer와 Microsoft Edge는 SSE 표준을 지원하지 않습니다. 만약 Microsoft 브라우저와 호환되도록 작업해야 하는 경우는 웹 소켓 (RFC6455) 방식을 사용하십시오.*
+*https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events*
+
 
 지원하는 이벤트 토픽은 다음과 같습니다.
 ```
@@ -1314,30 +1356,30 @@ LPR             # 차량 번호 인식
 emergencyCall   # 비상 호출
 ```
 
-웹 소켓 접속 경로와 매개변수들은 다음과 같습니다.
+SSE 접속 경로와 매개변수들은 다음과 같습니다.
 ```ruby
 /api/subscribeEvents
 
 # 필수 매개 변수들
-auth    # 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)
+auth    # 인증 정보
 topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
 
 # 사용 예
 # 차량 번호 인식 이벤트 요청
-ws://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
 
 # 비상 호출 이벤트 요청
-ws://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # 두 이벤트를 모두 요청
-ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 ```
 
 서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
 만약 인증 정보가 올바르지 않거나 지원하는 토픽이 아니면 즉시 접속을 끊습니다.
 ```jsx
 {
-  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", # 구독자 ID (웹 소켓 접속 당 유일한 ID를 발급)
+  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", # 구독자 ID (접속 당 유일한 ID를 발급)
   "topics": [   # 요청한 토픽에 대한 응답 (두 이벤트를 모두 지원한다는 의미임)
     "LPR",
     "emergencyCall"
@@ -1347,7 +1389,7 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 
 ### 차량 번호 인식 이벤트
 `topics=LPR`를 요청하면 실시간으로 차량 번호 인식 이벤트를 수신할 수 있습니다.
-차량 번호 이벤트는 웹 소켓 메시지를 통해 아래와 같이 JSON형식으로 수신됩니다.
+차량 번호 이벤트 메시지는 아래와 같이 JSON형식으로 수신됩니다.
 ```jsx
 {
   "timestamp":"2018-06-27T10:42:06.575+09:00",  # 차량 번호 인식 시점
@@ -1373,9 +1415,9 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 
 ### 비상 호출 이벤트
 `topics=emergencyCall`을 요청하면 실시간으로 비상 호출에 의한 통화 시작과 종료 시점에  이벤트 메시지를 수신할 수 있습니다.
-비상 호출 이벤트 메시지는 웹 소켓 메시지를 통해 아래와 같이 JSON형식으로 수신됩니다.
+비상 호출 이벤트 메시지는 아래와 같이 JSON형식으로 수신됩니다.
 
-통화 시작 메시지
+**통화 시작 메시지**
 ```jsx
 {
   "timestamp":"2018-06-27T10:56:16.316+09:00",  # 통화 시작 시점
@@ -1399,7 +1441,7 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 }
 ```
 
-통화 종료 메시지
+**통화 종료 메시지**
 ```jsx
 {
   "timestamp":"2018-06-27T10:59:26.322+09:00",  # 통화 종료 시점
@@ -1424,8 +1466,7 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 ```
 비상 호출 메시지는 실시간 통화를 위한 용도로 사용되므로 연동된 채널의 영상 주소는 차량 번호 인식의 경우와 달리 실시간 영상으로 링크되어 있습니다.
 
-
-이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
+이 번에는 SSE를 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
 ```html
 <!DOCTYPE>
 <head>
@@ -1441,7 +1482,179 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
   </style>
 </head>
 <body>
-  <h2>예제3. 웹 소켓 메시지 수신하기</h2>
+  <h2>예제3. 이벤트 수신하기 (Server-Sent Events)</h2>
+  <div id='control'>
+    <div>
+      <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
+      <input type='text' id='user-id' placeholder='사용자 ID'> 
+      <input type='password' id='password' placeholder='비밀번호'>
+    </div>
+    <div>
+      토픽:
+      <input type='checkbox' id="LPR" value="LPR" checked>차량 번호 인식 
+      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>비상 호출 
+      <button type='button' onClick='onConnect()'>접속</button>
+      <button type='button' onClick='onDisconnect()'>접속 종료</button>
+    </div>
+    <div id='url'>
+    </div>
+  </div>
+
+  <div>
+    <ul id='messages'></ul>
+  </div>
+</body>
+<script type='text/javascript'>
+  (function() {
+    window.myApp = { es: null };
+  })();
+
+  function getURL() {
+    var url = '';
+
+    if (typeof(EventSource) === 'undefined') {
+      alert('Server-Sent Events를 지원하지 않는 웹 브라우저입니다.');
+      return url;
+    }
+
+		if(window.myApp.es !== null) {
+			alert('이미 접속 중입니다.');
+			return url;
+		}
+			
+    var hostName = document.getElementById('host-name').value;
+    if(hostName == '') {
+      alert('호스트를 입력하십시오.');
+      return url;
+    }
+    var userId = document.getElementById('user-id').value;
+    if(userId == '') {
+      alert('사용자 아이디를 입력하십시오.');
+      return url;
+    }
+    var password = document.getElementById('password').value;
+    if(password == '') {
+      alert('비밀번호를 입력하십시오.');
+      return url;
+    }
+
+    var topics = '';
+    if(document.getElementById('LPR').checked)
+      topics += 'LPR';
+    if(document.getElementById('emergencyCall').checked) {
+      if(topics.length > 0)
+        topics += ',';
+      topics += 'emergencyCall';
+    }
+    if(topics.length == 0) {
+      alert('하나 이상의 토픽을 선택하십시오.');
+      return url;
+    }
+
+    var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
+    url = (hostName.includes('http://', 0) ? '' : 'http://') +
+    	hostName + '/api/subscribeEvents?topics=' + topics + 
+			'&auth=' + encodedData;
+
+    return url;
+  }
+
+  function addItem(tagClass, msg) {    
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(msg));
+    li.classList.add(tagClass); 
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function onConnect() {
+    var url = getURL();
+    if(url.length == 0)
+      return;
+
+    document.getElementById('url').innerText = url;
+
+    // 이벤트 소스 인스턴스와 핸들러 함수들
+		var es = new EventSource(url);
+		es.onopen = function() {
+			addItem('open', '접속 성공');
+		};
+		es.onerror = function() {
+			addItem('error', '오류');
+			onDisconnect();
+		};
+		es.onmessage = function(e) {
+			var data = JSON.parse(e.data);
+			addItem('data', e.data);
+		}
+		window.myApp.es = es;
+  }
+
+  function onDisconnect() {
+		if(	window.myApp.es !== null) {
+	    window.myApp.es.close();
+			window.myApp.es = null;
+			addItem('close', '접속 종료');
+			document.getElementById('url').innerText = '';
+		}
+  }
+</script>
+```
+[실행하기](./examples/ex3.html)
+
+
+### 웹 소켓 (RFC6455)
+**웹 소켓** `(RFC6455)`으로 실시간 이벤트 데이터를 수신할 수 있는 기능을 지원합니다.
+서버와 클라이언트가 접속 상태를 유지하며 이벤트가 발생하면 서버가 클라이언트에게 메시지를 송신하는 방식으로 동작합니다.
+
+단계별 통신 절차는 다음과 같습니다.
+>1. 클라이언트가 웹 소켓으로 서버에 접속
+>2. 서버에 인증에 성공하면 구독자 ID를 발급
+>3. 이후 클라이언트는 접속을 유지하며 메시지 대기 상태로 들어감
+>4. 이벤트 발생시 서버는 클라이언트에게 메시지를 송신
+>5. 클라이언트 스스로 접속을 종료하기 전까지 위의 3번에서 4번 과정을 반복
+
+`[참고]` *웹 소켓 방식은 Microsoft 웹 브라우저들을 포함한 모든 웹 브라우저에서 지원합니다.*
+ *https://developer.mozilla.org/en-US/docs/Web/API/WebSocket*
+
+ 
+웹 소켓 접속 경로와 매개변수들은 다음과 같습니다.
+```ruby
+/wsapi/subscribeEvents
+
+# 필수 매개 변수들
+auth    # 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)
+topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
+
+# 사용 예
+# 차량 번호 인식 이벤트 요청
+ws://host/wsapi/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+
+# 비상 호출 이벤트 요청
+ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+
+# 두 이벤트를 모두 요청
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+```
+
+웹 소켓으로 접속된 이후 수신되는 이벤트 데이터 형식은 Server-Sent Events (SSE)와 완전히 동일합니다.
+
+이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
+```html
+<!DOCTYPE>
+<head>
+  <meta charset='utf-8'>
+  <title>ex4</title>
+  <style>
+    body {font-family:Arial, Helvetica, sans-serif}
+    div {padding:5px}
+    #control {background-color:beige}
+    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
+    li.open, li.close {color:blue}
+    li.error {color:red}
+  </style>
+</head>
+<body>
+  <h2>예제4. 이벤트 수신하기 (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
@@ -1471,11 +1684,16 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
   function getURL() {
     var url = '';
 
-    if (!('WebSocket' in window)) {
+    if (typeof(WebSocket) === 'undefined') {
       alert('웹 소켓을 지원하지 않는 웹 브라우저입니다.');
       return url;
     }
 
+		if(window.myApp.ws !== null) {
+			alert('이미 접속 중입니다.');
+			return url;
+		}
+			
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('호스트를 입력하십시오.');
@@ -1507,8 +1725,8 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-      hostName + '/api/subscribeEvents?topics=' + topics + 
-      '&auth=' + encodedData;
+    	hostName + '/wsapi/subscribeEvents?topics=' + topics + 
+			'&auth=' + encodedData;
 
     return url;
   }
@@ -1534,6 +1752,7 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
     };
     ws.onclose = function(e) {
       addItem('close', '접속 종료: ' + e.code);
+			onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', '오류: ' + e.code);
@@ -1545,11 +1764,15 @@ ws://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
   }
 
   function onDisconnect() {
-    window.myApp.ws.close();
+		if(window.myApp.ws !== null) {
+	    window.myApp.ws.close();
+			window.myApp.ws = null;
+			document.getElementById('url').innerText = '';
+		}
   }
 </script>
 ```
-[실행하기](./examples/ex3.html)
+[실행하기](./examples/ex4.html)
 
 
 ## 부록

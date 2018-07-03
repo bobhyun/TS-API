@@ -1,7 +1,7 @@
 <!DOCTYPE>
 <head>
   <meta charset='utf-8'>
-  <title>ex3</title>
+  <title>ex4</title>
   <style>
     body {font-family:Arial, Helvetica, sans-serif}
     div {padding:5px}
@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h2>예제3. 이벤트 수신하기 (Server-Sent Events)</h2>
+  <h2>예제4. 이벤트 수신하기 (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
@@ -36,18 +36,18 @@
 </body>
 <script type='text/javascript'>
   (function() {
-    window.myApp = { es: null };
+    window.myApp = { ws: null };
   })();
 
   function getURL() {
     var url = '';
 
-    if (typeof(EventSource) === 'undefined') {
-      alert('Server-Sent Events를 지원하지 않는 웹 브라우저입니다.');
+    if (typeof(WebSocket) === 'undefined') {
+      alert('웹 소켓을 지원하지 않는 웹 브라우저입니다.');
       return url;
     }
 
-		if(window.myApp.es !== null) {
+		if(window.myApp.ws !== null) {
 			alert('이미 접속 중입니다.');
 			return url;
 		}
@@ -82,8 +82,8 @@
     }
 
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
-    url = (hostName.includes('http://', 0) ? '' : 'http://') +
-    	hostName + '/api/subscribeEvents?topics=' + topics + 
+    url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
+    	hostName + '/wsapi/subscribeEvents?topics=' + topics + 
 			'&auth=' + encodedData;
 
     return url;
@@ -103,27 +103,28 @@
 
     document.getElementById('url').innerText = url;
 
-    // 이벤트 소스 인스턴스와 핸들러 함수들
-		var es = new EventSource(url);
-		es.onopen = function() {
-			addItem('open', '접속 성공');
-		};
-		es.onerror = function() {
-			addItem('error', '오류');
+    // 웹 소켓 인스턴스와 핸들러 함수들
+    var ws = new WebSocket(url);
+    ws.onopen = function() {
+      addItem('open', '접속 성공');
+    };
+    ws.onclose = function(e) {
+      addItem('close', '접속 종료: ' + e.code);
 			onDisconnect();
-		};
-		es.onmessage = function(e) {
-			var data = JSON.parse(e.data);
-			addItem('data', e.data);
-		}
-		window.myApp.es = es;
+    };
+    ws.onerror = function(e) {
+      addItem('error', '오류: ' + e.code);
+    };
+    ws.onmessage = function(e) {
+      addItem('data', e.data);
+    };
+    window.myApp.ws = ws;
   }
 
   function onDisconnect() {
-		if(	window.myApp.es !== null) {
-	    window.myApp.es.close();
-			window.myApp.es = null;
-			addItem('close', '접속 종료');
+		if(window.myApp.ws !== null) {
+	    window.myApp.ws.close();
+			window.myApp.ws = null;
 			document.getElementById('url').innerText = '';
 		}
   }
