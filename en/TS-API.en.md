@@ -42,6 +42,7 @@ Table of contents
 - [Request various enumeration](#request-various-enumeration)
   - [Channel list](#channel-list)
   - [Vehicle number recognition device list](#vehicle-number-recognition-device-list)
+  - [Emergency call device list `@0.3.0`](#emergency-call-device-list-030)
   - [Event log type list](#event-log-type-list)
 - [Retrieve recorded data](#retrieve-recorded-data)
   - [Search dates with recorded video](#search-dates-with-recorded-video)
@@ -308,7 +309,7 @@ This request works, even if it is not in [session suthenticated](#session-authen
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
 {
-  "siteName": "My%20home%20server"  // (URL encoded)
+  "siteName": "My home server"
 }
 ```
 The value of `siteName`, `"My%20home%20server"`, is what you entered in the web service tab of the Settings window on the server, and it is [URL-encoded](#url-decoding) to present in JSON format.
@@ -412,8 +413,8 @@ If it is not in [session authenticated](#session-authentication) state, the serv
 ```jsx
 {
   "whoAmI": {
-    "uid":"admin",      // User ID (URL encoded)
-    "name":"admin",     // User name (URL encoded)
+    "uid":"admin",      // User ID
+    "name":"admin",     // User name
     "accessRights": [   // Permissions
       "DataExport",     // Export images, videos
       "Control",        // Pan tilt, relay control
@@ -547,11 +548,11 @@ For the request, the server returns JSON data in the following format with an HT
 [
   {
     "chid": 1,              // Channel number
-    "title": "Front%20door" // Channel name (URL encoded)
+    "title": "Front door"   // Channel name
   },
   {
     "chid": 2,              // Channel number
-    "title": "Garage"       // Channel name (URL encoded)
+    "title": "Garage"       // Channel name
   }
 ]
 ```
@@ -569,8 +570,8 @@ For the request, the server returns JSON data in the following format with an HT
   // Information received from the interworked car number recognition devices
   {
     "id": 1,                  // Device number
-    "code": "F00001",         // Device code (URL encoded)
-    "name": "F00001",         // Device name (URL encoded)
+    "code": "F00001",         // Device code
+    "name": "F00001",         // Device name
     "linkedChannel": [        // List of channels that are linked when trigger occurs
       1,
       2
@@ -581,8 +582,8 @@ For the request, the server returns JSON data in the following format with an HT
   // In the case of TS-LPR, the information recognized by the car number recognition zone
   {
     "id": 2,                  // Device number
-    "code": "1%2D1%2D1",      // Device code (URL encoded)
-    "name": "1%2D1%2D1",      // Device name (URL encoded)
+    "code": "1-1-1",          // Device code
+    "name": "1-1-1",          // Device name
     "linkedChannel": [],      // List of channels that are linked when trigger occurs (Empty if there is no linked channel)
     "tag": "Normal",          // Usage (Normal: Channel in use, NotUsed: Channel not in use, ReadOnly: Read-only channel)
     "zone": {                 // Recognition zone
@@ -605,6 +606,29 @@ For the request, the server returns JSON data in the following format with an HT
 // For example, if the video is 1920x1080 resolution and the zone is (480, 270, 1440, 810),
 // the abscissas are multiplied by 7680/1920, and the ordinates are multiplied by 4320/1080, 
 // then be calculated as (1920, 1080, 5760, 3240).
+```
+
+### Emergency call device list `@0.3.0`
+To receive a list of registered emergency call devices on the server, request the following:
+
+```ruby
+/api/enum?what=emergencyCall
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  // List of registered emergency call devices
+  {
+    "id": 1,                  // Device number
+    "code": "0000001",        // Location code
+    "name": "B1 stairs",      // Device name
+    "linkedChannel": [        // Linked channels when trigger occurs
+      1,
+      2
+    ],
+  },
+  // ... omitted
+]
 ```
 
 ### Event log type list
@@ -1125,8 +1149,8 @@ The server returns JSON data in the following format with an HTTP response code 
 ```jsx
 [ // Each channel consists of an array of items
   {
-    "chid": 1,                              // Channel number
-    "title": "Profile1%20%281920x1080%29",  // Channel name (URL encoded)
+    "chid": 1,                        // Channel number
+    "title": "Profile1 (1920x1080)",  // Channel name
     "src": [  // List of video sources
               // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
       { // 1080p RTMP stream
@@ -1169,7 +1193,7 @@ The server returns JSON data in the following format with an HTTP response code 
   },
   {
     "chid": 2,
-    "title": "192%2E168%2E0%2E106",
+    "title": "192.168.0.106",
     "src": [
       // ... omitted
     ]
