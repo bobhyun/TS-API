@@ -59,7 +59,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
   - [비상 호출 이벤트](#비상-호출-이벤트)
   - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
-- [서버에 이벤트 밀어넣기](#서버에-이벤트-밀어넣기)
+- [서버에 이벤트 밀어넣기 `(@0.3.0)`](#서버에-이벤트-밀어넣기-030)
 - [부록](#부록)
   - [제품별 API 지원 버전](#제품별-api-지원-버전)
   - [제품별 기능 지원 표](#제품별-기능-지원-표)
@@ -1379,7 +1379,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server
 
 
 지원하는 이벤트 토픽은 다음과 같습니다.
-```
+```ruby
 LPR             # 차량 번호 인식
 emergencyCall   # 비상 호출
 ```
@@ -1392,6 +1392,9 @@ SSE 접속 경로와 매개변수들은 다음과 같습니다.
 auth    # 인증 정보
 topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
 
+# 매개 변수들 (선택 사항)
+verbose # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 나열
+
 # 사용 예
 # 차량 번호 인식 이벤트 요청
 http://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
@@ -1401,14 +1404,17 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # 두 이벤트를 모두 요청
 http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+
+# 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
+http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
 ```
 
 서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
 만약 인증 정보가 올바르지 않거나 지원하는 토픽이 아니면 즉시 접속을 끊습니다.
 ```jsx
 {
-  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", # 구독자 ID (접속 당 유일한 ID를 발급)
-  "topics": [   # 요청한 토픽에 대한 응답 (두 이벤트를 모두 지원한다는 의미임)
+  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", // 구독자 ID (접속 당 유일한 ID를 발급)
+  "topics": [   // 요청한 토픽에 대한 응답 (두 이벤트를 모두 지원한다는 의미임)
     "LPR",
     "emergencyCall"
   ]
@@ -1420,24 +1426,24 @@ http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 차량 번호 이벤트 메시지는 아래와 같이 JSON형식으로 수신됩니다.
 ```jsx
 {
-  "timestamp":"2018-06-27T10:42:06.575+09:00",  # 차량 번호 인식 시점
-  "chid": {                                     # 차량 번호 인식 채널
+  "timestamp":"2018-06-27T10:42:06.575+09:00",  // 차량 번호 인식 시점
+  "chid": {                                     // 차량 번호 인식 채널
     "chid":1,
     "title":"카메라1",
-    "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"  # 차량 번호 인식 시점의 영상
+    "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"  // 차량 번호 인식 시점의 영상
   },
-  "deviceCode":"1-1-7",                         # 차량 번호 인식 장치(영역) 코드
-  "deviceName":"B1주차장",                       # 차량 번호 인식 장치(영역) 이름
-  "linkedChannel": [                            # 연동된 채널
+  "deviceCode":"1-1-7",                         // 차량 번호 인식 장치(영역) 코드
+  "deviceName":"B1주차장",                      // 차량 번호 인식 장치(영역) 이름
+  "linkedChannel": [                            // 연동된 채널
     {
       "chid":2,
       "title":"카메라2",
-      "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00" # 차량 번호 인식 시점의 영상
+      "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00" // 차량 번호 인식 시점의 영상
     }
   ],
-  "plateNo":"11가1432",                         # 차량 번호
-  "timeBegin":"2018-06-27T10:42:02.573+09:00",  # 동일 차량 번호 최초 인식 시점 
-  "topic":"LPR"                                 # 토픽 이름
+  "plateNo":"11가1432",                         // 차량 번호
+  "timeBegin":"2018-06-27T10:42:02.573+09:00",  // 동일 차량 번호 최초 인식 시점 
+  "topic":"LPR"                                 // 토픽 이름
 }
 ```
 
@@ -1448,11 +1454,11 @@ http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 **통화 시작 메시지**
 ```jsx
 {
-  "timestamp":"2018-06-27T10:56:16.316+09:00",  # 통화 시작 시점
-  "caller":"0000002",                           # 비상 호출 장치 위치 코드
-  "device":"Sammul/Vizufon",                    # 비상 호출 장치 이름
-  "event":"callStart",                          # 통화 시작 이벤트
-  "linkedChannel":[                             # 연동된 채널
+  "timestamp":"2018-06-27T10:56:16.316+09:00",  // 통화 시작 시점
+  "caller":"0000002",                           // 비상 호출 장치 위치 코드
+  "device":"Sammul/Vizufon",                    // 비상 호출 장치 이름
+  "event":"callStart",                          // 통화 시작 이벤트
+  "linkedChannel":[                             // 연동된 채널
     {
       "chid":1,
       "title":"카메라1",
@@ -1464,19 +1470,89 @@ http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
       "src":"http://host/watch?ch=2"
     }
   ],
-  "name":"지하1층 계단",                         # 비상 호출 장치 위치 이름
-  "topic":"emergencyCall"                       # 토픽 이름
+  "name":"지하1층 계단",                         // 비상 호출 장치 위치 이름
+  "topic":"emergencyCall"                       // 토픽 이름
+}
+```
+
+비상 호출 이벤트는 실시간 통화용 이벤트이므로 연동된 채널들은 모두 실시간 영상을 링크하고 있습니다. 
+아래와 같이 채널들의 동영상 스트림 소스를 자세히 요청한 경우는 동영상 스트림 항목들이 추가로 포함됩니다.
+```ruby
+http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+```
+```jsx
+{
+  "timestamp":"2018-06-27T10:56:16.316+09:00",  // 통화 시작 시점
+  "caller":"0000002",                           // 비상 호출 장치 위치 코드
+  "device":"Sammul/Vizufon",                    // 비상 호출 장치 이름
+  "event":"callStart",                          // 통화 시작 이벤트
+  "linkedChannel":[                             // 연동된 채널
+    {
+      "chid":1,
+      "title":"카메라1",
+      "src":"http://host/watch?ch=1",
+      "streams": [  // 동영상 소스 목록
+                // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨)
+        { // 1080p RTMP 스트림
+          "src": "rtmp://host/live/ch1main",  // 동영상 주소
+          "type": "rtmp/mp4",     // MIME 형식: RTMP 프로토콜 (Adobe Flash 방식)
+          "label": "1080p FHD",   // 해상도 이름
+          "size": [               // 해상도
+            1920,                 // 가로 픽셀 수
+            1080                  // 세로 픽셀 수
+          ]
+        },
+        { // 1080p HLS 스트림
+          "src": "http://host/hls/ch1main/index.m3u8", // 동영상 주소
+          "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
+          "label": "1080p FHD",   // 해상도 이름
+          "size": [               // 해상도
+            1920,                 // 가로 픽셀 수
+            1080                  // 세로 픽셀 수
+          ]
+        },
+        { // VGA RTMP 스트림
+          "src": "rtmp://host/live/ch1sub",   // RTMP 프로토콜 (Adobe Flash 방식)
+          "type": "rtmp/mp4",   // MIME 형식: RTMP 프로토콜 (Adobe Flash 방식)
+          "label": "VGA",
+          "size": [
+            640,
+            480
+          ]
+        },
+        { // VGA HLS 스트림
+          "src": "http://host/hls/ch1sub/index.m3u8", // 동영상 주소
+          "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
+          "label": "VGA",       // 해상도 이름
+          "size": [             // 해상도
+            640,                // 가로 픽셀 수
+            480                 // 세로 픽셀 수
+          ]
+        }
+      ]
+    },
+    {
+      "chid":2,
+      "title":"카메라2",
+      "src":"http://host/watch?ch=2",
+      "streams":[
+        // ... 중략
+      ]
+    }
+  ],
+  "name":"지하1층 계단",                         // 비상 호출 장치 위치 이름
+  "topic":"emergencyCall"                       // 토픽 이름
 }
 ```
 
 **통화 종료 메시지**
 ```jsx
 {
-  "timestamp":"2018-06-27T10:59:26.322+09:00",  # 통화 종료 시점
-  "caller":"0000002",                           # 비상 호출 장치 위치 코드
-  "device":"Sammul/Vizufon",                    # 비상 호출 장치 이름
-  "event":"callEnd",                            # 통화 종료 이벤트
-  "linkedChannel":[                             # 연동된 채널
+  "timestamp":"2018-06-27T10:59:26.322+09:00",  // 통화 종료 시점
+  "caller":"0000002",                           // 비상 호출 장치 위치 코드
+  "device":"Sammul/Vizufon",                    // 비상 호출 장치 이름
+  "event":"callEnd",                            // 통화 종료 이벤트
+  "linkedChannel":[                             // 연동된 채널
     {
       "chid":1,
       "title":"카메라1",
@@ -1488,8 +1564,8 @@ http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
       "src":"http://host/watch?ch=2"
     }
   ],
-  "name":"비상벨2",                             # 비상 호출 장치 위치 이름
-  "topic":"emergencyCall"                      # 토픽 이름
+  "name":"비상벨2",                             // 비상 호출 장치 위치 이름
+  "topic":"emergencyCall"                      // 토픽 이름
 }
 ```
 비상 호출 메시지는 실시간 통화를 위한 용도로 사용되므로 연동된 채널의 영상 주소는 차량 번호 인식의 경우와 달리 실시간 영상으로 링크되어 있습니다.
@@ -1654,6 +1730,9 @@ https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
 auth    # 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)
 topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
 
+# 매개 변수들 (선택 사항)
+verbose # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 나열
+
 # 사용 예
 # 차량 번호 인식 이벤트 요청
 ws://host/wsapi/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
@@ -1663,9 +1742,12 @@ ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # 두 이벤트를 모두 요청
 ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+
+# 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
 ```
 
-웹 소켓으로 접속된 이후 수신되는 이벤트 데이터 형식은 Server-Sent Events (SSE)와 완전히 동일합니다.
+웹 소켓으로 접속된 이후 수신되는 이벤트 데이터 형식은 Server-Sent Events (SSE)와 완전히 동일하므로 여기서는 설명을 생략합니다.
 
 이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
 ```html
@@ -1804,11 +1886,11 @@ ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 [실행하기](./examples/ex4.html)
 
 
-## 서버에 이벤트 밀어넣기
+## 서버에 이벤트 밀어넣기 `(@0.3.0)`
 외부의 장치나 소프로트웨어로부터 서버에 이벤트를 `HTTP POST` 방식으로 송신할 수 있습니다.
 
 지원하는 이벤트 토픽은 다음과 같습니다.
-```
+```ruby
 LPR             # 차량 번호 인식
 emergencyCall   # 비상 호출
 ```

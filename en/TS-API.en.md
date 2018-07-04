@@ -60,7 +60,7 @@ Table of contents
   - [Car number recognition event](#car-number-recognition-event)
   - [Emergency call event](#emergency-call-event)
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
-- [Pushing events to the server](#pushing-events-to-the-server)
+- [Pushing events to the server `(@0.3.0)`](#pushing-events-to-the-server-030)
 - [Appendix](#appendix)
   - [The API-supported versions by product](#the-api-supported-versions-by-product)
   - [The features table by product](#the-features-table-by-product)
@@ -1388,7 +1388,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server
 
 
 The following event topics are supported:
-```
+```ruby
 LPR             # Car number recognition
 emergencyCall   # Emergency call
 ```
@@ -1401,6 +1401,9 @@ SSE connection paths and parameters are as follows.
 auth    # Authentication Information
 topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
 
+# Optional argument
+verbose # request List the live video stream sources of the linked video channels
+
 # Examples
 # Request car number recognition event
 http://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
@@ -1410,14 +1413,17 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # Request both events
 http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+
+# request List the live video stream sources of the linked video channels
+http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
 ```
 
 The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
 If the authentication information is incorrect or is not a supported topic, it will be disconnected immediately.
 ```jsx
 {
-  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", # subscriber ID (Unique ID per each connection)
-  "topics": [   # Reply to requested topics (Both events are supported)
+  "subscriberId": "cd57c82b-7e8c-4b04-91eb-520f6a9773ce", // subscriber ID (Unique ID per each connection)
+  "topics": [   // Reply to requested topics (Both events are supported)
     "LPR",
     "emergencyCall"
   ]
@@ -1429,24 +1435,24 @@ If you request `topics=LPR`, you can receive the car number recognition event in
 The car number event message is received in JSON format as shown below.
 ```jsx
 {
-  "timestamp":"2018-06-27T10:42:06.575-05:00",  # Vehicle number recognition time
-  "chid": {                                     # Car number recognition channel
+  "timestamp":"2018-06-27T10:42:06.575-05:00",  // Vehicle number recognition time
+  "chid": {                                     // Car number recognition channel
     "chid":1,
     "title":"Camera1",
-    "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00"  # The video at vehicle identification time
+    "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00"  // The video at vehicle identification time
   },
-  "deviceCode":"1-1-7",                         # Car number identification device (zone) code
-  "deviceName":"B1 Parking Lot",                # Car number identification device (zone) name
-  "linkedChannel": [                            # Linked channels
+  "deviceCode":"1-1-7",                         // Car number identification device (zone) code
+  "deviceName":"B1 Parking Lot",                // Car number identification device (zone) name
+  "linkedChannel": [                            // Linked channels
     {
       "chid":2,
       "title":"Camera2",
-      "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" # The video at vehicle identification time
+      "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" // The video at vehicle identification time
     }
   ],
-  "plateNo":"DSP963",                           # Car plate number
-  "timeBegin":"2018-06-27T10:42:02.573-05:00",  # First recognized time of the car
-  "topic":"LPR"                                 # Topic name
+  "plateNo":"DSP963",                           // Car plate number
+  "timeBegin":"2018-06-27T10:42:02.573-05:00",  // First recognized time of the car
+  "topic":"LPR"                                 // Topic name
 }
 ```
 
@@ -1457,11 +1463,11 @@ Emergency call event messages are received in JSON format as shown below.
 **Call start message**
 ```jsx
 {
-  "timestamp":"2018-06-27T10:56:16.316-05:00",  # Start time of the call
-  "caller":"0000002",                           # Emergency call device location code
-  "device":"Sammul/Vizufon",                    # Emergency call device name
-  "event":"callStart",                          # Call start event
-  "linkedChannel":[                             # Linked channels
+  "timestamp":"2018-06-27T10:56:16.316-05:00",  // Start time of the call
+  "caller":"0000002",                           // Emergency call device location code
+  "device":"Sammul/Vizufon",                    // Emergency call device name
+  "event":"callStart",                          // Call start event
+  "linkedChannel":[                             // Linked channels
     {
       "chid":1,
       "title":"Camera1",
@@ -1473,19 +1479,89 @@ Emergency call event messages are received in JSON format as shown below.
       "src":"http://host/watch?ch=2"
     }
   ],
-  "name":"B1 Stairs",                           # Emergency call device location name
-  "topic":"emergencyCall"                       # Topic name
+  "name":"B1 Stairs",                           // Emergency call device location name
+  "topic":"emergencyCall"                       // Topic name
+}
+```
+
+Emergency call events are events for real-time communication, so all channels are linked to real-time video.
+If you request the video stream source of the channels as shown below, the video stream sources are additionally included.
+```ruby
+http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+```
+```jsx
+{
+  "timestamp":"2018-06-27T10:56:16.316+09:00",  // Start time of the call
+  "caller":"0000002",                           // Emergency call device location code
+  "device":"Sammul/Vizufon",                    // Emergency call device name
+  "event":"callStart",                          // Call start event
+  "linkedChannel":[                             // Linked channels
+    {
+      "chid":1,
+      "title":"Camera1",
+      "src":"http://host/watch?ch=1",
+      "streams": [  // vidio stream sources
+                // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
+        { // 1080p RTMP stream
+          "src": "rtmp://host/live/ch1main",  // video address
+          "type": "rtmp/mp4",     // MIME type: RTMP protocol (Adobe Flash format)
+          "label": "1080p FHD",   // resolution name
+          "size": [               // resolution
+            1920,                 // the number of horizontal pixels
+            1080                  // the number of verical pixels
+          ]
+        },
+        { // 1080p HLS stream
+          "src": "http://host/hls/ch1main/index.m3u8", // video address
+          "type": "application/x-mpegurl",  // MIME type: HLS protocol (format)
+          "label": "1080p FHD",   // resolution name
+          "size": [               // resolution
+            1920,                 // the number of horizontal pixels
+            1080                  // the number of verical pixels
+          ]
+        },
+        { // VGA RTMP stream
+          "src": "rtmp://host/live/ch1sub",   // RTMP protocol (Adobe Flash format)
+          "type": "rtmp/mp4",   // MIME type: RTMP protocol (Adobe Flash format)
+          "label": "VGA",
+          "size": [
+            640,
+            480
+          ]
+        },
+        { // VGA HLS stream
+          "src": "http://host/hls/ch1sub/index.m3u8", // video address
+          "type": "application/x-mpegurl",  // MIME type: HLS protocol (HTML5 format)
+          "label": "VGA",       // resolution name
+          "size": [             // resolution
+            640,                // the number of horizontal pixels
+            480                 // the number of verical pixels
+          ]
+        }
+      ]
+    },
+    {
+      "chid":2,
+      "title":"Camera2",
+      "src":"http://host/watch?ch=2",
+      "streams":[
+        // ... omitted
+      ]
+    }
+  ],
+  "name":"B1 Stairs",                     // 비상 호출 장치 위치 이름
+  "topic":"emergencyCall"                 // 토픽 이름
 }
 ```
 
 **Call end message**
 ```jsx
 {
-  "timestamp":"2018-06-27T10:59:26.322-05:00",  # End time of then call
-  "caller":"0000002",                           # Emergency call device location code
-  "device":"Sammul/Vizufon",                    # Emergency call device name
-  "event":"callEnd",                            # Call end event
-  "linkedChannel":[                             # Linked channels
+  "timestamp":"2018-06-27T10:59:26.322-05:00",  // End time of then call
+  "caller":"0000002",                           // Emergency call device location code
+  "device":"Sammul/Vizufon",                    // Emergency call device name
+  "event":"callEnd",                            // Call end event
+  "linkedChannel":[                             // Linked channels
     {
       "chid":1,
       "title":"Camera1",
@@ -1497,8 +1573,8 @@ Emergency call event messages are received in JSON format as shown below.
       "src":"http://host/watch?ch=2"
     }
   ],
-  "name":"B1 Stairs",                          # Emergency call device location name
-  "topic":"emergencyCall"                      # Topic name
+  "name":"B1 Stairs",                          // Emergency call device location name
+  "topic":"emergencyCall"                      // Topic name
 }
 ```
 Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.
@@ -1664,6 +1740,9 @@ The web socket connection path and parameters are as follows.
 auth    # Authentication Information (Requires authentication per individual web socket, independent of session authentication)
 topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
 
+# Optional argument
+verbose # request List the live video stream sources of the linked video channels
+
 # Example
 # Request car number recognition event
 ws://host/wsapi/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
@@ -1673,9 +1752,12 @@ ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # Request both events
 ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+
+# request List the live video stream sources of the linked video channels
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
 ```
 
-The event data format received after a Web socket connection is exactly the same as Server-Sent Events (SSE).
+The event data format received after a Web socket connection is exactly the same as Server-Sent Events (SSE) and is not described here again.
 
 Now, let's create an example that uses the Web socket to receive event messages.
 ```html
@@ -1814,11 +1896,11 @@ Now, let's create an example that uses the Web socket to receive event messages.
 [Run](./examples/ex4.html)
 
 
-## Pushing events to the server
+## Pushing events to the server `(@0.3.0)`
 You can send events from an external device or software to the server by `HTTP POST` method.
 
 The following event topics are supported:
-```
+```ruby
 LPR             # Car number recognition
 emergencyCall   # Emergency call
 ```
