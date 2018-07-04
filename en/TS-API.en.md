@@ -13,7 +13,8 @@ It would be helpful if you have some experience using simple `HTML` and `JavaScr
 Please refer to [The API-supported versions by product](#the-api-supported-versions-by-product) and 
 [The features table by product](#the-features-table-by-product) portion of [Appendix](#appendix), as the features supported by each product may differ.
  
-`[Tips]` *The API and this article are subject to change without notice for better development support and improvement.*
+> [Tips]
+The API and this article are subject to change without notice for better development support and improvement.
 
 Table of contents
 -----
@@ -47,9 +48,9 @@ Table of contents
 - [Retrieve recorded data](#retrieve-recorded-data)
   - [Search dates with recorded video](#search-dates-with-recorded-video)
   - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
-- [Search event log](#search-event-log)
-- [Vehicle number log search](#vehicle-number-log-search)
-- [Search for similar vehicle numbers `@0.2.0`](#search-for-similar-vehicle-numbers-020)
+  - [Search event log](#search-event-log)
+  - [Vehicle number log search](#vehicle-number-log-search)
+  - [Search for similar vehicle numbers `@0.2.0`](#search-for-similar-vehicle-numbers-020)
 - [Search for video sources](#search-for-video-sources)
   - [Real-time video source](#real-time-video-source)
   - [Recorded video source](#recorded-video-source)
@@ -59,6 +60,7 @@ Table of contents
   - [Car number recognition event](#car-number-recognition-event)
   - [Emergency call event](#emergency-call-event)
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
+- [Pushing events to the server](#pushing-events-to-the-server)
 - [Appendix](#appendix)
   - [The API-supported versions by product](#the-api-supported-versions-by-product)
   - [The features table by product](#the-features-table-by-product)
@@ -87,7 +89,8 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 
 Do you see the video?
 
-`[Tips]` *The demonstration video used in this sample code may not be connected depending on the situation in the field.*
+> [Tips]
+The demonstration video used in this sample code may not be connected depending on the situation in the field.
 
 ### Inserting video into web page
 Now let's insert the video into the web page.
@@ -114,7 +117,8 @@ Select the menu item you are to use, the code will be copied to the clipboard an
 | Copy video URL  | Paste into web browser address window         |
 | Copy embed code | Paste in the `<iframe>` tag of your HTML code |
 
-`[Tips]` For security reasons, the `auth=ZGVtbzohMTIzNHF3ZXI=` part is excluded from this copied code. This code is required for authentication and is described in [Session Authentication](#session-authentication).
+> [Tips]
+For security reasons, the `auth=ZGVtbzohMTIzNHF3ZXI=` part is excluded from this copied code. This code is required for authentication and is described in [Session Authentication](#session-authentication).
 In this example, we used only minimal code to display the video, so there are more parts that were not included in the copied code.
 
 ### Connecting to a real server
@@ -218,7 +222,9 @@ For example, to display a video recorded on `Channel 1` at 2:30:15 pm on Februar
 http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=
 ```
 [Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=&lang=en-US)
-`[Tips]` *The recorded video of the old date may already be overwritten depending on the capacity of the storage device.*
+
+> [Tips]
+The recorded video of the old date may already be overwritten depending on the capacity of the storage device.
 
 `2018-02-01T14%3a30%3a15%2b09%3a00` is the date and time in the format [ISO 8601](#date-and-time-notation-in-iso-8601-format).
 
@@ -853,7 +859,7 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
-## Search event log
+### Search event log
 To retrieve the event log recorded on the server, request the following.
 ```ruby
 /api/find?what=eventLog
@@ -947,15 +953,17 @@ type        # Event log type
 # Sort by old data order (ascending order)
 /api/find?what=eventLog&sort=asc
 
+# Request the system log type id list
+/api/enum?what=eventType
+
 # Request only system log (id: 0) of event log types
-# [Tips] Check the system log type id list as below.
-#        /api/enum?what=eventType
 /api/find?what=eventLog&type=0
+
 
 ```
 
 
-## Vehicle number log search
+### Vehicle number log search
 If you use the car number recognition function, the recognized car number is saved with the video. To retrieve the car number log you will request as follows:
 
 ```ruby
@@ -1111,7 +1119,7 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&a
 ```
 
 
-## Search for similar vehicle numbers `@0.2.0`
+### Search for similar vehicle numbers `@0.2.0`
 Can be used to verify that a similar vehicle number exists.
 To retrieve similar vehicle numbers from the log, request the following:
 ```ruby
@@ -1374,8 +1382,9 @@ The step-by-step communication procedure is as follows:
 >4. When an event occurs, the server sends a message to the client.
 >5. Repeat steps 3 through 4 until the client ends the connection itself.
 
-`[Tips]` *Microsoft Internet Explorer and Microsoft Edge do not support the SSE standard. If you need to work with Microsoft browsers, use the Web socket (RFC6455).*
-*https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events*
+> [Tips]
+Microsoft Internet Explorer and Microsoft Edge do not support the SSE standard. If you need to work with Microsoft browsers, use the Web socket (RFC6455).
+https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
 
 
 The following event topics are supported:
@@ -1495,7 +1504,7 @@ Emergency call event messages are received in JSON format as shown below.
 Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.
 
 
-Now, l et's create an example that uses SSE to receive event messages.
+Now, let's create an example that uses SSE to receive event messages.
 ```html
 <!DOCTYPE>
 <head>
@@ -1643,8 +1652,9 @@ The step-by-step communication procedure is as follows:
 >4. When an event occurs, the server sends a message to the client.
 >5. Repeat steps 3 through 4 until the client ends the connection itself.
 
-`[참고]` *The web socket method is supported by all web browsers including Microsoft web browsers.*
- *https://developer.mozilla.org/en-US/docs/Web/API/WebSocket*
+> [Tips]
+The web socket method is supported by all web browsers including Microsoft web browsers.
+https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
 
 The web socket connection path and parameters are as follows.
 ```ruby
@@ -1803,17 +1813,62 @@ Now, let's create an example that uses the Web socket to receive event messages.
 ```
 [Run](./examples/ex4.html)
 
+
+## Pushing events to the server
+You can send events from an external device or software to the server by `HTTP POST` method.
+
+The following event topics are supported:
+```
+LPR             # Car number recognition
+emergencyCall   # Emergency call
+```
+
+The path and parameters for sending events to the server are:
+```ruby
+/api/push
+
+# Parameter
+auth    # authentication information
+```
+
+Specify event data in JSON format in contents data.
+**Car number recognition data**
+```jsx
+{
+  "topic": "LPR",         // Car number data
+  "src": "F00001",        // Car number recognition device code
+  "plateNo": "01가2345",  // the car number
+  // Below are optional.
+  "when": "2018-02-01T14%3a30%3a15-05%3a00",    // Vehicle number recognition time, if not specified, the server uses the time when the event was received
+  "timeBegin": "2018-02-01T14%3a30%3a14-05%3a00"  // For car parked, specify the first recognition time
+}
+```
+
+**Emergency call data**
+```jsx
+{
+  "topic": "emergencyCall",   // Emergency call data
+  "device": "vendor/device",  // Emergency call device model name
+  "src": "0000001",           // Emergency call device location code
+  "event": "callStart",       // call start (or "callEnd" for call end)
+  "when": "2018-02-01T14%3a30%3a15-05%3a00" // Event occurrence time
+}
+```
+
+If the request is successful, the server returns an HTTP response code of 200 and no additional Contents data is returned.
+
+
 ## Appendix
 
 ### The API-supported versions by product
 
 The versions of the products that support the API are as follows.
 
-| API version |    TS-CMS   |    TS-NVR    |   TS-LPR     |
-|---------|--------------|--------------|--------------|
-| 0.1.0   | v0.38.0 or later | v0.35.0 or later | v0.2.0A or later  |
-| 0.2.0   | v0.41.0 or later | v0.40.0 or later | v0.7.0A or later  |
-| 0.3.0   | v0.42.1 or later | v0.41.1 or later | v0.8.2A or later  |
+| API version | TS-CMS           | TS-NVR           | TS-LPR           |
+|-------------|------------------|------------------|------------------|
+| 0.1.0       | v0.38.0 or later | v0.35.0 or later | v0.2.0A or later |
+| 0.2.0       | v0.41.0 or later | v0.40.0 or later | v0.7.0A or later |
+| 0.3.0       | v0.42.1 or later | v0.41.1 or later | v0.8.2A or later |
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
@@ -1830,10 +1885,12 @@ APIs are compatible across all product lines, but some features may not be suppo
 | [Request various enumeration](#request-various-enumeration)         | O      | O                                      | O      |
 | [Search date with recorded video](#search-date-with-recorded-video) | X      | O                                      | O      |
 | [Search Event Log](#search-event-log)                               | O      | O                                      | O      |
-| [Vehicle number log search](#vehicle-number-log-search)             | X      | depends on the license `[Explanation]` | O      |
+| [Vehicle number log search](#vehicle-number-log-search)             | X      | depends on the license `[Tips]` | O      |
 
-`[Explanation]` TS-NVR does not have built-in vehicle number recognition function and **vehicle number log search** function is not supported.
+> [Tips]
+TS-NVR does not have built-in vehicle number recognition function and **vehicle number log search** function is not supported.
 However, if you use the add-on license of **vehicle number recognition interworking**, you can use the **vehicle number log search** because it stores the car number log incoming from the external vehicle number recognition device.
+
 
 ### base64 Encoding
 For more information on base64 encoding, see the links below.
@@ -1904,20 +1961,20 @@ The server supports a total of 104 languages as follows:
 ```ruby
 af-ZA       # Afrikaans
 sq-AL       # Shqip, Albanian
-am-ET       # ?�ማ??��, Amharic
-ar-AE       # ا?عرب?ة, Arabic
-hy-AM       # ?այե?են, Armenian
-az-Latn     # Az?rbaycan, Azerbaijani
+am-ET       # አማርኛ, Amharic
+ar-AE       # العربية, Arabic
+hy-AM       # Հայերեն, Armenian
+az-Latn     # Azərbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
-be-BY       # бела???к?, Belarusian
-bn-BD       # বাংল�? Bengali
+be-BY       # беларускі, Belarusian
+bn-BD       # বাংলা, Bengali
 bs-Latn     # Bosanski, Bosnian
-bg-BG       # б?лга??ки, Bulgarian
+bg-BG       # български, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
-zh-CN       # 简体中?? Chinese (Simplified)
-zh-TW       # �?��?�統, Chinese (Traditional)
+zh-CN       # 简体中国, Chinese (Simplified)
+zh-TW       # 中國傳統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -1931,15 +1988,15 @@ fi-FI       # Suomalainen, Finnish
 fr-FR       # Français, French
 fy-NL       # Frysk, Frisian
 gl-ES       # Galego, Galician
-ka-GE       # ?�ა?�თ?�ლ?? Georgian
+ka-GE       # ქართული, Georgian
 de-DE       # Deutsch, German
-el-GR       # ?λληνικά, Greek
+el-GR       # Ελληνικά, Greek
 gu-IN       # ગુજરાતી, Gujarati
 ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
-he-IL       # ע?ר?ת, Hebrew
-hi-IN       # हिन्द�?, Hindi
+he-IL       # עברית, Hebrew
+hi-IN       # हिन्दी, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -1947,44 +2004,44 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # ?�本�? Japanese
+ja-JP       # 日本語, Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನ�? Kannada
-kk-KZ       # ?аза? ??л?нде, Kazakh
-km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
-ko-KR       # Korean
+kn-IN       # ಕನ್ನಡ, Kannada
+kk-KZ       # Қазақ тілінде, Kazakh
+km-KH       # ភាសាខ្មែរ, Khmer
+ko-KR       # 한국어, Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
-ru-KG       # ???г?з?а, Kyrgyz
-lo-LA       # �?���? Lao
+ru-KG       # Кыргызча, Kyrgyz
+lo-LA       # ລາວ, Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
 lb-LU       # Lëtzebuergesch, Luxembourgish
-mk-MK       # ?акедон?ки, Macedonian
+mk-MK       # Македонски, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # �?���?��ളം, Malayalam
+ml-IN       # മലയാളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # �?��ाठी, Marathi
-mn-MN       # ?онгол ??л д???, Mongolian
-my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
-ne-NP       # नेपाल�?, Nepali
+mr-IN       # मराठी, Marathi
+mn-MN       # Монгол хэл дээр, Mongolian
+my-MM       # မြန်မာ", Myanmar (Burmese)
+ne-NP       # नेपाली, Nepali
 nb-NO       # Norwegian
-ps-AF       # پ?ت?, Pashto
-fa-IR       # ?ارس?, Persian
+ps-AF       # پښتو, Pashto
+fa-IR       # فارسی, Persian
 pl-PL       # Polskie, Polish
 pt-PT       # Português, Portuguese
-pa-IN       # ਪੰਜਾਬ�?, Punjabi
+pa-IN       # ਪੰਜਾਬੀ, Punjabi
 ro-RO       # Română, Romanian
-ru-RU       # ????кий, Russian
+ru-RU       # Русский, Russian
 sm          # Samoan
 gd-GB       # Gàidhlig, Scots Gaelic
-sr-Cyrl-RS  # С?п?ки, Serbian
+sr-Cyrl-RS  # Српски, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
-sd-Arab-PK  # س???, Sindhi
-si-LK       # සිංහ�? Sinhala
+sd-Arab-PK  # سنڌي, Sindhi
+si-LK       # සිංහල, Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -1992,18 +2049,18 @@ es-ES       # Español, Spanish
 su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
-tg-Cyrl-TJ  # Тоҷики??он, Tajik
-ta-IN       # த�?ி�?�? Tamil
+tg-Cyrl-TJ  # Тоҷикистон, Tajik
+ta-IN       # தமிழ், Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไท�? Thai
+th-TH       # ไทย, Thai
 tr-TR       # Türkçe, Turkish
-uk-UA       # Ук?а?н??ка, Ukrainian
-ur-PK       # ارد?, Urdu
+uk-UA       # Українська, Ukrainian
+ur-PK       # اردو, Urdu
 uz-Latn-UZ  # O'zbek, Uzbek
 vi-VN       # Tiếng Việt, Vietnamese
 cy-GB       # Cymraeg, Welsh
 xh-ZA       # isiXhosa, Xhosa
-yi          # ??ִ??ש, Yiddish
+yi          # ייִדיש, Yiddish
 yo-NG       # Yorùbá, Yoruba
 zu-ZA       # isiZulu, Zulu
 ```
