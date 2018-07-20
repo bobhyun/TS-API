@@ -40,6 +40,7 @@ Table of contents
   - [User information](#user-information)
   - [Request all at once](#request-all-at-once)
 - [Request system informatoin `@0.2.0`](#request-system-informatoin-020)
+- [Request channel status `@0.3.0`](#request-channel-status-030)
 - [Request various enumeration](#request-various-enumeration)
   - [Channel list](#channel-list)
   - [Vehicle number recognition device list](#vehicle-number-recognition-device-list)
@@ -57,10 +58,11 @@ Table of contents
 - [Requesting video using video source `@0.3.0`](#requesting-video-using-video-source-030)
 - [Real-time event monitoring `@0.3.0`](#real-time-event-monitoring-030)
   - [Server-Sent Events (SSE)](#server-sent-events-sse)
-  - [Car number recognition event](#car-number-recognition-event)
-  - [Emergency call event](#emergency-call-event)
+  - [Channel status change events](#channel-status-change-events)
+  - [Car number recognition events](#car-number-recognition-events)
+  - [Emergency call events](#emergency-call-events)
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
-- [Pushing events to the server `(@0.3.0)`](#pushing-events-to-the-server-030)
+- [Pushing events to the server `@0.3.0`](#pushing-events-to-the-server-030)
 - [Appendix](#appendix)
   - [The API-supported versions by product](#the-api-supported-versions-by-product)
   - [The features table by product](#the-features-table-by-product)
@@ -390,7 +392,8 @@ For the request, the server returns JSON data in the following format with an HT
     "type": "genuine",    // Genuine lincense
     "maxChannels": 36,    // Maximum channels available
     "extension": [        // Add-ons
-      "lprExt"            // Interworking the vehicle number recognition
+      "lprExt",           // Interworking the vehicle number recognition
+      "emergencyCall"     // supports emergency call devices
     ]
   }
 }
@@ -443,7 +446,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 ```jsx
 // Session authenticated state (HTTP response code: 200):
 {
-  "apiVersion": "TS-API@0.2.0",
+  "apiVersion": "TS-API@0.3.0",
   "siteName": "My%20home%20server",
   "timezone": {
     "name": "America/New_York",
@@ -457,7 +460,8 @@ This request returns JSON data with an HTTP response code of 200 if the session 
     "type": "genuine",
     "maxChannels": 36,
     "extension": [
-      "lprExt"
+      "lprExt",
+      "emergencyCall"
     ]
   },
   "whoAmI": {
@@ -477,7 +481,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 
 // Session unauthenticated state (HTTP response code: 401):
 {
-  "apiVersion": "TS-API@0.2.0",
+  "apiVersion": "TS-API@0.3.0",
   "siteName": "My%20home%20server",
   "timezone": {
     "name": "America/New_York",
@@ -491,7 +495,8 @@ This request returns JSON data with an HTTP response code of 200 if the session 
     "type": "genuine",
     "maxChannels": 36,
     "extension": [
-      "lprExt"
+      "lprExt",
+      "emergencyCall"
     ]
   }     // whoAmI is not included
 }
@@ -539,6 +544,116 @@ For the request, the server returns JSON data in the following format with an HT
     },
   ]
 }
+```
+
+## Request channel status `@0.3.0`
+Requests the status of each channel on the server.
+```ruby
+/api/status
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  {
+    "chid": 1,
+    "status": {
+      "code": 200
+    }
+  },
+  {
+    "chid": 2,
+    "status": {
+      "code": 200
+    }
+  },
+  {
+    "chid": 3,
+    "status": {
+      "code": 200
+    }
+  },
+  {
+    "chid": 4,
+    "status": {
+      "code": 200
+    }
+  },
+  // ... omitted
+]
+```
+
+If necessary, the following parameters can be used.
+```ruby
+# Parameters
+ch        # Channel number (You can specify multiple channels at the same time, which are separated by a comma (,).)
+verbose   # Request a message corresponding to a status code
+lang      # Specify the language to use for the message
+
+# Examples
+# Specify channel 3 only
+/api/status?ch=3
+
+# Specify only channels 1 to 4
+/api/status?ch=1,2,3,4
+
+# Include status messages (if lang is not specified, the server-side language settings are applied.)
+/api/status?verbose=true
+
+# Include status messages in Spanish
+/api/status?verbose=true&lang=es-ES
+```
+
+Requests, including messages, return JSON data in the following format:
+```jsx
+[
+  {
+    "chid": 1,
+    "status": {
+      "code": 200,
+      "message": "Connected"
+    }
+  },
+  {
+    "chid": 2,
+    "status": {
+      "code": 200,
+      "message": "Connected"
+    }
+  },
+  {
+    "chid": 3,
+    "status": {
+      "code": 200,
+      "message": "Connected"
+    }
+  },
+  {
+    "chid": 4,
+    "status": {
+      "code": 200,
+      "message": "Connected"
+    }
+  },
+  // ... omitted
+]
+```
+
+The complete list of status codes is shown below.
+```ruby
+-5    # On rebooting
+-4    # On reconnecting
+-3    # On connecting
+-2    # Loading
+-1    # Not used
+0     # No response
+1     # Used
+2     # Has video
+200   # Connected
+401   # Camera login failed
+403 	# Camera blocked
+404 	# No network connection
+408 	# Camera response timeout
+410 	# No video input
 ```
 
 ## Request various enumeration
@@ -1389,6 +1504,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server
 
 The following event topics are supported:
 ```ruby
+channelStatus    # Change channel status
 LPR             # Car number recognition
 emergencyCall   # Emergency call
 ```
@@ -1402,7 +1518,12 @@ auth    # Authentication Information
 topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
 
 # Optional argument
-verbose # request List the live video stream sources of the linked video channels
+verbose # For emergencyCall, request List the live video stream sources of the linked video channels
+        # For channelStatus, request status messages (Include "title" in initial message immediately after issuing subscriber id)
+
+# channelStatus-specific parameters (optional)
+ch      # Used when specifying specific channels (separated by a comma (,) if multiple channels are specified at the same time)
+lang    # Specify language for status messages
 
 # Examples
 # Request car number recognition event
@@ -1414,8 +1535,17 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
 # Request both events
 http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 
-# request List the live video stream sources of the linked video channels
+# Request List the live video stream sources of the linked video channels
 http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+
+# Request status change events for all channels
+http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=
+
+# Requests status change events for all channels including messages
+http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&verbose=true
+
+# Requests status change events of channels 1 and 2 including Spanish messages
+http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,2&verbose=true&lang=es-ES
 ```
 
 The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
@@ -1430,7 +1560,85 @@ If the authentication information is incorrect or is not a supported topic, it w
 }
 ```
 
-### Car number recognition event
+### Channel status change events
+You can receive channel status change events in real time by requesting `topics=channelStatus`.
+Unlike other topics, in case of the channel status topic, for status change management, the current channel status is sent once, immediately after issuing the subscriber id.
+The rest events are then sent only when there is a change from the initial state.
+Channel status change event messages are received in JSON format as shown below.
+```jsx
+// subscriber id
+{
+  "subscriberId":"1a3dc2de-d3b5-4983-933a-49a86ac8ad3d",
+  "topics": [
+    "channelStatus"
+  ]
+}
+
+// Current all channel status (sent immediately after the subscriber id)
+{
+  "timestamp": "2018-07-20T15:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "currentStatus",
+  "channel": [
+    {
+      "chid": 1,
+      "title": "Camera1",
+      "status": {
+        "code": 200,
+        "message": "Connected"
+      }
+    },
+    {
+      "chid": 2,
+      "title": "Camera2",
+      "status": {
+        "code": 200,
+        "message": "Connected"
+      }
+    },
+  // ... omitted
+  ]
+}
+
+// When channel name changes
+{
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "nameChanged",
+  "chid": 1,
+  "name": "Camera1"
+}
+
+// When the video address modified
+{
+  "timestamp": "2018-07-20T16:01:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "videoSrcModified",
+  "chid": 1
+}
+
+// When the video stream is connected
+{
+  "timestamp": "2018-07-20T16:03:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "videoStreamReady",
+  "chid": 1
+}
+
+// When camera connection status is changed, or channel is added or deleted
+{
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "statusChanged",
+  "chid": 1,
+  "status": {
+    "code": 200,
+    "message": "Connected"
+  }
+}
+```
+
+### Car number recognition events
 If you request `topics=LPR`, you can receive the car number recognition event in real time.
 The car number event message is received in JSON format as shown below.
 ```jsx
@@ -1456,7 +1664,7 @@ The car number event message is received in JSON format as shown below.
 }
 ```
 
-### Emergency call event
+### Emergency call events
 If you request `topics=emergencyCall`, you can receive the event messages at the start and end of the emergency call in real time.
 Emergency call event messages are received in JSON format as shown below.
 
@@ -1605,10 +1813,13 @@ Now, let's create an example that uses SSE to receive event messages.
     </div>
     <div>
       Topics:
-      <input type='checkbox' id="LPR" value="LPR" checked>LPR 
-      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>emergencyCall 
+      <input class='topic' type='checkbox' value="channelStatus" checked>channelStatus
+      <input class='topic' type='checkbox' value="LPR" checked>LPR 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall 
+      <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
+      <button type='button' onClick='onClearAll()'>Clear all</button>
     </div>
     <div id='url'>
     </div>
@@ -1653,12 +1864,14 @@ Now, let's create an example that uses SSE to receive event messages.
     }
 
     var topics = '';
-    if(document.getElementById('LPR').checked)
-      topics += 'LPR';
-    if(document.getElementById('emergencyCall').checked) {
+    var el = document.getElementsByClassName('topic');
+    for(var i=0; i<el.length; i++) {
+      if(!el[i].checked)
+        continue;
+
       if(topics.length > 0)
         topics += ',';
-      topics += 'emergencyCall';
+       topics += el[i].value;
     }
     if(topics.length == 0) {
       alert('Please select at least one topic.');
@@ -1669,7 +1882,11 @@ Now, let's create an example that uses SSE to receive event messages.
     url = (hostName.includes('http://', 0) ? '' : 'http://') +
 			hostName + '/api/subscribeEvents?topics=' + topics + 
 			'&auth=' + encodedData;
+          
+    if(document.getElementById('verbose').checked)
+      url += '&verbose=true';
 
+    //url += '&ch=4&lang=es-ES';
     return url;
   }
 
@@ -1711,6 +1928,13 @@ Now, let's create an example that uses SSE to receive event messages.
 			document.getElementById('url').innerText = '';
 		}
   }
+    
+  function onClearAll() {
+    var el = document.getElementById("messages");
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  }
 </script>
 ```
 [Run](./examples/ex3.html)
@@ -1741,7 +1965,13 @@ auth    # Authentication Information (Requires authentication per individual web
 topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
 
 # Optional argument
-verbose # request List the live video stream sources of the linked video channels
+verbose # For emergencyCall, request List the live video stream sources of the linked video channels
+        # For channelStatus, request status messages (Include "title" in initial message immediately after issuing subscriber id
+session # Can pass authentication credentials by passing session cookie already connected
+
+# channelStatus-specific parameters (optional)
+ch      # Used when specifying specific channels (separated by a comma (,) if multiple channels are specified at the same time)
+lang    # Specify language for status messages
 
 # Example
 # Request car number recognition event
@@ -1755,6 +1985,15 @@ ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # request List the live video stream sources of the linked video channels
 ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+
+# Request status change events for all channels
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=
+
+# Requests status change events for all channels including messages
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&verbose=true
+
+# Requests status change events of channels 1 and 2 including Spanish messages
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,2&verbose=true&lang=es-ES
 ```
 
 The event data format received after a Web socket connection is exactly the same as Server-Sent Events (SSE) and is not described here again.
@@ -1784,10 +2023,13 @@ Now, let's create an example that uses the Web socket to receive event messages.
     </div>
     <div>
       Topics:
-      <input type='checkbox' id="LPR" value="LPR" checked>LPR 
-      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>emergencyCall 
+      <input class='topic' type='checkbox' value="channelStatus" checked>channelStatus
+      <input class='topic' type='checkbox' value="LPR" checked>LPR 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall 
+      <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
+      <button type='button' onClick='onClearAll()'>Clear all</button>
     </div>
     <div id='url'>
     </div>
@@ -1832,13 +2074,16 @@ Now, let's create an example that uses the Web socket to receive event messages.
     }
 
     var topics = '';
-    if(document.getElementById('LPR').checked)
-      topics += 'LPR';
-    if(document.getElementById('emergencyCall').checked) {
+    var el = document.getElementsByClassName('topic');
+    for(var i=0; i<el.length; i++) {
+      if(!el[i].checked)
+        continue;
+
       if(topics.length > 0)
         topics += ',';
-      topics += 'emergencyCall';
+       topics += el[i].value;
     }
+  
     if(topics.length == 0) {
       alert('Please select at least one topic.');
       return url;
@@ -1848,7 +2093,11 @@ Now, let's create an example that uses the Web socket to receive event messages.
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
     	hostName + '/api/subscribeEvents?topics=' + topics + 
 			'&auth=' + encodedData;
-
+    
+      if(document.getElementById('verbose').checked)
+      url += '&verbose=true';
+      
+    //url += '&ch=4';
     return url;
   }
 
@@ -1891,12 +2140,19 @@ Now, let's create an example that uses the Web socket to receive event messages.
 			document.getElementById('url').innerText = '';
 		}
   }
+  
+  function onClearAll() {
+    var el = document.getElementById("messages");
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  }
 </script>
 ```
 [Run](./examples/ex4.html)
 
 
-## Pushing events to the server `(@0.3.0)`
+## Pushing events to the server `@0.3.0`
 You can send events from an external device or software to the server by `HTTP POST` method.
 
 The following event topics are supported:

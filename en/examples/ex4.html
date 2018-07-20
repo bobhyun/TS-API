@@ -21,10 +21,13 @@
     </div>
     <div>
       Topics:
-      <input type='checkbox' id="LPR" value="LPR" checked>LPR 
-      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>emergencyCall 
+      <input class='topic' type='checkbox' value="channelStatus" checked>channelStatus
+      <input class='topic' type='checkbox' value="LPR" checked>LPR 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall 
+      <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
+      <button type='button' onClick='onClearAll()'>Clear all</button>
     </div>
     <div id='url'>
     </div>
@@ -69,13 +72,16 @@
     }
 
     var topics = '';
-    if(document.getElementById('LPR').checked)
-      topics += 'LPR';
-    if(document.getElementById('emergencyCall').checked) {
+    var el = document.getElementsByClassName('topic');
+    for(var i=0; i<el.length; i++) {
+      if(!el[i].checked)
+        continue;
+
       if(topics.length > 0)
         topics += ',';
-      topics += 'emergencyCall';
+       topics += el[i].value;
     }
+  
     if(topics.length == 0) {
       alert('Please select at least one topic.');
       return url;
@@ -85,7 +91,11 @@
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
     	hostName + '/api/subscribeEvents?topics=' + topics + 
 			'&auth=' + encodedData;
-
+    
+      if(document.getElementById('verbose').checked)
+      url += '&verbose=true';
+      
+    //url += '&ch=4';
     return url;
   }
 
@@ -127,5 +137,12 @@
 			window.myApp.ws = null;
 			document.getElementById('url').innerText = '';
 		}
+  }
+  
+  function onClearAll() {
+    var el = document.getElementById("messages");
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
   }
 </script>

@@ -39,6 +39,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [사용자 정보](#사용자-정보)
   - [모두 한 번에 요청](#모두-한-번에-요청)
 - [시스템 정보 요청 `@0.2.0`](#시스템-정보-요청-020)
+- [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)
 - [각종 목록 요청](#각종-목록-요청)
   - [채널 목록](#채널-목록)
   - [차량 번호 인식 장치 목록](#차량-번호-인식-장치-목록)
@@ -56,10 +57,11 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 - [동영상 소스를 사용하여 영상 요청 `@0.3.0`](#동영상-소스를-사용하여-영상-요청-030)
 - [실시간 이벤트 모니터링 `@0.3.0`](#실시간-이벤트-모니터링-030)
   - [Server-Sent Events (SSE)](#server-sent-events-sse)
+  - [채널 상태 변경 이벤트](#채널-상태-변경-이벤트)
   - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
   - [비상 호출 이벤트](#비상-호출-이벤트)
   - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
-- [서버에 이벤트 밀어넣기 `(@0.3.0)`](#서버에-이벤트-밀어넣기-030)
+- [서버에 이벤트 밀어넣기 `@0.3.0`](#서버에-이벤트-밀어넣기-030)
 - [부록](#부록)
   - [제품별 API 지원 버전](#제품별-api-지원-버전)
   - [제품별 기능 지원 표](#제품별-기능-지원-표)
@@ -386,7 +388,8 @@ http://userid:password@host/path/to/
     "type": "genuine",    // 정품 라이센스
     "maxChannels": 36,    // 최대 사용할 수 있는 채널 수
     "extension": [        // 부가 기능
-      "lprExt"            // 차량 번호 인식 장치 연동
+      "lprExt",           // 차량 번호 인식 장치 연동
+      "emergencyCall"     // 비상 호출 장치 연동
     ]
   }
 }
@@ -438,7 +441,7 @@ http://userid:password@host/path/to/
 ```jsx
 // 세션 인증된 상태 (HTTP 응답 코드: 200):
 {
-  "apiVersion": "TS-API@0.2.0",
+  "apiVersion": "TS-API@0.3.0",
   "siteName": "%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84",
   "timezone": {
     "name": "Asia/Seoul",
@@ -452,7 +455,8 @@ http://userid:password@host/path/to/
     "type": "genuine",
     "maxChannels": 36,
     "extension": [
-      "lprExt"
+      "lprExt",
+      "emergencyCall"
     ]
   },
   "whoAmI": {
@@ -472,7 +476,7 @@ http://userid:password@host/path/to/
 
 // 세션 인증 안된 상태 (HTTP 응답 코드: 401):
 {
-  "apiVersion": "TS-API@0.2.0",
+  "apiVersion": "TS-API@0.3.0",
   "siteName": "%EC%9A%B0%EB%A6%AC%EC%A7%91%20%EC%84%9C%EB%B2%84",
   "timezone": {
     "name": "Asia/Seoul",
@@ -486,7 +490,8 @@ http://userid:password@host/path/to/
     "type": "genuine",
     "maxChannels": 36,
     "extension": [
-      "lprExt"
+      "lprExt",
+      "emergencyCall"
     ]
   }     // whoAmI 부분 없음
 }
@@ -534,6 +539,116 @@ http://userid:password@host/path/to/
     },
   ]
 }
+```
+
+## 채널 상태 요청 `@0.3.0`
+서버의 각 채널 상태를 요청합니다.
+```ruby
+/api/status
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  {
+    "chid": 1,
+    "status": {
+      "code": 200
+    }
+  },
+  {
+    "chid": 2,
+    "status": {
+      "code": 200
+    }
+  },
+  {
+    "chid": 3,
+    "status": {
+      "code": 200
+    }
+  },
+  {
+    "chid": 4,
+    "status": {
+      "code": 200
+    }
+  },
+  // ... 중략
+]
+```
+
+필요한 경우, 아래 매개변수를 사용할 수 있습니다.
+```ruby
+# 매개변수
+ch        # 채널 번호 (여러 채널을 동시에 지정할 경우 쉼표 문자(,)로 구분)
+verbose   # 상태 코드에 해당하는 메시지 요청
+lang      # 메시지에 사용될 언어 지정
+
+# 예제
+# 3번 채널만 지정
+/api/status?ch=3
+
+# 1~4번 채널만 지정
+/api/status?ch=1,2,3,4
+
+# 상태 메시지를 포함 (lang을 명시하지 않으면 서버 측 언어 설정을 따름)
+/api/status?verbose=true
+
+# 상태 메시지를 스페인어로 포함
+/api/status?verbose=true&lang=es-ES
+```
+
+메시지를 포함하여 요청하면 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  {
+    "chid": 1,
+    "status": {
+      "code": 200,
+      "message": "연결됨"
+    }
+  },
+  {
+    "chid": 2,
+    "status": {
+      "code": 200,
+      "message": "연결됨"
+    }
+  },
+  {
+    "chid": 3,
+    "status": {
+      "code": 200,
+      "message": "연결됨"
+    }
+  },
+  {
+    "chid": 4,
+    "status": {
+      "code": 200,
+      "message": "연결됨"
+    }
+  },
+  // ... 중략
+]
+```
+
+전체 상태 코드 목록은 다음과 같습니다.
+```ruby
+-5    # 재부팅 중
+-4    # 재접속 중
+-3    # 접속 중
+-2    # 로딩 중
+-1    # 사용 안함
+0     # 응답 없음
+1     # 사용함
+2     # 동영상 있음
+200   # 연결됨
+401   # 카메라 로그인 실패
+403 	# 카메라 차단됨
+404 	# 네트워크 접속 안됨
+408 	# 카메라 응답 시간 초과
+410 	# 영상 입력 없음
 ```
 
 ## 각종 목록 요청
@@ -1380,6 +1495,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server
 
 지원하는 이벤트 토픽은 다음과 같습니다.
 ```ruby
+channelStatus   # 채널 상태 변경
 LPR             # 차량 번호 인식
 emergencyCall   # 비상 호출
 ```
@@ -1392,8 +1508,15 @@ SSE 접속 경로와 매개변수들은 다음과 같습니다.
 auth    # 인증 정보
 topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
 
-# 매개 변수들 (선택 사항)
-verbose # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 나열
+# 공용 매개 변수들 (선택 사항)
+verbose # emergencyCall의 경우 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 나열
+        # channelStatus의 경우 텍스트 메시지를 포함 (구독자 id 발급 직후 최초 메시지에 "title" 포함)
+
+# channelStatus 전용 매개 변수들 (선택 사항)
+ch      # 특정 채널을 지정할 경우 (여러 채널을 동시에 지정할 경우 쉼표 문자(,)로 구분)
+        # 채널을 명시하지 않으면 모든 채널을 의미
+lang    # 상태 메시지 표기 언어
+
 
 # 사용 예
 # 차량 번호 인식 이벤트 요청
@@ -1407,6 +1530,15 @@ http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
 http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+
+# 모든 채널의 상태 변경 이벤트 요청
+http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=
+
+# 모든 채널의 상태 변경 이벤트시 메시지를 포함 요청
+http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&verbose=true
+
+# 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
+http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,2&verbose=true&lang=es-ES
 ```
 
 서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
@@ -1418,6 +1550,84 @@ http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&v
     "LPR",
     "emergencyCall"
   ]
+}
+```
+
+### 채널 상태 변경 이벤트
+`topics=channelStatus`를 요청하면 실시간으로 채널 상태 변경 이벤트를 수신할 수 있습니다.
+채널 상태 토픽은 다른 토픽과 달리 상태 변경 관리를 위해 구독자 id 발급 직후 현재 채널 상태가 한 번 이벤트로 전송됩니다.
+이후 나머지 이벤트들은 최초 상태에서 변경 사항이 있을 때만 전송됩니다.
+ 채널 상태 변경 이벤트 메시지는 아래와 같이 JSON형식으로 수신됩니다.
+```jsx
+// 구독자 id
+{
+  "subscriberId":"1a3dc2de-d3b5-4983-933a-49a86ac8ad3d",
+  "topics": [
+    "channelStatus"
+  ]
+}
+
+// 현재 전체 채널 상태 (구독자 id 이후 즉시 전송됨)
+{
+  "timestamp": "2018-07-20T15:05:45.956+09:00",
+  "topic": "channelStatus",
+  "event": "currentStatus",
+  "channel": [
+    {
+      "chid": 1,
+      "title": "카메라1",
+      "status": {
+        "code": 200,
+        "message": "연결됨"
+      }
+    },
+    {
+      "chid": 2,
+      "title": "카메라2",
+      "status": {
+        "code": 200,
+        "message": "연결됨"
+      }
+    },
+  // ... 중략
+  ]
+}
+
+// 채널 이름 변경시
+{
+  "timestamp": "2018-07-20T16:05:45.956+09:00",
+  "topic": "channelStatus",
+  "event": "nameChanged",
+  "chid": 1,
+  "name": "카메라1"
+}
+
+// 채널의 영상 주소가 변경시
+{
+  "timestamp": "2018-07-20T16:01:45.956+09:00",
+  "topic": "channelStatus",
+  "event": "videoSrcModified",
+  "chid": 1
+}
+
+// 비디오 스트림이 연결된 경우
+{
+  "timestamp": "2018-07-20T16:03:45.956+09:00",
+  "topic": "channelStatus",
+  "event": "videoStreamReady",
+  "chid": 1
+}
+
+// 카메라 연결 상태가 변경되거나 채널이 추가, 삭제된 경우
+{
+  "timestamp": "2018-07-20T16:05:45.956+09:00",
+  "topic": "channelStatus",
+  "event": "statusChanged",
+  "chid": 1,
+  "status": {
+    "code": 200,
+    "message": "연결됨"
+  }
 }
 ```
 
@@ -1595,10 +1805,13 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=&verbo
     </div>
     <div>
       토픽:
-      <input type='checkbox' id="LPR" value="LPR" checked>차량 번호 인식 
-      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>비상 호출 
+      <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
+      <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출 
+      <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
+      <button type='button' onClick='onClearAll()'>모두 삭제</button>
     </div>
     <div id='url'>
     </div>
@@ -1643,12 +1856,14 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=&verbo
     }
 
     var topics = '';
-    if(document.getElementById('LPR').checked)
-      topics += 'LPR';
-    if(document.getElementById('emergencyCall').checked) {
+    var el = document.getElementsByClassName('topic');
+    for(var i=0; i<el.length; i++) {
+      if(!el[i].checked)
+        continue;
+
       if(topics.length > 0)
         topics += ',';
-      topics += 'emergencyCall';
+       topics += el[i].value;
     }
     if(topics.length == 0) {
       alert('하나 이상의 토픽을 선택하십시오.');
@@ -1659,7 +1874,11 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=&verbo
     url = (hostName.includes('http://', 0) ? '' : 'http://') +
     	hostName + '/api/subscribeEvents?topics=' + topics + 
 			'&auth=' + encodedData;
+          
+    if(document.getElementById('verbose').checked)
+      url += '&verbose=true';
 
+    //url += '&ch=4&lang=ko-KR';
     return url;
   }
 
@@ -1701,6 +1920,13 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=&verbo
 			document.getElementById('url').innerText = '';
 		}
   }
+  
+  function onClearAll() {
+    var el = document.getElementById("messages");
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  }
 </script>
 ```
 [실행하기](./examples/ex3.html)
@@ -1730,8 +1956,16 @@ https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
 auth    # 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)
 topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
 
-# 매개 변수들 (선택 사항)
+# 공용 매개 변수들 (선택 사항)
 verbose # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 나열
+        # channelStatus의 경우 텍스트 메시지를 포함 (구독자 id 발급 직후 최초 메시지에 "title" 포함)
+session # 이미 연결된 session cookie를 전달하여 인증 정보를 대신할 수 있음
+
+# channelStatus 전용 매개 변수들 (선택 사항)
+ch      # 특정 채널을 지정할 경우 (여러 채널을 동시에 지정할 경우 쉼표 문자(,)로 구분)
+        # 채널을 명시하지 않으면 모든 채널을 의미
+lang    # 상태 메시지 표기 언어
+
 
 # 사용 예
 # 차량 번호 인식 이벤트 요청
@@ -1745,6 +1979,15 @@ ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
 
 # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
 ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+
+# 모든 채널의 상태 변경 이벤트 요청
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=
+
+# 모든 채널의 상태 변경 이벤트시 메시지를 포함 요청
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&verbose=true
+
+# 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,2&verbose=true&lang=es-ES
 ```
 
 웹 소켓으로 접속된 이후 수신되는 이벤트 데이터 형식은 Server-Sent Events (SSE)와 완전히 동일하므로 여기서는 설명을 생략합니다.
@@ -1774,10 +2017,13 @@ ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&v
     </div>
     <div>
       토픽:
-      <input type='checkbox' id="LPR" value="LPR" checked>차량 번호 인식 
-      <input type='checkbox' id="emergencyCall" value="emergencyCall" checked>비상 호출 
+      <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
+      <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출 
+      <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
+      <button type='button' onClick='onClearAll()'>모두 삭제</button>
     </div>
     <div id='url'>
     </div>
@@ -1822,13 +2068,16 @@ ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&v
     }
 
     var topics = '';
-    if(document.getElementById('LPR').checked)
-      topics += 'LPR';
-    if(document.getElementById('emergencyCall').checked) {
+    var el = document.getElementsByClassName('topic');
+    for(var i=0; i<el.length; i++) {
+      if(!el[i].checked)
+        continue;
+
       if(topics.length > 0)
         topics += ',';
-      topics += 'emergencyCall';
+       topics += el[i].value;
     }
+  
     if(topics.length == 0) {
       alert('하나 이상의 토픽을 선택하십시오.');
       return url;
@@ -1838,7 +2087,11 @@ ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&v
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
     	hostName + '/wsapi/subscribeEvents?topics=' + topics + 
 			'&auth=' + encodedData;
+    
+    if(document.getElementById('verbose').checked)
+      url += '&verbose=true';
 
+    //url += '&ch=4&lang=ko-KR';
     return url;
   }
 
@@ -1881,12 +2134,19 @@ ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&v
 			document.getElementById('url').innerText = '';
 		}
   }
+
+  function onClearAll() {
+    var el = document.getElementById("messages");
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+  }
 </script>
 ```
 [실행하기](./examples/ex4.html)
 
 
-## 서버에 이벤트 밀어넣기 `(@0.3.0)`
+## 서버에 이벤트 밀어넣기 `@0.3.0`
 외부의 장치나 소프로트웨어로부터 서버에 이벤트를 `HTTP POST` 방식으로 송신할 수 있습니다.
 
 지원하는 이벤트 토픽은 다음과 같습니다.
