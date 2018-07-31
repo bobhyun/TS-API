@@ -1,0 +1,415 @@
+<!DOCTYPE>
+<head>
+  <meta charset='utf-8'>
+  <title>ex5</title>
+  <style>
+    body {font-family:Arial, Helvetica, sans-serif}
+    div {padding:3px}
+    #control {background-color:beige;font-size:0.8em}
+    #param {background-color:wheat;font-size:11px}
+    #param * {font-size:10px}
+    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
+    li.open, li.close {color:blue}
+    li.error {color:red}
+  </style>
+</head>
+<body>
+  <h2>Ex5. Exporting recorded video (Web Socket)</h2>
+  <div id='control'>
+    <div>
+      <input type='text' id='host-name' placeholder='Server IP address:port'>
+      <input type='text' id='user-id' placeholder='User ID'> 
+      <input type='password' id='password' placeholder='Password'>
+    </div>
+    <div id='param'>
+      <div>
+        Data range : <input type='datetime-local' id='timeBegin' step='1' value='2018-07-27T09:00:00'>
+        ~ <input type='datetime-local' id='timeEnd' step='1' value='2018-07-27T09:30:00'>
+      </div>
+      <div>
+        Channels: 
+          <input type='checkbox' onclick='onSelectAllChannels(this)'>Select all
+          <input type='checkbox' class='chid' value='1' checked>1
+          <input type='checkbox' class='chid' value='2'>2
+          <input type='checkbox' class='chid' value='3'>3
+          <input type='checkbox' class='chid' value='4'>4    
+          <input type='checkbox' class='chid' value='5'>5
+          <input type='checkbox' class='chid' value='6'>6
+          <input type='checkbox' class='chid' value='7'>7
+          <input type='checkbox' class='chid' value='8'>8
+          <input type='checkbox' class='chid' value='9'>9
+          <input type='checkbox' class='chid' value='10'>10
+          <input type='checkbox' class='chid' value='11'>11
+          <input type='checkbox' class='chid' value='12'>12   
+          <input type='checkbox' class='chid' value='13'>13
+          <input type='checkbox' class='chid' value='14'>14
+          <input type='checkbox' class='chid' value='15'>15
+          <input type='checkbox' class='chid' value='16'>16
+      </div>
+      <div>
+        File size unit: <input type='text' id='fileSizeUnit' placeholder='ex) 500MB'>
+      </div>
+      <div>
+        Subtitle format: <select id='subtitleFormat'>
+          <option value='VTT'>VTT file</option>
+          <option value='SMI'>SMI file</option>
+          <option value='SRT'>SRT file</option>
+          <option value='textStream'>Built-in text stream</option>
+        </select>
+      </div>
+      <div>
+        Submitter: <input type='text' id='submitter' placeholder='ex) submitter'>
+      </div>
+      <div>
+        Recipient: <input type='text' id='recipient' placeholder='ex) recipient'>
+      </div>
+      <div>
+        Purpose: <textarea cols='40' rows='3' id='purpose' placeholder='ex) purpose...'></textarea>
+      </div>
+      <div>
+        Status interval: <input type='text' id='statusInterval' placeholder='ex) 2s' value='2s'>
+      </div>
+      <div>
+        Language: <select id='lang'>
+          <option value='en-US'>English</option>
+          <option value='ko-KR'>Korean</option>
+          <option value='es-ES'>Spanish</option>
+          <option value='zh-CN'>Chinese (Simplified)</option>
+          <option value='zh-TW'>Chinese (Traditional)</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <button type='button' onClick='onConnect()'>Connect</button>
+      <button type='button' onClick='onDisconnect()'>Disconnect</button>
+      <button type='button' onClick='onClearAll()'>Clear all</button>
+      <button type='button' onClick='onCancel()' id='cancel' style='visibility:hidden;color:red'>Cancel task</button>
+    </div>
+    <div id='url'>
+    </div>
+  </div>
+  <div>
+
+    <ul id='messages'></ul>
+  </div>
+</body>
+<script type='text/javascript'>
+  (function() {
+    window.myApp = { 
+      ws: null,
+      task: '',
+      fname: '',
+      waitTimer: null,
+      downloadJobs: []
+    };
+  })();
+
+  function getURL() {
+    var url = '';
+
+    if (typeof(WebSocket) === 'undefined') {
+      alert('Your web browser does\'nt support Web Socket.');
+      return url;
+    }
+
+		if(window.myApp.ws !== null) {
+			alert('Already connected');
+			return url;
+		}
+		
+    var hostName = document.getElementById('host-name').value;
+    if(hostName == '') {
+      alert('Please enter the host.');
+      return url;
+    }
+    var userId = document.getElementById('user-id').value;
+    if(userId == '') {
+      alert('Please enter your user ID.');
+      return url;
+    }
+    var password = document.getElementById('password').value;
+    if(password == '') {
+      alert('Please enter your password.');
+      return url;
+    }
+
+
+    // parameters
+    var timeBegin = document.getElementById('timeBegin').value;
+    if(timeBegin == '') {
+      alert('Please enter the data range.');
+      return url;
+    }
+
+    var timeEnd = document.getElementById('timeEnd').value;
+    if(timeEnd == '') {
+      alert('Please enter the data range.');
+      return url;
+    }
+
+    var ch = '';
+    var chk = document.getElementsByClassName('chid');
+    for (var i = 0; i < chk.length; i++) {
+      if (chk[i].checked === true) {
+        if(ch.length > 0)
+          ch += ',';
+        ch += chk[i].value;
+      }
+    }
+    if(ch.length == 0) {
+      alert('Select channels.');
+      return url;
+    }
+ 
+    var fileSizeUnit = document.getElementById('fileSizeUnit').value;
+    if(fileSizeUnit == '') {
+      alert('Please enter the maximum video file size.');
+      return url;
+    }
+
+    var subtitleFormat = document.getElementById('subtitleFormat').value;
+    if(subtitleFormat == '') {
+      alert('Select subtitle format.');
+      return url;
+    }
+
+    var submitter = document.getElementById('submitter').value;
+    if(submitter == '') {
+      alert('Please enter submitter.');
+      return url;
+    }
+
+    var recipient = document.getElementById('recipient').value;
+    if(submitter == '') {
+      alert('Enter the recipient.');
+      return url;
+    }
+
+    var purpose = document.getElementById('purpose').value;
+    if(purpose == '') {
+      alert('Enter your purpose.');
+      return url;
+    }
+
+    var statusInterval = document.getElementById('statusInterval').value;
+    if(statusInterval == '') {
+      alert('Please enter the progress display interval.');
+      return url;
+    }
+
+    var lang = document.getElementById('lang').value;
+    if(lang == '') {
+      alert('Choose your language.');
+      return url;
+    }
+
+    var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
+    	hostName + '/wsapi/dataExport?auth=' + encodeURIComponent(encodedData);
+
+    url += 
+      '&timeBegin=' + encodeURIComponent(timeBegin) +
+      '&timeEnd=' + encodeURIComponent(timeEnd) +
+      '&ch=' + encodeURIComponent(ch) +
+      '&subtitle=' + encodeURIComponent(subtitleFormat) +
+      '&fileSizeUnit=' + encodeURIComponent(fileSizeUnit) +
+      '&statusInterval=' + encodeURIComponent(statusInterval) +
+      '&submitter=' + encodeURIComponent(submitter) +
+      '&recipient=' + encodeURIComponent(recipient) +
+      '&purpose=' + encodeURIComponent(purpose) +
+      '&lang=' + encodeURIComponent(lang);
+
+    return url;
+  }
+
+  function addItem(tagClass, msg) {    
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(msg));
+    li.classList.add(tagClass); 
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function addDownloadItem(fname) {
+    var li = document.createElement('li');
+    var span = document.createElement('span');
+    span.innerHTML = '<progress value="0" max="100"></progress> <label>Downloading... ' + fname + '<label>';
+    span.setAttribute('id', window.myApp.task + '/' + fname);
+    li.appendChild(span);
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function addSaveAsLink(fname, blob) {
+    var a = document.createElement('a');
+    a.appendChild(document.createTextNode(fname));
+    a.href = window.URL.createObjectURL(blob);
+    a.download = fname;
+    var span = document.getElementById(window.myApp.task + '/' + fname);
+    if(span) {
+      span.replaceChild(a, span.lastChild);
+    }
+  }
+
+  function showCancelButton(bShow) {
+    var el = document.getElementById('param');
+    el.style.display = bShow ? 'none' : 'block';
+
+    el = document.getElementById('cancel');
+    el.style.visibility = bShow ? 'visible' : 'hidden';
+  }
+
+  function onConnect() {
+    var url = getURL();
+    if(url.length == 0)
+      return;
+
+    document.getElementById('url').innerText = url;
+
+    // WebSocket instance and it's handler functions
+    var ws = new WebSocket(url);
+    ws.onopen = function() {
+      addItem('open', 'Connected');
+    };
+    ws.onclose = function(e) {
+      addItem('close', 'Disconnected: ' + e.code);
+			onDisconnect();
+    };
+    ws.onerror = function(e) {
+      addItem('error', 'Error: ' + e.code);
+    };
+    ws.onmessage = function(e) {
+      addItem('data', e.data);
+      
+      var msg = JSON.parse(e.data);
+      switch(msg.stage) {
+      case 'ready':
+        if(msg.status.code != 0)
+          break;
+        window.myApp.task = msg.task.id;
+
+        showCancelButton(true);
+        break;
+
+      case 'fileBegin':
+        window.myApp.fname = msg.channel.file.name;
+        break;
+
+      case 'fileEnd':
+        downloadFiles(msg.channel.file, function(bSuccess) {
+          window.myApp.ws.send(JSON.stringify({
+            task: window.myApp.task,
+            cmd: bSuccess ? "next" : "cancel"
+          }));
+        });
+        break;
+
+      case 'end':
+        showCancelButton(false);
+        break;
+      }
+    };
+    window.myApp.ws = ws;
+  }
+
+  function onDisconnect() {
+		if(window.myApp.ws !== null) {
+	    window.myApp.ws.close();
+			window.myApp.ws = null;
+		}
+  }
+
+  function onClearAll() {
+    var el = document.getElementById("messages");
+    while (el.firstChild)
+      el.removeChild(el.firstChild);
+    document.getElementById('url').innerText = '';
+  }
+
+  function downloadFiles(file, onFinished) {
+    // send "wait" repeatedly until downloading finished.
+    window.myApp.waitTimer = setInterval(function() {
+      window.myApp.ws.send(JSON.stringify({
+        task: window.myApp.task,
+        cmd: "wait"
+      }));
+    }, file.ttl);          
+
+    var downloadCnt = 0, successCnt = 0;
+    for(var i=0, cnt=file.download.length; i<cnt; i++) {
+      downloadFile(file.download[i], function(bSuccess) {
+        if(bSuccess)
+          successCnt++;
+
+        if(++downloadCnt == cnt) {
+          if(window.myApp.waitTimer) {
+            clearInterval(window.myApp.waitTimer);
+            window.myApp.waitTimer = null;
+          }
+          onFinished(successCnt == downloadCnt);
+        }
+      });
+    }
+  }
+
+  function downloadFile(urlToSend, onFinish) {
+    var pos = urlToSend.lastIndexOf('/');
+    var fname = decodeURIComponent(urlToSend.substr(pos+1));
+
+    addDownloadItem(fname);
+
+    var req = new XMLHttpRequest();
+    window.myApp.downloadJobs.push(req);
+
+    req.open("GET", urlToSend, true);
+    req.responseType = "blob";
+    req.onprogress = function(e) {
+      var prog = document.getElementById(window.myApp.task + '/' + fname).firstChild;
+      if(prog)
+        prog.value = Math.ceil(e.loaded * 100 / e.total);
+    },
+    req.onerror = function(e) {
+      if(onFinish)
+        onFinish(false);
+
+      var pos = window.myApp.downloadJobs.indexOf(req);
+      if(pos >= 0)
+        window.myApp.downloadJobs.splice(pos, 1);
+    },
+    req.onload = function (event) {
+      addSaveAsLink(fname, req.response);
+
+      if(onFinish)
+        onFinish(true);
+
+      var pos = window.myApp.downloadJobs.indexOf(req);
+      if(pos >= 0)
+        window.myApp.downloadJobs.splice(pos, 1);
+    };
+    req.send();
+
+  }
+
+  function onCancel() {
+    // stop sending "wait"
+    if(window.myApp.waitTimer) {
+      clearInterval(window.myApp.waitTimer);
+      window.myApp.waitTimer = null;
+    }
+
+    // abort all downloading jobs
+    window.myApp.downloadJobs.forEach(function(jobs) {
+      jobs.abort();
+    });
+    window.myApp.downloadJobs = null;
+
+    window.myApp.ws.send(JSON.stringify({
+      task: window.myApp.task,
+      cmd: "cancel"
+    }));
+  }
+
+  function onSelectAllChannels(el) {
+    var ch = document.getElementsByClassName('chid');
+    for(var i=0, cnt=ch.length; i<cnt; i++)
+      ch[i].checked = el.checked;
+  }
+</script>

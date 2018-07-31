@@ -62,6 +62,7 @@ Table of contents
   - [Car number recognition events](#car-number-recognition-events)
   - [Emergency call events](#emergency-call-events)
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
+- [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
 - [Pushing events to the server `@0.3.0`](#pushing-events-to-the-server-030)
 - [Appendix](#appendix)
   - [The API-supported versions by product](#the-api-supported-versions-by-product)
@@ -2150,6 +2151,679 @@ Now, let's create an example that uses the Web socket to receive event messages.
 </script>
 ```
 [Run](./examples/ex4.html)
+
+
+## Exporting recorded video `@0.3.0`
+You can use the web socket to receive recorded video from the server.
+The server creates the files one by one and deletes them when the client finishes downloading, and then creates the next file.
+All progress is made while the server and the client remain connected,
+If the connection is lost, the server immediately stops the operation and deletes the generated file.
+
+The step-by-step communication procedure is as follows.
+>1. Client connects to server via Web socket
+>2. `Server -> Client [stage:ready]` If authenticated successful, the server send ready stage which contains the summary of the task.
+>4. `Server -> Client [stage:begin]` Start the requested operation from the server
+>5. `Server -> Client [stage:channelBegin]` Start task on a channel
+>6. `Server -> Client [stage:fileBegin]` Start creating a file
+>7. `Server -> Client [stage:fileWriting]` Writing data to a file
+>8. `Server -> Client [stage:fileEnd]` Completed a file (download link provided)
+>9. `Client -> Server [cmd:wait]` Making server wait while the client is downloading
+>10. `Client -> Server [cmd:next]` Making server create next file after the file has finished downloading
+>11. `Server -> Client [stage:channelEnd]` Completed task on a channel
+>12. `Server -> Client [stage:end]` 
+>13. If there are next files, repeat steps 6 to 10
+>13. If there are next channels, repeat steps 5 through 11
+>14. `Client -> Server [cmd:cancel]` Clients can cancel jobs at any time after step 2
+
+
+The web socket connection path and parameters are as follows.
+```ruby
+/wsapi/dataExport
+
+# Required parameters
+auth            # Authentication Information (Requires authentication per individual web socket, independent of session authentication)
+timeBegin       # Start time of data range to export (ISO8601 format)
+timeEnd         # End time of data range to export (ISO8601 format)
+
+# Optional parameters
+ch              # Used when specifying specific channels (separated by a comma (,) if multiple channels are specified at the same time)
+                # If you do not specify a channel, it means all channels
+subtitleFormat  # Specify the type of subtitle file to be used for the date time display of video
+                # Supports VTT, SRT, and SMI formats. If not specified or set to None, subtitle files are not generated.
+fileSizeLimit   # Specify the maximum size of the video file (Can be expressed in units of GB, MB, KB, B, eg: 1GB, 700MB)
+statusInterval  # Displays the interval of receiving the progress (stage:fileWriting) of the video file to be exported from the server
+                # (Can be expressed in units of s, ms, eg: 1s, 500ms)
+                # If statusInterval is not specified, no progress is sent
+lang            # Specify the language to be used for backup progress status and subtitle file
+
+# Parameters used for server-side logging for privacy (multiple lines of text can be used)
+submitter       # Specify video submitter
+recipient       # Specify video recipient
+purpose         # Specify the purpose of the video to submit
+
+# Examples
+# July 27, 2018 to receive all recorded videos from 9:00 am to 9:30 am
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
+
+# Exporting video recorded on channel 1
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
+
+# Exporting video recorded on channel 1,2 and 3
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
+
+# Save the file as 500MB
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB
+
+# Create VTT subtitle file
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT
+
+# Receiving progress in 1 second interval
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s
+
+# Specify language to Spanish
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
+
+# Specify Video submitter(Begger), recipient(Prince), purpose(cold\nand hungry)
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=Begger&recipient=Prince&purpose=cold%0D%0Aand%20hungry
+```
+
+The message format sent by the server for each stage is as follows.
+**stage:ready - Ready**
+```jsx
+{
+  "stage": "ready",
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "task": {
+    "id": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # task id-05
+    "ch": [
+      1,
+      2,
+      3
+    ],
+    "timeRange": [
+      "2018-07-27T09:00:00.000-05:00",
+      "2018-07-27T09:30:00.000-05:00"
+    ],
+    "fileSizeLimit": 524288000,
+    "subtitleFormat": "VTT"
+  }
+}
+```
+
+In some situations, it may fail and terminate immediately.
+ The types of `status` code are as follows.
+```ruby
+0: Succcess
+-1: No data in the requested time range and channels
+-2: Invalid parameters
+-5: Out of storage space (If there is no free space on the server)		
+```
+
+**stage:begin - Start task**
+```jsx
+{
+  "stage": "begin",
+  "overallProgress": "0%", # Overall progress
+  "timestamp": "2018-07-27T09:00:00.000-05:00" # Current time stamp in progress
+}
+```
+
+**stage:channelBegin - Start a channel**
+```jsx
+{
+  "stage": "channelBegin",
+  "overallProgress": "0%", # Overall progress
+  "timestamp": "2018-07-27T09:00:00.000-05:00", # Current time stamp in progress
+  "channel": {
+    "chid": 1,         # Channel number
+    "progress": "0%"   # Channel progress
+  }
+}
+```
+
+**stage:fileBegin - Start file creation**
+```jsx
+{
+  "stage": "fileBegin",
+  "overallProgress": "37%",  # Overall progress
+  "timestamp": "2018-07-27T09:11:19.825-05:00", # Current time stamp in progress
+  "channel": {
+    "chid": 1,         # Channel number
+    "progress": "37%", # Channel progress
+    "file": {
+      "fid": 1,        # File id
+      "name": "CH1.2018-07-27T09.11.19.mp4"  # File name
+    }
+  }
+}
+```
+
+**stage:fileWriting -File writing in progress**
+```jsx
+{
+  "stage": "fileWriting",
+  "overallProgress": "42%",  # Overall progress
+  "timestamp": "2018-07-27T09:12:49.466-05:00", # Current time stamp in progress
+  "channel": {
+    "chid": 1,         # Channel number
+    "progress": "42%", # Channel progress
+    "file": {
+      "fid": 1         # File id
+    }
+  }
+}
+```
+
+**stage:fileEnd - File creation complete**
+Once a file is created, the download link will be returned with the ttl as follows:
+Within ttl, The client must send a command to the server to control the flow, otherwise the server automatically cancels the operation.
+```jsx
+{
+  "stage": "fileEnd",
+  "overallProgress": "51%",  # Overall progress
+  "timestamp": "2018-07-27T09:15:25.225-05:00", # Current time stamp in progress
+  "channel": {
+    "chid": 1,          # Channel number
+    "progress": "51%",  # Channel progress
+    "file": {
+      "fid": 1,         # File id
+      "ttl": 5000,      # If the client does not send any commands within 5000 milliseconds (5 seconds), 
+                        # the server will automatically cancel the operation
+      "download": [
+        # Created video file
+        "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
+        # Created subtitle file
+        "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt"
+      ]
+    }
+  }
+}
+```
+
+The format of the command that the client sends to the server for each situation is as follows:
+**cmd:wait - wait command**
+Video files created on the server side will be deleted immediately after downloading finished and before creating the next file, 
+so you should send a wait command during download to prevent the server from deleting the file.
+If you send a wait command once, you can make server wait for 5 seconds which is specified in ttl.
+If downloading takes a long time, you should send a wait command periodically.
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
+  "cmd": "wait"   # wait command
+}
+```
+
+**cmd:next - Continue to next file**
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
+  "cmd": "next"   # Proceed to the next file operation
+}
+```
+
+**cmd:cancel - Cancel task**
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
+  "cmd": "cancel"   # Client cancel the task
+}
+```
+
+**stage:channelEnd - Channel complete**
+```jsx
+{
+  "stage": "channelEnd",
+  "overallProgress": "100%", # Overall progress
+  "timestamp": "2018-07-27T09:30:00.000-05:00", # Current time stamp in progress
+  "channel": {
+    "chid": 1,         # Channel number
+    "progress": "100%" # Channel progress
+  }
+}
+```
+
+**stage:end - Task complete**
+```jsx
+{
+  "stage": "end",
+  "overallProgress": "100%", # Overall progress
+  "timestamp": "2018-07-27T09:30:00.000-05:00", # Current time stamp in progress
+  "status": {
+    "code":0,
+    "message":"Success"
+  }
+}
+```
+A typical `status` code is one of the following:
+```ruby
+0: Success
+-1001: Not enough space to save
+-1003: Task canceled by user
+-1004: Task terminated by timeout
+```
+
+Now let's create an example that uses a web socket to export the recorded video.
+```html
+<!DOCTYPE>
+<head>
+  <meta charset='utf-8'>
+  <title>ex5</title>
+  <style>
+    body {font-family:Arial, Helvetica, sans-serif}
+    div {padding:3px}
+    #control {background-color:beige;font-size:0.8em}
+    #param {background-color:wheat;font-size:11px}
+    #param * {font-size:10px}
+    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
+    li.open, li.close {color:blue}
+    li.error {color:red}
+  </style>
+</head>
+<body>
+  <h2>Ex5. Exporting recorded video (Web Socket)</h2>
+  <div id='control'>
+    <div>
+      <input type='text' id='host-name' placeholder='Server IP address:port'>
+      <input type='text' id='user-id' placeholder='User ID'> 
+      <input type='password' id='password' placeholder='Password'>
+    </div>
+    <div id='param'>
+      <div>
+        Data range : <input type='datetime-local' id='timeBegin' step='1' value='2018-07-27T09:00:00'>
+        ~ <input type='datetime-local' id='timeEnd' step='1' value='2018-07-27T09:30:00'>
+      </div>
+      <div>
+        Channels: 
+          <input type='checkbox' onclick='onSelectAllChannels(this)'>Select all
+          <input type='checkbox' class='chid' value='1' checked>1
+          <input type='checkbox' class='chid' value='2'>2
+          <input type='checkbox' class='chid' value='3'>3
+          <input type='checkbox' class='chid' value='4'>4    
+          <input type='checkbox' class='chid' value='5'>5
+          <input type='checkbox' class='chid' value='6'>6
+          <input type='checkbox' class='chid' value='7'>7
+          <input type='checkbox' class='chid' value='8'>8
+          <input type='checkbox' class='chid' value='9'>9
+          <input type='checkbox' class='chid' value='10'>10
+          <input type='checkbox' class='chid' value='11'>11
+          <input type='checkbox' class='chid' value='12'>12   
+          <input type='checkbox' class='chid' value='13'>13
+          <input type='checkbox' class='chid' value='14'>14
+          <input type='checkbox' class='chid' value='15'>15
+          <input type='checkbox' class='chid' value='16'>16
+      </div>
+      <div>
+        File size unit: <input type='text' id='fileSizeUnit' placeholder='ex) 500MB'>
+      </div>
+      <div>
+        Subtitle format: <select id='subtitleFormat'>
+          <option value='VTT'>VTT file</option>
+          <option value='SMI'>SMI file</option>
+          <option value='SRT'>SRT file</option>
+          <option value='textStream'>Built-in text stream</option>
+        </select>
+      </div>
+      <div>
+        Submitter: <input type='text' id='submitter' placeholder='ex) submitter'>
+      </div>
+      <div>
+        Recipient: <input type='text' id='recipient' placeholder='ex) recipient'>
+      </div>
+      <div>
+        Purpose: <textarea cols='40' rows='3' id='purpose' placeholder='ex) purpose...'></textarea>
+      </div>
+      <div>
+        Status interval: <input type='text' id='statusInterval' placeholder='ex) 2s' value='2s'>
+      </div>
+      <div>
+        Language: <select id='lang'>
+          <option value='en-US'>English</option>
+          <option value='ko-KR'>Korean</option>
+          <option value='es-ES'>Spanish</option>
+          <option value='zh-CN'>Chinese (Simplified)</option>
+          <option value='zh-TW'>Chinese (Traditional)</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <button type='button' onClick='onConnect()'>Connect</button>
+      <button type='button' onClick='onDisconnect()'>Disconnect</button>
+      <button type='button' onClick='onClearAll()'>Clear all</button>
+      <button type='button' onClick='onCancel()' id='cancel' style='visibility:hidden;color:red'>Cancel task</button>
+    </div>
+    <div id='url'>
+    </div>
+  </div>
+  <div>
+
+    <ul id='messages'></ul>
+  </div>
+</body>
+<script type='text/javascript'>
+  (function() {
+    window.myApp = { 
+      ws: null,
+      task: '',
+      fname: '',
+      waitTimer: null,
+      downloadJobs: []
+    };
+  })();
+
+  function getURL() {
+    var url = '';
+
+    if (typeof(WebSocket) === 'undefined') {
+      alert('Your web browser does\'nt support Web Socket.');
+      return url;
+    }
+
+		if(window.myApp.ws !== null) {
+			alert('Already connected');
+			return url;
+		}
+		
+    var hostName = document.getElementById('host-name').value;
+    if(hostName == '') {
+      alert('Please enter the host.');
+      return url;
+    }
+    var userId = document.getElementById('user-id').value;
+    if(userId == '') {
+      alert('Please enter your user ID.');
+      return url;
+    }
+    var password = document.getElementById('password').value;
+    if(password == '') {
+      alert('Please enter your password.');
+      return url;
+    }
+
+
+    // parameters
+    var timeBegin = document.getElementById('timeBegin').value;
+    if(timeBegin == '') {
+      alert('Please enter the data range.');
+      return url;
+    }
+
+    var timeEnd = document.getElementById('timeEnd').value;
+    if(timeEnd == '') {
+      alert('Please enter the data range.');
+      return url;
+    }
+
+    var ch = '';
+    var chk = document.getElementsByClassName('chid');
+    for (var i = 0; i < chk.length; i++) {
+      if (chk[i].checked === true) {
+        if(ch.length > 0)
+          ch += ',';
+        ch += chk[i].value;
+      }
+    }
+    if(ch.length == 0) {
+      alert('Select channels.');
+      return url;
+    }
+ 
+    var fileSizeUnit = document.getElementById('fileSizeUnit').value;
+    if(fileSizeUnit == '') {
+      alert('Please enter the maximum video file size.');
+      return url;
+    }
+
+    var subtitleFormat = document.getElementById('subtitleFormat').value;
+    if(subtitleFormat == '') {
+      alert('Select subtitle format.');
+      return url;
+    }
+
+    var submitter = document.getElementById('submitter').value;
+    if(submitter == '') {
+      alert('Please enter submitter.');
+      return url;
+    }
+
+    var recipient = document.getElementById('recipient').value;
+    if(submitter == '') {
+      alert('Enter the recipient.');
+      return url;
+    }
+
+    var purpose = document.getElementById('purpose').value;
+    if(purpose == '') {
+      alert('Enter your purpose.');
+      return url;
+    }
+
+    var statusInterval = document.getElementById('statusInterval').value;
+    if(statusInterval == '') {
+      alert('Please enter the progress display interval.');
+      return url;
+    }
+
+    var lang = document.getElementById('lang').value;
+    if(lang == '') {
+      alert('Choose your language.');
+      return url;
+    }
+
+    var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
+    	hostName + '/wsapi/dataExport?auth=' + encodeURIComponent(encodedData);
+
+    url += 
+      '&timeBegin=' + encodeURIComponent(timeBegin) +
+      '&timeEnd=' + encodeURIComponent(timeEnd) +
+      '&ch=' + encodeURIComponent(ch) +
+      '&subtitle=' + encodeURIComponent(subtitleFormat) +
+      '&fileSizeUnit=' + encodeURIComponent(fileSizeUnit) +
+      '&statusInterval=' + encodeURIComponent(statusInterval) +
+      '&submitter=' + encodeURIComponent(submitter) +
+      '&recipient=' + encodeURIComponent(recipient) +
+      '&purpose=' + encodeURIComponent(purpose) +
+      '&lang=' + encodeURIComponent(lang);
+
+    return url;
+  }
+
+  function addItem(tagClass, msg) {    
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(msg));
+    li.classList.add(tagClass); 
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function addDownloadItem(fname) {
+    var li = document.createElement('li');
+    var span = document.createElement('span');
+    span.innerHTML = '<progress value="0" max="100"></progress> <label>Downloading... ' + fname + '<label>';
+    span.setAttribute('id', window.myApp.task + '/' + fname);
+    li.appendChild(span);
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function addSaveAsLink(fname, blob) {
+    var a = document.createElement('a');
+    a.appendChild(document.createTextNode(fname));
+    a.href = window.URL.createObjectURL(blob);
+    a.download = fname;
+    var span = document.getElementById(window.myApp.task + '/' + fname);
+    if(span) {
+      span.replaceChild(a, span.lastChild);
+    }
+  }
+
+  function showCancelButton(bShow) {
+    var el = document.getElementById('param');
+    el.style.display = bShow ? 'none' : 'block';
+
+    el = document.getElementById('cancel');
+    el.style.visibility = bShow ? 'visible' : 'hidden';
+  }
+
+  function onConnect() {
+    var url = getURL();
+    if(url.length == 0)
+      return;
+
+    document.getElementById('url').innerText = url;
+
+    // WebSocket instance and it's handler functions
+    var ws = new WebSocket(url);
+    ws.onopen = function() {
+      addItem('open', 'Connected');
+    };
+    ws.onclose = function(e) {
+      addItem('close', 'Disconnected: ' + e.code);
+			onDisconnect();
+    };
+    ws.onerror = function(e) {
+      addItem('error', 'Error: ' + e.code);
+    };
+    ws.onmessage = function(e) {
+      addItem('data', e.data);
+      
+      var msg = JSON.parse(e.data);
+      switch(msg.stage) {
+      case 'ready':
+        if(msg.status.code != 0)
+          break;
+        window.myApp.task = msg.task.id;
+
+        showCancelButton(true);
+        break;
+
+      case 'fileBegin':
+        window.myApp.fname = msg.channel.file.name;
+        break;
+
+      case 'fileEnd':
+        downloadFiles(msg.channel.file, function(bSuccess) {
+          window.myApp.ws.send(JSON.stringify({
+            task: window.myApp.task,
+            cmd: bSuccess ? "next" : "cancel"
+          }));
+        });
+        break;
+
+      case 'end':
+        showCancelButton(false);
+        break;
+      }
+    };
+    window.myApp.ws = ws;
+  }
+
+  function onDisconnect() {
+		if(window.myApp.ws !== null) {
+	    window.myApp.ws.close();
+			window.myApp.ws = null;
+		}
+  }
+
+  function onClearAll() {
+    var el = document.getElementById("messages");
+    while (el.firstChild)
+      el.removeChild(el.firstChild);
+    document.getElementById('url').innerText = '';
+  }
+
+  function downloadFiles(file, onFinished) {
+    // send "wait" repeatedly until downloading finished.
+    window.myApp.waitTimer = setInterval(function() {
+      window.myApp.ws.send(JSON.stringify({
+        task: window.myApp.task,
+        cmd: "wait"
+      }));
+    }, file.ttl);          
+
+    var downloadCnt = 0, successCnt = 0;
+    for(var i=0, cnt=file.download.length; i<cnt; i++) {
+      downloadFile(file.download[i], function(bSuccess) {
+        if(bSuccess)
+          successCnt++;
+
+        if(++downloadCnt == cnt) {
+          if(window.myApp.waitTimer) {
+            clearInterval(window.myApp.waitTimer);
+            window.myApp.waitTimer = null;
+          }
+          onFinished(successCnt == downloadCnt);
+        }
+      });
+    }
+  }
+
+  function downloadFile(urlToSend, onFinish) {
+    var pos = urlToSend.lastIndexOf('/');
+    var fname = decodeURIComponent(urlToSend.substr(pos+1));
+
+    addDownloadItem(fname);
+
+    var req = new XMLHttpRequest();
+    window.myApp.downloadJobs.push(req);
+
+    req.open("GET", urlToSend, true);
+    req.responseType = "blob";
+    req.onprogress = function(e) {
+      var prog = document.getElementById(window.myApp.task + '/' + fname).firstChild;
+      if(prog)
+        prog.value = Math.ceil(e.loaded * 100 / e.total);
+    },
+    req.onerror = function(e) {
+      if(onFinish)
+        onFinish(false);
+
+      var pos = window.myApp.downloadJobs.indexOf(req);
+      if(pos >= 0)
+        window.myApp.downloadJobs.splice(pos, 1);
+    },
+    req.onload = function (event) {
+      addSaveAsLink(fname, req.response);
+
+      if(onFinish)
+        onFinish(true);
+
+      var pos = window.myApp.downloadJobs.indexOf(req);
+      if(pos >= 0)
+        window.myApp.downloadJobs.splice(pos, 1);
+    };
+    req.send();
+
+  }
+
+  function onCancel() {
+    // stop sending "wait"
+    if(window.myApp.waitTimer) {
+      clearInterval(window.myApp.waitTimer);
+      window.myApp.waitTimer = null;
+    }
+
+    // abort all downloading jobs
+    window.myApp.downloadJobs.forEach(function(jobs) {
+      jobs.abort();
+    });
+    window.myApp.downloadJobs = null;
+
+    window.myApp.ws.send(JSON.stringify({
+      task: window.myApp.task,
+      cmd: "cancel"
+    }));
+  }
+
+  function onSelectAllChannels(el) {
+    var ch = document.getElementsByClassName('chid');
+    for(var i=0, cnt=ch.length; i<cnt; i++)
+      ch[i].checked = el.checked;
+  }
+</script>
+````
+[Run](./examples/ex5.html)
 
 
 ## Pushing events to the server `@0.3.0`

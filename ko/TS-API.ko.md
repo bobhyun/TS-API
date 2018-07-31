@@ -61,6 +61,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
   - [비상 호출 이벤트](#비상-호출-이벤트)
   - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
+- [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
 - [서버에 이벤트 밀어넣기 `@0.3.0`](#서버에-이벤트-밀어넣기-030)
 - [부록](#부록)
   - [제품별 API 지원 버전](#제품별-api-지원-버전)
@@ -2144,6 +2145,679 @@ ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,
 </script>
 ```
 [실행하기](./examples/ex4.html)
+
+
+## 녹화 영상 받아내기 `@0.3.0`
+웹 소켓을 사용하여 서버로 부터 녹화된 동영상을 받아낼 수 있습니다.
+서버 측에서는 파일은 하나씩 생성하고 클라이언트에서 다운로드를 완료하면 해당 파일을 삭제한 후
+다음 파일을 생성하는 방식으로 동작합니다.
+모든 진행 과정은 서버와 클라이언트가 접속 상태가 유지되는 동안 동작하며,
+접속이 끊어지면 서버 측에서는 즉시 작업을 중단하고 생성된 파일을 삭제합니다.
+
+단계별 통신 절차는 다음과 같습니다.
+>1. 클라이언트가 웹 소켓으로 서버에 접속
+>2. `서버 -> 클라이언트 [stage:ready]` 서버에 인증에 성공하면 task id와 받아낼 데이터에 대한 요약 내용을 전송
+>4. `서버 -> 클라이언트 [stage:begin]` 서버에서 요청받은 작업을 시작
+>5. `서버 -> 클라이언트 [stage:channelBegin]` 하나의 채널에 대한 작업 시작
+>6. `서버 -> 클라이언트 [stage:fileBegin]` 하나의 파일을 생성 시작
+>7. `서버 -> 클라이언트 [stage:fileWriting]` 하나의 파일에 데이터를 저장 중
+>8. `서버 -> 클라이언트 [stage:fileEnd]` 하나의 파일을 생성 완료 (다운로드 링크 제공)
+>9. `클라이언트 -> 서버 [cmd:wait]` 클라이언트가 다운로드 받는 동안 서버 작업을 대기 시킴
+>10. `클라이언트 -> 서버 [cmd:next]` 클라이언트가 다운로드를 완료하고 서버에게 다음 파일을 생성하도록 지시함
+>11. `서버 -> 클라이언트 [stage:channelEnd]` 하나의 채널에 대한 작업 완료
+>12. `서버 -> 클라이언트 [stage:end]` 
+>13. 파일이 여러 개일 경우, 6번에서 10번 과정을 반복
+>13. 채널이 여러 개일 경우, 5번에서 11번 과정을 반복
+>14. `클라이언트 -> 서버 [cmd:cancel]` 2번 과정 이후 어느 때든 클라이언트는 작업을 취소할 수 있음
+
+
+웹 소켓 접속 경로와 매개변수들은 다음과 같습니다.
+```ruby
+/wsapi/dataExport
+
+# 필수 매개 변수들
+auth            # 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)
+timeBegin       # 받아낼 데이터 구간의 시작 시각 (ISO8601 형식)
+timeEnd         # 받아낼 데이터 구간의 끝 시각 (ISO8601 형식)
+
+# 매개 변수들 (선택 사항)
+ch              # 특정 채널을 지정할 경우 (여러 채널을 동시에 지정할 경우 쉼표 문자(,)로 구분)
+                # 채널을 명시하지 않으면 모든 채널을 의미
+subtitleFormat  # 영상의 시각 표시를 자막으로 할 경우 사용할 자막 파일 형식 지정
+                # VTT, SRT, SMI 형식을 지원하며, 지정하지 않거나 None으로 설정하면 자막 파일이 생성되지 않음
+fileSizeLimit   # 동영상 파일의 최대 크기를 지정 (GB, MB, KB, B 등의 단위를 붙여 표기할 수 있음, 예: 1GB, 700MB)
+statusInterval  # 서버에서 내보낼 동영상 파일이 생성되는 진행률(stage:fileWriting)을 전송 받는 주기를 설정
+                # (s, ms 등의 단위를 붙여서 표시할 수 있음, 예: 1s, 500ms)
+                # statusInterval을 명시하지 않으면 진행률을 전송하지 않음 
+lang            # 백업 진행 상태 표시와 자막 파일에 사용될 언어를 지정
+
+# 서버측 로그를 위해 사용되는 매개변수들 (여러 줄의 텍스트를 사용할 수 있음)
+submitter       # 동영상 제출자를 명시
+recipient       # 동영상 수령인을 명시
+purpose         # 제출할 동영상의 용도를 명시
+
+# 사용 예
+# 2018년 7월 27일 오전 9시 정각부터 9시 30분까지 녹화된 모든 동영상을 받아내기
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
+
+# 1번 채널에 녹화된 동영상을 받아내기
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
+
+# 1,2,3번 채널에 녹화된 동영상을 받아내기
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
+
+# 파일을 500MB 단위로 저장
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB
+
+# VTT 자막 파일 생성
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT
+
+# 1초 주기로 진행률 표시
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s
+
+# 언어를 스페인어로 지정
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
+
+# 동영상 제출자(흥부), 수령인(놀부), 용도(춥고\n배고파서)를 명시
+ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=%ED%9D%A5%EB%B6%80%0D%0A&recipient=%EB%86%80%EB%B6%80&purpose=%EC%B6%A5%EA%B3%A0%0D%0A%EB%B0%B0%EA%B3%A0%ED%8C%8C%EC%84%9C
+```
+
+각 단계(stage)별로 서버가 전송하는 메시지 형식은 다음과 같습니다.
+**stage:ready - 준비**
+```jsx
+{
+  "stage": "ready",
+  "status": {
+    "code": 0,
+    "message": "성공"
+  },
+  "task": {
+    "id": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # 작업 번호
+    "ch": [
+      1,
+      2,
+      3
+    ],
+    "timeRange": [
+      "2018-07-27T09:00:00.000+09:00",
+      "2018-07-27T09:30:00.000+09:00"
+    ],
+    "fileSizeLimit": 524288000,
+    "subtitleFormat": "VTT"
+  }
+}
+```
+
+상황에 따라 이 단계에서 실패하고 즉시 종료되는 경우가 발생할 수 있습니다.
+`status` 코드의 종류는 다음과 같습니다.
+```ruby
+0: 성공
+-1: 요청한 구간 내에 데이터 없음
+-2: 잘못된 매개변수
+-5: 저장 공간 부족 (서버에 여유 공간이 없을 경우)		
+```
+
+**stage:begin - 작업 시작**
+```jsx
+{
+  "stage": "begin",
+  "overallProgress": "0%", # 전체 진행률
+  "timestamp": "2018-07-27T09:00:00.000+09:00" # 현재 진행중인 위치
+}
+```
+
+**stage:channelBegin - 채널 시작**
+```jsx
+{
+  "stage": "channelBegin",
+  "overallProgress": "0%", # 전체 진행률
+  "timestamp": "2018-07-27T09:00:00.000+09:00", # 현재 진행중인 위치
+  "channel": {
+    "chid": 1,         # 채널 번호
+    "progress": "0%"   # 채널당 진행률
+  }
+}
+```
+
+**stage:fileBegin - 파일 생성 시작**
+```jsx
+{
+  "stage": "fileBegin",
+  "overallProgress": "37%",  # 전체 진행률
+  "timestamp": "2018-07-27T09:11:19.825+09:00", # 현재 진행중인 위치
+  "channel": {
+    "chid": 1,         # 채널 번호
+    "progress": "37%", # 채널당 진행률
+    "file": {
+      "fid": 1,        # 파일 번호
+      "name": "CH1.2018-07-27T09.11.19.mp4"  # 파일명
+    }
+  }
+}
+```
+
+**stage:fileWriting - 파일 생성 진행 중**
+```jsx
+{
+  "stage": "fileWriting",
+  "overallProgress": "42%",  # 전체 진행률
+  "timestamp": "2018-07-27T09:12:49.466+09:00", # 현재 진행중인 위치
+  "channel": {
+    "chid": 1,         # 채널 번호
+    "progress": "42%", # 채널당 진행률
+    "file": {
+      "fid": 1         # 파일 번호
+    }
+  }
+}
+```
+
+**stage:fileEnd - 파일 생성 완료**
+하나의 파일 생성이 완료되면 다음과 같이 다운로드 링크와 함께 ttl이 반환됩니다.
+ttl 이내에 클라이언트는 서버에로 명령을 보내어 흐름을 제어해야 하며, 그렇지 않으면 서버는 자동으로 작업을 취소합니다.
+```jsx
+{
+  "stage": "fileEnd",
+  "overallProgress": "51%",  # 전체 진행률
+  "timestamp": "2018-07-27T09:15:25.225+09:00", # 현재 진행중인 위치
+  "channel": {
+    "chid": 1,         # 채널 번호
+    "progress": "51%", # 채널당 진행률
+    "file": {
+      "fid": 1,        # 파일 번호
+      "ttl": 5000,     # 5000밀리초(5초) 이내에 클라이언트가 아무 명령을 보내지 않으면 서버는 작업을 자동 취소함
+      "download": [
+        # 생성된 동영상 파일
+        "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
+        # 생성된 자막 파일
+        "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt"
+      ]
+    }
+  }
+}
+```
+
+각 상황별로 클라이언트가 서버로 전송하는 명령 형식은 다음과 같습니다.
+**cmd:wait - 대기 명령**
+서버 측에서 생성된 동영상 파일은 다운로드가 끝나고 다음 파일을 생성하기 전에 즉시 삭제되므로
+다운로드하는 동안 wait 명령을 계속 보내서 서버가 파일을 삭제하지 않도록 해야 합니다.
+wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 있으며, 
+다운로드 시간이 오래걸리면 주기적으로 wait 명령를 보내야 합니다.
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
+  "cmd": "wait"   # 대기 명령
+}
+```
+
+**cmd:next - 작업 계속**
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
+  "cmd": "next"   # 다음 파일 작업으로 넘어감
+}
+```
+
+**cmd:cancel - 작업 취소**
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
+  "cmd": "cancel"   # 클라이언트가 작업 취소
+}
+```
+
+**stage:channelEnd - 채널 완료**
+```jsx
+{
+  "stage": "channelEnd",
+  "overallProgress": "100%", # 전체 진행률
+  "timestamp": "2018-07-27T09:30:00.000+09:00", # 현재 진행중인 위치
+  "channel": {
+    "chid": 1,         # 채널 번호
+    "progress": "100%" # 채널당 진행률
+  }
+}
+```
+
+**stage:end - 작업 완료**
+```jsx
+{
+  "stage": "end",
+  "overallProgress": "100%", # 전체 진행률
+  "timestamp": "2018-07-27T09:30:00.000+09:00", # 현재 진행중인 위치
+  "status": {
+    "code":0,
+    "message":"성공"
+  }
+}
+```
+대표적인 `status` 코드는 다음과 같습니다.
+```ruby
+0: 성공
+-1001: 저장할 공간 부족
+-1003: 사용자에 의해 작업 취소됨
+-1004: 시간 초과로 작업 종료됨
+```
+
+이 번에는 웹 소켓을 이용하여 동영상을 받아내는 예제를 만들어 봅시다.
+```html
+<!DOCTYPE>
+<head>
+  <meta charset='utf-8'>
+  <title>ex5</title>
+  <style>
+    body {font-family:Arial, Helvetica, sans-serif}
+    div {padding:3px}
+    #control {background-color:beige;font-size:0.8em}
+    #param {background-color:wheat;font-size:11px}
+    #param * {font-size:10px}
+    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
+    li.open, li.close {color:blue}
+    li.error {color:red}
+  </style>
+</head>
+<body>
+  <h2>예제5. 녹화 영상 받아내기 (Web Socket)</h2>
+  <div id='control'>
+    <div>
+      <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
+      <input type='text' id='user-id' placeholder='사용자 ID'> 
+      <input type='password' id='password' placeholder='비밀번호'>
+    </div>
+    <div id='param'>
+      <div>
+        데이터 구간 : <input type='datetime-local' id='timeBegin' step='1' value='2018-07-27T09:00:00'>
+        ~ <input type='datetime-local' id='timeEnd' step='1' value='2018-07-27T09:30:00'>
+      </div>
+      <div>
+        채널: 
+          <input type='checkbox' onclick='onSelectAllChannels(this)'>모두 선택
+          <input type='checkbox' class='chid' value='1' checked>1
+          <input type='checkbox' class='chid' value='2'>2
+          <input type='checkbox' class='chid' value='3'>3
+          <input type='checkbox' class='chid' value='4'>4    
+          <input type='checkbox' class='chid' value='5'>5
+          <input type='checkbox' class='chid' value='6'>6
+          <input type='checkbox' class='chid' value='7'>7
+          <input type='checkbox' class='chid' value='8'>8
+          <input type='checkbox' class='chid' value='9'>9
+          <input type='checkbox' class='chid' value='10'>10
+          <input type='checkbox' class='chid' value='11'>11
+          <input type='checkbox' class='chid' value='12'>12   
+          <input type='checkbox' class='chid' value='13'>13
+          <input type='checkbox' class='chid' value='14'>14
+          <input type='checkbox' class='chid' value='15'>15
+          <input type='checkbox' class='chid' value='16'>16
+      </div>
+      <div>
+        파일 크기: <input type='text' id='fileSizeUnit' placeholder='예) 500MB'>
+      </div>
+      <div>
+        자막 형식: <select id='subtitleFormat'>
+          <option value='VTT'>VTT 파일</option>
+          <option value='SMI'>SMI 파일</option>
+          <option value='SRT'>SRT 파일</option>
+          <option value='textStream'>비디오 파일에 내장</option>
+        </select>
+      </div>
+      <div>
+        제출자: <input type='text' id='submitter' placeholder='예) 흥부'>
+      </div>
+      <div>
+        수령인: <input type='text' id='recipient' placeholder='예) 놀부'>
+      </div>
+      <div>
+        용도: <textarea cols='40' rows='3' id='purpose' placeholder='예) 너무 배고파서...'></textarea>
+      </div>
+      <div>
+        진행 표시 주기: <input type='text' id='statusInterval' placeholder='예) 2s' value='2s'>
+      </div>
+      <div>
+        언어: <select id='lang'>
+          <option value='ko-KR'>한국어</option>
+          <option value='en-US'>영어</option>
+          <option value='es-ES'>스페인어</option>
+          <option value='zh-CN'>중국어 (간체)</option>
+          <option value='zh-TW'>중국어 (번체)</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <button type='button' onClick='onConnect()'>접속</button>
+      <button type='button' onClick='onDisconnect()'>접속 종료</button>
+      <button type='button' onClick='onClearAll()'>모두 삭제</button>
+      <button type='button' onClick='onCancel()' id='cancel' style='visibility:hidden;color:red'>작업 취소</button>
+    </div>
+    <div id='url'>
+    </div>
+  </div>
+  <div>
+
+    <ul id='messages'></ul>
+  </div>
+</body>
+<script type='text/javascript'>
+  (function() {
+    window.myApp = { 
+      ws: null,
+      task: '',
+      fname: '',
+      waitTimer: null,
+      downloadJobs: []
+    };
+  })();
+
+  function getURL() {
+    var url = '';
+
+    if (typeof(WebSocket) === 'undefined') {
+      alert('웹 소켓을 지원하지 않는 웹 브라우저입니다.');
+      return url;
+    }
+
+		if(window.myApp.ws !== null) {
+			alert('이미 접속 중입니다.');
+			return url;
+		}
+		
+    var hostName = document.getElementById('host-name').value;
+    if(hostName == '') {
+      alert('호스트를 입력하십시오.');
+      return url;
+    }
+    var userId = document.getElementById('user-id').value;
+    if(userId == '') {
+      alert('사용자 아이디를 입력하십시오.');
+      return url;
+    }
+    var password = document.getElementById('password').value;
+    if(password == '') {
+      alert('비밀번호를 입력하십시오.');
+      return url;
+    }
+
+
+    // 매개 변수들
+    var timeBegin = document.getElementById('timeBegin').value;
+    if(timeBegin == '') {
+      alert('데이터 구간을 입력하십시오.');
+      return url;
+    }
+
+    var timeEnd = document.getElementById('timeEnd').value;
+    if(timeEnd == '') {
+      alert('데이터 구간을 입력하십시오.');
+      return url;
+    }
+
+    var ch = '';
+    var chk = document.getElementsByClassName('chid');
+    for (var i = 0; i < chk.length; i++) {
+      if (chk[i].checked === true) {
+        if(ch.length > 0)
+          ch += ',';
+        ch += chk[i].value;
+      }
+    }
+    if(ch.length == 0) {
+      alert('채널을 선택하십시오.');
+      return url;
+    }
+ 
+    var fileSizeUnit = document.getElementById('fileSizeUnit').value;
+    if(fileSizeUnit == '') {
+      alert('동영상 파일의 최대 크기를 입력하십시오.');
+      return url;
+    }
+
+    var subtitleFormat = document.getElementById('subtitleFormat').value;
+    if(subtitleFormat == '') {
+      alert('자막 형식을 선택하십시오.');
+      return url;
+    }
+
+    var submitter = document.getElementById('submitter').value;
+    if(submitter == '') {
+      alert('제출자를 입력하십시오.');
+      return url;
+    }
+
+    var recipient = document.getElementById('recipient').value;
+    if(submitter == '') {
+      alert('수령인을 입력하십시오.');
+      return url;
+    }
+
+    var purpose = document.getElementById('purpose').value;
+    if(purpose == '') {
+      alert('용도를 입력하십시오.');
+      return url;
+    }
+
+    var statusInterval = document.getElementById('statusInterval').value;
+    if(statusInterval == '') {
+      alert('진행 표시 주기를 입력하십시오.');
+      return url;
+    }
+
+    var lang = document.getElementById('lang').value;
+    if(lang == '') {
+      alert('언어를 선택하십시오.');
+      return url;
+    }
+
+    var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
+    url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
+    	hostName + '/wsapi/dataExport?auth=' + encodeURIComponent(encodedData);
+
+    url += 
+      '&timeBegin=' + encodeURIComponent(timeBegin) +
+      '&timeEnd=' + encodeURIComponent(timeEnd) +
+      '&ch=' + encodeURIComponent(ch) +
+      '&subtitle=' + encodeURIComponent(subtitleFormat) +
+      '&fileSizeUnit=' + encodeURIComponent(fileSizeUnit) +
+      '&statusInterval=' + encodeURIComponent(statusInterval) +
+      '&submitter=' + encodeURIComponent(submitter) +
+      '&recipient=' + encodeURIComponent(recipient) +
+      '&purpose=' + encodeURIComponent(purpose) +
+      '&lang=' + encodeURIComponent(lang);
+
+    return url;
+  }
+
+  function addItem(tagClass, msg) {    
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(msg));
+    li.classList.add(tagClass); 
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function addDownloadItem(fname) {
+    var li = document.createElement('li');
+    var span = document.createElement('span');
+    span.innerHTML = '<progress value="0" max="100"></progress> <label>Downloading... ' + fname + '<label>';
+    span.setAttribute('id', window.myApp.task + '/' + fname);
+    li.appendChild(span);
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function addSaveAsLink(fname, blob) {
+    var a = document.createElement('a');
+    a.appendChild(document.createTextNode(fname));
+    a.href = window.URL.createObjectURL(blob);
+    a.download = fname;
+    var span = document.getElementById(window.myApp.task + '/' + fname);
+    if(span) {
+      span.replaceChild(a, span.lastChild);
+    }
+  }
+
+  function showCancelButton(bShow) {
+    var el = document.getElementById('param');
+    el.style.display = bShow ? 'none' : 'block';
+
+    el = document.getElementById('cancel');
+    el.style.visibility = bShow ? 'visible' : 'hidden';
+  }
+
+  function onConnect() {
+    var url = getURL();
+    if(url.length == 0)
+      return;
+
+    document.getElementById('url').innerText = url;
+
+    // 웹 소켓 인스턴스와 핸들러 함수들
+    var ws = new WebSocket(url);
+    ws.onopen = function() {
+      addItem('open', '접속 성공');
+    };
+    ws.onclose = function(e) {
+      addItem('close', '접속 종료: ' + e.code);
+			onDisconnect();
+    };
+    ws.onerror = function(e) {
+      addItem('error', '오류: ' + e.code);
+    };
+    ws.onmessage = function(e) {
+      addItem('data', e.data);
+      
+      var msg = JSON.parse(e.data);
+      switch(msg.stage) {
+      case 'ready':
+        if(msg.status.code != 0)
+          break;
+        window.myApp.task = msg.task.id;
+
+        showCancelButton(true);
+        break;
+
+      case 'fileBegin':
+        window.myApp.fname = msg.channel.file.name;
+        break;
+
+      case 'fileEnd':
+        downloadFiles(msg.channel.file, function(bSuccess) {
+          window.myApp.ws.send(JSON.stringify({
+            task: window.myApp.task,
+            cmd: bSuccess ? "next" : "cancel"
+          }));
+        });
+        break;
+
+      case 'end':
+        showCancelButton(false);
+        break;
+      }
+    };
+    window.myApp.ws = ws;
+  }
+
+  function onDisconnect() {
+		if(window.myApp.ws !== null) {
+	    window.myApp.ws.close();
+			window.myApp.ws = null;
+		}
+  }
+
+  function onClearAll() {
+    var el = document.getElementById("messages");
+    while (el.firstChild)
+      el.removeChild(el.firstChild);
+    document.getElementById('url').innerText = '';
+  }
+
+  function downloadFiles(file, onFinished) {
+    // 다운로드가 완료될 때까지 "wait" 명령을 반복해서 전송
+    window.myApp.waitTimer = setInterval(function() {
+      window.myApp.ws.send(JSON.stringify({
+        task: window.myApp.task,
+        cmd: "wait"
+      }));
+    }, file.ttl);          
+
+    var downloadCnt = 0, successCnt = 0;
+    for(var i=0, cnt=file.download.length; i<cnt; i++) {
+      downloadFile(file.download[i], function(bSuccess) {
+        if(bSuccess)
+          successCnt++;
+
+        if(++downloadCnt == cnt) {
+          if(window.myApp.waitTimer) {
+            clearInterval(window.myApp.waitTimer);
+            window.myApp.waitTimer = null;
+          }
+          onFinished(successCnt == downloadCnt);
+        }
+      });
+    }
+  }
+
+  function downloadFile(urlToSend, onFinish) {
+    var pos = urlToSend.lastIndexOf('/');
+    var fname = decodeURIComponent(urlToSend.substr(pos+1));
+
+    addDownloadItem(fname);
+
+    var req = new XMLHttpRequest();
+    window.myApp.downloadJobs.push(req);
+
+    req.open("GET", urlToSend, true);
+    req.responseType = "blob";
+    req.onprogress = function(e) {
+      var prog = document.getElementById(window.myApp.task + '/' + fname).firstChild;
+      if(prog)
+        prog.value = Math.ceil(e.loaded * 100 / e.total);
+    },
+    req.onerror = function(e) {
+      if(onFinish)
+        onFinish(false);
+
+      var pos = window.myApp.downloadJobs.indexOf(req);
+      if(pos >= 0)
+        window.myApp.downloadJobs.splice(pos, 1);
+    },
+    req.onload = function (event) {
+      addSaveAsLink(fname, req.response);
+
+      if(onFinish)
+        onFinish(true);
+
+      var pos = window.myApp.downloadJobs.indexOf(req);
+      if(pos >= 0)
+        window.myApp.downloadJobs.splice(pos, 1);
+    };
+    req.send();
+
+  }
+
+  function onCancel() {
+    // "wait" 명령 전송 중지
+    if(window.myApp.waitTimer) {
+      clearInterval(window.myApp.waitTimer);
+      window.myApp.waitTimer = null;
+    }
+
+    // 다운로드 작업을 모두 중단
+    window.myApp.downloadJobs.forEach(function(jobs) {
+      jobs.abort();
+    });
+    window.myApp.downloadJobs = null;
+
+    window.myApp.ws.send(JSON.stringify({
+      task: window.myApp.task,
+      cmd: "cancel"
+    }));
+  }
+
+  function onSelectAllChannels(el) {
+    var ch = document.getElementsByClassName('chid');
+    for(var i=0, cnt=ch.length; i<cnt; i++)
+      ch[i].checked = el.checked;
+  }
+</script>
+````
+[실행하기](./examples/ex5.html)
 
 
 ## 서버에 이벤트 밀어넣기 `@0.3.0`
