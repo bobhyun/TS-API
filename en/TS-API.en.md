@@ -85,9 +85,9 @@ In this article, TS-API is abbreviated as **API**, and each product is simply ca
 ### Real-time video display
 Try to type the following in the Web browser address window.
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
+http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=)
+[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 
 Do you see the video?
@@ -106,7 +106,7 @@ Now let's insert the video into the web page.
 
 <body>
 <h2>Example 1. Insert video</h2>
-<iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=' 
+<iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D' 
   width='640' height='360' frameborder='0' allowfullscreen />
 </body>
 ```
@@ -121,7 +121,7 @@ Select the menu item you are to use, the code will be copied to the clipboard an
 | Copy embed code | Paste in the `<iframe>` tag of your HTML code |
 
 > [Tips]
-For security reasons, the `auth=ZGVtbzohMTIzNHF3ZXI=` part is excluded from this copied code. This code is required for authentication and is described in [Session Authentication](#session-authentication).
+For security reasons, the `auth=ZGVtbzohMTIzNHF3ZXI%3D` part is excluded from this copied code. This code is required for authentication and is described in [Session Authentication](#session-authentication).
 In this example, we used only minimal code to display the video, so there are more parts that were not included in the copied code.
 
 ### Connecting to a real server
@@ -144,13 +144,13 @@ For example, assuming that you use the following connection information;
 
 In the above example, you can change the address part as follows:
 ```html
-<iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI='
+<iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D'
   width='640' height='360' frameborder='0' allowfullscreen></iframe>
 ```
-Here `ZGVtbzohMTIzNHF3ZXI=` following `auth=` is the [base64 encoded](#base64-encoding) part of user ID and password.
+Here `ZGVtbzohMTIzNHF3ZXI%3D` following `auth=` is the [base64 encoded](#base64-encoding) part of user ID and password.
 
 The format is to use a colon (`:`) delimiter, such as `userid: password`, to create a username and password as a single text and then [base64 encoded](#base64-encoding).
-In the above example, `demo:!1234qwer` is [base64 encoded](#base64-encoding) and becomes `ZGVtbzohMTIzNHF3ZXI=`.
+In the above example, `demo:!1234qwer` is [base64 encoded](#base64-encoding) and becomes `ZGVtbzohMTIzNHF3ZXI%3D`.
 
 
 In this example, we will improve the way we access the login information using JavaScript [base64 encoding](#base64-encoding) function.
@@ -214,17 +214,17 @@ If you change the `ch=` part of the video source to the desired channel number a
 Channel numbers are integers starting at 1.
 For example, if you want to see channel 3, you can modify it like this:
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=
+http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-Run: [Channel1](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=) [Channel2](http://tssolution.ipdisk.co.kr:85/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI=) [Channel3](http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=)
+Run: [Channel1](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel2](http://tssolution.ipdisk.co.kr:85/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel3](http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 ### Display recorded video
 To display the recorded video, you need the date and time information (time stamp) of the desired video.
 For example, to display a video recorded on `Channel 1` at 2:30:15 pm on February 1, 2018, you would need to add `when=2018-02-01T14%3a30%3a15%2b09%3a00`.
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=
+http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=&lang=en-US)
+[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
 
 > [Tips]
 The recorded video of the old date may already be overwritten depending on the capacity of the storage device.
@@ -236,7 +236,7 @@ You can use `when=now` to request real-time video, but if omitted, it means real
 when=yesterday    // Local time on server yesterday 00:00:00
 when=today        // Local time on server today 00:00:00
 ```
-Run: [Yesterday](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI=&lang=en-US) [Today](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI=&lang=en-US)
+Run: [Yesterday](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US) [Today](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
 
 You can use the parameters to set the language of the subtitles displayed on the video.
 For a [list of supported languages](#list-of-languages-supported), refer to the appendix.
@@ -276,13 +276,13 @@ http://userid:password@host/path/to/
 For this reason, we provide the following additional login methods:
 Using `login=` parameter after encrypting the user ID and password in the same way as in [User Authentication](#user-authentication).
 ```ruby
-/api/auth?login=ZGVtbzohMTIzNHF3ZXI=    # http://host omitted
+/api/auth?login=ZGVtbzohMTIzNHF3ZXI%3D    # http://host omitted
 ```
 If the login is successful, the server returns an HTTP response code of 200.
 
 You can use `auth=` to sign in the same way as shown below.
 ```ruby
-/api/auth?auth=ZGVtbzohMTIzNHF3ZXI=
+/api/auth?auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 The `auth =` parameter is used in various APIs to be introduced later and can be used when making a request with user authentication information to the server without going through a separate login process.
 
@@ -1231,7 +1231,7 @@ In here, you can display video using  `http://192.168.0.100/watch?ch=1&when=2018
 http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00
 
 # If the session is not authenticated, add the auth parameter
-http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&auth=ZGVtbzohMTIzNHF3ZXI=
+http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
 
@@ -1475,14 +1475,14 @@ When this request is made, the server returns JSON data in the following format 
 For video request using video source without using `/watch` provided by API, authentication is supported by each protocol as follows.
 ```ruby 
 # RTMP (auth= parameter supported)
-rtmp://host/path/to&auth=YWRtaW46YWRtaW4=
+rtmp://host/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # HTTP (Only basic authentication is supported for file-based resources such as m3u8, JPG, and MP4)
 http://userid:password@host/path/to
 
 # HTTP (The resources of sub path /api/ are supported in both ways)
 http://userid:passwordn@host/api/path/to
-http://host/api/path/to&auth=YWRtaW46YWRtaW4=
+http://host/api/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
 ## Real-time event monitoring `@0.3.0`
@@ -1528,25 +1528,25 @@ lang    # Specify language for status messages
 
 # Examples
 # Request car number recognition event
-http://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request emergency call event
-http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request both events
-http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request List the live video stream sources of the linked video channels
-http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # Request status change events for all channels
-http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests status change events for all channels including messages
-http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&verbose=true
+http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # Requests status change events of channels 1 and 2 including Spanish messages
-http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,2&verbose=true&lang=es-ES
+http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
 ```
 
 The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
@@ -1696,7 +1696,7 @@ Emergency call event messages are received in JSON format as shown below.
 Emergency call events are events for real-time communication, so all channels are linked to real-time video.
 If you request the video stream source of the channels as shown below, the video stream sources are additionally included.
 ```ruby
-http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 ```
 ```jsx
 {
@@ -1976,25 +1976,25 @@ lang    # Specify language for status messages
 
 # Example
 # Request car number recognition event
-ws://host/wsapi/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+ws://host/wsapi/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request emergency call event
-ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request both events
-ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # request List the live video stream sources of the linked video channels
-ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # Request status change events for all channels
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests status change events for all channels including messages
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&verbose=true
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # Requests status change events of channels 1 and 2 including Spanish messages
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,2&verbose=true&lang=es-ES
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
 ```
 
 The event data format received after a Web socket connection is exactly the same as Server-Sent Events (SSE) and is not described here again.
@@ -2203,28 +2203,28 @@ purpose         # Specify the purpose of the video to submit
 
 # Examples
 # July 27, 2018 to receive all recorded videos from 9:00 am to 9:30 am
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
 
 # Exporting video recorded on channel 1
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
 
 # Exporting video recorded on channel 1,2 and 3
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
 
 # Save the file as 500MB
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB
 
 # Create VTT subtitle file
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT
 
 # Receiving progress in 1 second interval
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s
 
 # Specify language to Spanish
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
 
 # Specify Video submitter(Begger), recipient(Prince), purpose(cold\nand hungry)
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=Begger&recipient=Prince&purpose=cold%0D%0Aand%20hungry
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=Begger&recipient=Prince&purpose=cold%0D%0Aand%20hungry
 ```
 
 The message format sent by the server for each stage is as follows.
@@ -2343,6 +2343,11 @@ Within ttl, The client must send a command to the server to control the flow, ot
 }
 ```
 
+Download links can be used with the `auth` parameter.
+```ruby
+http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4&auth=YWRtaW46YWRtaW4
+```
+
 The format of the command that the client sends to the server for each situation is as follows:
 **cmd:wait - wait command**
 Video files created on the server side will be deleted immediately after downloading finished and before creating the next file, 
@@ -2423,7 +2428,7 @@ Now let's create an example that uses a web socket to export the recorded video.
   </style>
 </head>
 <body>
-  <h2>Ex5. Exporting recorded video (Web Socket)</h2>
+    <h2>Ex5. Exporting recorded video (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='Server IP address:port'>
@@ -2456,14 +2461,14 @@ Now let's create an example that uses a web socket to export the recorded video.
           <input type='checkbox' class='chid' value='16'>16
       </div>
       <div>
-        File size unit: <input type='text' id='fileSizeUnit' placeholder='ex) 500MB'>
+        File size unit: <input type='text' id='fileSizeLimit' placeholder='ex) 500MB'>
       </div>
       <div>
         Subtitle format: <select id='subtitleFormat'>
           <option value='VTT'>VTT file</option>
           <option value='SMI'>SMI file</option>
           <option value='SRT'>SRT file</option>
-          <option value='textStream'>Built-in text stream</option>
+          <option value='None'>None</option>
         </select>
       </div>
       <div>
@@ -2508,6 +2513,7 @@ Now let's create an example that uses a web socket to export the recorded video.
       ws: null,
       task: '',
       fname: '',
+      auth: '',
       waitTimer: null,
       downloadJobs: []
     };
@@ -2570,8 +2576,8 @@ Now let's create an example that uses a web socket to export the recorded video.
       return url;
     }
  
-    var fileSizeUnit = document.getElementById('fileSizeUnit').value;
-    if(fileSizeUnit == '') {
+    var fileSizeLimit = document.getElementById('fileSizeLimit').value;
+    if(fileSizeLimit == '') {
       alert('Please enter the maximum video file size.');
       return url;
     }
@@ -2613,15 +2619,16 @@ Now let's create an example that uses a web socket to export the recorded video.
     }
 
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/dataExport?auth=' + encodeURIComponent(encodedData);
+    	hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
 
     url += 
       '&timeBegin=' + encodeURIComponent(timeBegin) +
       '&timeEnd=' + encodeURIComponent(timeEnd) +
       '&ch=' + encodeURIComponent(ch) +
-      '&subtitle=' + encodeURIComponent(subtitleFormat) +
-      '&fileSizeUnit=' + encodeURIComponent(fileSizeUnit) +
+      '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
+      '&fileSizeLimit=' + encodeURIComponent(fileSizeLimit) +
       '&statusInterval=' + encodeURIComponent(statusInterval) +
       '&submitter=' + encodeURIComponent(submitter) +
       '&recipient=' + encodeURIComponent(recipient) +
@@ -2724,6 +2731,7 @@ Now let's create an example that uses a web socket to export the recorded video.
 	    window.myApp.ws.close();
 			window.myApp.ws = null;
 		}
+    document.getElementById('param').style.display = 'block';
   }
 
   function onClearAll() {
@@ -2731,6 +2739,7 @@ Now let's create an example that uses a web socket to export the recorded video.
     while (el.firstChild)
       el.removeChild(el.firstChild);
     document.getElementById('url').innerText = '';
+    document.getElementById('param').style.display = 'block';
   }
 
   function downloadFiles(file, onFinished) {
@@ -2768,7 +2777,8 @@ Now let's create an example that uses a web socket to export the recorded video.
     var req = new XMLHttpRequest();
     window.myApp.downloadJobs.push(req);
 
-    req.open("GET", urlToSend, true);
+    // Requesting download link with auth parameter
+    req.open('GET', urlToSend + '?auth=' + window.myApp.auth, true);
     req.responseType = "blob";
     req.onprogress = function(e) {
       var prog = document.getElementById(window.myApp.task + '/' + fname).firstChild;

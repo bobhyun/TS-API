@@ -84,9 +84,9 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 ### 실시간 영상 표시
 웹 브라우저 주소 창에 다음과 같이 입력해 보십시오.
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
+http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[실행하기](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=)
+[실행하기](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 
 동영상이 표시되나요?
@@ -105,7 +105,7 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 
 <body>
 <h2>예제1. 동영상 삽입하기</h2>
-<iframe src="http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=" 
+<iframe src="http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D" 
   width="640" height="360" frameborder="0" allowfullscreen />
 </body>
 ```
@@ -119,7 +119,7 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 | 동영상 태그 코드 복사 | HTML 코드의 `<iframe>`부분에 붙여넣기 |
 
 > [참고]
-보안 상의 이유로 이렇게 복사한 코드에는 `auth=ZGVtbzohMTIzNHF3ZXI=` 부분이 제외됩니다. 이 부분은 로그인에 필요한 코드이며 [세션 인증](#세션-인증)에서 자세히 설명합니다.
+보안 상의 이유로 이렇게 복사한 코드에는 `auth=ZGVtbzohMTIzNHF3ZXI%3D` 부분이 제외됩니다. 이 부분은 로그인에 필요한 코드이며 [세션 인증](#세션-인증)에서 자세히 설명합니다.
 이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.
 
 ### 실제 서버에 접속하기
@@ -142,12 +142,12 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 
 위의 예제에서 주소 부분을 다음과 같이 변경하면 됩니다.
 ```html
-<iframe src="http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI="
+<iframe src="http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D"
   width="640" height="360" frameborder="0" allowfullscreen></iframe>
 ```
-여기서 `auth=` 다음에 있는 `ZGVtbzohMTIzNHF3ZXI=` 부분은 사용자 아이디와 비밀번호를 [base64 인코딩](#base64-인코딩)한 부분입니다.
+여기서 `auth=` 다음에 있는 `ZGVtbzohMTIzNHF3ZXI%3D` 부분은 사용자 아이디와 비밀번호를 [base64 인코딩](#base64-인코딩)한 부분입니다.
 형식은 `userid:password`와 같이 콜론(`:`) 구분자를 사용하여 사용자 아이디와 비밀번호를 하나의 텍스트로 만든 다음 [base64 인코딩](#base64-인코딩)합니다.
-위의 예에서는 `demo:!1234qwer`을 [base64 인코딩](#base64-인코딩)해서 `ZGVtbzohMTIzNHF3ZXI=`가 됩니다.
+위의 예에서는 `demo:!1234qwer`을 [base64 인코딩](#base64-인코딩)해서 `ZGVtbzohMTIzNHF3ZXI%3D`가 됩니다.
 
 
 이번 예제에서는 자바스크립트로 로그인 정보를 [base64 인코딩](#base64-인코딩)해서 접속하는 방식으로 개선해 보도록 하겠습니다.
@@ -211,18 +211,18 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=
 채널 번호는 1부터 시작하는 정수입니다.
 예를 들어, 채널 3번을 보고 싶다면 다음과 같이 수정하면 됩니다.
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=
+http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-실행하기: [채널1](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI=) [채널2](http://tssolution.ipdisk.co.kr:85/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI=) [채널3](http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI=)
+실행하기: [채널1](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [채널2](http://tssolution.ipdisk.co.kr:85/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [채널3](http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 
 ### 녹화 영상 표시
 녹화된 영상을 표시하기 위해서는 원하는 동영상의 날짜, 시각 정보(타임스탬프)가 필요합니다.
 예를 들어, 위의 예제와 동일한 접속 정보로 `채널 1번`의 `2018년 2월 1일 오후 2시 30분 15초`에 녹화된 영상을 표시하기 위해서는 다음과 같이 `when=2018-02-01T14%3a30%3a15%2b09%3a00` 부분을 추가해야 합니다.
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=
+http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[실행하기](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI=)
+[실행하기](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 > [참고]
 오래된 날짜의 녹화 영상은 저장장치의 용량에 따라 이미 덮어쓰기 되어 존재하지 않을 수 있습니다.
 
@@ -234,7 +234,7 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3
 when=yesterday    // 서버의 로컬 타임으로 어제 00시 00분 00초
 when=today        // 서버의 로컬 타임으로 오늘 00시 00분 00초
 ```
-실행하기: [어제 영상](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI=) [오늘 영상](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI=)
+실행하기: [어제 영상](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI%3D) [오늘 영상](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 매개변수를 사용하여 영상 위에 표시되는 자막의 언어를 설정할 수 있습니다.
 [지원하는 언어 목록](#지원하는-언어-목록)은 부록을 참고하십시오.
@@ -274,13 +274,13 @@ http://userid:password@host/path/to/
 이런 이유로 다음과 같이 추가적인 로그인 방식을 제공합니다.
 [사용자 인증](#사용자-인증)에서 사용했던 방법으로 사용자 아이디와 비빌번호를 암호화한 다음, 다음과 같이 `login=` 매개변수에 붙여서 사용합니다.
 ```ruby
-/api/auth?login=ZGVtbzohMTIzNHF3ZXI=    # http://host 부분 생략함
+/api/auth?login=ZGVtbzohMTIzNHF3ZXI%3D    # http://host 부분 생략함
 ```
 로그인이 성공한 경우 서버는 HTTP 응답 코드 200을 반환합니다.
 
 아래와 같이 `auth=`를 사용해도 동일하게 로그인할 수 있습니다.
 ```ruby
-/api/auth?auth=ZGVtbzohMTIzNHF3ZXI=
+/api/auth?auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 `auth=` 매개변수는 앞으로 소개할 다양한 API에 사용될 수 있으며, 별도의 로그인 과정을 거치지 않고 서버에 어떤 요청을 하면서 사용자 인증 정보를 한꺼번에 전달하는 용도로 사용할 수 있습니다.
 
@@ -1466,14 +1466,14 @@ otherwise   # 검색 결과가 없을 경우,
 API로 제공되는 `/watch`를 사용하지 않고 영상 소스를 사용하여 영상을 요청하는 경우에 대해, 각 프로토콜 별로 다음과 같은 방식으로 인증을 지원합니다.
 ```ruby 
 # RTMP (auth= 매개변수가 지원됩니다.)
-rtmp://host/path/to&auth=YWRtaW46YWRtaW4=
+rtmp://host/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # HTTP (m3u8, JPG, MP4 와 같은 정적인 파일 기반 리소스들은 Basic Authentication만 지원됩니다.)
 http://userid:password@host/path/to
 
 # HTTP (/api/ 하위 경로는 두 가지 방법이 모두 지원됩니다.)
 http://userid:password@host/api/path/to
-http://host/api/path/to&auth=YWRtaW46YWRtaW4=
+http://host/api/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
 ## 실시간 이벤트 모니터링 `@0.3.0`
@@ -1521,25 +1521,25 @@ lang    # 상태 메시지 표기 언어
 
 # 사용 예
 # 차량 번호 인식 이벤트 요청
-http://host/api/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 비상 호출 이벤트 요청
-http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 두 이벤트를 모두 요청
-http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
-http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # 모든 채널의 상태 변경 이벤트 요청
-http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=
+http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 모든 채널의 상태 변경 이벤트시 메시지를 포함 요청
-http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&verbose=true
+http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
-http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,2&verbose=true&lang=es-ES
+http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
 ```
 
 서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
@@ -1689,7 +1689,7 @@ http://host/api/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,
 비상 호출 이벤트는 실시간 통화용 이벤트이므로 연동된 채널들은 모두 실시간 영상을 링크하고 있습니다. 
 아래와 같이 채널들의 동영상 스트림 소스를 자세히 요청한 경우는 동영상 스트림 항목들이 추가로 포함됩니다.
 ```ruby
-http://host/api/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 ```
 ```jsx
 {
@@ -1970,25 +1970,25 @@ lang    # 상태 메시지 표기 언어
 
 # 사용 예
 # 차량 번호 인식 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=LPR&auth=YWRtaW46YWRtaW4=
+ws://host/wsapi/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 비상 호출 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=YWRtaW46YWRtaW4=
+ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 두 이벤트를 모두 요청
-ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
-ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=YWRtaW46YWRtaW4=&verbose=true
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # 모든 채널의 상태 변경 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 모든 채널의 상태 변경 이벤트시 메시지를 포함 요청
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&verbose=true
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=YWRtaW46YWRtaW4=&ch=1,2&verbose=true&lang=es-ES
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
 ```
 
 웹 소켓으로 접속된 이후 수신되는 이벤트 데이터 형식은 Server-Sent Events (SSE)와 완전히 동일하므로 여기서는 설명을 생략합니다.
@@ -2198,28 +2198,28 @@ purpose         # 제출할 동영상의 용도를 명시
 
 # 사용 예
 # 2018년 7월 27일 오전 9시 정각부터 9시 30분까지 녹화된 모든 동영상을 받아내기
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
 
 # 1번 채널에 녹화된 동영상을 받아내기
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
 
 # 1,2,3번 채널에 녹화된 동영상을 받아내기
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
 
 # 파일을 500MB 단위로 저장
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB
 
 # VTT 자막 파일 생성
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT
 
 # 1초 주기로 진행률 표시
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s
 
 # 언어를 스페인어로 지정
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
 
 # 동영상 제출자(흥부), 수령인(놀부), 용도(춥고\n배고파서)를 명시
-ws://host/wsapi/dataExport?&auth=YWRtaW46YWRtaW4=&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=%ED%9D%A5%EB%B6%80%0D%0A&recipient=%EB%86%80%EB%B6%80&purpose=%EC%B6%A5%EA%B3%A0%0D%0A%EB%B0%B0%EA%B3%A0%ED%8C%8C%EC%84%9C
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=%ED%9D%A5%EB%B6%80%0D%0A&recipient=%EB%86%80%EB%B6%80&purpose=%EC%B6%A5%EA%B3%A0%0D%0A%EB%B0%B0%EA%B3%A0%ED%8C%8C%EC%84%9C
 ```
 
 각 단계(stage)별로 서버가 전송하는 메시지 형식은 다음과 같습니다.
@@ -2337,6 +2337,11 @@ ttl 이내에 클라이언트는 서버에로 명령을 보내어 흐름을 제�
 }
 ```
 
+다운로드 링크는 `auth` 매개변수를 붙여서 다운로드할 수있습니다.
+```ruby
+http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4&auth=YWRtaW46YWRtaW4
+```
+
 각 상황별로 클라이언트가 서버로 전송하는 명령 형식은 다음과 같습니다.
 **cmd:wait - 대기 명령**
 서버 측에서 생성된 동영상 파일은 다운로드가 끝나고 다음 파일을 생성하기 전에 즉시 삭제되므로
@@ -2450,14 +2455,14 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
           <input type='checkbox' class='chid' value='16'>16
       </div>
       <div>
-        파일 크기: <input type='text' id='fileSizeUnit' placeholder='예) 500MB'>
+        파일 크기: <input type='text' id='fileSizeLimit' placeholder='예) 500MB'>
       </div>
       <div>
         자막 형식: <select id='subtitleFormat'>
           <option value='VTT'>VTT 파일</option>
           <option value='SMI'>SMI 파일</option>
           <option value='SRT'>SRT 파일</option>
-          <option value='textStream'>비디오 파일에 내장</option>
+          <option value='None'>사용안함</option>
         </select>
       </div>
       <div>
@@ -2502,6 +2507,7 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
       ws: null,
       task: '',
       fname: '',
+      auth: '',
       waitTimer: null,
       downloadJobs: []
     };
@@ -2564,8 +2570,8 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
       return url;
     }
  
-    var fileSizeUnit = document.getElementById('fileSizeUnit').value;
-    if(fileSizeUnit == '') {
+    var fileSizeLimit = document.getElementById('fileSizeLimit').value;
+    if(fileSizeLimit == '') {
       alert('동영상 파일의 최대 크기를 입력하십시오.');
       return url;
     }
@@ -2607,15 +2613,16 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
     }
 
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
+    window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/dataExport?auth=' + encodeURIComponent(encodedData);
+    	hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
 
     url += 
       '&timeBegin=' + encodeURIComponent(timeBegin) +
       '&timeEnd=' + encodeURIComponent(timeEnd) +
       '&ch=' + encodeURIComponent(ch) +
-      '&subtitle=' + encodeURIComponent(subtitleFormat) +
-      '&fileSizeUnit=' + encodeURIComponent(fileSizeUnit) +
+      '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
+      '&fileSizeLimit=' + encodeURIComponent(fileSizeLimit) +
       '&statusInterval=' + encodeURIComponent(statusInterval) +
       '&submitter=' + encodeURIComponent(submitter) +
       '&recipient=' + encodeURIComponent(recipient) +
@@ -2718,6 +2725,7 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
 	    window.myApp.ws.close();
 			window.myApp.ws = null;
 		}
+    document.getElementById('param').style.display = 'block';
   }
 
   function onClearAll() {
@@ -2725,6 +2733,7 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
     while (el.firstChild)
       el.removeChild(el.firstChild);
     document.getElementById('url').innerText = '';
+    document.getElementById('param').style.display = 'block';
   }
 
   function downloadFiles(file, onFinished) {
@@ -2762,7 +2771,8 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
     var req = new XMLHttpRequest();
     window.myApp.downloadJobs.push(req);
 
-    req.open("GET", urlToSend, true);
+    // 다운로드 링크에 auth 매개변수를 붙여서 요청
+    req.open('GET', urlToSend + '?auth=' + window.myApp.auth, true);
     req.responseType = "blob";
     req.onprogress = function(e) {
       var prog = document.getElementById(window.myApp.task + '/' + fname).firstChild;

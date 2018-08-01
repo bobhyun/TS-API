@@ -14,7 +14,7 @@
   </style>
 </head>
 <body>
-  <h2>Ex5. Exporting recorded video (Web Socket)</h2>
+    <h2>Ex5. Exporting recorded video (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='Server IP address:port'>
@@ -47,14 +47,14 @@
           <input type='checkbox' class='chid' value='16'>16
       </div>
       <div>
-        File size unit: <input type='text' id='fileSizeUnit' placeholder='ex) 500MB'>
+        File size unit: <input type='text' id='fileSizeLimit' placeholder='ex) 500MB'>
       </div>
       <div>
         Subtitle format: <select id='subtitleFormat'>
           <option value='VTT'>VTT file</option>
           <option value='SMI'>SMI file</option>
           <option value='SRT'>SRT file</option>
-          <option value='textStream'>Built-in text stream</option>
+          <option value='None'>None</option>
         </select>
       </div>
       <div>
@@ -99,6 +99,7 @@
       ws: null,
       task: '',
       fname: '',
+      auth: '',
       waitTimer: null,
       downloadJobs: []
     };
@@ -161,8 +162,8 @@
       return url;
     }
  
-    var fileSizeUnit = document.getElementById('fileSizeUnit').value;
-    if(fileSizeUnit == '') {
+    var fileSizeLimit = document.getElementById('fileSizeLimit').value;
+    if(fileSizeLimit == '') {
       alert('Please enter the maximum video file size.');
       return url;
     }
@@ -204,15 +205,16 @@
     }
 
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/dataExport?auth=' + encodeURIComponent(encodedData);
+    	hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
 
     url += 
       '&timeBegin=' + encodeURIComponent(timeBegin) +
       '&timeEnd=' + encodeURIComponent(timeEnd) +
       '&ch=' + encodeURIComponent(ch) +
-      '&subtitle=' + encodeURIComponent(subtitleFormat) +
-      '&fileSizeUnit=' + encodeURIComponent(fileSizeUnit) +
+      '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
+      '&fileSizeLimit=' + encodeURIComponent(fileSizeLimit) +
       '&statusInterval=' + encodeURIComponent(statusInterval) +
       '&submitter=' + encodeURIComponent(submitter) +
       '&recipient=' + encodeURIComponent(recipient) +
@@ -315,6 +317,7 @@
 	    window.myApp.ws.close();
 			window.myApp.ws = null;
 		}
+    document.getElementById('param').style.display = 'block';
   }
 
   function onClearAll() {
@@ -322,6 +325,7 @@
     while (el.firstChild)
       el.removeChild(el.firstChild);
     document.getElementById('url').innerText = '';
+    document.getElementById('param').style.display = 'block';
   }
 
   function downloadFiles(file, onFinished) {
@@ -359,7 +363,8 @@
     var req = new XMLHttpRequest();
     window.myApp.downloadJobs.push(req);
 
-    req.open("GET", urlToSend, true);
+    // Requesting download link with auth parameter
+    req.open('GET', urlToSend + '?auth=' + window.myApp.auth, true);
     req.responseType = "blob";
     req.onprogress = function(e) {
       var prog = document.getElementById(window.myApp.task + '/' + fname).firstChild;

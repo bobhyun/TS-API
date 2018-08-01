@@ -47,14 +47,14 @@
           <input type='checkbox' class='chid' value='16'>16
       </div>
       <div>
-        파일 크기: <input type='text' id='fileSizeUnit' placeholder='예) 500MB'>
+        파일 크기: <input type='text' id='fileSizeLimit' placeholder='예) 500MB'>
       </div>
       <div>
         자막 형식: <select id='subtitleFormat'>
           <option value='VTT'>VTT 파일</option>
           <option value='SMI'>SMI 파일</option>
           <option value='SRT'>SRT 파일</option>
-          <option value='textStream'>비디오 파일에 내장</option>
+          <option value='None'>사용안함</option>
         </select>
       </div>
       <div>
@@ -99,6 +99,7 @@
       ws: null,
       task: '',
       fname: '',
+      auth: '',
       waitTimer: null,
       downloadJobs: []
     };
@@ -161,8 +162,8 @@
       return url;
     }
  
-    var fileSizeUnit = document.getElementById('fileSizeUnit').value;
-    if(fileSizeUnit == '') {
+    var fileSizeLimit = document.getElementById('fileSizeLimit').value;
+    if(fileSizeLimit == '') {
       alert('동영상 파일의 최대 크기를 입력하십시오.');
       return url;
     }
@@ -204,15 +205,16 @@
     }
 
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
+    window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/dataExport?auth=' + encodeURIComponent(encodedData);
+    	hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
 
     url += 
       '&timeBegin=' + encodeURIComponent(timeBegin) +
       '&timeEnd=' + encodeURIComponent(timeEnd) +
       '&ch=' + encodeURIComponent(ch) +
-      '&subtitle=' + encodeURIComponent(subtitleFormat) +
-      '&fileSizeUnit=' + encodeURIComponent(fileSizeUnit) +
+      '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
+      '&fileSizeLimit=' + encodeURIComponent(fileSizeLimit) +
       '&statusInterval=' + encodeURIComponent(statusInterval) +
       '&submitter=' + encodeURIComponent(submitter) +
       '&recipient=' + encodeURIComponent(recipient) +
@@ -315,6 +317,7 @@
 	    window.myApp.ws.close();
 			window.myApp.ws = null;
 		}
+    document.getElementById('param').style.display = 'block';
   }
 
   function onClearAll() {
@@ -322,6 +325,7 @@
     while (el.firstChild)
       el.removeChild(el.firstChild);
     document.getElementById('url').innerText = '';
+    document.getElementById('param').style.display = 'block';
   }
 
   function downloadFiles(file, onFinished) {
@@ -359,7 +363,8 @@
     var req = new XMLHttpRequest();
     window.myApp.downloadJobs.push(req);
 
-    req.open("GET", urlToSend, true);
+    // 다운로드 링크에 auth 매개변수를 붙여서 요청
+    req.open('GET', urlToSend + '?auth=' + window.myApp.auth, true);
     req.responseType = "blob";
     req.onprogress = function(e) {
       var prog = document.getElementById(window.myApp.task + '/' + fname).firstChild;
