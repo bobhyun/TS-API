@@ -2190,7 +2190,7 @@ ch              # Used when specifying specific channels (separated by a comma (
                 # If you do not specify a channel, it means all channels
 subtitleFormat  # Specify the type of subtitle file to be used for the date time display of video
                 # Supports VTT, SRT, and SMI formats. If not specified or set to None, subtitle files are not generated.
-fileSizeLimit   # Specify the maximum size of the video file (Can be expressed in units of GB, MB, KB, B, eg: 1GB, 700MB)
+mediaSize   # Specify the maximum size of the video file (Can be expressed in units of GB, MB, KB, B, eg: 1GB, 700MB)
 statusInterval  # Displays the interval of receiving the progress (stage:fileWriting) of the video file to be exported from the server
                 # (Can be expressed in units of s, ms, eg: 1s, 500ms)
                 # If statusInterval is not specified, no progress is sent
@@ -2212,19 +2212,19 @@ ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3
 ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
 
 # Save the file as 500MB
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB
 
 # Create VTT subtitle file
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT
 
 # Receiving progress in 1 second interval
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s
 
 # Specify language to Spanish
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
 
 # Specify Video submitter(Begger), recipient(Prince), purpose(cold\nand hungry)
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=Begger&recipient=Prince&purpose=cold%0D%0Aand%20hungry
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=Begger&recipient=Prince&purpose=cold%0D%0Aand%20hungry
 ```
 
 The message format sent by the server for each stage is as follows.
@@ -2247,8 +2247,9 @@ The message format sent by the server for each stage is as follows.
       "2018-07-27T09:00:00.000-05:00",
       "2018-07-27T09:30:00.000-05:00"
     ],
-    "fileSizeLimit": 524288000,
-    "subtitleFormat": "VTT"
+    "mediaSize": 524288000,
+    "subtitleFormat": "VTT",
+    "language": "en-US",
   }
 }
 ```
@@ -2461,7 +2462,7 @@ Now let's create an example that uses a web socket to export the recorded video.
           <input type='checkbox' class='chid' value='16'>16
       </div>
       <div>
-        File size unit: <input type='text' id='fileSizeLimit' placeholder='ex) 500MB'>
+        File size unit: <input type='text' id='mediaSize' placeholder='ex) 500MB'>
       </div>
       <div>
         Subtitle format: <select id='subtitleFormat'>
@@ -2576,8 +2577,8 @@ Now let's create an example that uses a web socket to export the recorded video.
       return url;
     }
  
-    var fileSizeLimit = document.getElementById('fileSizeLimit').value;
-    if(fileSizeLimit == '') {
+    var mediaSize = document.getElementById('mediaSize').value;
+    if(mediaSize == '') {
       alert('Please enter the maximum video file size.');
       return url;
     }
@@ -2628,7 +2629,7 @@ Now let's create an example that uses a web socket to export the recorded video.
       '&timeEnd=' + encodeURIComponent(timeEnd) +
       '&ch=' + encodeURIComponent(ch) +
       '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
-      '&fileSizeLimit=' + encodeURIComponent(fileSizeLimit) +
+      '&mediaSize=' + encodeURIComponent(mediaSize) +
       '&statusInterval=' + encodeURIComponent(statusInterval) +
       '&submitter=' + encodeURIComponent(submitter) +
       '&recipient=' + encodeURIComponent(recipient) +

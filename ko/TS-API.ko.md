@@ -2185,7 +2185,7 @@ ch              # 특정 채널을 지정할 경우 (여러 채널을 동시에 
                 # 채널을 명시하지 않으면 모든 채널을 의미
 subtitleFormat  # 영상의 시각 표시를 자막으로 할 경우 사용할 자막 파일 형식 지정
                 # VTT, SRT, SMI 형식을 지원하며, 지정하지 않거나 None으로 설정하면 자막 파일이 생성되지 않음
-fileSizeLimit   # 동영상 파일의 최대 크기를 지정 (GB, MB, KB, B 등의 단위를 붙여 표기할 수 있음, 예: 1GB, 700MB)
+mediaSize   # 동영상 파일의 최대 크기를 지정 (GB, MB, KB, B 등의 단위를 붙여 표기할 수 있음, 예: 1GB, 700MB)
 statusInterval  # 서버에서 내보낼 동영상 파일이 생성되는 진행률(stage:fileWriting)을 전송 받는 주기를 설정
                 # (s, ms 등의 단위를 붙여서 표시할 수 있음, 예: 1s, 500ms)
                 # statusInterval을 명시하지 않으면 진행률을 전송하지 않음 
@@ -2207,19 +2207,19 @@ ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3
 ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
 
 # 파일을 500MB 단위로 저장
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB
 
 # VTT 자막 파일 생성
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT
 
 # 1초 주기로 진행률 표시
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s
 
 # 언어를 스페인어로 지정
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
 
 # 동영상 제출자(흥부), 수령인(놀부), 용도(춥고\n배고파서)를 명시
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&fileSizeLimit=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=%ED%9D%A5%EB%B6%80%0D%0A&recipient=%EB%86%80%EB%B6%80&purpose=%EC%B6%A5%EA%B3%A0%0D%0A%EB%B0%B0%EA%B3%A0%ED%8C%8C%EC%84%9C
+ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=%ED%9D%A5%EB%B6%80%0D%0A&recipient=%EB%86%80%EB%B6%80&purpose=%EC%B6%A5%EA%B3%A0%0D%0A%EB%B0%B0%EA%B3%A0%ED%8C%8C%EC%84%9C
 ```
 
 각 단계(stage)별로 서버가 전송하는 메시지 형식은 다음과 같습니다.
@@ -2242,8 +2242,9 @@ ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3
       "2018-07-27T09:00:00.000+09:00",
       "2018-07-27T09:30:00.000+09:00"
     ],
-    "fileSizeLimit": 524288000,
-    "subtitleFormat": "VTT"
+    "mediaSize": 524288000,
+    "subtitleFormat": "VTT",
+    "language":"ko-KR"
   }
 }
 ```
@@ -2455,7 +2456,7 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
           <input type='checkbox' class='chid' value='16'>16
       </div>
       <div>
-        파일 크기: <input type='text' id='fileSizeLimit' placeholder='예) 500MB'>
+        파일 크기: <input type='text' id='mediaSize' placeholder='예) 500MB'>
       </div>
       <div>
         자막 형식: <select id='subtitleFormat'>
@@ -2570,8 +2571,8 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
       return url;
     }
  
-    var fileSizeLimit = document.getElementById('fileSizeLimit').value;
-    if(fileSizeLimit == '') {
+    var mediaSize = document.getElementById('mediaSize').value;
+    if(mediaSize == '') {
       alert('동영상 파일의 최대 크기를 입력하십시오.');
       return url;
     }
@@ -2622,7 +2623,7 @@ wait 명령을 한번 보내면 ttl에 명시된 5초 동안 대기 시킬 수 �
       '&timeEnd=' + encodeURIComponent(timeEnd) +
       '&ch=' + encodeURIComponent(ch) +
       '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
-      '&fileSizeLimit=' + encodeURIComponent(fileSizeLimit) +
+      '&mediaSize=' + encodeURIComponent(mediaSize) +
       '&statusInterval=' + encodeURIComponent(statusInterval) +
       '&submitter=' + encodeURIComponent(submitter) +
       '&recipient=' + encodeURIComponent(recipient) +

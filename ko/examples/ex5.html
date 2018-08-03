@@ -47,7 +47,7 @@
           <input type='checkbox' class='chid' value='16'>16
       </div>
       <div>
-        파일 크기: <input type='text' id='fileSizeLimit' placeholder='예) 500MB'>
+        파일 크기: <input type='text' id='mediaSize' placeholder='예) 500MB'>
       </div>
       <div>
         자막 형식: <select id='subtitleFormat'>
@@ -162,8 +162,8 @@
       return url;
     }
  
-    var fileSizeLimit = document.getElementById('fileSizeLimit').value;
-    if(fileSizeLimit == '') {
+    var mediaSize = document.getElementById('mediaSize').value;
+    if(mediaSize == '') {
       alert('동영상 파일의 최대 크기를 입력하십시오.');
       return url;
     }
@@ -214,7 +214,7 @@
       '&timeEnd=' + encodeURIComponent(timeEnd) +
       '&ch=' + encodeURIComponent(ch) +
       '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
-      '&fileSizeLimit=' + encodeURIComponent(fileSizeLimit) +
+      '&mediaSize=' + encodeURIComponent(mediaSize) +
       '&statusInterval=' + encodeURIComponent(statusInterval) +
       '&submitter=' + encodeURIComponent(submitter) +
       '&recipient=' + encodeURIComponent(recipient) +

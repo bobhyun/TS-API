@@ -47,7 +47,7 @@
           <input type='checkbox' class='chid' value='16'>16
       </div>
       <div>
-        File size unit: <input type='text' id='fileSizeLimit' placeholder='ex) 500MB'>
+        File size unit: <input type='text' id='mediaSize' placeholder='ex) 500MB'>
       </div>
       <div>
         Subtitle format: <select id='subtitleFormat'>
@@ -162,8 +162,8 @@
       return url;
     }
  
-    var fileSizeLimit = document.getElementById('fileSizeLimit').value;
-    if(fileSizeLimit == '') {
+    var mediaSize = document.getElementById('mediaSize').value;
+    if(mediaSize == '') {
       alert('Please enter the maximum video file size.');
       return url;
     }
@@ -214,7 +214,7 @@
       '&timeEnd=' + encodeURIComponent(timeEnd) +
       '&ch=' + encodeURIComponent(ch) +
       '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
-      '&fileSizeLimit=' + encodeURIComponent(fileSizeLimit) +
+      '&mediaSize=' + encodeURIComponent(mediaSize) +
       '&statusInterval=' + encodeURIComponent(statusInterval) +
       '&submitter=' + encodeURIComponent(submitter) +
       '&recipient=' + encodeURIComponent(recipient) +
