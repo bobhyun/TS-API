@@ -2198,28 +2198,28 @@ purpose         # 제출할 동영상의 용도를 명시
 
 # 사용 예
 # 2018년 7월 27일 오전 9시 정각부터 9시 30분까지 녹화된 모든 동영상을 받아내기
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
 
 # 1번 채널에 녹화된 동영상을 받아내기
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
 
 # 1,2,3번 채널에 녹화된 동영상을 받아내기
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
 
 # 파일을 500MB 단위로 저장
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB
 
 # VTT 자막 파일 생성
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT
 
 # 1초 주기로 진행률 표시
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s
 
 # 언어를 스페인어로 지정
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
 
 # 동영상 제출자(흥부), 수령인(놀부), 용도(춥고\n배고파서)를 명시
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=%ED%9D%A5%EB%B6%80%0D%0A&recipient=%EB%86%80%EB%B6%80&purpose=%EC%B6%A5%EA%B3%A0%0D%0A%EB%B0%B0%EA%B3%A0%ED%8C%8C%EC%84%9C
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=%ED%9D%A5%EB%B6%80%0D%0A&recipient=%EB%86%80%EB%B6%80&purpose=%EC%B6%A5%EA%B3%A0%0D%0A%EB%B0%B0%EA%B3%A0%ED%8C%8C%EC%84%9C
 ```
 
 각 단계(stage)별로 서버가 전송하는 메시지 형식은 다음과 같습니다.

@@ -2203,28 +2203,28 @@ purpose         # Specify the purpose of the video to submit
 
 # Examples
 # July 27, 2018 to receive all recorded videos from 9:00 am to 9:30 am
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
 
 # Exporting video recorded on channel 1
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
 
 # Exporting video recorded on channel 1,2 and 3
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
 
 # Save the file as 500MB
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB
 
 # Create VTT subtitle file
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT
 
 # Receiving progress in 1 second interval
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s
 
 # Specify language to Spanish
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&lang=es-ES
 
 # Specify Video submitter(Begger), recipient(Prince), purpose(cold\nand hungry)
-ws://host/wsapi/dataExport?&auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=Begger&recipient=Prince&purpose=cold%0D%0Aand%20hungry
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&mediaSize=500MB&subtitleFormat=VTT&statusInterval=1s&submitter=Begger&recipient=Prince&purpose=cold%0D%0Aand%20hungry
 ```
 
 The message format sent by the server for each stage is as follows.
