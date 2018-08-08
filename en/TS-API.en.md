@@ -2353,14 +2353,24 @@ The format of the command that the client sends to the server for each situation
 **cmd:wait - wait command**
 Video files created on the server side will be deleted immediately after downloading finished and before creating the next file, 
 so you should send a wait command during download to prevent the server from deleting the file.
-If you send a wait command once, you can make server wait for 5 seconds which is specified in ttl.
-If downloading takes a long time, you should send a wait command periodically.
+
+If you send the `wait` command once, you can make server wait for` ttl` specified in `fileEnd`,
+If the download takes a long time, you should send the wait command periodically.
 ```jsx
 {
   "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
   "cmd": "wait"   # wait command
 }
 ```
+
+The server will send `aliveCheck` message to the client in the format shown below if the `wait` command does not come 5 seconds before the end of the time specified in ttl (in milliseconds).
+```jsx
+{
+  "request": "aliveCheck",
+  "ttl": 5000
+}
+```
+When the client receives this message, it must send the `wait` command to the server within 5 seconds specified in` ttl`, otherwise the task will be canceled automatically.
 
 **cmd:next - Continue to next file**
 ```jsx
