@@ -2162,13 +2162,14 @@ ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 >6. `서버 -> 클라이언트 [stage:fileBegin]` 하나의 파일을 생성 시작
 >7. `서버 -> 클라이언트 [stage:fileWriting]` 하나의 파일에 데이터를 저장 중
 >8. `서버 -> 클라이언트 [stage:fileEnd]` 하나의 파일을 생성 완료 (다운로드 링크 제공)
->9. `클라이언트 -> 서버 [cmd:wait]` 클라이언트가 다운로드 받는 동안 서버 작업을 대기 시킴
->10. `클라이언트 -> 서버 [cmd:next]` 클라이언트가 다운로드를 완료하고 서버에게 다음 파일을 생성하도록 지시함
->11. `서버 -> 클라이언트 [stage:channelEnd]` 하나의 채널에 대한 작업 완료
->12. `서버 -> 클라이언트 [stage:end]` 
->13. 파일이 여러 개일 경우, 6번에서 10번 과정을 반복
->13. 채널이 여러 개일 경우, 5번에서 11번 과정을 반복
->14. `클라이언트 -> 서버 [cmd:cancel]` 2번 과정 이후 어느 때든 클라이언트는 작업을 취소할 수 있음
+>9. `서버 -> 클라이언트 [stage:timeoutAlert]` `fileEnd`의 `ttl`에 명시된 시간이 초과되기 직전에 보내짐
+>10. `클라이언트 -> 서버 [cmd:wait]` 클라이언트가 다운로드 받는 동안 서버 작업을 대기 시킴
+>11. `클라이언트 -> 서버 [cmd:next]` 클라이언트가 다운로드를 완료하고 서버에게 다음 파일을 생성하도록 지시함
+>12. `서버 -> 클라이언트 [stage:channelEnd]` 하나의 채널에 대한 작업 완료
+>13. `서버 -> 클라이언트 [stage:end]` 
+>14. 파일이 여러 개일 경우, 6번에서 10번 과정을 반복
+>15. 채널이 여러 개일 경우, 5번에서 12번 과정을 반복
+>16. `클라이언트 -> 서버 [cmd:cancel]` 2번 과정 이후 어느 때든 클라이언트는 작업을 취소할 수 있음
 
 
 웹 소켓 접속 경로와 매개변수들은 다음과 같습니다.
@@ -2185,7 +2186,7 @@ ch              # 특정 채널을 지정할 경우 (여러 채널을 동시에 
                 # 채널을 명시하지 않으면 모든 채널을 의미
 subtitleFormat  # 영상의 시각 표시를 자막으로 할 경우 사용할 자막 파일 형식 지정
                 # VTT, SRT, SMI 형식을 지원하며, 지정하지 않거나 None으로 설정하면 자막 파일이 생성되지 않음
-mediaSize   # 동영상 파일의 최대 크기를 지정 (GB, MB, KB, B 등의 단위를 붙여 표기할 수 있음, 예: 1GB, 700MB)
+mediaSize       # 동영상 파일의 최대 크기를 지정 (GB, MB, KB, B 등의 단위를 붙여 표기할 수 있음, 예: 1GB, 700MB)
 statusInterval  # 서버에서 내보낼 동영상 파일이 생성되는 진행률(stage:fileWriting)을 전송 받는 주기를 설정
                 # (s, ms 등의 단위를 붙여서 표시할 수 있음, 예: 1s, 500ms)
                 # statusInterval을 명시하지 않으면 진행률을 전송하지 않음 
@@ -2326,7 +2327,7 @@ ttl 이내에 클라이언트는 서버에로 명령을 보내어 흐름을 제�
     "progress": "51%", # 채널당 진행률
     "file": {
       "fid": 1,        # 파일 번호
-      "ttl": 5000,     # 5000밀리초(5초) 이내에 클라이언트가 아무 명령을 보내지 않으면 서버는 작업을 자동 취소함
+      "ttl": 10000,    # 10000밀리초(10초) 이내에 클라이언트가 아무 명령을 보내지 않으면 서버는 작업을 자동 취소함
       "download": [
         # 생성된 동영상 파일
         "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
@@ -2343,44 +2344,15 @@ ttl 이내에 클라이언트는 서버에로 명령을 보내어 흐름을 제�
 http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4&auth=YWRtaW46YWRtaW4
 ```
 
-각 상황별로 클라이언트가 서버로 전송하는 명령 형식은 다음과 같습니다.
-**cmd:wait - 대기 명령**
-서버 측에서 생성된 동영상 파일은 다운로드가 끝나고 다음 파일을 생성하기 전에 즉시 삭제되므로
-다운로드하는 동안 wait 명령을 계속 보내서 서버가 파일을 삭제하지 않도록 해야 합니다.
-
-`wait` 명령을 한번 보내면 `fileEnd`시 명시된 `ttl`만큼 서버를 대기 시킬 수 있으며, 
-다운로드 시간이 오래걸리면 주기적으로 wait 명령를 보내야 합니다.
+**stage:timeoutAlert - 대기 시간 종료 알림**
+`fileEnd`에 명시된 ttl에 명시된 시간이 종료되기 직전에 곧 종료된다는 것을 알리기 위해 서버가 클라이언트로 보냅니다.
 ```jsx
 {
-  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
-  "cmd": "wait"   # 대기 명령
+  "stage": "timeoutAlert",
+  "ttl": 2000         # 종료까지 남은 시간 2초
 }
 ```
-
-ttl에 명시된 시간(밀리초 단위) 종료 5초 전까지 `wait` 명령이 오지 않으면 서버는 아래와 같은 형식의 `aliveCheck` 메시지를 클라이언트로 보냅니다.
-```jsx
-{
-  "request": "aliveCheck",
-  "ttl": 5000
-}
-```
-클라이언트는 이 메시지를 수신하면 `ttl`에 명시된 5초 내에 `wait` 명령을 서버로 전송해야 하며 그렇지 않으면 작업은 자동 취소됩니다.
-
-**cmd:next - 작업 계속**
-```jsx
-{
-  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
-  "cmd": "next"   # 다음 파일 작업으로 넘어감
-}
-```
-
-**cmd:cancel - 작업 취소**
-```jsx
-{
-  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
-  "cmd": "cancel"   # 클라이언트가 작업 취소
-}
-```
+클라이언트는 이 메시지를 수신하면 `ttl`에 명시된 시간 내에 `wait` 명령을 서버로 전송해야 하며 그렇지 않으면 작업은 자동 취소됩니다.
 
 **stage:channelEnd - 채널 완료**
 ```jsx
@@ -2415,6 +2387,37 @@ ttl에 명시된 시간(밀리초 단위) 종료 5초 전까지 `wait` 명령이
 -1004: 시간 초과로 작업 종료됨
 ```
 
+
+각 상황별로 클라이언트가 서버로 전송하는 명령 형식은 다음과 같습니다.
+**cmd:wait - 대기 명령**
+서버 측에서 생성된 동영상 파일은 다운로드가 끝나고 다음 파일을 생성하기 전에 즉시 삭제되므로
+다운로드하는 동안 wait 명령을 계속 보내서 서버가 파일을 삭제하지 않도록 해야 합니다.
+
+`wait` 명령을 한번 보내면 `fileEnd`시 명시된 `ttl`만큼 서버를 대기 시킬 수 있으며, 
+다운로드 시간이 오래걸리면 주기적으로 wait 명령를 보내야 합니다.
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
+  "cmd": "wait"   # 대기 명령
+}
+```
+
+**cmd:next - 작업 계속**
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
+  "cmd": "next"   # 다음 파일 작업으로 넘어감
+}
+```
+
+**cmd:cancel - 작업 취소**
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # stage:ready시 발급된 작업 번호
+  "cmd": "cancel"   # 클라이언트가 작업 취소
+}
+```
+
 이 번에는 웹 소켓을 이용하여 동영상을 받아내는 예제를 만들어 봅시다.
 ```html
 <!DOCTYPE>
@@ -2429,6 +2432,7 @@ ttl에 명시된 시간(밀리초 단위) 종료 5초 전까지 `wait` 명령이
     #param * {font-size:10px}
     #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
     li.open, li.close {color:blue}
+    li.command {color:orange}
     li.error {color:red}
   </style>
 </head>
@@ -2519,7 +2523,6 @@ ttl에 명시된 시간(밀리초 단위) 종료 5초 전까지 `wait` 명령이
       task: '',
       fname: '',
       auth: '',
-      waitTimer: null,
       downloadJobs: []
     };
   })();
@@ -2716,11 +2719,13 @@ ttl에 명시된 시간(밀리초 단위) 종료 5초 전까지 `wait` 명령이
 
       case 'fileEnd':
         downloadFiles(msg.channel.file, function(bSuccess) {
-          window.myApp.ws.send(JSON.stringify({
-            task: window.myApp.task,
-            cmd: bSuccess ? "next" : "cancel"
-          }));
+          sendCommand(bSuccess ? "next" : "cancel");          
         });
+        break;
+
+      case 'timeoutAlert':
+        if( window.myApp.downloadJobs.length > 0)
+          sendCommand("wait");
         break;
 
       case 'end':
@@ -2748,14 +2753,6 @@ ttl에 명시된 시간(밀리초 단위) 종료 5초 전까지 `wait` 명령이
   }
 
   function downloadFiles(file, onFinished) {
-    // 다운로드가 완료될 때까지 "wait" 명령을 반복해서 전송
-    window.myApp.waitTimer = setInterval(function() {
-      window.myApp.ws.send(JSON.stringify({
-        task: window.myApp.task,
-        cmd: "wait"
-      }));
-    }, file.ttl);          
-
     var downloadCnt = 0, successCnt = 0;
     for(var i=0, cnt=file.download.length; i<cnt; i++) {
       downloadFile(file.download[i], function(bSuccess) {
@@ -2763,10 +2760,6 @@ ttl에 명시된 시간(밀리초 단위) 종료 5초 전까지 `wait` 명령이
           successCnt++;
 
         if(++downloadCnt == cnt) {
-          if(window.myApp.waitTimer) {
-            clearInterval(window.myApp.waitTimer);
-            window.myApp.waitTimer = null;
-          }
           onFinished(successCnt == downloadCnt);
         }
       });
@@ -2801,34 +2794,34 @@ ttl에 명시된 시간(밀리초 단위) 종료 5초 전까지 `wait` 명령이
     req.onload = function (event) {
       addSaveAsLink(fname, req.response);
 
-      if(onFinish)
-        onFinish(true);
-
       var pos = window.myApp.downloadJobs.indexOf(req);
       if(pos >= 0)
         window.myApp.downloadJobs.splice(pos, 1);
+      
+      if(onFinish)
+        onFinish(true);
     };
     req.send();
+  }
 
+  function sendCommand(command) {
+    var str = JSON.stringify({
+      task: window.myApp.task,
+      cmd: command
+    });
+
+    addItem('command', str)
+    window.myApp.ws.send(str);
   }
 
   function onCancel() {
-    // "wait" 명령 전송 중지
-    if(window.myApp.waitTimer) {
-      clearInterval(window.myApp.waitTimer);
-      window.myApp.waitTimer = null;
-    }
-
     // 다운로드 작업을 모두 중단
     window.myApp.downloadJobs.forEach(function(jobs) {
       jobs.abort();
     });
-    window.myApp.downloadJobs = null;
+    window.myApp.downloadJobs = [];
 
-    window.myApp.ws.send(JSON.stringify({
-      task: window.myApp.task,
-      cmd: "cancel"
-    }));
+    sendCommand("cancel");
   }
 
   function onSelectAllChannels(el) {

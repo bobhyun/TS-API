@@ -2167,13 +2167,14 @@ The step-by-step communication procedure is as follows.
 >6. `Server -> Client [stage:fileBegin]` Start creating a file
 >7. `Server -> Client [stage:fileWriting]` Writing data to a file
 >8. `Server -> Client [stage:fileEnd]` Completed a file (download link provided)
->9. `Client -> Server [cmd:wait]` Making server wait while the client is downloading
->10. `Client -> Server [cmd:next]` Making server create next file after the file has finished downloading
->11. `Server -> Client [stage:channelEnd]` Completed task on a channel
->12. `Server -> Client [stage:end]` 
->13. If there are next files, repeat steps 6 to 10
->13. If there are next channels, repeat steps 5 through 11
->14. `Client -> Server [cmd:cancel]` Clients can cancel jobs at any time after step 2
+>9. `Server -> Client [stage:timeoutAlert]` Sent immediately before the time specified at `ttl` in` fileEnd` is exceeded
+>10. `Client -> Server [cmd:wait]` Making server wait while the client is downloading
+>11. `Client -> Server [cmd:next]` Making server create next file after the file has finished downloading
+>12. `Server -> Client [stage:channelEnd]` Completed task on a channel
+>13. `Server -> Client [stage:end]` 
+>14. If there are next files, repeat steps 6 to 10
+>15. If there are next channels, repeat steps 5 through 12
+>16. `Client -> Server [cmd:cancel]` Clients can cancel jobs at any time after step 2
 
 
 The web socket connection path and parameters are as follows.
@@ -2331,7 +2332,7 @@ Within ttl, The client must send a command to the server to control the flow, ot
     "progress": "51%",  # Channel progress
     "file": {
       "fid": 1,         # File id
-      "ttl": 5000,      # If the client does not send any commands within 5000 milliseconds (5 seconds), 
+      "ttl": 10000,     # If the client does not send any commands within 10000 milliseconds (10 seconds), 
                         # the server will automatically cancel the operation
       "download": [
         # Created video file
@@ -2349,44 +2350,15 @@ Download links can be used with the `auth` parameter.
 http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4&auth=YWRtaW46YWRtaW4
 ```
 
-The format of the command that the client sends to the server for each situation is as follows:
-**cmd:wait - wait command**
-Video files created on the server side will be deleted immediately after downloading finished and before creating the next file, 
-so you should send a wait command during download to prevent the server from deleting the file.
-
-If you send the `wait` command once, you can make server wait for` ttl` specified in `fileEnd`,
-If the download takes a long time, you should send the wait command periodically.
+**stage:timeoutAlert - timeout alert**
+The server sends it to the client to notify the task will be canceled shortly before the time specified in the ttl specified in `fileEnd`.
 ```jsx
 {
-  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
-  "cmd": "wait"   # wait command
+  "request": "timeoutAlert",
+  "ttl": 2000         # 2 seconds remaining
 }
 ```
-
-The server will send `aliveCheck` message to the client in the format shown below if the `wait` command does not come 5 seconds before the end of the time specified in ttl (in milliseconds).
-```jsx
-{
-  "request": "aliveCheck",
-  "ttl": 5000
-}
-```
-When the client receives this message, it must send the `wait` command to the server within 5 seconds specified in` ttl`, otherwise the task will be canceled automatically.
-
-**cmd:next - Continue to next file**
-```jsx
-{
-  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
-  "cmd": "next"   # Proceed to the next file operation
-}
-```
-
-**cmd:cancel - Cancel task**
-```jsx
-{
-  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
-  "cmd": "cancel"   # Client cancel the task
-}
-```
+When the client receives this message, it must send the `wait` command to the server within the time specified in` ttl`, otherwise the task will be automatically canceled.
 
 **stage:channelEnd - Channel complete**
 ```jsx
@@ -2421,6 +2393,36 @@ A typical `status` code is one of the following:
 -1004: Task terminated by timeout
 ```
 
+The format of the command that the client sends to the server for each situation is as follows:
+**cmd:wait - wait command**
+Video files created on the server side will be deleted immediately after downloading finished and before creating the next file, 
+so you should send a wait command during download to prevent the server from deleting the file.
+
+If you send the `wait` command once, you can make server wait for` ttl` specified in `fileEnd`,
+If the download takes a long time, you should send the wait command periodically.
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
+  "cmd": "wait"   # wait command
+}
+```
+
+**cmd:next - Continue to next file**
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
+  "cmd": "next"   # Proceed to the next file operation
+}
+```
+
+**cmd:cancel - Cancel task**
+```jsx
+{
+  "task": "7963635e-1bff-40e1-bbf3-3f17525aef40",  # The task number issued at stage:ready
+  "cmd": "cancel"   # Client cancel the task
+}
+```
+
 Now let's create an example that uses a web socket to export the recorded video.
 ```html
 <!DOCTYPE>
@@ -2435,6 +2437,7 @@ Now let's create an example that uses a web socket to export the recorded video.
     #param * {font-size:10px}
     #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
     li.open, li.close {color:blue}
+    li.command {color:orange}
     li.error {color:red}
   </style>
 </head>
@@ -2525,7 +2528,6 @@ Now let's create an example that uses a web socket to export the recorded video.
       task: '',
       fname: '',
       auth: '',
-      waitTimer: null,
       downloadJobs: []
     };
   })();
@@ -2722,11 +2724,13 @@ Now let's create an example that uses a web socket to export the recorded video.
 
       case 'fileEnd':
         downloadFiles(msg.channel.file, function(bSuccess) {
-          window.myApp.ws.send(JSON.stringify({
-            task: window.myApp.task,
-            cmd: bSuccess ? "next" : "cancel"
-          }));
+          sendCommand(bSuccess ? "next" : "cancel");
         });
+        break;
+
+        case 'timeoutAlert':
+        if( window.myApp.downloadJobs.length > 0)
+          sendCommand("wait");
         break;
 
       case 'end':
@@ -2754,14 +2758,6 @@ Now let's create an example that uses a web socket to export the recorded video.
   }
 
   function downloadFiles(file, onFinished) {
-    // send "wait" repeatedly until downloading finished.
-    window.myApp.waitTimer = setInterval(function() {
-      window.myApp.ws.send(JSON.stringify({
-        task: window.myApp.task,
-        cmd: "wait"
-      }));
-    }, file.ttl);          
-
     var downloadCnt = 0, successCnt = 0;
     for(var i=0, cnt=file.download.length; i<cnt; i++) {
       downloadFile(file.download[i], function(bSuccess) {
@@ -2769,10 +2765,6 @@ Now let's create an example that uses a web socket to export the recorded video.
           successCnt++;
 
         if(++downloadCnt == cnt) {
-          if(window.myApp.waitTimer) {
-            clearInterval(window.myApp.waitTimer);
-            window.myApp.waitTimer = null;
-          }
           onFinished(successCnt == downloadCnt);
         }
       });
@@ -2807,34 +2799,34 @@ Now let's create an example that uses a web socket to export the recorded video.
     req.onload = function (event) {
       addSaveAsLink(fname, req.response);
 
-      if(onFinish)
-        onFinish(true);
-
       var pos = window.myApp.downloadJobs.indexOf(req);
       if(pos >= 0)
         window.myApp.downloadJobs.splice(pos, 1);
+              
+      if(onFinish)
+        onFinish(true);
     };
     req.send();
+  }
 
+  function sendCommand(command) {
+    var str = JSON.stringify({
+      task: window.myApp.task,
+      cmd: command
+    });
+
+    addItem('command', str)
+    window.myApp.ws.send(str);
   }
 
   function onCancel() {
-    // stop sending "wait"
-    if(window.myApp.waitTimer) {
-      clearInterval(window.myApp.waitTimer);
-      window.myApp.waitTimer = null;
-    }
-
     // abort all downloading jobs
     window.myApp.downloadJobs.forEach(function(jobs) {
       jobs.abort();
     });
-    window.myApp.downloadJobs = null;
+    window.myApp.downloadJobs = [];
 
-    window.myApp.ws.send(JSON.stringify({
-      task: window.myApp.task,
-      cmd: "cancel"
-    }));
+    sendCommand("cancel");
   }
 
   function onSelectAllChannels(el) {
