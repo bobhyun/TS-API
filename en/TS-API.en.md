@@ -2336,9 +2336,15 @@ Within ttl, The client must send a command to the server to control the flow, ot
                         # the server will automatically cancel the operation
       "download": [
         # Created video file
-        "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
+        {
+          "fileName": "CH1.2018-07-27T09.11.19.mp4",
+          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4"
+        },
         # Created subtitle file
-        "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt"
+        {
+          "fileName": "CH1.2018-07-27T09.11.19.vtt",
+          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt"
+        }
       ]
     }
   }
