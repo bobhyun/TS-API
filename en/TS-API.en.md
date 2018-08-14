@@ -2485,9 +2485,9 @@ Now let's create an example that uses a web socket to export the recorded video.
       </div>
       <div>
         Subtitle format: <select id='subtitleFormat'>
-          <option value='VTT'>VTT file</option>
-          <option value='SMI'>SMI file</option>
-          <option value='SRT'>SRT file</option>
+          <option value='SRT' selected>SRT</option>
+          <option value='SMI'>SMI</option>
+          <option value='VTT'>VTT</option>
           <option value='None'>None</option>
         </select>
       </div>
@@ -2667,21 +2667,10 @@ Now let's create an example that uses a web socket to export the recorded video.
   function addDownloadItem(fname) {
     var li = document.createElement('li');
     var span = document.createElement('span');
-    span.innerHTML = '<progress value="0" max="100"></progress> <label>Downloading... ' + fname + '<label>';
+    span.innerHTML = '<progress value="0" max="100"></progress> <label>' + fname + '<label>';
     span.setAttribute('id', window.myApp.task + '/' + fname);
     li.appendChild(span);
     document.getElementById('messages').appendChild(li);
-  }
-
-  function addSaveAsLink(fname, blob) {
-    var a = document.createElement('a');
-    a.appendChild(document.createTextNode(fname));
-    a.href = window.URL.createObjectURL(blob);
-    a.download = fname;
-    var span = document.getElementById(window.myApp.task + '/' + fname);
-    if(span) {
-      span.replaceChild(a, span.lastChild);
-    }
   }
 
   function showCancelButton(bShow) {
@@ -2764,33 +2753,51 @@ Now let's create an example that uses a web socket to export the recorded video.
   }
 
   function downloadFiles(file, onFinished) {
-    var downloadCnt = 0, successCnt = 0;
-    for(var i=0, cnt=file.download.length; i<cnt; i++) {
-      downloadFile(file.download[i], function(bSuccess) {
-        if(bSuccess)
-          successCnt++;
+		if(file.download.length <= 0) {
+			onFinished(false);
+			return;
+		}
 
-        if(++downloadCnt == cnt) {
-          onFinished(successCnt == downloadCnt);
-        }
-      });
-    }
+		var downloadCnt = 0, successCnt = 0;
+
+		function onDone(bSuccess) {
+			if(bSuccess)
+				successCnt++;
+
+			if(++downloadCnt < file.download.length) {
+				setTimeout(function() {
+					downloadFile(file.download[downloadCnt], onDone);
+				}, 1000);
+			}
+			else {
+				onFinished(successCnt == downloadCnt);
+			}
+		}
+		downloadFile(file.download[downloadCnt], onDone);
   }
 
-  function downloadFile(urlToSend, onFinish) {
-    var pos = urlToSend.lastIndexOf('/');
-    var fname = decodeURIComponent(urlToSend.substr(pos+1));
-
-    addDownloadItem(fname);
+  function downloadFile(download, onFinish) {
+    addDownloadItem(download.fileName);
 
     var req = new XMLHttpRequest();
     window.myApp.downloadJobs.push(req);
 
     // Requesting download link with auth parameter
-    req.open('GET', urlToSend + '?auth=' + window.myApp.auth, true);
+    req.open('GET', download.src + '?auth=' + window.myApp.auth, true);
     req.responseType = "blob";
+    req.onreadystatechange = function() {
+			if (req.readyState === 4 && req.status === 200) {
+				var a = document.createElement('a');
+				a.href = window.URL.createObjectURL(req.response);
+				a.download = download.fileName;
+				a.style.display = 'none';
+				document.body.appendChild(a);
+				a.click();
+				window.URL.revokeObjectURL(a.href);
+			}
+		},
     req.onprogress = function(e) {
-      var prog = document.getElementById(window.myApp.task + '/' + fname).firstChild;
+      var prog = document.getElementById(window.myApp.task + '/' + download.fileName).firstChild;
       if(prog)
         prog.value = Math.ceil(e.loaded * 100 / e.total);
     },
@@ -2802,9 +2809,7 @@ Now let's create an example that uses a web socket to export the recorded video.
       if(pos >= 0)
         window.myApp.downloadJobs.splice(pos, 1);
     },
-    req.onload = function (event) {
-      addSaveAsLink(fname, req.response);
-
+    req.onloadend = function (event) {
       var pos = window.myApp.downloadJobs.indexOf(req);
       if(pos >= 0)
         window.myApp.downloadJobs.splice(pos, 1);
