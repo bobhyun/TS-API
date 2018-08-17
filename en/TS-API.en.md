@@ -1639,6 +1639,8 @@ Channel status change event messages are received in JSON format as shown below.
 }
 ```
 
+The list of channel status codes is the same as the status code list in [Request channel status `@0.3.0`](#request-channel-status-030).
+
 ### Car number recognition events
 If you request `topics=LPR`, you can receive the car number recognition event in real time.
 The car number event message is received in JSON format as shown below.

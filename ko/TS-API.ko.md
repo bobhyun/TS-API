@@ -1632,6 +1632,9 @@ http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 }
 ```
 
+채널 상태 코드 목록은 [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)의 상태 코드 목록과 동일합니다.
+
+
 ### 차량 번호 인식 이벤트
 `topics=LPR`를 요청하면 실시간으로 차량 번호 인식 이벤트를 수신할 수 있습니다.
 차량 번호 이벤트 메시지는 아래와 같이 JSON형식으로 수신됩니다.
