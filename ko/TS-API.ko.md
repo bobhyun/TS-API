@@ -1619,6 +1619,14 @@ http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
   "chid": 1
 }
 
+// 비디오 스트림이 주소는 동일하나 변경되어 다시 연결해야 하는 경우
+{
+  "timestamp": "2018-07-20T16:03:45.956+09:00",
+  "topic": "channelStatus",
+  "event": "videoStreamChanged",
+  "chid": 1
+}
+
 // 카메라 연결 상태가 변경되거나 채널이 추가, 삭제된 경우
 {
   "timestamp": "2018-07-20T16:05:45.956+09:00",

@@ -1626,6 +1626,14 @@ Channel status change event messages are received in JSON format as shown below.
   "chid": 1
 }
 
+// Video stream has the same address but needs to be reconnected
+{
+  "timestamp": "2018-07-20T16:03:45.956+09:00",
+  "topic": "channelStatus",
+  "event": "videoStreamChanged",
+  "chid": 1
+}
+
 // When camera connection status is changed, or channel is added or deleted
 {
   "timestamp": "2018-07-20T16:05:45.956-05:00",
