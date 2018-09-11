@@ -38,7 +38,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [라이센스 정보](#라이센스-정보)
   - [사용자 정보](#사용자-정보)
   - [모두 한 번에 요청](#모두-한-번에-요청)
-- [시스템 정보 요청 `@0.2.0`](#시스템-정보-요청-020)
+- [시스템 정보 요청 `@0.3.0`](#시스템-정보-요청-030)
 - [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)
 - [각종 목록 요청](#각종-목록-요청)
   - [채널 목록](#채널-목록)
@@ -498,7 +498,7 @@ http://userid:password@host/path/to/
 }
 ```
 
-## 시스템 정보 요청 `@0.2.0`
+## 시스템 정보 요청 `@0.3.0`
 서버의 시스템 정보를 요청합니다.
 ```ruby
 /api/sysinfo
@@ -506,38 +506,81 @@ http://userid:password@host/path/to/
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
 {
-  "cpu": {
-    "name": "Intel(R) Core(TM) i7-4712MQ CPU @ 2.30GHz",
-    "cores": 8
+  "operatingSystem": {
+    "name": "Microsoft Windows Embedded Standard",
+    "servicePack": "Service Pack 1",
+    "version": "6.1.7601",
+    "arch": "64-bit"
   },
-  "systemMemory": "12 GB",
-  "displayAdapter": [
+  "cpu": [
     {
-      "model": "Intel(R) HD Graphics 4600",
-      "monitor": [
-        "Generic PnP Monitor",
-        "Generic PnP Monitor"
-      ]
+      "name": "Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz",
+      "manufacturer": "GenuineIntel",
+      "cores": 4
     }
   ],
-  "hdd": [
+  "mainBoard": {
+    "name": "B150M-A",
+    "manufacturer": "ASUSTeK COMPUTER INC."
+  },
+  "displayAdapter": [
     {
-      "model": "SanDisk SD7SB6S256G1122",
-      "serialNo": "150608401947",
-      "capacity": "256 GB"
+      "name": "NVIDIA GeForce GT 1030",
+      "manufacturer": "NVIDIA",
+      "videoMemory": 2147483649
     },
     {
-      "model": "ST1000LM024 HN-M101MBB",
-      "serialNo": "S2R8J9BC700641",
-      "capacity": "1 TB"
+      "name": "Intel(R) HD Graphics 530",
+      "manufacturer": "Intel Corporation",
+      "videoMemory": 1073741824
+    }
+  ],
+  "physicalMemory": [
+    {
+      "name": "DIMM_A1",
+      "manufacturer": "Samsung",
+      "bank": "BANK 0",
+      "capacity": 4294967296,
+      "serialNo": "15392520"
+    },
+    {
+      "name": "DIMM_B1",
+      "manufacturer": "Samsung",
+      "bank": "BANK 2",
+      "capacity": 4294967296,
+      "serialNo": "15392519"
+    }
+  ],
+  "memoryAmount": 8589934592,
+  "diskDrive": [
+    {
+      "name": "ST4000VX 007-2DT166 SCSI Disk Device",
+      "manufacturer": "(Standard disk drives)",
+      "capacity": 4000784417280,
+      "interface": "IDE",
+      "serialNo": "WDH308RW"
+    }
+  ],
+  "storageAmount": 4000784417280,
+  "opticalDrive": [
+    {
+      "name": "TSSTcorp CDDVDW SH-222AB SCSI CdRom Device",
+      "manufacturer": "(Standard CD-ROM drives)",
+      "type": "DVD Writer"
     }
   ],
   "networkAdapter": [
     {
-      "name": "Realtek PCIe GBE Family Controller",
-      "mac": "80-FA-5B-03-79-5E",
-      "ipAddress": "192.168.0.43"
-    },
+      "name": "Realtek PCIe GBE Family Controller #2",
+      "manufacturer": "Realtek",
+      "connectionId": "로컬 영역 연결 2",
+      "macAddress": "D0:17:C2:89:02:BB",
+      "speed": 1000000000,
+      "ipAddress": [
+        "192.168.0.44",
+        "fe80::987c:ad81:b1f3:2146"
+      ]
+    }
   ]
 }
 ```

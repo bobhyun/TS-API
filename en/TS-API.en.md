@@ -39,7 +39,7 @@ Table of contents
   - [License information](#license-information)
   - [User information](#user-information)
   - [Request all at once](#request-all-at-once)
-- [Request system informatoin `@0.2.0`](#request-system-informatoin-020)
+- [Request system informatoin `@0.3.0`](#request-system-informatoin-030)
 - [Request channel status `@0.3.0`](#request-channel-status-030)
 - [Request various enumeration](#request-various-enumeration)
   - [Channel list](#channel-list)
@@ -503,7 +503,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 }
 ```
 
-## Request system informatoin `@0.2.0`
+## Request system informatoin `@0.3.0`
 Requests system information from the server.
 ```ruby
 /api/sysinfo
@@ -511,38 +511,81 @@ Requests system information from the server.
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
 {
-  "cpu": {
-    "name": "Intel(R) Core(TM) i7-4712MQ CPU @ 2.30GHz",
-    "cores": 8
+  "operatingSystem": {
+    "name": "Microsoft Windows Embedded Standard",
+    "servicePack": "Service Pack 1",
+    "version": "6.1.7601",
+    "arch": "64-bit"
   },
-  "systemMemory": "12 GB",
-  "displayAdapter": [
+  "cpu": [
     {
-      "model": "Intel(R) HD Graphics 4600",
-      "monitor": [
-        "Generic PnP Monitor",
-        "Generic PnP Monitor"
-      ]
+      "name": "Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz",
+      "manufacturer": "GenuineIntel",
+      "cores": 4
     }
   ],
-  "hdd": [
+  "mainBoard": {
+    "name": "B150M-A",
+    "manufacturer": "ASUSTeK COMPUTER INC."
+  },
+  "displayAdapter": [
     {
-      "model": "SanDisk SD7SB6S256G1122",
-      "serialNo": "150608401947",
-      "capacity": "256 GB"
+      "name": "NVIDIA GeForce GT 1030",
+      "manufacturer": "NVIDIA",
+      "videoMemory": 2147483649
     },
     {
-      "model": "ST1000LM024 HN-M101MBB",
-      "serialNo": "S2R8J9BC700641",
-      "capacity": "1 TB"
+      "name": "Intel(R) HD Graphics 530",
+      "manufacturer": "Intel Corporation",
+      "videoMemory": 1073741824
+    }
+  ],
+  "physicalMemory": [
+    {
+      "name": "DIMM_A1",
+      "manufacturer": "Samsung",
+      "bank": "BANK 0",
+      "capacity": 4294967296,
+      "serialNo": "15392520"
+    },
+    {
+      "name": "DIMM_B1",
+      "manufacturer": "Samsung",
+      "bank": "BANK 2",
+      "capacity": 4294967296,
+      "serialNo": "15392519"
+    }
+  ],
+  "memoryAmount": 8589934592,
+  "diskDrive": [
+    {
+      "name": "ST4000VX 007-2DT166 SCSI Disk Device",
+      "manufacturer": "(Standard disk drives)",
+      "capacity": 4000784417280,
+      "interface": "IDE",
+      "serialNo": "WDH308RW"
+    }
+  ],
+  "storageAmount": 4000784417280,
+  "opticalDrive": [
+    {
+      "name": "TSSTcorp CDDVDW SH-222AB SCSI CdRom Device",
+      "manufacturer": "(Standard CD-ROM drives)",
+      "type": "DVD Writer"
     }
   ],
   "networkAdapter": [
     {
-      "name": "Realtek PCIe GBE Family Controller",
-      "mac": "80-FA-5B-03-79-5E",
-      "ipAddress": "192.168.0.43"
-    },
+      "name": "Realtek PCIe GBE Family Controller #2",
+      "manufacturer": "Realtek",
+      "connectionId": "Local Area Connection #2",
+      "macAddress": "D0:17:C2:89:02:BB",
+      "speed": 1000000000,
+      "ipAddress": [
+        "192.168.0.44",
+        "fe80::987c:ad81:b1f3:2146"
+      ]
+    }
   ]
 }
 ```
