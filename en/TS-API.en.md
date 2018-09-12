@@ -40,6 +40,7 @@ Table of contents
   - [User information](#user-information)
   - [Request all at once](#request-all-at-once)
 - [Request system informatoin `@0.3.0`](#request-system-informatoin-030)
+- [Request system health `@0.3.0`](#request-system-health-030)
 - [Request channel status `@0.3.0`](#request-channel-status-030)
 - [Request various enumeration](#request-various-enumeration)
   - [Channel list](#channel-list)
@@ -506,7 +507,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 ## Request system informatoin `@0.3.0`
 Requests system information from the server.
 ```ruby
-/api/sysinfo
+/api/system?info
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -581,10 +582,87 @@ For the request, the server returns JSON data in the following format with an HT
       "connectionId": "Local Area Connection #2",
       "macAddress": "D0:17:C2:89:02:BB",
       "speed": 1000000000,
+      "dhcp": true,
       "ipAddress": [
         "192.168.0.44",
         "fe80::987c:ad81:b1f3:2146"
       ]
+    }
+  ]
+}
+```
+
+## Request system health `@0.3.0`
+Requests system health from the server.
+```ruby
+/api/system?health
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+{
+  "cpu": {
+    "usagePercent": {
+      "0,0": 44,      # Usage percentage of the first core of the first CPU
+      "0,1": 0,       # Usage percentage of the second core of the first CPU
+      "0,2": 6,
+      "0,3": 6,
+      "0,4": 19,
+      "0,5": 6,
+      "0,6": 13,
+      "0,7": 68,
+      "0,_Total": 20, # The total usage percentage of the first CPU
+      "_Total": 20    # The total usage percentage of total CPU
+    },
+    "temperatureK": {   # Unit: Kelvin
+      "current": 287.2, # Current temperature
+      "critical": 393.2 # Critical temperature (System must shut down when this temperature is reached)
+    }
+  },
+  "memory": {
+    "totalPhysical": 12797329408,
+    "freePhysical": 4630482944,
+    "totalVirtual": 14743486464,
+    "freeVirtual": 4666306560
+  },
+  "disk": [
+    {
+      "name": "C:",
+      "totalTimePercent": 0,
+      "readTimePercent": 0,
+      "writeTimePercent": 0,
+      "totalBytesPerSec": 0,
+      "readBytesPerSec": 0,
+      "writeBytesPerSec": 0,
+      "fileSystem": "NTFS",
+      "volumeName": "Windows",
+      "totalSpace": 135794782208,
+      "freeSpace": 32854175744
+    },
+    {
+      "name": "D:",
+      "totalTimePercent": 0,
+      "readTimePercent": 0,
+      "writeTimePercent": 0,
+      "totalBytesPerSec": 0,
+      "readBytesPerSec": 0,
+      "writeBytesPerSec": 0,
+      "fileSystem": "NTFS",
+      "volumeName": "data.ssd",
+      "totalSpace": 161598140416,
+      "freeSpace": 7250055168
+    },
+    {
+      "name": "E:",
+      "totalTimePercent": 0,
+      "readTimePercent": 0,
+      "writeTimePercent": 0,
+      "totalBytesPerSec": 0,
+      "readBytesPerSec": 0,
+      "writeBytesPerSec": 0,
+      "fileSystem": "NTFS",
+      "volumeName": "data.hdd",
+      "totalSpace": 1000202039296,
+      "freeSpace": 199067635712
     }
   ]
 }
