@@ -568,25 +568,41 @@ For the request, the server returns JSON data in the following format with an HT
     }
   ],
   "storageAmount": 4000784417280,
-  "opticalDrive": [
-    {
-      "name": "TSSTcorp CDDVDW SH-222AB SCSI CdRom Device",
-      "manufacturer": "(Standard CD-ROM drives)",
-      "type": "DVD Writer"
-    }
-  ],
   "networkAdapter": [
     {
       "name": "Realtek PCIe GBE Family Controller #2",
       "manufacturer": "Realtek",
       "connectionId": "Local Area Connection #2",
       "macAddress": "D0:17:C2:89:02:BB",
-      "speed": 1000000000,
-      "dhcp": true,
-      "ipAddress": [
-        "192.168.0.44",
-        "fe80::987c:ad81:b1f3:2146"
-      ]
+      "netEnabled": true,
+      "ulSpeed": 1000000000,
+      "dlSpeed": 1000000000,
+      "ipv4": {
+        "dhcp": false,
+        "ip": [
+          "192.168.0.44/24",
+          "192.168.0.149/16"
+        ],
+        "gateway": [
+          "192.168.0.1"
+        ],
+        "dns": [
+          "118.126.63.1",
+          "118.126.63.2"
+        ]
+      },
+      "ipv6": {
+        "ip": [
+          "fe80::987c:ad81:b1f3:2146%13/64",
+          "fe80::987c:ad81:b1f3:2147%13/64"
+        ],
+        "gateway": [
+          "fe80::987c:ad81:b1f3:1%13"
+        ],
+        "dns": [
+          "fe80::8:8:8:8%13"
+        ]
+      }
     }
   ]
 }
