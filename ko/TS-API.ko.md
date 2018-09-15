@@ -39,7 +39,9 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [사용자 정보](#사용자-정보)
   - [모두 한 번에 요청](#모두-한-번에-요청)
 - [시스템 정보 요청 `@0.3.0`](#시스템-정보-요청-030)
+  - [개별 항목 요청](#개별-항목-요청)
 - [시스템 상태 요청 `@0.3.0`](#시스템-상태-요청-030)
+  - [개별 항목 요청](#개별-항목-요청-1)
 - [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)
 - [각종 목록 요청](#각종-목록-요청)
   - [채널 목록](#채널-목록)
@@ -503,11 +505,13 @@ http://userid:password@host/path/to/
 서버의 시스템 정보를 요청합니다.
 ```ruby
 /api/system?info
+/api/system   # 생략 가능
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
 {
-  "operatingSystem": {
+  "lastUpdate": "2018-09-15T13:49:12.440+09:00",
+  "os": {
     "name": "Microsoft Windows Embedded Standard",
     "servicePack": "Service Pack 1",
     "version": "6.1.7601",
@@ -520,11 +524,11 @@ http://userid:password@host/path/to/
       "cores": 4
     }
   ],
-  "mainBoard": {
+  "mainboard": {
     "name": "B150M-A",
     "manufacturer": "ASUSTeK COMPUTER INC."
   },
-  "displayAdapter": [
+  "graphicAdapter": [
     {
       "name": "NVIDIA GeForce GT 1030",
       "manufacturer": "NVIDIA",
@@ -553,7 +557,7 @@ http://userid:password@host/path/to/
     }
   ],
   "memoryAmount": 8589934592,
-  "diskDrive": [
+  "storage": [
     {
       "name": "ST4000VX 007-2DT166 SCSI Disk Device",
       "manufacturer": "(Standard disk drives)",
@@ -568,7 +572,7 @@ http://userid:password@host/path/to/
       "name": "Realtek PCIe GBE Family Controller #2",
       "manufacturer": "Realtek",
       "connectionId": "로컬 영역 연결 2",
-      "macAddress": "D0:17:C2:89:02:BB",
+      "mac": "D0:17:C2:89:02:BB",
       "netEnabled": true,
       "ulSpeed": 1000000000,
       "dlSpeed": 1000000000,
@@ -603,6 +607,34 @@ http://userid:password@host/path/to/
 }
 ```
 
+또는 아래와 같이 개별 항목을 지정해서 요청할 수 있습니다.
+```ruby
+/api/system?info=supported  # 지원하는 항목 목록 요청
+```
+지원하는 항목 목록 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  "os",
+  "cpu",
+  "mainboard",
+  "memory",
+  "graphicAdapter",
+  "starage",
+  "cdrom",
+  "networkAdapter",
+  "all"
+]
+```
+### 개별 항목 요청
+```ruby
+/api/system?info=os   # OS만 요청
+/api/system?info=cpu  # CPU만 요청
+/api/system?info=storage,network  # storage와 network항목을 요청
+
+/api/system?info=all  # 모든 항목을 요청 (간단히 /api/system?info 또는 /api/system)
+```
+
+
 ## 시스템 상태 요청 `@0.3.0`
 서버의 시스템 상태를 요청합니다.
 ```ruby
@@ -611,6 +643,7 @@ http://userid:password@host/path/to/
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
 {
+  "lastUpdate": "2018-09-15T13:49:12.440+09:00",
   "cpu": {
     "usagePercent": {
       "0,0": 44,      # 첫번째 CPU의 첫번째 코어 사용률
@@ -624,7 +657,7 @@ http://userid:password@host/path/to/
       "0,_Total": 20, # 첫번째 CPU의 총 사용률
       "_Total": 20    # 총 CPU 사용률
     },
-    "temperatureK": {     # 단위: Kelvin (절대온도)
+    "temperatureK": {     # 절대온도(Kelvin) 단위
       "current": 287.2,   # 현재 온도
       "critical": 393.2   # 한계 온도 (이 온도에 도달하면 시스템을 종료해야 함)
     }
@@ -675,9 +708,49 @@ http://userid:password@host/path/to/
       "totalSpace": 1000202039296,
       "freeSpace": 199067635712
     }
+  ],
+  "network": [
+    {
+      "name": "Intel[R] Dual Band Wireless-AC 3160",
+      "totalBytesPerSec": 650,
+      "recvBytesPerSec": 650,
+      "sendBytesPerSec": 0,
+      "curBandwidth": 433300000
+    },
+    {
+      "name": "Realtek PCIe GBE Family Controller",
+      "totalBytesPerSec": 0,
+      "recvBytesPerSec": 0,
+      "sendBytesPerSec": 0,
+      "curBandwidth": 0
+    }
   ]
 }
 ```
+
+또는 아래와 같이 개별 항목을 지정해서 요청할 수 있습니다.
+```ruby
+/api/system?health=supported  # 지원하는 항목 목록 요청
+```
+지원하는 항목 목록 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  "cpu",
+  "memory",
+  "disk",
+  "network",
+  "all"
+]
+```
+### 개별 항목 요청
+```ruby
+/api/system?health=os   # OS만 요청
+/api/system?health=cpu  # CPU만 요청
+/api/system?health=storage,network  # storage와 network항목을 요청
+
+/api/system?health=all  # 모든 항목을 요청 (간단히 /api/system?health)
+```
+
 
 ## 채널 상태 요청 `@0.3.0`
 서버의 각 채널 상태를 요청합니다.

@@ -39,8 +39,10 @@ Table of contents
   - [License information](#license-information)
   - [User information](#user-information)
   - [Request all at once](#request-all-at-once)
-- [Request system informatoin `@0.3.0`](#request-system-informatoin-030)
+- [Request system information `@0.3.0`](#request-system-information-030)
+  - [Requests individual items](#requests-individual-items)
 - [Request system health `@0.3.0`](#request-system-health-030)
+  - [Requests individual items](#requests-individual-items-1)
 - [Request channel status `@0.3.0`](#request-channel-status-030)
 - [Request various enumeration](#request-various-enumeration)
   - [Channel list](#channel-list)
@@ -504,15 +506,17 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 }
 ```
 
-## Request system informatoin `@0.3.0`
+## Request system information `@0.3.0`
 Requests system information from the server.
 ```ruby
 /api/system?info
+/api/system   # omitted
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
 {
-  "operatingSystem": {
+  "lastUpdate": "2018-09-15T13:49:12.440-05:00",
+  "os": {
     "name": "Microsoft Windows Embedded Standard",
     "servicePack": "Service Pack 1",
     "version": "6.1.7601",
@@ -525,11 +529,11 @@ For the request, the server returns JSON data in the following format with an HT
       "cores": 4
     }
   ],
-  "mainBoard": {
+  "mainboard": {
     "name": "B150M-A",
     "manufacturer": "ASUSTeK COMPUTER INC."
   },
-  "displayAdapter": [
+  "graphicAdapter": [
     {
       "name": "NVIDIA GeForce GT 1030",
       "manufacturer": "NVIDIA",
@@ -558,7 +562,7 @@ For the request, the server returns JSON data in the following format with an HT
     }
   ],
   "memoryAmount": 8589934592,
-  "diskDrive": [
+  "storage": [
     {
       "name": "ST4000VX 007-2DT166 SCSI Disk Device",
       "manufacturer": "(Standard disk drives)",
@@ -573,7 +577,7 @@ For the request, the server returns JSON data in the following format with an HT
       "name": "Realtek PCIe GBE Family Controller #2",
       "manufacturer": "Realtek",
       "connectionId": "Local Area Connection #2",
-      "macAddress": "D0:17:C2:89:02:BB",
+      "mac": "D0:17:C2:89:02:BB",
       "netEnabled": true,
       "ulSpeed": 1000000000,
       "dlSpeed": 1000000000,
@@ -608,6 +612,33 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
+Or it can be requested individual items by specifying them as shown below.
+```ruby
+/api/system?info=supported  # Request a list of supported items
+```
+For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  "os",
+  "cpu",
+  "mainboard",
+  "memory",
+  "graphicAdapter",
+  "starage",
+  "cdrom",
+  "networkAdapter",
+  "all"
+]
+```
+### Requests individual items
+```ruby
+/api/system?info=os   # requests OS only
+/api/system?info=cpu  # requests CPU only
+/api/system?info=storage,network  # requests both storage and network
+
+/api/system?info=all  # requests all the items (Simply /api/system?info or /api/system)
+```
+
 ## Request system health `@0.3.0`
 Requests system health from the server.
 ```ruby
@@ -616,6 +647,7 @@ Requests system health from the server.
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
 {
+  "lastUpdate": "2018-09-15T13:49:12.440-05:00",
   "cpu": {
     "usagePercent": {
       "0,0": 44,      # Usage percentage of the first core of the first CPU
@@ -629,7 +661,7 @@ For the request, the server returns JSON data in the following format with an HT
       "0,_Total": 20, # The total usage percentage of the first CPU
       "_Total": 20    # The total usage percentage of total CPU
     },
-    "temperatureK": {   # Unit: Kelvin
+    "temperatureK": {   # Kelvin unit
       "current": 287.2, # Current temperature
       "critical": 393.2 # Critical temperature (System must shut down when this temperature is reached)
     }
@@ -680,8 +712,47 @@ For the request, the server returns JSON data in the following format with an HT
       "totalSpace": 1000202039296,
       "freeSpace": 199067635712
     }
+  ],
+  "network": [
+    {
+      "name": "Intel[R] Dual Band Wireless-AC 3160",
+      "totalBytesPerSec": 650,
+      "recvBytesPerSec": 650,
+      "sendBytesPerSec": 0,
+      "curBandwidth": 433300000
+    },
+    {
+      "name": "Realtek PCIe GBE Family Controller",
+      "totalBytesPerSec": 0,
+      "recvBytesPerSec": 0,
+      "sendBytesPerSec": 0,
+      "curBandwidth": 0
+    }
   ]
 }
+```
+
+Or it can be requested individual items by specifying them as shown below.
+```ruby
+/api/system?health=supported  # Request a list of supported items
+```
+For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  "cpu",
+  "memory",
+  "disk",
+  "network",
+  "all"
+]
+```
+### Requests individual items
+```ruby
+/api/system?health=cpu   # requests CPU only
+/api/system?health=memory  # requests memory only
+/api/system?health=disk,network  # requests both disk and network
+
+/api/system?health=all  # requests all the items (Simply /api/system?health)
 ```
 
 ## Request channel status `@0.3.0`
