@@ -611,14 +611,14 @@ For the request, the server returns JSON data in the following format with an HT
       },
       "ipv6": {
         "ip": [
-          "fe80::987c:ad81:b1f3:2146/64",
-          "fe80::987c:ad81:b1f3:2147/64"
+          "fe80::987c:ad81:b1f3:2146%13/64",
+          "fe80::987c:ad81:b1f3:2147%13/64"
         ],
         "gateway": [
-          "fe80::987c:ad81:b1f3:1"
+          "fe80::987c:ad81:b1f3:1%13"
         ],
         "dns": [
-          "fe80::8:8:8:8"
+          "fe80::8:8:8:8%13"
         ]
       }
     }
