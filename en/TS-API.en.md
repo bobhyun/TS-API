@@ -572,7 +572,21 @@ For the request, the server returns JSON data in the following format with an HT
     }
   ],
   "storageAmount": 4000784417280,
+  "cdrom": [
+    {
+      "name": "HL-DT-ST DVDRAM GP50NB40 USB Device",
+      "manufacturer": "(Standard CD-ROM drives)",
+      "type": "DVD Writer"
+    }
+  ],  
   "networkAdapter": [
+    {
+      "name": "Intel(R) Dual Band Wireless-AC 3160",
+      "manufacturer": "Intel Corporation",
+      "connectionId": "Wi-Fi",
+      "mac": "D0:7E:35:F7:86:A4",
+      "netEnabled": false
+    },    
     {
       "name": "Realtek PCIe GBE Family Controller #2",
       "manufacturer": "Realtek",
@@ -597,14 +611,14 @@ For the request, the server returns JSON data in the following format with an HT
       },
       "ipv6": {
         "ip": [
-          "fe80::987c:ad81:b1f3:2146%13/64",
-          "fe80::987c:ad81:b1f3:2147%13/64"
+          "fe80::987c:ad81:b1f3:2146/64",
+          "fe80::987c:ad81:b1f3:2147/64"
         ],
         "gateway": [
-          "fe80::987c:ad81:b1f3:1%13"
+          "fe80::987c:ad81:b1f3:1"
         ],
         "dns": [
-          "fe80::8:8:8:8%13"
+          "fe80::8:8:8:8"
         ]
       }
     }
