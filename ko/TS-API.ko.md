@@ -3123,6 +3123,23 @@ Contents에 JSON 형식으로 이벤트 데이터를 명시합니다.
 
 요청이 성공한 경우 서버는 HTTP 응답 코드 200을 반환하며 추가로 반환되는 Contents 데이터는 없습니다.
 
+아래와 같이 여러 개의 이벤트를 배열로 만들어 한 번에 보낼 수도 있습니다.
+```jsx
+[
+  {
+    "topic": "LPR",
+    "src": "F00001",
+    "plateNo": "01가2345"
+  },
+  {
+    "topic": "emergencyCall",
+    "device": "vendor/device",
+    "src": "0000001",
+    "event": "callStart",
+    "when": "2018-02-01T14%3a30%3a15%2b09%3a00"
+  }
+]
+```
 
 ## 부록
 
