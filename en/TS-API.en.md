@@ -66,7 +66,7 @@ Table of contents
   - [Emergency call events](#emergency-call-events)
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
 - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
-- [Pushing events to the server `@0.3.0`](#pushing-events-to-the-server-030)
+- [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
 - [Appendix](#appendix)
   - [The API-supported versions by product](#the-api-supported-versions-by-product)
   - [The features table by product](#the-features-table-by-product)
@@ -3082,7 +3082,7 @@ Now let's create an example that uses a web socket to export the recorded video.
 [Run](./examples/ex5.html)
 
 
-## Pushing events to the server `@0.3.0`
+## Pushing events to the server `@0.4.0`
 You can send events from an external device or software to the server by `HTTP POST` method.
 
 The following event topics are supported:
@@ -3100,6 +3100,7 @@ auth    # authentication information
 ```
 
 Specify event data in JSON format in contents data.
+
 **Car number recognition data**
 ```jsx
 {
@@ -3141,6 +3142,18 @@ It can be created as multiple events in the array as shown below and sent at onc
     "when": "2018-02-01T14%3a30%3a15-05%3a00"
   }
 ]
+```
+
+You can test it by using the curl command in the console window.
+>1. At first copy the above json data and save it as a test.json in a UTF-8 encoded text file.
+>2. Let's assume the server address is `192.168.0.100`, the web port is `80`, the user ID is `demo`, and the password is`!1234qwer`.
+>3. Open a console window, navigate to the directory where the test.json file is saved, and run the curl command as shown below.
+```bash
+curl http://192.168.0.100/api/push -H "Content-Type: application/json; charset=UTF-8" -X POST -u demo:!1234qwer -d @a.json
+```
+>4. Alternatively, you can use the `auth =` parameter for Base64-encoded and URL-encoded user accounts.
+```bash
+curl http://192.168.0.100/api/push?auth=ZGVtbzohMTIzNHF3ZXI%3D -H "Content-Type: application/json; charset=UTF-8" -X POST -d @a.json
 ```
 
 ## Appendix
