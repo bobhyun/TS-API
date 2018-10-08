@@ -877,6 +877,7 @@ The complete list of status codes is shown below.
 404 	# No network connection
 408 	# Camera response timeout
 410 	# No video input
+503   # Camera service failure
 ```
 
 ## Request various enumeration
