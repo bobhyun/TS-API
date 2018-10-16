@@ -3144,15 +3144,15 @@ Contents에 JSON 형식으로 이벤트 데이터를 명시합니다.
 ```
 
 콘솔 창에서 curl 명령을 사용해서 테스트 해 볼 수 있습니다.
->1. 먼저 위의 json 데이터를 복사해서 UTF-8 인코딩 텍스트 파일로 test.json 이라는 이름으로 저장합니다.
+>1. 먼저 위의 json 데이터를 복사해서 UTF-8 인코딩 텍스트 파일로 `test.json` 이라는 이름으로 저장합니다.
 >2. 서버 주소를 `192.168.0.100`, 웹 포트를 `80`으로 가정하고, 사용자 아이디를 `demo`, 비밀번호를 `!1234qwer` 라고 가정합니다.
->3. 콘솔 창을 열고 test.json 파일이 저장된 디렉토리로 이동한 다음, 아래와 같이 curl 명령을 실행합니다.
+>3. 콘솔 창을 열고 `test.json` 파일이 저장된 디렉토리로 이동한 다음, 아래와 같이 curl 명령을 실행합니다.
 ```bash
-curl http://192.168.0.100/api/push -H "Content-Type: application/json; charset=UTF-8" -X POST -u demo:!1234qwer -d @a.json
+curl http://192.168.0.100/api/push -H "Content-Type: application/json; charset=UTF-8" -X POST -u demo:!1234qwer -d @test.json
 ```
 >4. 또는 사용자 계정을 Base64 인코딩하고 URL 인코딩해서 `auth=` 매개변수를 사용할 수도 있습니다.
 ```bash
-curl http://192.168.0.100/api/push?auth=ZGVtbzohMTIzNHF3ZXI%3D -H "Content-Type: application/json; charset=UTF-8" -X POST -d @a.json
+curl http://192.168.0.100/api/push?auth=ZGVtbzohMTIzNHF3ZXI%3D -H "Content-Type: application/json; charset=UTF-8" -X POST -d @test.json
 ```
 
 
