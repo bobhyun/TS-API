@@ -1991,8 +1991,8 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
       ]
     }
   ],
-  "name":"B1 Stairs",                     // 비상 ?�출 ?�치 ?�치 ?�름
-  "topic":"emergencyCall"                 // ?�픽 ?�름
+  "name":"B1 Stairs",                     // 비상 ?�출 ?�치 ?�치 ?�름
+  "topic":"emergencyCall"                 // ?�픽 ?�름
 }
 ```
 
@@ -3168,6 +3168,7 @@ The versions of the products that support the API are as follows.
 | 0.1.0       | v0.38.0 or later | v0.35.0 or later | v0.2.0A or later |
 | 0.2.0       | v0.41.0 or later | v0.40.0 or later | v0.7.0A or later |
 | 0.3.0       | v0.42.1 or later | v0.41.1 or later | v0.8.2A or later |
+| 0.4.0       | v0.44.7 or later | v0.44.7 or later | v0.11.7A or later |
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
@@ -3260,20 +3261,20 @@ The server supports a total of 104 languages as follows:
 ```ruby
 af-ZA       # Afrikaans
 sq-AL       # Shqip, Albanian
-am-ET       # ?�ማ??��, Amharic
+am-ET       # ?�ማ??��, Amharic
 ar-AE       # ا?عرب?ة, Arabic
 hy-AM       # ?այե?են, Armenian
 az-Latn     # Az?rbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
 be-BY       # бела???к?, Belarusian
-bn-BD       # বাংল�? Bengali
+bn-BD       # বাংল�? Bengali
 bs-Latn     # Bosanski, Bosnian
 bg-BG       # б?лга??ки, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
 zh-CN       # 简体中?? Chinese (Simplified)
-zh-TW       # �?��?�統, Chinese (Traditional)
+zh-TW       # �?��?�統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -3287,7 +3288,7 @@ fi-FI       # Suomalainen, Finnish
 fr-FR       # Français, French
 fy-NL       # Frysk, Frisian
 gl-ES       # Galego, Galician
-ka-GE       # ?�ა?�თ?�ლ?? Georgian
+ka-GE       # ?�ა?�თ?�ლ?? Georgian
 de-DE       # Deutsch, German
 el-GR       # ?λληνικά, Greek
 gu-IN       # ગુજરાતી, Gujarati
@@ -3295,7 +3296,7 @@ ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
 he-IL       # ע?ר?ת, Hebrew
-hi-IN       # हिन्द�?, Hindi
+hi-IN       # हिन्द�?, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -3303,15 +3304,15 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # ?�本�? Japanese
+ja-JP       # ?�本�? Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನ�? Kannada
+kn-IN       # ಕನ್ನ�? Kannada
 kk-KZ       # ?аза? ??л?нде, Kazakh
-km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
-ko-KR       # ?�국?? Korean
+km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
+ko-KR       # ?�국?? Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
 ru-KG       # ???г?з?а, Kyrgyz
-lo-LA       # �?���? Lao
+lo-LA       # �?���? Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
@@ -3319,19 +3320,19 @@ lb-LU       # Lëtzebuergesch, Luxembourgish
 mk-MK       # ?акедон?ки, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # �?���?��ളം, Malayalam
+ml-IN       # �?���?��ളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # �?��ाठी, Marathi
+mr-IN       # �?��ाठी, Marathi
 mn-MN       # ?онгол ??л д???, Mongolian
-my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
-ne-NP       # नेपाल�?, Nepali
+my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
+ne-NP       # नेपाल�?, Nepali
 nb-NO       # Norwegian
 ps-AF       # پ?ت?, Pashto
 fa-IR       # ?ارس?, Persian
 pl-PL       # Polskie, Polish
 pt-PT       # Português, Portuguese
-pa-IN       # ਪੰਜਾਬ�?, Punjabi
+pa-IN       # ਪੰਜਾਬ�?, Punjabi
 ro-RO       # Română, Romanian
 ru-RU       # ????кий, Russian
 sm          # Samoan
@@ -3340,7 +3341,7 @@ sr-Cyrl-RS  # С?п?ки, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
 sd-Arab-PK  # س???, Sindhi
-si-LK       # සිංහ�? Sinhala
+si-LK       # සිංහ�? Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -3349,9 +3350,9 @@ su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
 tg-Cyrl-TJ  # Тоҷики??он, Tajik
-ta-IN       # த�?ி�?�? Tamil
+ta-IN       # த�?ி�?�? Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไท�? Thai
+th-TH       # ไท�? Thai
 tr-TR       # Türkçe, Turkish
 uk-UA       # Ук?а?н??ка, Ukrainian
 ur-PK       # ارد?, Urdu
