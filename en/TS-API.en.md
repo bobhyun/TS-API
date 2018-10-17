@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.3.0
+TS-API@0.5.0
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Co.,Ltd.
@@ -28,6 +28,7 @@ Table of contents
   - [User authentication](#user-authentication)
   - [Change channel](#change-channel)
   - [Display recorded video](#display-recorded-video)
+- [JSON data indentation `0.5.0`](#json-data-indentation-050)
 - [Session authentication](#session-authentication)
   - [Sign in](#sign-in)
   - [Sign out](#sign-out)
@@ -261,8 +262,37 @@ showPlayTime    # Whether the date and time are displayed (true, false)
 ```
 
 So far, We've seen how to display video using the `/watch`. Here we will see how to request various information using `/api`.
-All response data is in the [JSON format](#json-data-format) and the text is encoded as `utf8`. The actual data being transferred uses an optimized format without line breaks and whitespace, but this article uses a format that is easy to read the items in the data.
 
+## JSON data indentation `0.5.0`
+All response data is in the [JSON format](#json-data-format) and the text is encoded as `utf8`. 
+The actual data being transferred uses an optimized format without line breaks and whitespace, but This is too uncomfortable for a person to read.
+
+For example, when request timezone as shown below:
+```ruby
+/api/info?timezone
+```
+The server returns JSON data in an optimized format with no line breaks and no whitespace, like this:
+```jsx
+{"timezone":{"name":"America/New_York","bias":"-05:00"}}
+```
+
+For developer's convenience, you can specify `indent` option to indent the JSON data in an easy-to-read format.
+
+For example, when request timezone using indentation of 2 as shown below:
+```ruby
+/api/info?timezone&indent=2
+```
+The server indents two blank characters and inserts a newline character to return the JSON data in an easy-to-read format:
+```jsx
+{
+  "timezone": {
+    "name": "America/New_York",
+    "bias": "-05:00"
+  }
+}
+```
+Of course, you can use the desired number as the indent value, and it can be used in the same way for all TS-APIs.
+This document uses a format with indentation of 2 to make it easier to read items in the data.
 
 ## Session authentication
 The server maintains an HTTP session using Cookie until the client software (the web browser) logs in and logs out. Since the server maintains the authentication information while the session is being connected, the client software (web browser) does not need to sign in whenever makes request.
