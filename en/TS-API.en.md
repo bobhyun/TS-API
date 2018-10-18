@@ -277,6 +277,7 @@ The server returns JSON data in an optimized format with no line breaks and no w
 ```
 
 For developer's convenience, you can specify `indent` option to indent the JSON data in an easy-to-read format.
+The value of `indent` ranges from 0 to 8.
 
 For example, when request timezone using indentation of 2 as shown below:
 ```ruby
