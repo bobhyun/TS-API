@@ -4,7 +4,7 @@ TS-API Programmer's Guide
 TS-API@0.5.0
 -----
 
-This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Co.,Ltd.
+This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
 
 You can easily embed the real-time video, recorded video, and video search functions into your application software with the API. 
 
@@ -28,7 +28,7 @@ Table of contents
   - [User authentication](#user-authentication)
   - [Change channel](#change-channel)
   - [Display recorded video](#display-recorded-video)
-- [JSON data indentation `0.5.0`](#json-data-indentation-050)
+- [JSON data indentation `@0.5.0`](#json-data-indentation-050)
 - [Session authentication](#session-authentication)
   - [Sign in](#sign-in)
   - [Sign out](#sign-out)
@@ -68,6 +68,13 @@ Table of contents
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
 - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
 - [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
+- [Channel information and device control `@0.5.0`](#channel-information-and-device-control-050)
+  - [Request Device Information and Support Function List](#request-device-information-and-support-function-list)
+  - [Pan tilt control](#pan-tilt-control)
+  - [Pan tilt preset control](#pan-tilt-preset-control)
+  - [Relay output](#[relay-output)
+  - [AUX output](#aux-output)
+  - [Reboot the device](#reboot-the-device)
 - [Appendix](#appendix)
   - [The API-supported versions by product](#the-api-supported-versions-by-product)
   - [The features table by product](#the-features-table-by-product)
@@ -263,7 +270,7 @@ showPlayTime    # Whether the date and time are displayed (true, false)
 
 So far, We've seen how to display video using the `/watch`. Here we will see how to request various information using `/api`.
 
-## JSON data indentation `0.5.0`
+## JSON data indentation `@0.5.0`
 All response data is in the [JSON format](#json-data-format) and the text is encoded as `utf8`. 
 The actual data being transferred uses an optimized format without line breaks and whitespace, but This is too uncomfortable for a person to read.
 
@@ -924,14 +931,18 @@ For the request, the server returns JSON data in the following format with an HT
 [
   {
     "chid": 1,              // Channel number
-    "title": "Front door"   // Channel name
+    "title": "Front door",  // Channel name
+    "ptzSupported": true    // Ptz capabilities
   },
   {
     "chid": 2,              // Channel number
-    "title": "Garage"       // Channel name
+    "title": "Garage",      // Channel name
+    "ptzSupported": true    // Ptz capabilities
   }
 ]
 ```
+> [Tips]
+Added `"ptzSupported"` item from `TS-API@0.5.0`.
 
 ### Vehicle number recognition device list
 To get a list of vehicle identification devices in use, ask for the following:
@@ -1529,6 +1540,7 @@ The server returns JSON data in the following format with an HTTP response code 
   {
     "chid": 1,                        // Channel number
     "title": "Profile1 (1920x1080)",  // Channel name
+    "ptzSupported": true,
     "src": [  // List of video sources
               // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
       { // 1080p RTMP stream
@@ -1572,6 +1584,7 @@ The server returns JSON data in the following format with an HTTP response code 
   {
     "chid": 2,
     "title": "192.168.0.106",
+    "ptzSupported": false,
     "src": [
       // ... omitted
     ]
@@ -1579,6 +1592,8 @@ The server returns JSON data in the following format with an HTTP response code 
   // ... omitted
 ]
 ```
+> [Tips]
+Added `"ptzSupported"` item from `TS-API@0.5.0`.
 
 Because of the variety of environments (network bandwidth and protocol supported by the player) in which the video is played, we provide multiple video sources per channel as shown in the example above for compatibility.
 In the current version, it is streamed in two formats `RTMP` and` HLS`, and if the camera supports it, it can be dual-stream in high resolution and low resolution.
@@ -3188,18 +3203,350 @@ curl http://192.168.0.100/api/push -H "Content-Type: application/json; charset=U
 curl http://192.168.0.100/api/push?auth=ZGVtbzohMTIzNHF3ZXI%3D -H "Content-Type: application/json; charset=UTF-8" -X POST -d @test.json
 ```
 
+## Channel information and device control `@0.5.0`
+
+You can get a list of devices connected to each channel, a list of features supported by each device, and control each device.
+
+### Request Device Information and Support Function List
+The connected device information requests:
+```ruby
+/api/channel/info
+
+# Parameters
+caps    # Only requested "caps" item, If not specified, includes all information
+ch      # specify channels, If not specified, all channels in use
+
+# Examples
+# Only requests device capabilities for each channel in use
+/api/channel/info?caps
+
+# Only requests device capabilities connected to channels 1
+/api/channel/info?caps&ch=1
+
+# Only requests devices capabilities connected to channels 1, 2 and 3
+/api/channel/info?caps&ch=1,2,3
+```
+
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  {
+    "chid": 1,
+    "type": "onvif"         // ONVIF device
+    "caps": {               // Device capabilities
+      "pantilt": true,      // Supports pan tilt function
+      "zoom": true          // Supports zoom function
+      "focus": false,       // Supports focus function
+      "iris": false,        // Supports iris function
+      "home": true,         // Supports home position function
+      "maxPreset": 255,     // Up to 255 PTZ presets can be registered
+      "aux": 0,             // No AUX output
+      "digitalInputs": 2,   // Supports two digital inputs
+      "relayOutputs": 2,    // Supports two relay outputs
+      "reboot": true,       // Supports remote reboot
+    },
+    "onvif": {              // ONVIF device information
+      "basic": {
+        "city": "seoul",
+        "country": "korea",
+        "deviceType": "NVT",
+        "host": "192.168.0.211:4500",
+        "location": "",
+        "name": "SNP-3120"
+      },
+      "product": {
+        "firmwareVersion": "3.01_140915",
+        "hardwareId": "SNP-3120",
+        "macAddress": "00:09:18:73:E9:98",
+        "manufacturer": "Samsung Techwin",
+        "model": "SNP-3120",
+        "serialNumber": "C5FS6V3D401101R"
+      }
+    },
+  },
+  // ... omitted
+]
+```
+
+**Device control response code**
+
+If each channel on the server supports device control, it can be remotely controlled from the client side.
+The remote control functions will only work if the logged-in user account has `Device control permission`.
+
+The device control commands are of the form `/api/channel/` followed by an individual command and a destination channel and additional required parameters.
+In the example we will use here, let's assume that the destination channel is `ch = 1 '.
+```ruby
+/api/channel/ptz?ch=1&home&indent=2
+```
+
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+{
+  "code": 0,          // response code
+  "message": "Success"
+}
+```
+
+The server sends control commands and immediately resonse with JSON data, including one of the following codes, as an HTTP response code 200, asynchronously with the device, without waiting for the device's execution result.
+```ruby
+0     # Sucess
+-1    #	No user rights
+-2    # Features not supported by the device
+-3    # The device is not ready to execute the command
+-4    # Device is still processing previous command (busy status)
+-5    # Invalid channel
+-6    # Invalid channel token
+-7    # Invalid request
+-8    # Invalid parameters
+```
+The above response codes are common to all device control commands.
+
+
+In the `message` part, if no language is specified, the language set on the server side is used.
+You can specify the language for the parameter as shown below.
+```ruby
+/api/channel/ptz?ch=1&home&lang=en_US
+```
+For [a list of supported languages](#list-of-languages-supported), see the appendix.
+
+
+### Pan tilt control
+
+If your device supports the pan tilt function, you can control it with the following commands.
+```ruby
+# Commands without parameters
+home    # Return to home position
+stop    # Stop (Common to all move commands)
+
+# Commands used with parameters (Commands to move continuously)
+move    # Move horizontally and vertically
+zoom    # Zoom in / out    
+focus   # Focus near / far
+iris    # Open / close iris
+```
+
+A control command consists of one target channel and a command.
+For example, for the `home` command, you must specify the target channel as a parameter.
+```ruby
+/api/channel/ptz?ch=1&home
+```
+
+Commands used with parameters must specify the direction and velocity of movement.
+Commands with direction and speed will continue to move until you issue a `stop` command.
+The `move` command uses two parameters to represent the direction of movement in the horizontal and vertical directions.
+The velocity of movement is expressed as a decimal value between `0` and `1`.
+Two decimal values between `-1` and `1` can be used to express both the direction and velocity of movement from the current position in 2D space.
+
+![Alt Direction and velocity of movement](data:image/jpeg;base64,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KknLTr7t9Ouw9eWaj8XLK3lJxfK/lKzPKvghrGrfsxf8FSLn4H2XiTxd4j+H3i34aHxpplt4l1+81690K+tNSW0uQl7eyy3TxTpdQtsklYI0J2BAxFbv/BYvXPij4W/YO+JmsfDjxbaeBo9B8Ha1qup6xBG760hgs2eCGxIwkDO27fckl4wgEab3EsWSvwV+KPhD4r/En9pjxzpPhmb4gaF8Np/Dfg/wb4SuL3xFb2yRPLfSkzNbWk93Pd3CWyiKOCMqIQqs7NuHZfFH4a/ET9tL/glRrPhTxDZ6H4X+KnxP+Gr6fqVpKJ7bTtK1a90/bLGw/eyxxRzSMCP3jgL/ABEc8+JVSWClFa1Ixd/PmlVcPW0VFNdNE+x0YSUIYyMpaQk4/dGNNT9Peb16u8l3PVP2ZNWutf8A2bfh7fX1zcXt7e+GtNnuLieQySzyNaxszuxyWYkkkk5JNdxXL/BDwVdfDX4LeEPDl9Jby3ugaJZabcPAxaJ5IYEjYoSASpKnGQDjsK6ivTxsoyxFSUNnJ29Lnm4KMo4enGe6ir+tgooorlOkKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/2Q==)
+
+```ruby
+/api/channel/ptz?ch=1&move=0.5,0.5  # Moves at medium speed in the upper right diagonal
+/api/channel/ptz?ch=1&move=-1       # Moves to the left at maximum speed (can be omitted if vertical value is zero)
+/api/channel/ptz?ch=1&move=0,0.1    # Move slowly downward
+/api/channel/ptz?ch=1&move          # Can be omitted if both horizontal and vertical are 0, same as stop command
+```
+
+The rest of the `zoom`,` focus`, and `iris` commands are all camera lens controls and use one parameter to express forward and backward.
+Likewise, you can express both the direction and velocity of movement from the current position in a one-dimensional space, using one decimal value between `-1` and` 1` to express both the speed and direction of movement.
+```ruby
+/api/channel/ptz?ch=1&zoom=0.5      # Zoom in at medium speed
+/api/channel/ptz?ch=1&zoom=-0.5     # Zoom out at medium speed
+/api/channel/ptz?ch=1&focus=0.1     # Focus near at very slow speed
+/api/channel/ptz?ch=1&focus=-0.5    # Focus far at medium speed
+/api/channel/ptz?ch=1&focus=-0.1    # Close iris at very slow speed
+/api/channel/ptz?ch=1&focus=1       # Open iris at maximum speed
+```
+
+The physical travel limit and speed for the move command can vary depending on the unique characteristics of each device.
+
+
+### Pan tilt preset control
+
+Available when the device supports the pan tilt preset function.
+
+**Request a preset list**
+This command requests a list of presets that the server has already obtained (cached).
+```ruby
+/api/channel/preset?ch=1&ls
+```
+While the response time is fast because you do not reload from the device each time, if the preset list modified by the other software (for example, the embedded web page of the device), the server responds with the list of past.
+
+If the request is successful, the server responds with JSON data in the following format:
+```jsx
+{
+  "chid": 1,
+  "code": 0,
+  "message": "Success",
+  "preset": [
+    {
+      "name": "Front Door",  // The name that the user places conveniently for each preset position
+      "token": "1"           // Unique ID indicating each preset position
+    },
+    {
+      "name": "Garage",
+      "token": "2"
+    },
+    // ... omitted
+  ]
+}
+```
+
+**Preset list reload request**
+This command reloads the preset list from the device and sends it back.
+```ruby
+/api/channel/preset?ch=1&reload
+```
+Contrary to the `ls` command, while the response time is slow, you can always receive the same data as the preset list that the device has.
+
+
+**Setting preset**
+Sets the camera's current position as a preset.
+
+Two parameters are required to set a preset.
+The first parameter is the `preset token` and the second parameter is the `preset name`.
+If you do not specify a preset name, the name of the preset token will be used.
+If the presets of the same `Preset Token` already exist, it will be overwritten, otherwise added as a new one.
+
+The maximum number of presets supported by the camera can be found at [Request Device Information and Support Function List](#request-device-information-and-support-function-list).
+
+Since the camera does not support various character sets, it is recommended to use numeric charactors for the `preset token`.
+However, since the preset name is stored in the server instead of the camera, you can use the `preset name` without any character restrictions.
+Don't forget to URL-encode to send the text string normally.
+
+```ruby
+# token: 1, preset name: preset1
+/api/channel/preset?ch=1&set=1,preset1 
+
+# Omit preset name
+/api/channel/preset?ch=1&set=2
+
+# token: 3, preset name: Sweet home ^^
+/api/channel/preset?ch=1&set=3,Sweet%20home%20%5E%5E
+```
+
+**Remove presets**
+Removes the preset of the specified preset tokens.
+
+To remove presets, you must specify the `preset token` as a parameter.
+```ruby
+# Remove presets token 1
+/api/channel/preset?ch=1&rm=1
+
+# Remove multiple presets
+/api/channel/preset?ch=1&rm=1,2,3
+```
+
+**Go to preset position**
+Goes to the preset position of the specified preset token.
+
+To move to the preset position, `preset token` must be specified as a parameter.
+```ruby
+/api/channel/preset?ch=1&go=1 # Goes to the preset token 1
+```
+
+### Relay output
+
+If your device supports relay output, you can request a list of relay outputs as follows:
+To get a list of relay outputs, you must specify one channel to which the device is connected.
+```ruby
+/api/channel/relay?ls&ch=1    # Request relay output list connected to channel 1
+```
+
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+{
+  "chid": 1,
+  "code": 0,          // Response code
+  "message": "Success",  // Message
+  "relay": [
+    {
+      "name": "Stairway",   // name
+      "token": "7657b9aa-61d6-4b4f-a70a-c91e8657dfcf" // relay output token
+    },
+    {
+      "name": "Warehouse",
+      "token": "cffd1289-cb2c-4d82-8c6f-c7634b432f57"
+    }
+  ]
+}
+```
+
+Relay output command is specified using the `on` or` off` command and one or more relay output tokens.
+```ruby
+# Turn on the relay output of 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+
+# Turn off the relay output of 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+/api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+
+# Simultaneously turn on two relay outputs
+/api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf,cffd1289-cb2c-4d82-8c6f-c7634b432f57
+
+# If both on and off are specified at the same time, the off command is ignored.
+/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
+
+# If one is turned on and the other is turned off, each must be sent separately for each command.
+/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+/api/channel/relay?ch=1&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
+```
+
+### AUX output
+
+If your device supports AUX output, use the `on` or` off` command as `relay output`.
+The AUX outputs are specified using a zero-based number instead of a token.
+
+```ruby
+# Turn on AUX 1 output
+/api/channel/aux?ch=1&on=0
+
+# Turn off AUX 1 output
+/api/channel/aux?ch=1&off=1
+
+# Simultaneously turn on two AUX outputs
+/api/channel/aux?ch=1&on=0,1
+
+# If both on and off are specified at the same time, the off command is ignored.
+/api/channel/aux?ch=1&on=0&off=1
+
+# If one is turned on and the other is turned off, each must be sent separately for each command.
+/api/channel/aux?ch=1&on=0
+/api/channel/aux?ch=1&off=1
+```
+
+### Reboot the device
+
+If your device supports it, you can reboot it remotely with the following command:
+
+```ruby
+/api/channel/reboot?ch=1    # Reboot camera on channel 1
+```
+
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+{
+  "code": 0,
+  "message": "Success"
+}
+```
+After sending the response, the camera will start rebooting in a few seconds.
+Typically, the reboot takes approximately one minute to complete, which may vary from each camera.
+
+From the perspective of the client software, it is necessary to monitor the completion of the reboot by attempting to reconnect periodically from the video connection is disconnected after sending the reboot command.
+
+
 ## Appendix
 
 ### The API-supported versions by product
 
 The versions of the products that support the API are as follows.
 
-| API version | TS-CMS           | TS-NVR           | TS-LPR           |
-|-------------|------------------|------------------|------------------|
-| 0.1.0       | v0.38.0 or later | v0.35.0 or later | v0.2.0A or later |
-| 0.2.0       | v0.41.0 or later | v0.40.0 or later | v0.7.0A or later |
-| 0.3.0       | v0.42.1 or later | v0.41.1 or later | v0.8.2A or later |
+| API version | TS-CMS           | TS-NVR           | TS-LPR            |
+|-------------|------------------|------------------|-------------------|
+| 0.1.0       | v0.38.0 or later | v0.35.0 or later | v0.2.0A or later  |
+| 0.2.0       | v0.41.0 or later | v0.40.0 or later | v0.7.0A or later  |
+| 0.3.0       | v0.42.1 or later | v0.41.1 or later | v0.8.2A or later  |
 | 0.4.0       | v0.44.7 or later | v0.44.7 or later | v0.11.7A or later |
+| 0.5.0       | v0.45.0 or later | v0.45.0 or later | v0.12.0A or later |
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
@@ -3216,7 +3563,9 @@ APIs are compatible across all product lines, but some features may not be suppo
 | [Request various enumeration](#request-various-enumeration)         | O      | O                                      | O      |
 | [Search date with recorded video](#search-date-with-recorded-video) | X      | O                                      | O      |
 | [Search Event Log](#search-event-log)                               | O      | O                                      | O      |
-| [Vehicle number log search](#vehicle-number-log-search)             | X      | depends on the license `[Tips]` | O      |
+| [Vehicle number log search](#vehicle-number-log-search)             | X      | depends on the license `[Tips]`        | O      |
+| [Pushing events to the server](#pushing-events-to-the-server-040)   | X      | O                                      | O      |
+| [Channel information and device control](#channel-information-and-device-control-050) | O  | O                        | O      |
 
 > [Tips]
 TS-NVR does not have built-in vehicle number recognition function and **vehicle number log search** function is not supported.
@@ -3292,20 +3641,20 @@ The server supports a total of 104 languages as follows:
 ```ruby
 af-ZA       # Afrikaans
 sq-AL       # Shqip, Albanian
-am-ET       # ?�ማ??��, Amharic
-ar-AE       # ا?عرب?ة, Arabic
-hy-AM       # ?այե?են, Armenian
-az-Latn     # Az?rbaycan, Azerbaijani
+am-ET       # አማርኛ, Amharic
+ar-AE       # العربية, Arabic
+hy-AM       # Հայերեն, Armenian
+az-Latn     # Azərbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
-be-BY       # бела???к?, Belarusian
-bn-BD       # বাংল�? Bengali
+be-BY       # беларускі, Belarusian
+bn-BD       # বাংলা, Bengali
 bs-Latn     # Bosanski, Bosnian
-bg-BG       # б?лга??ки, Bulgarian
+bg-BG       # български, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
-zh-CN       # 简体中?? Chinese (Simplified)
-zh-TW       # �?��?�統, Chinese (Traditional)
+zh-CN       # 简体中国, Chinese (Simplified)
+zh-TW       # 中國傳統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -3319,15 +3668,15 @@ fi-FI       # Suomalainen, Finnish
 fr-FR       # Français, French
 fy-NL       # Frysk, Frisian
 gl-ES       # Galego, Galician
-ka-GE       # ?�ა?�თ?�ლ?? Georgian
+ka-GE       # ქართული, Georgian
 de-DE       # Deutsch, German
-el-GR       # ?λληνικά, Greek
+el-GR       # Ελληνικά, Greek
 gu-IN       # ગુજરાતી, Gujarati
 ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
-he-IL       # ע?ר?ת, Hebrew
-hi-IN       # हिन्द�?, Hindi
+he-IL       # עברית, Hebrew
+hi-IN       # हिन्दी, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -3335,44 +3684,44 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # ?�本�? Japanese
+ja-JP       # 日本語, Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನ�? Kannada
-kk-KZ       # ?аза? ??л?нде, Kazakh
-km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
-ko-KR       # ?�국?? Korean
+kn-IN       # ಕನ್ನಡ, Kannada
+kk-KZ       # Қазақ тілінде, Kazakh
+km-KH       # ភាសាខ្មែរ, Khmer
+ko-KR       # 한국어, Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
-ru-KG       # ???г?з?а, Kyrgyz
-lo-LA       # �?���? Lao
+ru-KG       # Кыргызча, Kyrgyz
+lo-LA       # ລາວ, Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
 lb-LU       # Lëtzebuergesch, Luxembourgish
-mk-MK       # ?акедон?ки, Macedonian
+mk-MK       # Македонски, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # �?���?��ളം, Malayalam
+ml-IN       # മലയാളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # �?��ाठी, Marathi
-mn-MN       # ?онгол ??л д???, Mongolian
-my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
-ne-NP       # नेपाल�?, Nepali
+mr-IN       # मराठी, Marathi
+mn-MN       # Монгол хэл дээр, Mongolian
+my-MM       # မြန်မာ", Myanmar (Burmese)
+ne-NP       # नेपाली, Nepali
 nb-NO       # Norwegian
-ps-AF       # پ?ت?, Pashto
-fa-IR       # ?ارس?, Persian
+ps-AF       # پښتو, Pashto
+fa-IR       # فارسی, Persian
 pl-PL       # Polskie, Polish
 pt-PT       # Português, Portuguese
-pa-IN       # ਪੰਜਾਬ�?, Punjabi
+pa-IN       # ਪੰਜਾਬੀ, Punjabi
 ro-RO       # Română, Romanian
-ru-RU       # ????кий, Russian
+ru-RU       # Русский, Russian
 sm          # Samoan
 gd-GB       # Gàidhlig, Scots Gaelic
-sr-Cyrl-RS  # С?п?ки, Serbian
+sr-Cyrl-RS  # Српски, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
-sd-Arab-PK  # س???, Sindhi
-si-LK       # සිංහ�? Sinhala
+sd-Arab-PK  # سنڌي, Sindhi
+si-LK       # සිංහල, Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -3380,18 +3729,18 @@ es-ES       # Español, Spanish
 su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
-tg-Cyrl-TJ  # Тоҷики??он, Tajik
-ta-IN       # த�?ி�?�? Tamil
+tg-Cyrl-TJ  # Тоҷикистон, Tajik
+ta-IN       # தமிழ், Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไท�? Thai
+th-TH       # ไทย, Thai
 tr-TR       # Türkçe, Turkish
-uk-UA       # Ук?а?н??ка, Ukrainian
-ur-PK       # ارد?, Urdu
+uk-UA       # Українська, Ukrainian
+ur-PK       # اردو, Urdu
 uz-Latn-UZ  # O'zbek, Uzbek
 vi-VN       # Tiếng Việt, Vietnamese
 cy-GB       # Cymraeg, Welsh
 xh-ZA       # isiXhosa, Xhosa
-yi          # ??ִ??ש, Yiddish
+yi          # ייִדיש, Yiddish
 yo-NG       # Yorùbá, Yoruba
 zu-ZA       # isiZulu, Zulu
 ```

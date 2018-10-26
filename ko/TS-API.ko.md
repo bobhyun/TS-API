@@ -27,7 +27,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [사용자 인증](#사용자-인증)
   - [채널 변경](#채널-변경)
   - [녹화 영상 표시](#녹화-영상-표시)
-- [JSON 데이터 들여쓰기 `0.5.0`](#json-데이터-들여쓰기-050)
+- [JSON 데이터 들여쓰기 `@0.5.0`](#json-데이터-들여쓰기-050)
 - [세션 인증](#세션-인증)
   - [로그인](#로그인)
   - [로그아웃](#로그아웃)
@@ -67,6 +67,13 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
 - [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
 - [서버에 이벤트 밀어넣기 `@0.4.0`](#서버에-이벤트-밀어넣기-040)
+- [채널 정보 및 장치 제어 `@0.5.0`](#채널-정보-및-장치-제어-050)
+  - [장치 정보 및 지원 기능 목록 요청](#장치-정보-및-지원-기능-목록-요청)
+  - [팬틸트 제어](#팬틸트-제어)
+  - [팬틸트 프리셋 제어](#팬틸트-프리셋-제어)
+  - [릴레이 출력](#릴레이-출력)
+  - [AUX 출력](#AUX-출력)
+  - [장치 재부팅](#장치-재부팅)
 - [부록](#부록)
   - [제품별 API 지원 버전](#제품별-api-지원-버전)
   - [제품별 기능 지원 표](#제품별-기능-지원-표)
@@ -79,6 +86,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [피드백](#피드백)
 
 <!-- /TOC -->
+
 
 ## 시작하기
 이 문서 내에서는 TS-API를 줄여서 **API**로 부르고, 각 제품들은 간단히 **서버**로 부르겠습니다.
@@ -261,7 +269,7 @@ showPlayTime    # 재생 날짜, 시각 표시 (true, false)
 
 지금까지는 `/watch` 호출을 통해 영상을 표시하는 방법들을 알아 보았습니다. 여기서부터는 `/api` 호출을 통해 각종 정보를 질의하는 방법을 알아보겠습니다.
 
-## JSON 데이터 들여쓰기 `0.5.0`
+## JSON 데이터 들여쓰기 `@0.5.0`
 모든 응답 데이터는 [JSON](#JSON-데이터-형식) 형식이며 텍스트는 `utf8`로 인코딩되어 있습니다.
 
 데이터는 줄바꿈과 공백 문자없이 최적화된 형식을 사용하는 것이 성능을 위해서 좋지만 사람이 읽기에는 불편합니다.
@@ -921,15 +929,19 @@ lang      # 메시지에 사용될 언어 지정
 ```jsx
 [
   {
-    "chid": 1,        //채널 번호
-    "title": "카메라1" //채널 이름
+    "chid": 1,            //채널 번호
+    "title": "카메라1",   //채널 이름
+    "ptzSupported": true  //PTZ 지원 여부
   },
   {
-    "chid": 2,        //채널 번호
-    "title": "카메라2" //채널 이름
+    "chid": 2,            //채널 번호
+    "title": "카메라2",   //채널 이름
+    "ptzSupported": true  //PTZ 지원 여부
   }
 ]
 ```
+> [참고]
+`TS-API@0.5.0`부터 `"ptzSupported"` 항목이 추가되었습니다.
 
 ### 차량 번호 인식 장치 목록
 사용 중인 차량 번호 인식 장치 목록을 얻기 위해 아래와 같이 요청합니다.
@@ -1528,6 +1540,7 @@ maxCount    # 최대 항목 개수
   {
     "chid": 1,                        // 채널 번호
     "title": "Profile1 (1920x1080)",  // 채널 이름
+    "ptzSupported": true,
     "src": [  // 동영상 소스 목록
               // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨)
       { // 1080p RTMP 스트림
@@ -1571,6 +1584,7 @@ maxCount    # 최대 항목 개수
   {
     "chid": 2,
     "title": "192.168.0.106",
+    "ptzSupported": false,
     "src": [
       // ... 중략
     ]
@@ -1578,6 +1592,8 @@ maxCount    # 최대 항목 개수
   // ... 중략
 ]
 ```
+> [참고]
+`TS-API@0.5.0`부터 `"ptzSupported"` 항목이 추가되었습니다.
 
 동영상을 재생하는 환경 (전송 선로 속도와 플레이어에서 지원하는 프로토콜)이 다양하기 때문에 호환성을 높이기 위해 위의 예처럼 채널 당 여러 개의 동영상 소스를 제공합니다.
 현재 버전에서는 `RTMP`와 `HLS` 두 가지 형식으로 스트리밍하고 있으며, 카메라가 지원하는 경우 고해상도와 저해상도로 이중으로 스트리밍합니다.
@@ -3187,6 +3203,339 @@ curl http://192.168.0.100/api/push -H "Content-Type: application/json; charset=U
 curl http://192.168.0.100/api/push?auth=ZGVtbzohMTIzNHF3ZXI%3D -H "Content-Type: application/json; charset=UTF-8" -X POST -d @test.json
 ```
 
+## 채널 정보 및 장치 제어 `@0.5.0`
+
+각 채널에 연결된 장치 정보 및 각 장치가 지원하는 기능 목록을 확인하거나 각 장치를 제어할 수 있습니다.
+
+### 장치 정보 및 지원 기능 목록 요청
+연결된 장치 정보는 다음과 같이 요청합니다.
+```ruby
+/api/channel/info
+
+# 매개변수
+caps    # "caps" 항목만 요청함, 지정하지 않으면 모든 정보를 포함
+ch      # 채널을 지정함, 지정하지 않으면 사용중인 모든 채널
+
+# 예
+# 사용중인 각 채널 별로 연결된 장비의 지원 기능만 요청
+/api/channel/info?caps
+
+# 1번 채널에 연결된 장비의 지원 기능만 요청
+/api/channel/info?caps&ch=1
+
+# 1,2,3번 채널에 연결된 장비의 지원 기능만 요청
+/api/channel/info?caps&ch=1,2,3
+```
+
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  {
+    "chid": 1,
+    "type": "onvif"         // ONVIF 장치
+    "caps": {               // 지원 기능
+      "pantilt": true,      // 팬 틸트 기능 지원
+      "zoom": true          // 줌 기능 지원
+      "focus": false,       // 초점 제어 지원 안함
+      "iris": false,        // 조리개 제어 지원 안함
+      "home": true,         // 홈 포지션 기능 지원
+      "maxPreset": 255,     // PTZ 프리셋 최대 255개 등록 지원
+      "aux": 0,             // AUX 출력 없음
+      "digitalInputs": 2,   // 디지털 입력 2개 지원
+      "relayOutputs": 2,    // 릴레이 출력 2개 지원
+      "reboot": true,       // 원격 재부팅 지원
+    },
+    "onvif": {              // ONVIF 장치 정보
+      "basic": {
+        "city": "seoul",
+        "country": "korea",
+        "deviceType": "NVT",
+        "host": "192.168.0.211:4500",
+        "location": "",
+        "name": "SNP-3120"
+      },
+      "product": {
+        "firmwareVersion": "3.01_140915",
+        "hardwareId": "SNP-3120",
+        "macAddress": "00:09:18:73:E9:98",
+        "manufacturer": "Samsung Techwin",
+        "model": "SNP-3120",
+        "serialNumber": "C5FS6V3D401101R"
+      }
+    },
+  },
+  // ... 중략
+]
+```
+
+**장치 제어 응답 코드**
+
+서버의 각 채널이 장치 제어 기능을 지원할 경우 클라이언트 측에서 원격 제어할 수 있습니다.
+원격 제어 기능들은 로그인 한 사용자 계정에 `장치 제어 권한`이 있는 경우만 동작합니다.
+
+장치 제어 명령은 `/api/channel/` 다음에 개별 명령과 대상 채널과 추가로 필요한 매개변수를 지정하는 형식입니다.
+여기서부터 사용할 예제에서는 대상 채널을 1번`ch=1`으로 가정했습니다.
+```ruby
+/api/channel/ptz?ch=1&home&indent=2
+```
+
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+{
+  "code": 0,          // 응답 코드
+  "message": "성공"
+}
+```
+서버는 제어 명령을 보내고 나서 장치의 실행 결과를 기다리지 않고 장치와는 비동기로 HTTP 응답 코드 200으로 아래 코드 중 하나를 포함하는 JSON 데이터를 사용합니다.
+```ruby
+0     # 성공
+-1    #	사용자 권한 없음
+-2    # 장치가 지원하지 않는 기능
+-3    # 장치가 명령을 수행할 준비가 안됨
+-4    # 장치가 아직 이전 요청을 처리중 (busy)
+-5    # 잘못된 채널
+-6    # 잘못된 장치 토큰
+-7    #	잘못된 요청
+-8    # 잘못된 매개변수
+```
+위의 응답 코드는 모든 장치 제어 명령에 공통으로 사용됩니다.
+
+
+`message` 부분은 언어를 지정하지 않은 경우 서버 측에 설정된 언어가 사용됩니다.
+아래와 같이 매개변수에 언어를 지정하여 사용해도 됩니다.
+```ruby
+/api/channel/ptz?ch=1&home&lang=en_US
+```
+[지원하는 언어 목록](#지원하는-언어-목록)은 부록을 참고하십시오.
+
+
+### 팬틸트 제어
+
+장치가 팬틸트 기능을 지원할 경우 아래 명령들로 제어할 수 있습니다.
+```ruby
+# 매개변수가 없는 명령들
+home    # 홈 위치로 복귀
+stop    # 정지 (모든 이동에 대해 공통으로 사용)
+
+# 매개변수와 함께 사용하는 명령들 (계속 이동 시키는 명령들)
+move    # 가로 세로 방향 이동
+zoom    # 줌 인 / 아웃
+focus   # 초점 가까이 / 멀리
+iris    # 조리개 열기 / 닫기
+```
+
+제어 명령은 반드시 하나의 대상 채널과 명령으로 구성됩니다.
+예를 들어 `home` 명령일 경우 대상 채널을 매개변수로 지정해야 합니다.
+```ruby
+/api/channel/ptz?ch=1&home
+```
+
+매개변수와 함께 사용하는 명령들은 이동 방향과 속도를 지정해야 합니다.
+방향과 속도를 가지는 명령들은 `stop` 명령을 보내기 전까지 계속 이동합니다.
+`move` 명령은 가로, 세로의 이동 방향을 표현하기 위해 2개의 매개변수를 사용합니다.
+그리고 이동 속도는 `0`과 `1` 사이의 소수값으로 표현합니다.
+`-1`에서 `1` 사이의 소수값 2개를 사용하여 2차원 공간에 대해 현 위치로부터 이동 방향과 속도를 모두 표현할 수 있습니다.
+
+![Alt 이동 방향과 속도](data:image/jpeg;base64,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KknLTr7t9Ouw9eWaj8XLK3lJxfK/lKzPKvghrGrfsxf8FSLn4H2XiTxd4j+H3i34aHxpplt4l1+81690K+tNSW0uQl7eyy3TxTpdQtsklYI0J2BAxFbv/BYvXPij4W/YO+JmsfDjxbaeBo9B8Ha1qup6xBG760hgs2eCGxIwkDO27fckl4wgEab3EsWSvwV+KPhD4r/En9pjxzpPhmb4gaF8Np/Dfg/wb4SuL3xFb2yRPLfSkzNbWk93Pd3CWyiKOCMqIQqs7NuHZfFH4a/ET9tL/glRrPhTxDZ6H4X+KnxP+Gr6fqVpKJ7bTtK1a90/bLGw/eyxxRzSMCP3jgL/ABEc8+JVSWClFa1Ixd/PmlVcPW0VFNdNE+x0YSUIYyMpaQk4/dGNNT9Peb16u8l3PVP2ZNWutf8A2bfh7fX1zcXt7e+GtNnuLieQySzyNaxszuxyWYkkkk5JNdxXL/BDwVdfDX4LeEPDl9Jby3ugaJZabcPAxaJ5IYEjYoSASpKnGQDjsK6ivTxsoyxFSUNnJ29Lnm4KMo4enGe6ir+tgooorlOkKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/2Q==)
+
+```ruby
+/api/channel/ptz?ch=1&move=0.5,0.5  # 오른쪽 위 대각선 방향으로 중간 속도로 이동
+/api/channel/ptz?ch=1&move=-1       # 왼쪽으로 최대 속도로 이동 (세로가 0인 경우는 생략 가능)
+/api/channel/ptz?ch=1&move=0,0.1    # 아래쪽으로 느리게 이동
+/api/channel/ptz?ch=1&move          # 가로, 세로 모두 0인 경우 모두 생략 가능, 정지 명령 stop과 동일함
+```
+
+나머지 `zoom`, `focus`, `iris` 명령은 모두 카메라 렌즈 제어 기능이며, 전진, 후진을 표현하기 위해 1개의 매개변수를 사용합니다.
+마찬가지로 이동 속도와 방향을 함께 표현하기 위해 `-1`에서 `1` 사이의 소수값 1개를 사용하여 
+1차원 공간에 대해 현 위치로부터 이동 방향과 속도를 모두 표현할 수 있습니다.
+```ruby
+/api/channel/ptz?ch=1&zoom=0.5      # 중간 속도로 줌인
+/api/channel/ptz?ch=1&zoom=-0.5     # 중간 속도로 줌 아웃
+/api/channel/ptz?ch=1&focus=0.1     # 아주 느리게 초점 가까이
+/api/channel/ptz?ch=1&focus=-0.5    # 중간 속도로  초점 멀리
+/api/channel/ptz?ch=1&focus=-0.1    # 아주 느리게 조리개 닫기
+/api/channel/ptz?ch=1&focus=1       # 최대 속도로 조리개 열기
+```
+
+이동 명령에 대해 물리적인 이동 한계 지점과 속도는 각 장치의 고유 특성에 따라 다를 수 있습니다.
+
+
+### 팬틸트 프리셋 제어
+
+장치가 팬틸트 프리셋 기능을 지원할 경우 사용할 수 있습니다.
+
+**프리셋 목록 요청**
+이 명령은 서버가 이미 확보한 프리셋 목록을 요청합니다.
+```ruby
+/api/channel/preset?ch=1&ls
+```
+매번 장치로부터 다시 읽어서 전송하지 않으므로 응답 시간이 빠른 반면, 
+타 소프트웨어(예: 장치의 내장 웹 페이지)을 사용하여 프리셋 목록을 변경한 경우
+서버는 변경된 목록이 아니라 이미 확보하고 있던 과거의 목록을 응답할 수 있습니다.
+
+요청이 성공할 경우 서버는 다음과 같은 형식의 JSON 데이터로 응답합니다.
+```jsx
+{
+  "chid": 1,
+  "code": 0,
+  "message": "성공",
+  "preset": [
+    {
+      "name": "정문",   // 각 프리셋 위치에 대해 사용자가 편의상 붙이는 이름
+      "token": "1"      // 각 프리셋 위치를 가리키는 고유 아이디
+    },
+    {
+      "name": "주차장",
+      "token": "2"
+    },
+    // ... 중략
+  ]
+}
+```
+
+**프리셋 목록 갱신 요청**
+이 명령은 장치로부터 프리셋 목록을 다시 읽어서 전송합니다.
+```ruby
+/api/channel/preset?ch=1&reload
+```
+`ls` 명령과 반대로 응답 시간이 느린 반면 항상 장치가 가지고 있는 프리셋 목록과 동일한 데이터를 받을 수 있습니다.
+
+
+**프리셋 지정**
+카메라의 현재 위치를 프리셋으로 설정합니다.
+
+프리셋을 설정하기 위해서는 두 개의 매개변수가 필요합니다.
+첫 번째 매개변수는 `프리셋 토큰`, 두 번째 매개변수는 `프리셋 이름`입니다.
+프리셋 이름을 지정하지 않으면 `프리셋 토큰`이 이름이 사용됩니다.
+동일한 `프리셋 토큰`의 프리셋이 이미 있으면 덮어쓰고, 그렇지 아니면 새로 추가됩니다.
+카메라가 지원하는 최대 프리셋 갯수는 [장치 정보 및 지원 기능 목록 요청](#장치-정보-및-지원-기능-목록-요청)을 사용하여 확인할 수 있습니다.
+
+카메라가 다양한 문자를 지원하지 않으므로 `프리셋 토큰`은 가능하면 숫자로 지정하길 권장합니다.
+다만 `프리셋 이름`은 카메라 대신 서버에 저장되므로 문자 제약없이 다양한 문자열을 사용할 수 있습니다.
+문자열을 정상적으로 보내기 위해서는 URL 인코딩하는 것을 잊지 마십시오.
+
+```ruby
+# 토큰: 1, 프리셋 이름: preset1
+/api/channel/preset?ch=1&set=1,preset1 
+
+# 프리셋 이름을 생략
+/api/channel/preset?ch=1&set=2
+
+# 토큰: 3, 프리셋 이름: 우리집 현관
+/api/channel/preset?ch=1&set=3,%EC%9A%B0%EB%A6%AC%EC%A7%91%20%ED%98%84%EA%B4%80
+```
+
+**프리셋 삭제**
+지정한 프리셋 토큰의 프리셋을 삭제합니다.
+
+프리셋을 삭제하기 위해서는 `프리셋 토큰`을 매개변수로 지정해야 합니다.
+```ruby
+# 토큰 1의 프리셋을 삭제
+/api/channel/preset?ch=1&rm=1
+
+# 여러 개의 프리셋을 삭제
+/api/channel/preset?ch=1&rm=1,2,3
+```
+
+**프리셋 위치로 이동**
+
+지정한 프리셋 토큰의 프리셋 위치로 이동합니다.
+
+프리셋 위치로 이동시키기 위해서는 `프리셋 토큰`을 매개변수로 지정해야 합니다.
+```ruby
+/api/channel/preset?ch=1&go=1 # 프리셋 1번으로 이동
+```
+
+### 릴레이 출력
+
+장치가 릴레이 출력을 지원할 경우 다음과 같이 릴레이 출력의 목록을 요청할 수 있습니다.
+릴레이 출력 목록을 얻기 위해서는 장치가 연결된 하나의 채널을 지정해야 합니다.
+```ruby
+/api/channel/relay?ls&ch=1    # 채널 1번에 연결된 릴레이 출력 목록 요청
+```
+
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+{
+  "chid": 1,
+  "code": 0,          // 응답 코드
+  "message": "성공",  // 응답 메시지
+  "relay": [
+    {
+      "name": "계단",   // 이름
+      "token": "7657b9aa-61d6-4b4f-a70a-c91e8657dfcf" // 릴레이 출력 토큰
+    },
+    {
+      "name": "창고",
+      "token": "cffd1289-cb2c-4d82-8c6f-c7634b432f57"
+    }
+  ]
+}
+```
+
+릴레이 출력 명령은 `on` 또는 `off` 명령과 하나 이상의 릴레이 출력 토큰을 사용하여 지정합니다.
+```ruby
+# 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf 출력을 켜기
+/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+
+# 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf 출력을 끄기
+/api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+
+# 두 개의 출력을 동시에 켜기
+/api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf,cffd1289-cb2c-4d82-8c6f-c7634b432f57
+
+# on과 off를 인자에 동시 지정할 경우 off 명령은 무시됩니다.
+/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
+
+# 하나는 켜고 하나는 끌 경우는 각각 명령을 나누어 각 각 보내야 합니다.
+/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+/api/channel/relay?ch=1&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
+```
+
+### AUX 출력
+
+장치가 AUX 출력을 지원할 경우 `릴레이 출력`와 마찬가지로 `on` 또는 `off` 명령을 사용합니다.
+AUX 출력은 토큰 대신 0부터 시작하는 번호를 사용하여 지정합니다.
+```ruby
+# AUX 0 출력을 켜기
+/api/channel/aux?ch=1&on=0
+
+# AUX 1 출력을 끄기
+/api/channel/aux?ch=1&off=1
+
+# 두 개의 출력을 동시에 켜기
+/api/channel/aux?ch=1&on=0,1
+
+# on과 off를 인자에 동시 지정할 경우 off 명령은 무시됩니다.
+/api/channel/aux?ch=1&on=0&off=1
+
+# 하나는 켜고 하나는 끌 경우는 각각 명령을 나누어 각 각 보내야 합니다.
+/api/channel/aux?ch=1&on=0
+/api/channel/aux?ch=1&off=1
+```
+
+### 장치 재부팅
+
+장치가 지원할 경우 원격으로 아래 명령으로 재부팅 시킬 수 있습니다.
+
+```ruby
+/api/channel/reboot?ch=1    # 1번 채널의 카메라 재부팅
+
+```
+
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+{
+  "code": 0,
+  "message": "성공"
+}
+```
+응답을 보낸 후 카메라는 수 초 내에 재부팅을 시작합니다.
+재부팅이 완료되데 일반적으로 1분 정도의 시간이 걸리 수 있으며 카메라마다 다를 수 있습니다.
+
+클라이언트 소프트웨어 관점에서는 재부팅 명령을 보낸 후 영상 접속이 끊어진 후부터 
+주기적으로 재 접속을 시도해서 재부팅이 완료되는 과정을 모니터링할 필요가 있습니다.
+
 
 ## 부록
 
@@ -3200,6 +3549,7 @@ API를 지원하는 제품들의 버전은 다음과 같습니다.
 | 0.2.0  | v0.41.0 이상 | v0.40.0 이상 | v0.7.0A 이상 |
 | 0.3.0  | v0.42.1 이상 | v0.41.1 이상 | v0.8.2A 이상 |
 | 0.4.0  | v0.44.7 이상 | v0.44.7 이상 | v0.11.7A 이상 |
+| 0.5.0  | v0.45.0 이상 | v0.45.0 이상 | v0.12.0A 이상 |
 
 API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 일부 기능이 지원되지 않을 수 있습니다. 아래 목록 중에서 사용하는 제품이 어디에 해당하는지 확인하시기 바랍니다.
 
@@ -3217,6 +3567,8 @@ API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 
 | [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색) | X      | O               | O      |
 | [이벤트 로그 검색](#이벤트-로그-검색)             | O      | O               | O      |
 | [차량 번호 로그 검색](#차량-번호-로그-검색)         | X      | 라이센스에 준함 `[참고]` | O      |
+| [서버에 이벤트 밀어넣기](#서버에-이벤트-밀어넣기-040)   | X      | O       | O      |
+| [채널 정보 및 장치 제어](#채널-정보-및-장치-제어-050) | O  | O                        | O      |
 
 > [참고]
 TS-NVR은 자체적인 차량 번호 인식 기능이 없어 **차량 번호 로그 검색** 기능을 지원하지 않습니다. 
