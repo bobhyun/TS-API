@@ -466,14 +466,27 @@ If it is not in [session authenticated](#session-authentication) state, the serv
   "whoAmI": {
     "uid":"admin",      // User ID
     "name":"admin",     // User name
-    "accessRights": [   // Permissions
-      "DataExport",     // Export images, videos
-      "Control",        // Pan tilt, relay control
-      "Settings",       // Change settings
-      "Playback",       // Play saved videos
-      "LPR",            // Vehicle number search
-      "SearchEdit",     // Edit search data
-      "Remote"          // Eemote access
+    "##COMMENT1": "---- NOTICE OF CHANGE -------------------------------------------",
+    "##COMMENT2": "'accessRights' is deprecated and 'accessRights2' is used instead.",
+    "##COMMENT3": "-----------------------------------------------------------------",    
+    // The new format is used since 0.5.0
+    "accessRights2": {         // Permissions
+      "DataExport": true,     // Export images, videos
+      "Control": true,        // Pan tilt, relay control
+      "Settings": true,       // Change settings
+      "Playback": true,       // Search and Play back saved videos
+      "LPR": true,            // Vehicle number search
+      "Remote": true          // Remote access
+    },
+    // Old format will be deleted and kept for backwards compatibility
+    "accessRights": [
+      "DataExport",
+      "Control",
+      "Settings",
+      "Playback",
+      "LPR",
+      //"SearchEdit",   // Removed since 0.5.0 (replaced with Playback permission)
+      "Remote"
     ]
   }
 }
@@ -3641,20 +3654,20 @@ The server supports a total of 104 languages as follows:
 ```ruby
 af-ZA       # Afrikaans
 sq-AL       # Shqip, Albanian
-am-ET       # አማርኛ, Amharic
-ar-AE       # العربية, Arabic
-hy-AM       # Հայերեն, Armenian
-az-Latn     # Azərbaycan, Azerbaijani
+am-ET       # ?�ማ??��, Amharic
+ar-AE       # ا?عرب?ة, Arabic
+hy-AM       # ?այե?են, Armenian
+az-Latn     # Az?rbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
-be-BY       # беларускі, Belarusian
-bn-BD       # বাংলা, Bengali
+be-BY       # бела???к?, Belarusian
+bn-BD       # বাংল�? Bengali
 bs-Latn     # Bosanski, Bosnian
-bg-BG       # български, Bulgarian
+bg-BG       # б?лга??ки, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
-zh-CN       # 简体中国, Chinese (Simplified)
-zh-TW       # 中國傳統, Chinese (Traditional)
+zh-CN       # 简体中?? Chinese (Simplified)
+zh-TW       # �?��?�統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -3668,15 +3681,15 @@ fi-FI       # Suomalainen, Finnish
 fr-FR       # Français, French
 fy-NL       # Frysk, Frisian
 gl-ES       # Galego, Galician
-ka-GE       # ქართული, Georgian
+ka-GE       # ?�ა?�თ?�ლ?? Georgian
 de-DE       # Deutsch, German
-el-GR       # Ελληνικά, Greek
+el-GR       # ?λληνικά, Greek
 gu-IN       # ગુજરાતી, Gujarati
 ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
-he-IL       # עברית, Hebrew
-hi-IN       # हिन्दी, Hindi
+he-IL       # ע?ר?ת, Hebrew
+hi-IN       # हिन्द�?, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -3684,44 +3697,44 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # 日本語, Japanese
+ja-JP       # ?�本�? Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನಡ, Kannada
-kk-KZ       # Қазақ тілінде, Kazakh
-km-KH       # ភាសាខ្មែរ, Khmer
-ko-KR       # 한국어, Korean
+kn-IN       # ಕನ್ನ�? Kannada
+kk-KZ       # ?аза? ??л?нде, Kazakh
+km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
+ko-KR       # ?�국?? Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
-ru-KG       # Кыргызча, Kyrgyz
-lo-LA       # ລາວ, Lao
+ru-KG       # ???г?з?а, Kyrgyz
+lo-LA       # �?���? Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
 lb-LU       # Lëtzebuergesch, Luxembourgish
-mk-MK       # Македонски, Macedonian
+mk-MK       # ?акедон?ки, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # മലയാളം, Malayalam
+ml-IN       # �?���?��ളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # मराठी, Marathi
-mn-MN       # Монгол хэл дээр, Mongolian
-my-MM       # မြန်မာ", Myanmar (Burmese)
-ne-NP       # नेपाली, Nepali
+mr-IN       # �?��ाठी, Marathi
+mn-MN       # ?онгол ??л д???, Mongolian
+my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
+ne-NP       # नेपाल�?, Nepali
 nb-NO       # Norwegian
-ps-AF       # پښتو, Pashto
-fa-IR       # فارسی, Persian
+ps-AF       # پ?ت?, Pashto
+fa-IR       # ?ارس?, Persian
 pl-PL       # Polskie, Polish
 pt-PT       # Português, Portuguese
-pa-IN       # ਪੰਜਾਬੀ, Punjabi
+pa-IN       # ਪੰਜਾਬ�?, Punjabi
 ro-RO       # Română, Romanian
-ru-RU       # Русский, Russian
+ru-RU       # ????кий, Russian
 sm          # Samoan
 gd-GB       # Gàidhlig, Scots Gaelic
-sr-Cyrl-RS  # Српски, Serbian
+sr-Cyrl-RS  # С?п?ки, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
-sd-Arab-PK  # سنڌي, Sindhi
-si-LK       # සිංහල, Sinhala
+sd-Arab-PK  # س???, Sindhi
+si-LK       # සිංහ�? Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -3729,18 +3742,18 @@ es-ES       # Español, Spanish
 su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
-tg-Cyrl-TJ  # Тоҷикистон, Tajik
-ta-IN       # தமிழ், Tamil
+tg-Cyrl-TJ  # Тоҷики??он, Tajik
+ta-IN       # த�?ி�?�? Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไทย, Thai
+th-TH       # ไท�? Thai
 tr-TR       # Türkçe, Turkish
-uk-UA       # Українська, Ukrainian
-ur-PK       # اردو, Urdu
+uk-UA       # Ук?а?н??ка, Ukrainian
+ur-PK       # ارد?, Urdu
 uz-Latn-UZ  # O'zbek, Uzbek
 vi-VN       # Tiếng Việt, Vietnamese
 cy-GB       # Cymraeg, Welsh
 xh-ZA       # isiXhosa, Xhosa
-yi          # ייִדיש, Yiddish
+yi          # ??ִ??ש, Yiddish
 yo-NG       # Yorùbá, Yoruba
 zu-ZA       # isiZulu, Zulu
 ```

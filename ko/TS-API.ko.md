@@ -463,14 +463,27 @@ http://userid:password@host/path/to/
   "whoAmI": {
     "uid":"admin",      // 사용자 아이디
     "name":"admin",     // 사용자 이름
-    "accessRights": [   // 사용 권한
-      "DataExport",     // 이미지, 동영상 받아내기
-      "Control",        // 팬틸트, 릴레이 제어
-      "Settings",       // 설정 변경
-      "Playback",       // 녹화 데이터 보기
-      "LPR",            // 차량 번호 조회
-      "SearchEdit",     // 검색 데이터 편집
-      "Remote"          // 원격 접속
+    "##COMMENT1": "---- NOTICE OF CHANGE --------------------------------------------",
+    "##COMMENT2": "'accessRights' is deprecated and 'accessRights2' is used instead.",
+    "##COMMENT3": "------------------------------------------------------------------",    
+    // 0.5.0 이후 새 형식으로 변경됨 
+    "accessRights2": {        // 사용자 권한
+      "DataExport": true,     // 이미지, 동영상 받아내기
+      "Control": true,        // 팬틸트, 릴레이 제어
+      "Settings": true,       // 설정 변경
+      "Playback": true,       // 녹화 데이터 보기
+      "LPR": true,            // 차량 번호 조회
+      "Remote": true          // 원격 접속
+    },
+    // 기존 형식은 삭제 예정이며 하위 호환성을 위해 유지함
+    "accessRights": [
+      "DataExport",
+      "Control",
+      "Settings",
+      "Playback",
+      "LPR",
+      //"SearchEdit",   // 0.5.0 이후 삭제됨 (Playback 권한으로 대체됨)
+      "Remote"
     ]
   }
 }
