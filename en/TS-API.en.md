@@ -3366,8 +3366,8 @@ Likewise, you can express both the direction and velocity of movement from the c
 /api/channel/ptz?ch=1&zoom=-0.5     # Zoom out at medium speed
 /api/channel/ptz?ch=1&focus=0.1     # Focus near at very slow speed
 /api/channel/ptz?ch=1&focus=-0.5    # Focus far at medium speed
-/api/channel/ptz?ch=1&focus=-0.1    # Close iris at very slow speed
-/api/channel/ptz?ch=1&focus=1       # Open iris at maximum speed
+/api/channel/ptz?ch=1&iris=-0.1    # Close iris at very slow speed
+/api/channel/ptz?ch=1&iris=1       # Open iris at maximum speed
 ```
 
 The physical travel limit and speed for the move command can vary depending on the unique characteristics of each device.

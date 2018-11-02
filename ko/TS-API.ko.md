@@ -3366,8 +3366,8 @@ iris    # 조리개 열기 / 닫기
 /api/channel/ptz?ch=1&zoom=-0.5     # 중간 속도로 줌 아웃
 /api/channel/ptz?ch=1&focus=0.1     # 아주 느리게 초점 가까이
 /api/channel/ptz?ch=1&focus=-0.5    # 중간 속도로  초점 멀리
-/api/channel/ptz?ch=1&focus=-0.1    # 아주 느리게 조리개 닫기
-/api/channel/ptz?ch=1&focus=1       # 최대 속도로 조리개 열기
+/api/channel/ptz?ch=1&iris=-0.1    # 아주 느리게 조리개 닫기
+/api/channel/ptz?ch=1&iris=1       # 최대 속도로 조리개 열기
 ```
 
 이동 명령에 대해 물리적인 이동 한계 지점과 속도는 각 장치의 고유 특성에 따라 다를 수 있습니다.
