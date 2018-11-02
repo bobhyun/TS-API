@@ -3380,36 +3380,53 @@ Available when the device supports the pan tilt preset function.
 **Request a preset list**
 This command requests a list of presets that the server has already obtained (cached).
 ```ruby
-/api/channel/preset?ch=1&ls
+# Request a list of presets from channel 1
+/api/channel/preset?ch=1&list
+
+# Request a list of presets from multiple channels
+/api/channel/preset?ch=1,2,3&list
+
+# Request a preset list of all channels
+/api/channel/preset?list
 ```
 While the response time is fast because you do not reload from the device each time, if the preset list modified by the other software (for example, the embedded web page of the device), the server responds with the list of past.
 
 If the request is successful, the server responds with JSON data in the following format:
 ```jsx
-{
-  "chid": 1,
-  "code": 0,
-  "message": "Success",
-  "preset": [
-    {
-      "name": "Front Door",  // The name that the user places conveniently for each preset position
-      "token": "1"           // Unique ID indicating each preset position
-    },
-    {
-      "name": "Garage",
-      "token": "2"
-    },
-    // ... omitted
-  ]
-}
+[
+  {
+    "chid": 1,
+    "code": 0,
+    "message": "Success",
+    "preset": [
+      {
+        "name": "Front Door",  // The name that the user places conveniently for each preset position
+        "token": "1"           // Unique ID indicating each preset position
+      },
+      {
+        "name": "Garage",
+        "token": "2"
+      },
+      // ... omitted
+    ]
+  },
+  // ... omitted
+]
 ```
 
 **Preset list reload request**
 This command reloads the preset list from the device and sends it back.
 ```ruby
+# Request to reload the preset list of channel 1
 /api/channel/preset?ch=1&reload
+
+#  Request to reload the preset list of multiple channels
+/api/channel/preset?ch=1,2,3&reload
+
+#  Request to reload the preset list of all channels
+/api/channel/preset?reload
 ```
-Contrary to the `ls` command, while the response time is slow, you can always receive the same data as the preset list that the device has.
+Contrary to the `list` command, while the response time is slow, you can always receive the same data as the preset list that the device has.
 
 
 **Setting preset**
@@ -3654,20 +3671,20 @@ The server supports a total of 104 languages as follows:
 ```ruby
 af-ZA       # Afrikaans
 sq-AL       # Shqip, Albanian
-am-ET       # ?�ማ??��, Amharic
+am-ET       # ?�ማ??��, Amharic
 ar-AE       # ا?عرب?ة, Arabic
 hy-AM       # ?այե?են, Armenian
 az-Latn     # Az?rbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
 be-BY       # бела???к?, Belarusian
-bn-BD       # বাংল�? Bengali
+bn-BD       # বাংল�? Bengali
 bs-Latn     # Bosanski, Bosnian
 bg-BG       # б?лга??ки, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
 zh-CN       # 简体中?? Chinese (Simplified)
-zh-TW       # �?��?�統, Chinese (Traditional)
+zh-TW       # �?��?�統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -3681,7 +3698,7 @@ fi-FI       # Suomalainen, Finnish
 fr-FR       # Français, French
 fy-NL       # Frysk, Frisian
 gl-ES       # Galego, Galician
-ka-GE       # ?�ა?�თ?�ლ?? Georgian
+ka-GE       # ?�ა?�თ?�ლ?? Georgian
 de-DE       # Deutsch, German
 el-GR       # ?λληνικά, Greek
 gu-IN       # ગુજરાતી, Gujarati
@@ -3689,7 +3706,7 @@ ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
 he-IL       # ע?ר?ת, Hebrew
-hi-IN       # हिन्द�?, Hindi
+hi-IN       # हिन्द�?, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -3697,15 +3714,15 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # ?�本�? Japanese
+ja-JP       # ?�本�? Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನ�? Kannada
+kn-IN       # ಕನ್ನ�? Kannada
 kk-KZ       # ?аза? ??л?нде, Kazakh
-km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
-ko-KR       # ?�국?? Korean
+km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
+ko-KR       # ?�국?? Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
 ru-KG       # ???г?з?а, Kyrgyz
-lo-LA       # �?���? Lao
+lo-LA       # �?���? Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
@@ -3713,19 +3730,19 @@ lb-LU       # Lëtzebuergesch, Luxembourgish
 mk-MK       # ?акедон?ки, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # �?���?��ളം, Malayalam
+ml-IN       # �?���?��ളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # �?��ाठी, Marathi
+mr-IN       # �?��ाठी, Marathi
 mn-MN       # ?онгол ??л д???, Mongolian
-my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
-ne-NP       # नेपाल�?, Nepali
+my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
+ne-NP       # नेपाल�?, Nepali
 nb-NO       # Norwegian
 ps-AF       # پ?ت?, Pashto
 fa-IR       # ?ارس?, Persian
 pl-PL       # Polskie, Polish
 pt-PT       # Português, Portuguese
-pa-IN       # ਪੰਜਾਬ�?, Punjabi
+pa-IN       # ਪੰਜਾਬ�?, Punjabi
 ro-RO       # Română, Romanian
 ru-RU       # ????кий, Russian
 sm          # Samoan
@@ -3734,7 +3751,7 @@ sr-Cyrl-RS  # С?п?ки, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
 sd-Arab-PK  # س???, Sindhi
-si-LK       # සිංහ�? Sinhala
+si-LK       # සිංහ�? Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -3743,9 +3760,9 @@ su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
 tg-Cyrl-TJ  # Тоҷики??он, Tajik
-ta-IN       # த�?ி�?�? Tamil
+ta-IN       # த�?ி�?�? Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไท�? Thai
+th-TH       # ไท�? Thai
 tr-TR       # Türkçe, Turkish
 uk-UA       # Ук?а?н??ка, Ukrainian
 ur-PK       # ارد?, Urdu
