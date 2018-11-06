@@ -3311,6 +3311,7 @@ The server sends control commands and immediately resonse with JSON data, includ
 -6    # Invalid channel token
 -7    # Invalid request
 -8    # Invalid parameters
+-9    # Device response error
 ```
 The above response codes are common to all device control commands.
 
