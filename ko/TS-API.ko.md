@@ -3445,14 +3445,26 @@ iris    # 조리개 열기 / 닫기
 문자열을 정상적으로 보내기 위해서는 URL 인코딩하는 것을 잊지 마십시오.
 
 ```ruby
-# 토큰: 1, 프리셋 이름: preset1
-/api/channel/preset?ch=1&set=1,preset1 
+# 프리셋 이름: preset1 (프리셋 토큰은 카메라에서 생성되며 응답 데이터에 포함됩니다.)
+/api/channel/preset?ch=1&set=preset1 
 
 # 프리셋 이름을 생략
-/api/channel/preset?ch=1&set=2
+/api/channel/preset?ch=1&set
 
-# 토큰: 3, 프리셋 이름: 우리집 현관
-/api/channel/preset?ch=1&set=3,%EC%9A%B0%EB%A6%AC%EC%A7%91%20%ED%98%84%EA%B4%80
+# 프리셋 이름: 우리집 현관
+/api/channel/preset?ch=1&set=%EC%9A%B0%EB%A6%AC%EC%A7%91%20%ED%98%84%EA%B4%80
+```
+
+프리셋 지정 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+{
+  "chid": 1,
+  "deviceResponseCode": 200,  // 카메라의 응답 코드
+  "code": 0,                  // 응답 코드
+  "message": "성공",          // 응답 메시지
+  "token": "preset3",         // 카메라에서 생성된 프리셋 토큰
+  "name": "우리집 현관"
+}
 ```
 
 **프리셋 삭제**
@@ -3465,6 +3477,22 @@ iris    # 조리개 열기 / 닫기
 
 # 여러 개의 프리셋을 삭제
 /api/channel/preset?ch=1&rm=1,2,3
+```
+
+프리셋 삭제 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+{
+  "chid": 1,
+  "preset":[
+    {
+      "deviceResponseCode":200,   // 카메라의 응답 코드
+      "code": 0,                  // 응답 코드
+      "message": "성공",          // 응답 메시지
+      "token": "preset1"          // 삭제된 프리셋 토큰
+    },
+    // ... 중략
+  ]
+}
 ```
 
 **프리셋 위치로 이동**
