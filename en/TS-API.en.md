@@ -1460,6 +1460,7 @@ timeEnd     # List of vehicle numbers recorded before a specific date and time
 at          # Offset from the first data
 maxCount    # Maximum number of items
 sort        # Sorting method (desc: Latest data order (default), asc: Oldest data order)
+src         # Vehicle number recognition device id (separated by a comma (,) if multiple channels are specified at the same time)
 
 # Examples
 # Search for vehicle number including "12" (keyword search)
@@ -1477,6 +1478,9 @@ sort        # Sorting method (desc: Latest data order (default), asc: Oldest dat
 
 # Sort by old data order (ascending order)
 /api/find?what=carNo&sort=asc
+
+# Search by specifying vehicle number recognition device 1, 2
+/api/find?what=carNo&src=1,2
 ```
 
 To display the video in the retrieved result data, use the method used in [Display recorded video](#display-recorded-video).
@@ -3706,14 +3710,14 @@ hy-AM       # ?այե?են, Armenian
 az-Latn     # Az?rbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
 be-BY       # бела???к?, Belarusian
-bn-BD       # বাংল�? Bengali
+bn-BD       # বাংল�? Bengali
 bs-Latn     # Bosanski, Bosnian
 bg-BG       # б?лга??ки, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
 zh-CN       # 简体中?? Chinese (Simplified)
-zh-TW       # �?��?�統, Chinese (Traditional)
+zh-TW       # �?��?�統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -3735,7 +3739,7 @@ ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
 he-IL       # ע?ר?ת, Hebrew
-hi-IN       # हिन्द�?, Hindi
+hi-IN       # हिन्�?��?, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -3743,15 +3747,15 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # ?�本�? Japanese
+ja-JP       # ?�本�? Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನ�? Kannada
+kn-IN       # ಕನ್ನ�? Kannada
 kk-KZ       # ?аза? ??л?нде, Kazakh
 km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
 ko-KR       # ?�국?? Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
 ru-KG       # ???г?з?а, Kyrgyz
-lo-LA       # �?���? Lao
+lo-LA       # �?���? Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
@@ -3759,10 +3763,10 @@ lb-LU       # Lëtzebuergesch, Luxembourgish
 mk-MK       # ?акедон?ки, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # �?���?��ളം, Malayalam
+ml-IN       # �?���?��ളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # �?��ाठी, Marathi
+mr-IN       # �?��ाठी, Marathi
 mn-MN       # ?онгол ??л д???, Mongolian
 my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
 ne-NP       # नेपाल�?, Nepali
@@ -3780,7 +3784,7 @@ sr-Cyrl-RS  # С?п?ки, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
 sd-Arab-PK  # س???, Sindhi
-si-LK       # සිංහ�? Sinhala
+si-LK       # සිංහ�? Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -3789,9 +3793,9 @@ su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
 tg-Cyrl-TJ  # Тоҷики??он, Tajik
-ta-IN       # த�?ி�?�? Tamil
+ta-IN       # த�?ி�?�? Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไท�? Thai
+th-TH       # ไท�? Thai
 tr-TR       # Türkçe, Turkish
 uk-UA       # Ук?а?н??ка, Ukrainian
 ur-PK       # ارد?, Urdu
