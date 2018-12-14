@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.5.0
+TS-API@0.6.0
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -43,6 +43,9 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [개별 항목 요청](#개별-항목-요청)
 - [시스템 상태 요청 `@0.3.0`](#시스템-상태-요청-030)
   - [개별 항목 요청](#개별-항목-요청-1)
+- [HDD S.M.A.R.T. 요청 `@0.6.0`](#hdd-smart-요청-060)
+- [서버 재시작 요청 `@0.6.0`](#서버-재시작-요청-060)
+- [시스템 재부팅 요청 `@0.6.0`](#시스템-재부팅-요청-060)
 - [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)
 - [각종 목록 요청](#각종-목록-요청)
   - [채널 목록](#채널-목록)
@@ -686,7 +689,7 @@ http://userid:password@host/path/to/
   "mainboard",
   "memory",
   "graphicAdapter",
-  "starage",
+  "storage",
   "cdrom",
   "networkAdapter",
   "all"
@@ -804,7 +807,8 @@ http://userid:password@host/path/to/
 [
   "cpu",
   "memory",
-  "disk",
+  "disk",       // 물리적 디스크를 의미
+  "partition",  // 논리적 디스크(디스크 파티션)을 의미, TS-API@0.6.0에 추가됨
   "network",
   "all"
 ]
@@ -814,9 +818,76 @@ http://userid:password@host/path/to/
 /api/system?health=os   # OS만 요청
 /api/system?health=cpu  # CPU만 요청
 /api/system?health=storage,network  # storage와 network항목을 요청
-
 /api/system?health=all  # 모든 항목을 요청 (간단히 /api/system?health)
 ```
+
+## HDD S.M.A.R.T. 요청 `@0.6.0`
+서버 각 하드 디스크의 S.M.A.R.T. 정보를 요청합니다.
+```ruby
+/api/system?hddsmart    # 모든 하드 디스크의 S.M.A.R.T. 정보를 요청
+/api/system?hddsmart=1  # 첫번째 하드 디스크의 S.M.A.R.T. 정보를 요청
+/api/system?hddsmart=1,2  # 첫번째와 두번째 하드 디스크의 S.M.A.R.T. 정보를 요청
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  {
+    "code": 1,          // S.M.A.R.T. 지원 여부 (-1:아직 테스트 안됨, 0:지원안됨, 1:지원)
+    "message": "지원",
+    "model": "SanDisk SD9SB8W512G1122",
+    "name": "\\\\.\\PHYSICALDRIVE0",
+    "smart": [
+      {
+        "attribute": "Reallocated Sector Count",
+        "critical": true,
+        "id": 5,
+        "raw": 100,
+        "threshold": 0,
+        "value": 0,
+        "worst": 100
+      },
+      {
+        "attribute": "Power-On Time Count",
+        "critical": false,
+        "id": 9,
+        "raw": 100,
+        "threshold": 0,
+        "value": 1819,
+        "worst": 100
+      },
+      // ... 중략
+    ]
+  }
+]
+```
+
+## 서버 재시작 요청 `@0.6.0`
+관리자 권한을 가진 계정으로 로그인 한 경우, 서버 프로세스를 재시작 시킬 수 있습니다.
+```ruby
+/api/system?restart
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+  {
+    "code": 0,
+    "message": "서버가 수 초 내로 다시 시작됩니다."
+  }
+```
+관리자 권한이 없는 경우에 대해 서버는 HTTP 응답 코드 403 (FORBIDDEN)을 반환합니다.
+
+## 시스템 재부팅 요청 `@0.6.0`
+관리자 권한을 가진 계정으로 로그인 한 경우, 서버 시스템을 재부팅 시킬 수 있습니다.
+```ruby
+/api/system?reboot
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+  {
+    "code": 0,
+    "message": "1 분 안에 시스템이 종료된 후 다시 시작됩니다."
+  }
+```
+관리자 권한이 없는 경우에 대해 서버는 HTTP 응답 코드 403 (FORBIDDEN)을 반환합니다.
 
 
 ## 채널 상태 요청 `@0.3.0`

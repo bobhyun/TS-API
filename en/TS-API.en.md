@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.5.0
+TS-API@0.6.0
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -44,6 +44,9 @@ Table of contents
   - [Requests individual items](#requests-individual-items)
 - [Request system health `@0.3.0`](#request-system-health-030)
   - [Requests individual items](#requests-individual-items-1)
+- [Request HDD S.M.A.R.T. `@0.6.0`](#request-hdd-smart-060)
+- [Request to restart server process `@0.6.0`](#request-to-restart-server-process-060)
+- [Request to reboot server system `@0.6.0`](#request-to-reboot-server-system-060)
 - [Request channel status `@0.3.0`](#request-channel-status-030)
 - [Request various enumeration](#request-various-enumeration)
   - [Channel list](#channel-list)
@@ -689,7 +692,7 @@ For the request of a list of supported items, the server response JSON data in t
   "mainboard",
   "memory",
   "graphicAdapter",
-  "starage",
+  "storage",
   "cdrom",
   "networkAdapter",
   "all"
@@ -806,7 +809,8 @@ For the request of a list of supported items, the server response JSON data in t
 [
   "cpu",
   "memory",
-  "disk",
+  "disk",       // Physical disk
+  "partition",  // Logical disk (disk partition), added at @0.6.0
   "network",
   "all"
 ]
@@ -816,9 +820,78 @@ For the request of a list of supported items, the server response JSON data in t
 /api/system?health=cpu   # requests CPU only
 /api/system?health=memory  # requests memory only
 /api/system?health=disk,network  # requests both disk and network
-
 /api/system?health=all  # requests all the items (Simply /api/system?health)
 ```
+
+## Request HDD S.M.A.R.T. `@0.6.0`
+Requests S.M.A.R.T. infomation of each HDD.
+```ruby
+/api/system?hddsmart    # Request for all the HDDs
+/api/system?hddsmart=1  # Request for the first HDD
+/api/system?hddsmart=1,2  # Request for the first and second HDDs
+```
+For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  {
+    "code": 1,    // S.M.A.R.T. supports or not (-1:Not tested yet, 0:Not supportd, 1:Supported)
+    "message": "Supported",
+    "model": "SanDisk SD9SB8W512G1122",
+    "name": "\\\\.\\PHYSICALDRIVE0",
+    "smart": [
+      {
+        "attribute": "Reallocated Sector Count",
+        "critical": true,
+        "id": 5,
+        "raw": 100,
+        "threshold": 0,
+        "value": 0,
+        "worst": 100
+      },
+      {
+        "attribute": "Power-On Time Count",
+        "critical": false,
+        "id": 9,
+        "raw": 100,
+        "threshold": 0,
+        "value": 1819,
+        "worst": 100
+      },
+      // ... omitted
+    ]
+  }
+]
+```
+
+## Request to restart server process `@0.6.0`
+If you are logged in with administrator privileges, you can restart the server process.
+```ruby
+/api/system?restart
+```
+For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
+```jsx
+  {
+    "code": 0,
+    "message": "The server restarts in a few seconds."
+  }
+```
+The server returns HTTP response code 403 (FORBIDDEN) if you do not have administrator rights.
+
+
+## Request to reboot server system `@0.6.0`
+If you are logged in with administrator privileges, you can reboot the server system.
+```ruby
+/api/system?reboot
+```
+For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
+```jsx
+  {
+    "code": 0,
+    "message": "The system will shut down in less than a minute and then restart."
+  }
+```
+The server returns HTTP response code 403 (FORBIDDEN) if you do not have administrator rights.
+
 
 ## Request channel status `@0.3.0`
 Requests the status of each channel on the server.
@@ -3710,14 +3783,14 @@ hy-AM       # ?այե?են, Armenian
 az-Latn     # Az?rbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
 be-BY       # бела???к?, Belarusian
-bn-BD       # বাংল�? Bengali
+bn-BD       # বাংল�? Bengali
 bs-Latn     # Bosanski, Bosnian
 bg-BG       # б?лга??ки, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
 zh-CN       # 简体中?? Chinese (Simplified)
-zh-TW       # �?��?�統, Chinese (Traditional)
+zh-TW       # �?��?�統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -3739,7 +3812,7 @@ ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
 he-IL       # ע?ר?ת, Hebrew
-hi-IN       # हिन्�?��?, Hindi
+hi-IN       # हिन्�?��?, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -3747,15 +3820,15 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # ?�本�? Japanese
+ja-JP       # ?�本�? Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನ�? Kannada
+kn-IN       # ಕನ್ನ�? Kannada
 kk-KZ       # ?аза? ??л?нде, Kazakh
 km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
 ko-KR       # ?�국?? Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
 ru-KG       # ???г?з?а, Kyrgyz
-lo-LA       # �?���? Lao
+lo-LA       # �?���? Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
@@ -3763,10 +3836,10 @@ lb-LU       # Lëtzebuergesch, Luxembourgish
 mk-MK       # ?акедон?ки, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # �?���?��ളം, Malayalam
+ml-IN       # �?���?��ളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # �?��ाठी, Marathi
+mr-IN       # �?��ाठी, Marathi
 mn-MN       # ?онгол ??л д???, Mongolian
 my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
 ne-NP       # नेपाल�?, Nepali
@@ -3784,7 +3857,7 @@ sr-Cyrl-RS  # С?п?ки, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
 sd-Arab-PK  # س???, Sindhi
-si-LK       # සිංහ�? Sinhala
+si-LK       # සිංහ�? Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -3793,9 +3866,9 @@ su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
 tg-Cyrl-TJ  # Тоҷики??он, Tajik
-ta-IN       # த�?ி�?�? Tamil
+ta-IN       # த�?ி�?�? Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไท�? Thai
+th-TH       # ไท�? Thai
 tr-TR       # Türkçe, Turkish
 uk-UA       # Ук?а?н??ка, Ukrainian
 ur-PK       # ارد?, Urdu
