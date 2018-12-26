@@ -23,7 +23,8 @@
       Topics:
       <input class='topic' type='checkbox' value="channelStatus" checked>channelStatus
       <input class='topic' type='checkbox' value="LPR" checked>LPR 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
+      <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -135,7 +136,6 @@
 		if(window.myApp.ws !== null) {
 	    window.myApp.ws.close();
 			window.myApp.ws = null;
-			document.getElementById('url').innerText = '';
 		}
   }
   
@@ -144,5 +144,6 @@
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
+		document.getElementById('url').innerText = '';
   }
 </script>

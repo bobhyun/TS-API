@@ -23,7 +23,8 @@
       토픽:
       <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
+			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
@@ -133,7 +134,6 @@
 	    window.myApp.es.close();
 			window.myApp.es = null;
 			addItem('close', '접속 종료');
-			document.getElementById('url').innerText = '';
 		}
   }
   
@@ -142,5 +142,6 @@
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
+		document.getElementById('url').innerText = '';
   }
 </script>

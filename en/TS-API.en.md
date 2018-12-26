@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.6.0
+TS-API@0.7.0
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -68,6 +68,7 @@ Table of contents
   - [Channel status change events](#channel-status-change-events)
   - [Car number recognition events](#car-number-recognition-events)
   - [Emergency call events](#emergency-call-events)
+  - [System event `@0.7.0`](#system-event-070)
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
 - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
 - [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
@@ -567,6 +568,7 @@ Requests system information from the server.
 /api/system   # omitted
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+*@0.7.0 disk data format modified*
 ```jsx
 {
   "lastUpdate": "2018-09-15T13:49:12.440-05:00",
@@ -616,13 +618,73 @@ For the request, the server returns JSON data in the following format with an HT
     }
   ],
   "memoryAmount": 8589934592,
-  "storage": [
+  "disk": [
     {
-      "name": "ST4000VX 007-2DT166 SCSI Disk Device",
-      "manufacturer": "(Standard disk drives)",
-      "capacity": 4000784417280,
+      "capacity": 512105932800,
+      "deviceId": "\\\\.\\PHYSICALDRIVE0",
       "interface": "IDE",
-      "serialNo": "WDH308RW"
+      "manufacturer": "(Standard disk drives)",
+      "name": "SanDisk SD9SB8W512G1122",
+      "partition": [
+        {
+          "name": "Disk #0, Partition #0",
+          "numberOfBlocks": 204800,
+          "size": 104857600,
+          "startingOffset": 1048576
+        },
+        {
+          "name": "Disk #0, Partition #1",
+          "numberOfBlocks": 16777216,
+          "size": 8589934592,
+          "startingOffset": 105906176
+        },
+        {
+          "fileSystem": "NTFS",
+          "mount": "C:",
+          "name": "Disk #0, Partition #2",
+          "numberOfBlocks": 401210938,
+          "size": 205420000256,
+          "startingOffset": 8695840768,
+          "volumeName": "windows"
+        },
+        {
+          "fileSystem": "NTFS",
+          "mount": "D:",
+          "name": "Disk #0, Partition #3",
+          "numberOfBlocks": 457089024,
+          "size": 234029580288,
+          "startingOffset": 214116073472,
+          "volumeName": "data"
+        },
+        {
+          "name": "Disk #0, Partition #4",
+          "numberOfBlocks": 124930048,
+          "size": 63964184576,
+          "startingOffset": 448145653760
+        }
+      ],
+      "serialNo": "182168800139",
+      "smartCaps": true
+    },
+    {
+      "capacity": 1000202273280,
+      "deviceId": "\\\\.\\PHYSICALDRIVE1",
+      "interface": "IDE",
+      "manufacturer": "(Standard disk drives)",
+      "name": "ST1000LM024 HN-M101MBB",
+      "partition": [
+        {
+          "fileSystem": "NTFS",
+          "mount": "E:",
+          "name": "Disk #1, Partition #0",
+          "numberOfBlocks": 1953519616,
+          "size": 1000202043392,
+          "startingOffset": 1048576,
+          "volumeName": "data.hdd"
+        }
+      ],
+      "serialNo": "S2R8J9BC700641",
+      "smartCaps": true
     }
   ],
   "storageAmount": 4000784417280,
@@ -635,46 +697,38 @@ For the request, the server returns JSON data in the following format with an HT
   ],  
   "networkAdapter": [
     {
-      "name": "Intel(R) Dual Band Wireless-AC 3160",
-      "manufacturer": "Intel Corporation",
-      "connectionId": "Wi-Fi",
-      "mac": "D0:7E:35:F7:86:A4",
-      "netEnabled": false
-    },    
-    {
-      "name": "Realtek PCIe GBE Family Controller #2",
-      "manufacturer": "Realtek",
-      "connectionId": "Local Area Connection #2",
-      "mac": "D0:17:C2:89:02:BB",
-      "netEnabled": true,
-      "ulSpeed": 1000000000,
-      "dlSpeed": 1000000000,
+      "connectionId": "Ethernet",
+      "dlSpeed": 100000000,
       "ipv4": {
-        "dhcp": false,
-        "ip": [
-          "192.168.0.44/24",
-          "192.168.0.149/16"
+        "dhcp": true,
+        "dns": [
+          "210.220.163.82",
+          "219.250.36.130"
         ],
         "gateway": [
           "192.168.0.1"
         ],
-        "dns": [
-          "118.126.63.1",
-          "118.126.63.2"
+        "ip": [
+          "192.168.0.43/24"
         ]
       },
       "ipv6": {
         "ip": [
-          "fe80::987c:ad81:b1f3:2146%13/64",
-          "fe80::987c:ad81:b1f3:2147%13/64"
-        ],
-        "gateway": [
-          "fe80::987c:ad81:b1f3:1%13"
-        ],
-        "dns": [
-          "fe80::8:8:8:8%13"
+          "fe80::8f0:3d03:b67f:7025%8/64"
         ]
-      }
+      },
+      "mac": "80:FA:5B:03:79:5E",
+      "manufacturer": "Realtek",
+      "name": "Realtek PCIe GBE Family Controller",
+      "netEnabled": true,
+      "ulSpeed": 100000000
+    },
+    {
+      "connectionId": "Wi-Fi",
+      "mac": "D0:7E:35:F7:86:A4",
+      "manufacturer": "Intel Corporation",
+      "name": "Intel(R) Dual Band Wireless-AC 3160",
+      "netEnabled": false
     }
   ]
 }
@@ -692,7 +746,7 @@ For the request of a list of supported items, the server response JSON data in t
   "mainboard",
   "memory",
   "graphicAdapter",
-  "storage",
+  "disk",
   "cdrom",
   "networkAdapter",
   "all"
@@ -713,27 +767,31 @@ Requests system health from the server.
 /api/system?health
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+*@0.7.0 cpu data format modified*
 ```jsx
 {
   "lastUpdate": "2018-09-15T13:49:12.440-05:00",
-  "cpu": {
-    "usagePercent": {
-      "0,0": 44,      # Usage percentage of the first core of the first CPU
-      "0,1": 0,       # Usage percentage of the second core of the first CPU
-      "0,2": 6,
-      "0,3": 6,
-      "0,4": 19,
-      "0,5": 6,
-      "0,6": 13,
-      "0,7": 68,
-      "0,_Total": 20, # The total usage percentage of the first CPU
-      "_Total": 20    # The total usage percentage of total CPU
-    },
-    "temperatureK": {   # Kelvin unit
-      "current": 287.2, # Current temperature
-      "critical": 393.2 # Critical temperature (System must shut down when this temperature is reached)
+  "cpu": [
+    {                         # the 1st CPU
+      "temperatureKelvin": {  # Kelvin unit
+        "critical": 393.2,    # Critical temperature (System must shut down when this temperature is reached)
+        "current": 287.2      # Current temperature
+      },
+      "usage": {
+        "threads": [
+          37,                 # Usage percentage of the 1st thread of the 1st CPU
+          19,                 # Usage percentage of 2nd thread of the 1st CPU
+          50,
+          6,
+          19,
+          31,
+          31,
+          12
+        ],
+        "total": 26           # Total usage persantage of the 1st CPU
+      }
     }
-  },
+  ],
   "memory": {
     "totalPhysical": 12797329408,
     "freePhysical": 4630482944,
@@ -783,7 +841,7 @@ For the request, the server returns JSON data in the following format with an HT
   ],
   "network": [
     {
-      "name": "Intel[R] Dual Band Wireless-AC 3160",
+      "name": "Intel(R) Dual Band Wireless-AC 3160",
       "totalBytesPerSec": 650,
       "recvBytesPerSec": 650,
       "sendBytesPerSec": 0,
@@ -809,8 +867,8 @@ For the request of a list of supported items, the server response JSON data in t
 [
   "cpu",
   "memory",
-  "disk",       // Physical disk
-  "partition",  // Logical disk (disk partition), added at @0.6.0
+  "disk",       // Mounted logical disk (disk partition), added at @0.6.0
+  "recording",  // Storage status for recording, added at @0.7.0
   "network",
   "all"
 ]
@@ -819,7 +877,7 @@ For the request of a list of supported items, the server response JSON data in t
 ```ruby
 /api/system?health=cpu   # requests CPU only
 /api/system?health=memory  # requests memory only
-/api/system?health=disk,network  # requests both disk and network
+/api/system?health=disk,recording,network  # requests disk, recording and network
 /api/system?health=all  # requests all the items (Simply /api/system?health)
 ```
 
@@ -1364,7 +1422,7 @@ For the request, the server returns JSON data in the following format with an HT
         "uid": "admin",
         "autoLogin": 1
       },
-      "comment": "admin: Auto-login"
+      "comment": "admin: Auto-login"    // optional
     },
     // ... omitted
     {
@@ -1386,7 +1444,7 @@ For the request, the server returns JSON data in the following format with an HT
         ],
         "mediaType": "USB dongle"
       },
-      "comment": "Genuine license"
+      "comment": "Genuine license"    // optional
     }
   ]
 }
@@ -1864,9 +1922,10 @@ https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server
 
 The following event topics are supported:
 ```ruby
-channelStatus    # Change channel status
+channelStatus   # Change channel status
 LPR             # Car number recognition
 emergencyCall   # Emergency call
+systemEvent     # System Events (added @0.7.0)
 ```
 
 SSE connection paths and parameters are as follows.
@@ -2127,8 +2186,8 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
       ]
     }
   ],
-  "name":"B1 Stairs",                     // 비상 ?�출 ?�치 ?�치 ?�름
-  "topic":"emergencyCall"                 // ?�픽 ?�름
+  "name":"B1 Stairs",                     // Emergency call device location name
+  "topic":"emergencyCall"                 // Topic name
 }
 ```
 
@@ -2157,6 +2216,42 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.
 
+### System event `@0.7.0`
+If you request `topics = systemEvent`, you can receive system events in real time.
+System event is received in JSON format as below when "System log" data is generated from [Event log type list](#event-log-type-list).
+Each data type is the same as those used in [Search event log](#search-event-log).
+
+```jsx
+{
+  "topic": "systemEvent",
+  "id": 16384,
+  "type": 0,
+  "typeName": "System log",
+  "code": 30,
+  "codeName": "Storage path changed",
+  "timeRange": [
+    "2018-11-15T13:16:38.054-05:00"
+  ],
+  "param": {
+		"storagePathBefore": "D:\\recData\\",
+		"storagePathAfter": "E:\\recData\\"
+	},
+  "comment": "Storage path changed from D:\\recData\\ to E:\\recData\\."  // optional
+}
+```
+```jsx
+{
+  "topic": "systemEvent",
+  "id": 19138,
+  "type": 0,
+  "typeName": "System log",
+  "code": 2,
+  "codeName": "System shutdown",
+  "timeRange": [
+    "2018-12-26T15:29:20.013-05:00"
+  ]
+}
+```
 
 Now, let's create an example that uses SSE to receive event messages.
 ```html
@@ -2185,7 +2280,8 @@ Now, let's create an example that uses SSE to receive event messages.
       Topics:
       <input class='topic' type='checkbox' value="channelStatus" checked>channelStatus
       <input class='topic' type='checkbox' value="LPR" checked>LPR 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
+      <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -2295,7 +2391,6 @@ Now, let's create an example that uses SSE to receive event messages.
 	    window.myApp.es.close();
 			window.myApp.es = null;
 			addItem('close', 'Disconnected');
-			document.getElementById('url').innerText = '';
 		}
   }
     
@@ -2304,6 +2399,7 @@ Now, let's create an example that uses SSE to receive event messages.
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
+		document.getElementById('url').innerText = '';
   }
 </script>
 ```
@@ -2395,7 +2491,8 @@ Now, let's create an example that uses the Web socket to receive event messages.
       Topics:
       <input class='topic' type='checkbox' value="channelStatus" checked>channelStatus
       <input class='topic' type='checkbox' value="LPR" checked>LPR 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
+      <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -2507,7 +2604,6 @@ Now, let's create an example that uses the Web socket to receive event messages.
 		if(window.myApp.ws !== null) {
 	    window.myApp.ws.close();
 			window.myApp.ws = null;
-			document.getElementById('url').innerText = '';
 		}
   }
   
@@ -2516,6 +2612,7 @@ Now, let's create an example that uses the Web socket to receive event messages.
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
+		document.getElementById('url').innerText = '';
   }
 </script>
 ```
@@ -3683,25 +3780,27 @@ The versions of the products that support the API are as follows.
 | 0.3.0       | v0.42.1 or later | v0.41.1 or later | v0.8.2A or later  |
 | 0.4.0       | v0.44.7 or later | v0.44.7 or later | v0.11.7A or later |
 | 0.5.0       | v0.45.0 or later | v0.45.0 or later | v0.12.0A or later |
+| 0.6.0       | v0.46.0 or later | v0.46.0 or later | v0.14.0A or later |
+| 0.7.0       | v0.46.2 or later | v0.46.2 or later | v0.14.2A or later |
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
 ### The features table by product
 
-| Features                                                            | TS-CMS | TS-NVR                                 | TS-LPR |
-|---------------------------------------------------------------------|--------|----------------------------------------|--------|
-| [Real-time video display](#real-time-video-display)                 | O      | O                                      | O      |
-| [Real-time video source search](#real-time-video-source)            | O      | O                                      | O      |
-| [Display recorded video](#display-recorded-video)                   | X      | O                                      | O      |
-| [Rcorded video source search](#recorded-video-source)               | X      | O                                      | O      |
-| [Session Authentication](#session-authentication)                   | O      | O                                      | O      |
-| [Request server information](#request-server-information)           | O      | O                                      | O      |
-| [Request various enumeration](#request-various-enumeration)         | O      | O                                      | O      |
-| [Search date with recorded video](#search-date-with-recorded-video) | X      | O                                      | O      |
-| [Search Event Log](#search-event-log)                               | O      | O                                      | O      |
-| [Vehicle number log search](#vehicle-number-log-search)             | X      | depends on the license `[Tips]`        | O      |
-| [Pushing events to the server](#pushing-events-to-the-server-040)   | X      | O                                      | O      |
-| [Channel information and device control](#channel-information-and-device-control-050) | O  | O                        | O      |
+| Features                                                                              | TS-CMS | TS-NVR                          | TS-LPR |
+|---------------------------------------------------------------------------------------|--------|---------------------------------|--------|
+| [Real-time video display](#real-time-video-display)                                   | O      | O                               | O      |
+| [Real-time video source search](#real-time-video-source)                              | O      | O                               | O      |
+| [Display recorded video](#display-recorded-video)                                     | X      | O                               | O      |
+| [Rcorded video source search](#recorded-video-source)                                 | X      | O                               | O      |
+| [Session Authentication](#session-authentication)                                     | O      | O                               | O      |
+| [Request server information](#request-server-information)                             | O      | O                               | O      |
+| [Request various enumeration](#request-various-enumeration)                           | O      | O                               | O      |
+| [Search date with recorded video](#search-date-with-recorded-video)                   | X      | O                               | O      |
+| [Search Event Log](#search-event-log)                                                 | O      | O                               | O      |
+| [Vehicle number log search](#vehicle-number-log-search)                               | X      | depends on the license `[Tips]` | O      |
+| [Pushing events to the server](#pushing-events-to-the-server-040)                     | X      | O                               | O      |
+| [Channel information and device control](#channel-information-and-device-control-050) | O      | O                               | O      |
 
 > [Tips]
 TS-NVR does not have built-in vehicle number recognition function and **vehicle number log search** function is not supported.

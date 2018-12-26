@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.6.0
+TS-API@0.7.0
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -67,6 +67,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [채널 상태 변경 이벤트](#채널-상태-변경-이벤트)
   - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
   - [비상 호출 이벤트](#비상-호출-이벤트)
+  - [시스템 이벤트 `@0.7.0`](#시스템-이벤트-070)
   - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
 - [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
 - [서버에 이벤트 밀어넣기 `@0.4.0`](#서버에-이벤트-밀어넣기-040)
@@ -564,6 +565,7 @@ http://userid:password@host/path/to/
 /api/system   # 생략 가능
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+*@0.7.0에서 disk 데이터 형식 수정됨*
 ```jsx
 {
   "lastUpdate": "2018-09-15T13:49:12.440+09:00",
@@ -613,13 +615,73 @@ http://userid:password@host/path/to/
     }
   ],
   "memoryAmount": 8589934592,
-  "storage": [
+  "disk": [
     {
-      "name": "ST4000VX 007-2DT166 SCSI Disk Device",
-      "manufacturer": "(Standard disk drives)",
-      "capacity": 4000784417280,
+      "capacity": 512105932800,
+      "deviceId": "\\\\.\\PHYSICALDRIVE0",
       "interface": "IDE",
-      "serialNo": "WDH308RW"
+      "manufacturer": "(Standard disk drives)",
+      "name": "SanDisk SD9SB8W512G1122",
+      "partition": [
+        {
+          "name": "Disk #0, Partition #0",
+          "numberOfBlocks": 204800,
+          "size": 104857600,
+          "startingOffset": 1048576
+        },
+        {
+          "name": "Disk #0, Partition #1",
+          "numberOfBlocks": 16777216,
+          "size": 8589934592,
+          "startingOffset": 105906176
+        },
+        {
+          "fileSystem": "NTFS",
+          "mount": "C:",
+          "name": "Disk #0, Partition #2",
+          "numberOfBlocks": 401210938,
+          "size": 205420000256,
+          "startingOffset": 8695840768,
+          "volumeName": "windows"
+        },
+        {
+          "fileSystem": "NTFS",
+          "mount": "D:",
+          "name": "Disk #0, Partition #3",
+          "numberOfBlocks": 457089024,
+          "size": 234029580288,
+          "startingOffset": 214116073472,
+          "volumeName": "data"
+        },
+        {
+          "name": "Disk #0, Partition #4",
+          "numberOfBlocks": 124930048,
+          "size": 63964184576,
+          "startingOffset": 448145653760
+        }
+      ],
+      "serialNo": "182168800139",
+      "smartCaps": true
+    },
+    {
+      "capacity": 1000202273280,
+      "deviceId": "\\\\.\\PHYSICALDRIVE1",
+      "interface": "IDE",
+      "manufacturer": "(Standard disk drives)",
+      "name": "ST1000LM024 HN-M101MBB",
+      "partition": [
+        {
+          "fileSystem": "NTFS",
+          "mount": "E:",
+          "name": "Disk #1, Partition #0",
+          "numberOfBlocks": 1953519616,
+          "size": 1000202043392,
+          "startingOffset": 1048576,
+          "volumeName": "data.hdd"
+        }
+      ],
+      "serialNo": "S2R8J9BC700641",
+      "smartCaps": true
     }
   ],
   "storageAmount": 4000784417280,
@@ -632,46 +694,38 @@ http://userid:password@host/path/to/
   ],  
   "networkAdapter": [
     {
-      "name": "Intel(R) Dual Band Wireless-AC 3160",
-      "manufacturer": "Intel Corporation",
-      "connectionId": "Wi-Fi",
-      "mac": "D0:7E:35:F7:86:A4",
-      "netEnabled": false
-    },    
-    {
-      "name": "Realtek PCIe GBE Family Controller #2",
-      "manufacturer": "Realtek",
-      "connectionId": "로컬 영역 연결 2",
-      "mac": "D0:17:C2:89:02:BB",
-      "netEnabled": true,
-      "ulSpeed": 1000000000,
-      "dlSpeed": 1000000000,
+      "connectionId": "Ethernet",
+      "dlSpeed": 100000000,
       "ipv4": {
-        "dhcp": false,
-        "ip": [
-          "192.168.0.44/24",
-          "192.168.0.149/16"
+        "dhcp": true,
+        "dns": [
+          "210.220.163.82",
+          "219.250.36.130"
         ],
         "gateway": [
           "192.168.0.1"
         ],
-        "dns": [
-          "118.126.63.1",
-          "118.126.63.2"
+        "ip": [
+          "192.168.0.43/24"
         ]
       },
       "ipv6": {
         "ip": [
-          "fe80::987c:ad81:b1f3:2146%13/64",
-          "fe80::987c:ad81:b1f3:2147%13/64"
-        ],
-        "gateway": [
-          "fe80::987c:ad81:b1f3:1%13"
-        ],
-        "dns": [
-          "fe80::8:8:8:8%13"
+          "fe80::8f0:3d03:b67f:7025%8/64"
         ]
-      }
+      },
+      "mac": "80:FA:5B:03:79:5E",
+      "manufacturer": "Realtek",
+      "name": "Realtek PCIe GBE Family Controller",
+      "netEnabled": true,
+      "ulSpeed": 100000000
+    },
+    {
+      "connectionId": "Wi-Fi",
+      "mac": "D0:7E:35:F7:86:A4",
+      "manufacturer": "Intel Corporation",
+      "name": "Intel(R) Dual Band Wireless-AC 3160",
+      "netEnabled": false
     }
   ]
 }
@@ -689,7 +743,7 @@ http://userid:password@host/path/to/
   "mainboard",
   "memory",
   "graphicAdapter",
-  "storage",
+  "disk",
   "cdrom",
   "networkAdapter",
   "all"
@@ -711,27 +765,31 @@ http://userid:password@host/path/to/
 /api/system?health
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+*@0.7.0에서 cpu 데이터 형식 수정됨*
 ```jsx
 {
   "lastUpdate": "2018-09-15T13:49:12.440+09:00",
-  "cpu": {
-    "usagePercent": {
-      "0,0": 44,      # 첫번째 CPU의 첫번째 코어 사용률
-      "0,1": 0,       # 두번째 CPU의 첫번째 코어 사용률
-      "0,2": 6,
-      "0,3": 6,
-      "0,4": 19,
-      "0,5": 6,
-      "0,6": 13,
-      "0,7": 68,
-      "0,_Total": 20, # 첫번째 CPU의 총 사용률
-      "_Total": 20    # 총 CPU 사용률
-    },
-    "temperatureK": {     # 절대온도(Kelvin) 단위
-      "current": 287.2,   # 현재 온도
-      "critical": 393.2   # 한계 온도 (이 온도에 도달하면 시스템을 종료해야 함)
+  "cpu": [
+    {                         # 첫번째 CPU
+      "temperatureKelvin": {  # 절대온도(Kelvin) 단위
+        "critical": 393.2,    # 한계 온도 (이 온도에 도달하면 시스템을 종료해야 함)
+        "current": 287.2      # 현재 온도
+      },
+      "usage": {
+        "threads": [
+          37,                 # 첫번째 CPU의 첫번째 쓰레드 사용률
+          19,                 # 첫번째 CPU의 두번째 쓰레드 사용률
+          50,
+          6,
+          19,
+          31,
+          31,
+          12
+        ],
+        "total": 26           # 첫번째 CPU 총 사용률
+      }
     }
-  },
+  ],  
   "memory": {
     "totalPhysical": 12797329408,
     "freePhysical": 4630482944,
@@ -807,8 +865,8 @@ http://userid:password@host/path/to/
 [
   "cpu",
   "memory",
-  "disk",       // 물리적 디스크를 의미
-  "partition",  // 논리적 디스크(디스크 파티션)을 의미, TS-API@0.6.0에 추가됨
+  "disk",       // 마운트된 논리적 디스크(디스크 파티션)을 의미, @0.6.0에 추가됨
+  "recording",  // 녹화용 스토리지 상태, @0.7.0에 추가됨
   "network",
   "all"
 ]
@@ -817,7 +875,7 @@ http://userid:password@host/path/to/
 ```ruby
 /api/system?health=os   # OS만 요청
 /api/system?health=cpu  # CPU만 요청
-/api/system?health=storage,network  # storage와 network항목을 요청
+/api/system?health=disk,recording,network  # disk, recording, network 항목을 요청
 /api/system?health=all  # 모든 항목을 요청 (간단히 /api/system?health)
 ```
 
@@ -1362,7 +1420,7 @@ timeBegin 또는 timeEnd 중 하나만 지정하면 저정한 날짜로 부터 �
         "uid": "admin",
         "autoLogin": 1
       },
-      "comment": "admin: 자동 로그인"
+      "comment": "admin: 자동 로그인" // 옵션
     },
     // ... 중략
     {
@@ -1384,7 +1442,7 @@ timeBegin 또는 timeEnd 중 하나만 지정하면 저정한 날짜로 부터 �
         ],
         "mediaType": "USB dongle"
       },
-      "comment": "정품 라이센스"
+      "comment": "정품 라이센스"  // 옵션
     }
   ]
 }
@@ -1860,6 +1918,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server
 channelStatus   # 채널 상태 변경
 LPR             # 차량 번호 인식
 emergencyCall   # 비상 호출
+systemEvent     # 시스템 이벤트 (@0.7.0에서 추가됨)
 ```
 
 SSE 접속 경로와 매개변수들은 다음과 같습니다.
@@ -2153,6 +2212,43 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 비상 호출 메시지는 실시간 통화를 위한 용도로 사용되므로 연동된 채널의 영상 주소는 차량 번호 인식의 경우와 달리 실시간 영상으로 링크되어 있습니다.
 
+### 시스템 이벤트 `@0.7.0`
+`topics=systemEvent`를 요청하면 실시간으로 시스템 이벤트를 수신할 수 있습니다.
+시스템 이벤트는 [이벤트 로그 종류 목록](#이벤트-로그-종류-목록) 중에서 "시스템 로그" 데이터가 생성되면 아래와 같이 JSON형식으로 수신됩니다.
+개별 데이터 형식은 [이벤트 로그 검색](#이벤트-로그-검색)에서 사용되는 형식과 동일합니다.
+
+```jsx
+{
+  "topic": "systemEvent",
+  "id": 16384,
+  "type": 0,
+  "typeName": "시스템 로그",
+  "code": 30,
+  "codeName": "저장 경로 변경",
+  "timeRange": [
+    "2018-11-15T13:16:38.054+09:00"
+  ],
+  "param": {
+		"storagePathBefore": "D:\\recData\\",
+		"storagePathAfter": "E:\\recData\\"
+	},
+  "comment": "D:\\recData\\에서 E:\\recData\\로 저장 경로 변경됨"  // 옵션
+}
+```
+```jsx
+{
+  "topic": "systemEvent",
+  "id": 19138,
+  "type": 0,
+  "typeName": "시스템 로그",
+  "code": 2,
+  "codeName": "시스템 종료",
+  "timeRange": [
+    "2018-12-26T15:29:20.013+09:00"
+  ]
+}
+```
+
 이 번에는 SSE를 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
 ```html
 <!DOCTYPE>
@@ -2180,7 +2276,8 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
       토픽:
       <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
+			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
@@ -2290,7 +2387,6 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 	    window.myApp.es.close();
 			window.myApp.es = null;
 			addItem('close', '접속 종료');
-			document.getElementById('url').innerText = '';
 		}
   }
   
@@ -2299,6 +2395,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
+		document.getElementById('url').innerText = '';
   }
 </script>
 ```
@@ -2392,7 +2489,8 @@ ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
       토픽:
       <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출 
+      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
+			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
@@ -2504,7 +2602,6 @@ ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 		if(window.myApp.ws !== null) {
 	    window.myApp.ws.close();
 			window.myApp.ws = null;
-			document.getElementById('url').innerText = '';
 		}
   }
 
@@ -2513,6 +2610,7 @@ ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
+		document.getElementById('url').innerText = '';
   }
 </script>
 ```
@@ -3694,6 +3792,8 @@ API를 지원하는 제품들의 버전은 다음과 같습니다.
 | 0.3.0  | v0.42.1 이상 | v0.41.1 이상 | v0.8.2A 이상 |
 | 0.4.0  | v0.44.7 이상 | v0.44.7 이상 | v0.11.7A 이상 |
 | 0.5.0  | v0.45.0 이상 | v0.45.0 이상 | v0.12.0A 이상 |
+| 0.6.0  | v0.46.0 이상 | v0.46.0 이상 | v0.14.0A 이상 |
+| 0.7.0  | v0.46.2 이상 | v0.46.2 이상 | v0.14.2A 이상 |
 
 API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 일부 기능이 지원되지 않을 수 있습니다. 아래 목록 중에서 사용하는 제품이 어디에 해당하는지 확인하시기 바랍니다.
 
