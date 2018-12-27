@@ -839,6 +839,21 @@ For the request, the server returns JSON data in the following format with an HT
       "freeSpace": 199067635712
     }
   ],
+  "recording": {
+    "current": "E:\\recData\\",
+    "storage": [
+      {
+        "comment": "Not used",
+        "path": "D:\\recData\\",
+        "usage": -1
+      },
+      {
+        "comment": "Overwrite",
+        "path": "E:\\recData\\",
+        "usage": 2
+      }
+    ]
+  },
   "network": [
     {
       "name": "Intel(R) Dual Band Wireless-AC 3160",
@@ -856,6 +871,14 @@ For the request, the server returns JSON data in the following format with an HT
     }
   ]
 }
+```
+
+The `usage` value under `storage` in `recording` is one of the following:
+```ruby
+-1    # Not used
+0     # Read-only
+1     # Write once
+2     # Overwrite
 ```
 
 Or it can be requested individual items by specifying them as shown below.

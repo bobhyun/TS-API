@@ -837,6 +837,21 @@ http://userid:password@host/path/to/
       "freeSpace": 199067635712
     }
   ],
+  "recording": {
+    "current": "E:\\recData\\",
+    "storage": [
+      {
+        "comment": "사용 안함",
+        "path": "D:\\recData\\",
+        "usage": -1
+      },
+      {
+        "comment": "덮어 쓰기",
+        "path": "E:\\recData\\",
+        "usage": 2
+      }
+    ]
+  },
   "network": [
     {
       "name": "Intel[R] Dual Band Wireless-AC 3160",
@@ -855,6 +870,15 @@ http://userid:password@host/path/to/
   ]
 }
 ```
+
+`recording` 항목 중 `storage` 아래 `usage` 값은 다음 중 하나입니다.
+```ruby
+-1    # 사용 안함
+0     # 읽기 전용
+1     # 한 번 녹화
+2     # 덮어 쓰기
+```
+
 
 또는 아래와 같이 개별 항목을 지정해서 요청할 수 있습니다.
 ```ruby
