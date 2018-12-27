@@ -604,14 +604,18 @@ http://userid:password@host/path/to/
       "manufacturer": "Samsung",
       "bank": "BANK 0",
       "capacity": 4294967296,
-      "serialNo": "15392520"
+      "serialNo": "15392520",
+      "type": "DDR3",
+      "speed": 1600
     },
     {
       "name": "DIMM_B1",
       "manufacturer": "Samsung",
       "bank": "BANK 2",
       "capacity": 4294967296,
-      "serialNo": "15392519"
+      "serialNo": "15392519",
+      "type": "DDR3",
+      "speed": 1600
     }
   ],
   "memoryAmount": 8589934592,
