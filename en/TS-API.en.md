@@ -3369,8 +3369,8 @@ Specify event data in JSON format in contents data.
   "src": "F00001",        // Car number recognition device code
   "plateNo": "DSP963",    // the car number
   // Below are optional.
-  "when": "2018-02-01T14%3a30%3a15-05%3a00",    // Vehicle number recognition time, if not specified, the server uses the time when the event was received
-  "timeBegin": "2018-02-01T14%3a30%3a14-05%3a00"  // For car parked, specify the first recognition time
+  "when": "2018-02-01T14:30:15-05:00",    // Vehicle number recognition time, if not specified, the server uses the time when the event was received
+  "timeBegin": "2018-02-01T14:30:14-05:00"  // For car parked, specify the first recognition time
 }
 ```
 
@@ -3381,7 +3381,7 @@ Specify event data in JSON format in contents data.
   "device": "vendor/device",  // Emergency call device model name
   "src": "0000001",           // Emergency call device location code
   "event": "callStart",       // call start (or "callEnd" for call end)
-  "when": "2018-02-01T14%3a30%3a15-05%3a00" // Event occurrence time
+  "when": "2018-02-01T14:30:15-05:00" // Event occurrence time
 }
 ```
 
@@ -3400,7 +3400,7 @@ It can be created as multiple events in the array as shown below and sent at onc
     "device": "vendor/device",
     "src": "0000001",
     "event": "callStart",
-    "when": "2018-02-01T14%3a30%3a15-05%3a00"
+    "when": "2018-02-01T14:30:15-05:00"
   }
 ]
 ```
