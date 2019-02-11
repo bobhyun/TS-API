@@ -2290,7 +2290,8 @@ Each data type is the same as those used in [Search event log](#search-event-log
 
 ### Motion Detection Status Change Event `@0.8.0`
 If you request `topics=motionChanges`, you can receive the event when changing the motion detection status for each channel in real time.
-The data format is as follows in the JSON format as shown below for the channels whose motion detection has been changed every 1 second.
+Immediately after the request, the current motion detection status of all specified channels is received
+After this, the status of channels whose motion detection is changed in 1 second cycle is received in JSON format as below.
 No events occur for channels with the same motion detection status.
 
 ```jsx
@@ -3850,6 +3851,7 @@ The versions of the products that support the API are as follows.
 | 0.5.0       | v0.45.0 or later | v0.45.0 or later | v0.12.0A or later |
 | 0.6.0       | v0.46.0 or later | v0.46.0 or later | v0.14.0A or later |
 | 0.7.0       | v0.46.2 or later | v0.46.2 or later | v0.14.2A or later |
+| 0.8.0       | v0.46.5 or later | v0.46.5 or later | v0.14.5A or later |
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
@@ -3944,20 +3946,20 @@ The server supports a total of 104 languages as follows:
 ```ruby
 af-ZA       # Afrikaans
 sq-AL       # Shqip, Albanian
-am-ET       # ?�ማ??��, Amharic
-ar-AE       # ا?عرب?ة, Arabic
-hy-AM       # ?այե?են, Armenian
-az-Latn     # Az?rbaycan, Azerbaijani
+am-ET       # አማርኛ, Amharic
+ar-AE       # العربية, Arabic
+hy-AM       # Հայերեն, Armenian
+az-Latn     # Azərbaycan, Azerbaijani
 eu-ES       # Euskara, Basque
-be-BY       # бела???к?, Belarusian
-bn-BD       # বাংল�? Bengali
+be-BY       # беларускі, Belarusian
+bn-BD       # বাংলা, Bengali
 bs-Latn     # Bosanski, Bosnian
-bg-BG       # б?лга??ки, Bulgarian
+bg-BG       # български, Bulgarian
 ca-ES       # Català, Catalan
 ceb         # Cebuano
 ny          # Chichewa
-zh-CN       # 简体中?? Chinese (Simplified)
-zh-TW       # �?��?�統, Chinese (Traditional)
+zh-CN       # 简体中国, Chinese (Simplified)
+zh-TW       # 中國傳統, Chinese (Traditional)
 co-FR       # Corsu, Corsican
 hr-HR       # Hrvatski, Croatian
 cs-CZ       # Čeština, Czech
@@ -3971,15 +3973,15 @@ fi-FI       # Suomalainen, Finnish
 fr-FR       # Français, French
 fy-NL       # Frysk, Frisian
 gl-ES       # Galego, Galician
-ka-GE       # ?�ა?�თ?�ლ?? Georgian
+ka-GE       # ქართული, Georgian
 de-DE       # Deutsch, German
-el-GR       # ?λληνικά, Greek
+el-GR       # Ελληνικά, Greek
 gu-IN       # ગુજરાતી, Gujarati
 ht          # Kreyòl ayisyen, Haitian Creole
 ha          # Hausa
 haw-U       # ʻŌlelo Hawaiʻi, Hawaiian,
-he-IL       # ע?ר?ת, Hebrew
-hi-IN       # हिन्�?��?, Hindi
+he-IL       # עברית, Hebrew
+hi-IN       # हिन्दी, Hindi
 hmn         # Hmong
 hu-HU       # Magyar, Hungarian
 is-IS       # Íslensku, Icelandic
@@ -3987,44 +3989,44 @@ ig-NG       # Igbo
 id-ID       # Bahasa Indonesia, Indonesian
 ga-IE       # Gaeilge, Irish
 it-IT       # Italiano, Italian
-ja-JP       # ?�本�? Japanese
+ja-JP       # 日本語, Japanese
 jv-Latn     # Jawa, Javanese
-kn-IN       # ಕನ್ನ�? Kannada
-kk-KZ       # ?аза? ??л?нде, Kazakh
-km-KH       # ?�ា?�ា?�្?�ែ?? Khmer
-ko-KR       # ?�국?? Korean
+kn-IN       # ಕನ್ನಡ, Kannada
+kk-KZ       # Қазақ тілінде, Kazakh
+km-KH       # ភាសាខ្មែរ, Khmer
+ko-KR       # Korean
 ku-Arab-IR  # Kurdî, Kurdish (Kurmanji)
-ru-KG       # ???г?з?а, Kyrgyz
-lo-LA       # �?���? Lao
+ru-KG       # Кыргызча, Kyrgyz
+lo-LA       # ລາວ, Lao
 sr-Latn     # Latine, Latin
 lv-LV       # Latviešu, Latvian
 lt-LT       # Lietuviškai, Lithuanian
 lb-LU       # Lëtzebuergesch, Luxembourgish
-mk-MK       # ?акедон?ки, Macedonian
+mk-MK       # Македонски, Macedonian
 mg-MG       # Malagasy
 ms-MY       # Melayu, Malay
-ml-IN       # �?���?��ളം, Malayalam
+ml-IN       # മലയാളം, Malayalam
 mt-MT       # Malti, Maltese
 mi-NZ       # Maori
-mr-IN       # �?��ाठी, Marathi
-mn-MN       # ?онгол ??л д???, Mongolian
-my-MM       # ?�ြန်မ�?, Myanmar (Burmese)
-ne-NP       # नेपाल�?, Nepali
+mr-IN       # मराठी, Marathi
+mn-MN       # Монгол хэл дээр, Mongolian
+my-MM       # မြန်မာ", Myanmar (Burmese)
+ne-NP       # नेपाली, Nepali
 nb-NO       # Norwegian
-ps-AF       # پ?ت?, Pashto
-fa-IR       # ?ارس?, Persian
+ps-AF       # پښتو, Pashto
+fa-IR       # فارسی, Persian
 pl-PL       # Polskie, Polish
 pt-PT       # Português, Portuguese
-pa-IN       # ਪੰਜਾਬ�?, Punjabi
+pa-IN       # ਪੰਜਾਬੀ, Punjabi
 ro-RO       # Română, Romanian
-ru-RU       # ????кий, Russian
+ru-RU       # Русский, Russian
 sm          # Samoan
 gd-GB       # Gàidhlig, Scots Gaelic
-sr-Cyrl-RS  # С?п?ки, Serbian
+sr-Cyrl-RS  # Српски, Serbian
 nso-ZA      # Sesotho
 sn-Latn-ZW  # Shona
-sd-Arab-PK  # س???, Sindhi
-si-LK       # සිංහ�? Sinhala
+sd-Arab-PK  # سنڌي, Sindhi
+si-LK       # සිංහල, Sinhala
 sk-SK       # Slovenský, Slovak
 sl-SI       # Slovenščina, Slovenian
 so-SO       # Soomaali, Somali
@@ -4032,18 +4034,18 @@ es-ES       # Español, Spanish
 su          # Basa Sunda, Sundanese
 swc-CD      # Kiswahili, Swahili
 sv-SE       # Svenska, Swedish
-tg-Cyrl-TJ  # Тоҷики??он, Tajik
-ta-IN       # த�?ி�?�? Tamil
+tg-Cyrl-TJ  # Тоҷикистон, Tajik
+ta-IN       # தமிழ், Tamil
 te-IN       # తెలుగు, Telugu
-th-TH       # ไท�? Thai
+th-TH       # ไทย, Thai
 tr-TR       # Türkçe, Turkish
-uk-UA       # Ук?а?н??ка, Ukrainian
-ur-PK       # ارد?, Urdu
+uk-UA       # Українська, Ukrainian
+ur-PK       # اردو, Urdu
 uz-Latn-UZ  # O'zbek, Uzbek
 vi-VN       # Tiếng Việt, Vietnamese
 cy-GB       # Cymraeg, Welsh
 xh-ZA       # isiXhosa, Xhosa
-yi          # ??ִ??ש, Yiddish
+yi          # ייִדיש, Yiddish
 yo-NG       # Yorùbá, Yoruba
 zu-ZA       # isiZulu, Zulu
 ```
