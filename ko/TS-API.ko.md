@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.7.0
+TS-API@0.8.0
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -68,6 +68,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
   - [비상 호출 이벤트](#비상-호출-이벤트)
   - [시스템 이벤트 `@0.7.0`](#시스템-이벤트-070)
+  - [움직임 감지 이벤트 `@0.8.0`](#움직임-감지-이벤트-080)
   - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
 - [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
 - [서버에 이벤트 밀어넣기 `@0.4.0`](#서버에-이벤트-밀어넣기-040)
@@ -1947,6 +1948,8 @@ channelStatus   # 채널 상태 변경
 LPR             # 차량 번호 인식
 emergencyCall   # 비상 호출
 systemEvent     # 시스템 이벤트 (@0.7.0에서 추가됨)
+motionChanges   # 움직임 감지 상태 변경 (@0.8.0에서 추가됨)
+
 ```
 
 SSE 접속 경로와 매개변수들은 다음과 같습니다.
@@ -1988,6 +1991,12 @@ http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
 http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
+
+# 모든 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
+http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# 1, 2번 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
+http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
@@ -2277,6 +2286,31 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 }
 ```
 
+### 움직임 감지 이벤트 `@0.8.0`
+`topics=motionChanges`를 요청하면 실시간으로 각 채널별 움직임 감지 상태 변경시 이벤트를 수신할 수 있습니다.
+데이터 형식은 1초 주기로 움직임 감지가 변경된 채널들의 상태를 아래와 같이 JSON 형식으로 수신됩니다.
+동일한 움직임 감지 상태가 지속되는 채널의 경우는 이벤트가 발생하지 않습니다.
+
+```jsx
+{
+  "topic": "motionChanges",
+  "updated": [
+    {
+      "chid": 1,
+      "motion": true
+    },
+    {
+      "chid": 2,
+      "motion": false
+    },
+    {
+      "chid": 5,
+      "motion": true
+    },
+  ]
+}
+```
+
 이 번에는 SSE를 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
 ```html
 <!DOCTYPE>
@@ -2306,6 +2340,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
       <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
 			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
+			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
@@ -2486,6 +2521,12 @@ ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
 ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
+
+# 모든 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
+ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# 1, 2번 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
+ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 웹 소켓으로 접속된 이후 수신되는 이벤트 데이터 형식은 Server-Sent Events (SSE)와 완전히 동일하므로 여기서는 설명을 생략합니다.
@@ -2518,7 +2559,8 @@ ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
       <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
       <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
-			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
+      <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
+ 			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>

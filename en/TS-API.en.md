@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.7.0
+TS-API@0.8.0
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -69,6 +69,7 @@ Table of contents
   - [Car number recognition events](#car-number-recognition-events)
   - [Emergency call events](#emergency-call-events)
   - [System event `@0.7.0`](#system-event-070)
+  - [Motion Detection Status Change Event `@0.8.0`](#motion-detection-status-change-event-080)
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
 - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
 - [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
@@ -1953,6 +1954,7 @@ channelStatus   # Change channel status
 LPR             # Car number recognition
 emergencyCall   # Emergency call
 systemEvent     # System Events (added @0.7.0)
+motionChanges   # Motion detection status changes (added @0.8.0)
 ```
 
 SSE connection paths and parameters are as follows.
@@ -1992,6 +1994,12 @@ http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests status change events of channels 1 and 2 including Spanish messages
 http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
+
+# Requests motion detection status change events of all channels
+http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# Requests motion detection status change events of channels 1 and 2
+http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
@@ -2280,6 +2288,31 @@ Each data type is the same as those used in [Search event log](#search-event-log
 }
 ```
 
+### Motion Detection Status Change Event `@0.8.0`
+If you request `topics=motionChanges`, you can receive the event when changing the motion detection status for each channel in real time.
+The data format is as follows in the JSON format as shown below for the channels whose motion detection has been changed every 1 second.
+No events occur for channels with the same motion detection status.
+
+```jsx
+{
+  "topic": "motionChanges",
+  "updated": [
+    {
+      "chid": 1,
+      "motion": true
+    },
+    {
+      "chid": 2,
+      "motion": false
+    },
+    {
+      "chid": 5,
+      "motion": true
+    },
+  ]
+}
+```
+
 Now, let's create an example that uses SSE to receive event messages.
 ```html
 <!DOCTYPE>
@@ -2309,6 +2342,7 @@ Now, let's create an example that uses SSE to receive event messages.
       <input class='topic' type='checkbox' value="LPR" checked>LPR 
       <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
       <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
+      <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -2487,6 +2521,12 @@ ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests status change events of channels 1 and 2 including Spanish messages
 ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
+
+# Requests motion detection status change events for all channels
+ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# Requests motion detection status change events of channels 1 and 2
+ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 The event data format received after a Web socket connection is exactly the same as Server-Sent Events (SSE) and is not described here again.
@@ -2520,6 +2560,7 @@ Now, let's create an example that uses the Web socket to receive event messages.
       <input class='topic' type='checkbox' value="LPR" checked>LPR 
       <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
       <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
+      <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
