@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.8.0
+TS-API@0.9.0
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -52,6 +52,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [차량 번호 인식 장치 목록](#차량-번호-인식-장치-목록)
   - [비상 호출 장치 목록 `@0.3.0`](#비상-호출-장치-목록-030)
   - [이벤트 로그 종류 목록](#이벤트-로그-종류-목록)
+  - [주차장 목록 `@0.9.0`](#주차장-목록-090)
 - [저장 데이터 검색](#저장-데이터-검색)
   - [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색)
   - [녹화 영상이 있는 분 단위 검색 `@0.2.0`](#녹화-영상이-있는-분-단위-검색-020)
@@ -69,6 +70,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [비상 호출 이벤트](#비상-호출-이벤트)
   - [시스템 이벤트 `@0.7.0`](#시스템-이벤트-070)
   - [움직임 감지 이벤트 `@0.8.0`](#움직임-감지-이벤트-080)
+  - [주차 카운트 이벤트 `@0.9.0`](#주차-카운트-이벤트-090)
   - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
 - [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
 - [서버에 이벤트 밀어넣기 `@0.4.0`](#서버에-이벤트-밀어넣기-040)
@@ -1257,6 +1259,41 @@ lang      # 언어
 ]
 ```
 
+### 주차장 목록 `@0.9.0`
+서버에 등록된 주차장 목록을 얻으려면 다음과 같이 요청합니다.
+```ruby
+/api/enum?what=parkingLot
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  {
+    "id": 1,
+    "name": "B1 주차장",
+    "type": "counter"     // 주차 구역 (입출차 카운터)
+    "count": 3,           // 현재 입차 수 
+    "maxCount": 50,       // 최대 주차 수
+  },
+  {
+    "id": 2,
+    "name": "B2 주차장",
+    "type": "counter"     // 주차 구역 (입출차 카운터)
+    "count": 25,          // 현재 입차 수 
+    "maxCount": 40,       // 최대 주차 수
+  },
+  {
+    "id": 3,
+    "name": "지하주차장",
+    "type": "group",      // 그룹 (주차 구역의 집합)
+    "count": 28,          // 현재 입차 수 합계
+    "maxCount": 90,       // 최대 주차 수 합계
+    "member": [           // 그룹 멤버 id
+      1,
+      2
+    ]
+  }
+]
+```
 
 ## 저장 데이터 검색
 
@@ -2312,6 +2349,46 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 }
 ```
 
+### 주차 카운트 이벤트 `@0.9.0`
+`topics=parkingCount`를 요청하면 각 주차장의 차량 수가 변경시 실시간으로 이벤트를 수신할 수 있습니다.
+요청 직후 한번은 지정한 모든 주차장의 현재 차량 수가 수신되며 
+이 후 변경시 마다 해당 주차장의 차량 수가 아래와 같이 JSON 형식으로 수신됩니다.
+
+```jsx
+{
+  "timestamp" :"2019-02-18T23:11:12.119+09:00",
+  "topic": "parkingCount",
+  "updated": [
+    {
+      "id": 11,
+      "name": "전체",
+      "type": "group",
+      "count": 3,
+      "maxCount": 31,
+      "member":[
+        12,
+        13
+      ]
+    },
+    {
+      "id": 12,
+      "name": "B1 주차장",
+      "type": "counter",
+      "count": 2,
+      "maxCount": 21
+    },
+    {
+      "id": 13,
+      "name": "B2 주차장",
+      "type": "counter",
+      "count":1,
+      "maxCount":10
+    }
+  ]
+}
+```
+
+
 이 번에는 SSE를 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
 ```html
 <!DOCTYPE>
@@ -2342,6 +2419,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
       <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
 			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
 			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
+			<input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
@@ -2528,6 +2606,12 @@ ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 1, 2번 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
 ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+
+# 모든 주차장의 주차 카운트 변경시 이벤트 요청
+ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# Id 1, 2번 주차장의 주차 카운트 변경시 이벤트 요청
+ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 웹 소켓으로 접속된 이후 수신되는 이벤트 데이터 형식은 Server-Sent Events (SSE)와 완전히 동일하므로 여기서는 설명을 생략합니다.
@@ -2562,6 +2646,7 @@ ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
       <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
       <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
  			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
+			<input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
@@ -3865,7 +3950,8 @@ API를 지원하는 제품들의 버전은 다음과 같습니다.
 | 0.5.0  | v0.45.0 이상 | v0.45.0 이상 | v0.12.0A 이상 |
 | 0.6.0  | v0.46.0 이상 | v0.46.0 이상 | v0.14.0A 이상 |
 | 0.7.0  | v0.46.2 이상 | v0.46.2 이상 | v0.14.2A 이상 |
-| 0.8.0  | v0.46.5 이상 | v0.46.5 이상 | v0.14.5A 이상 |
+| 0.8.0  | v0.46.6 이상 | v0.46.6 이상 | v0.14.6A 이상 |
+| 0.9.0  |              |             | v0.14.7A 이상 |
 
 API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 일부 기능이 지원되지 않을 수 있습니다. 아래 목록 중에서 사용하는 제품이 어디에 해당하는지 확인하시기 바랍니다.
 

@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.8.0
+TS-API@0.9.0
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -53,6 +53,7 @@ Table of contents
   - [Vehicle number recognition device list](#vehicle-number-recognition-device-list)
   - [Emergency call device list `@0.3.0`](#emergency-call-device-list-030)
   - [Event log type list](#event-log-type-list)
+  - [Parking lot list `@0.9.0`](#parking-lot-list-090)
 - [Retrieve recorded data](#retrieve-recorded-data)
   - [Search dates with recorded video](#search-dates-with-recorded-video)
   - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
@@ -70,6 +71,7 @@ Table of contents
   - [Emergency call events](#emergency-call-events)
   - [System event `@0.7.0`](#system-event-070)
   - [Motion Detection Status Change Event `@0.8.0`](#motion-detection-status-change-event-080)
+  - [Parking Count Event `@0.9.0`](#parking-count-event-090)
   - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
 - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
 - [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
@@ -1258,6 +1260,42 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
+### Parking lot list `@0.9.0`
+To get a list of registered parking lots on the server, request the followings:
+```ruby
+/api/enum?what=parkingLot
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  {
+    "id": 1,
+    "name": "B1 Parking Lot",
+    "type": "counter"     // parking area (in/out counter)
+    "count": 3,           // current entrances
+    "maxCount": 50,       // Maximum number of parking spaces
+  },
+  {
+    "id": 2,
+    "name": "B2 Parking Lot",
+    "type": "counter"     // parking area (in/out counter)
+    "count": 25,          // current entrances
+    "maxCount": 40,       // Maximum number of parking spaces
+  },
+  {
+    "id": 3,
+    "name": "Basement Parking Lot",
+    "type": "group",      // Group (a set of parking area)
+    "count": 28,          // Total number of current entrances
+    "maxCount": 90,       // Total number of parking spaces
+    "member": [           // id of the group menmbers
+      1,
+      2
+    ]
+  }
+]
+```
+
 
 ## Retrieve recorded data
 
@@ -2314,6 +2352,46 @@ No events occur for channels with the same motion detection status.
 }
 ```
 
+### Parking Count Event `@0.9.0`
+If you ask for `topics=parkingCount`, you can receive events in real time when the number of cars in each parking lot is changed.
+Immediately after the request, the current number of vehicles in all the specified parking lots will be received once.
+The number of vehicles in the parking lot will be received in JSON format as shown below.
+
+```jsx
+{
+  "timestamp" :"2019-02-18T23:11:12.119-05:00",
+  "topic": "parkingCount",
+  "updated": [
+    {
+      "id": 11,
+      "name": "Total",
+      "type": "group",
+      "count": 3,
+      "maxCount": 31,
+      "member":[
+        12,
+        13
+      ]
+    },
+    {
+      "id": 12,
+      "name": "B1 Parking Lot",
+      "type": "counter",
+      "count": 2,
+      "maxCount": 21
+    },
+    {
+      "id": 13,
+      "name": "B2 Parking Lot",
+      "type": "counter",
+      "count":1,
+      "maxCount":10
+    }
+  ]
+}
+```
+
+
 Now, let's create an example that uses SSE to receive event messages.
 ```html
 <!DOCTYPE>
@@ -2344,6 +2422,7 @@ Now, let's create an example that uses SSE to receive event messages.
       <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
       <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
+			<input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -2528,6 +2607,12 @@ ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests motion detection status change events of channels 1 and 2
 ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+
+# Requests parking count for all the parking lots
+ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# Requests parking count for the parking lot id 1 and 2
+ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 The event data format received after a Web socket connection is exactly the same as Server-Sent Events (SSE) and is not described here again.
@@ -2562,6 +2647,7 @@ Now, let's create an example that uses the Web socket to receive event messages.
       <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
       <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
+      <input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -3851,7 +3937,8 @@ The versions of the products that support the API are as follows.
 | 0.5.0       | v0.45.0 or later | v0.45.0 or later | v0.12.0A or later |
 | 0.6.0       | v0.46.0 or later | v0.46.0 or later | v0.14.0A or later |
 | 0.7.0       | v0.46.2 or later | v0.46.2 or later | v0.14.2A or later |
-| 0.8.0       | v0.46.5 or later | v0.46.5 or later | v0.14.5A or later |
+| 0.8.0       | v0.46.6 or later | v0.46.6 or later | v0.14.6A or later |
+| 0.9.0       |                  |                  | v0.14.7A or later |
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 

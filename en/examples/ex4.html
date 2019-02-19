@@ -26,6 +26,7 @@
       <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
       <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
+      <input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -128,6 +129,7 @@
       addItem('error', 'Error: ' + e.code);
     };
     ws.onmessage = function(e) {
+      var data = JSON.parse(e.data);
       addItem('data', e.data);
     };
     window.myApp.ws = ws;
@@ -139,7 +141,7 @@
 			window.myApp.ws = null;
 		}
   }
-  
+
   function onClearAll() {
     var el = document.getElementById("messages");
     while (el.firstChild) {
