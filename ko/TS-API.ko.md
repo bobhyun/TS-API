@@ -1986,7 +1986,7 @@ LPR             # 차량 번호 인식
 emergencyCall   # 비상 호출
 systemEvent     # 시스템 이벤트 (@0.7.0에서 추가됨)
 motionChanges   # 움직임 감지 상태 변경 (@0.8.0에서 추가됨)
-
+parkingCount    # 주차장 차량수 변동 이벤트 (@0.9.0에서 추가됨)
 ```
 
 SSE 접속 경로와 매개변수들은 다음과 같습니다.
@@ -2034,6 +2034,12 @@ http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 1, 2번 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
 http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+
+# 모든 주차장의 주차 카운트 변경시 이벤트 요청
+http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# Id 1, 2번 주차장의 주차 카운트 변경시 이벤트 요청 (이때 ch는 주차장 id로 사용됨)
+http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
@@ -2610,7 +2616,7 @@ ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 # 모든 주차장의 주차 카운트 변경시 이벤트 요청
 ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
-# Id 1, 2번 주차장의 주차 카운트 변경시 이벤트 요청
+# Id 1, 2번 주차장의 주차 카운트 변경시 이벤트 요청 (이때 ch는 주차장 id로 사용됨)
 ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 

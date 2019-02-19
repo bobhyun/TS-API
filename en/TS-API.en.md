@@ -1993,6 +1993,7 @@ LPR             # Car number recognition
 emergencyCall   # Emergency call
 systemEvent     # System Events (added @0.7.0)
 motionChanges   # Motion detection status changes (added @0.8.0)
+parkingCount    # Parking count events (added @0.9.0)
 ```
 
 SSE connection paths and parameters are as follows.
@@ -2038,6 +2039,12 @@ http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests motion detection status change events of channels 1 and 2
 http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+
+# Requests parking count for all the parking lots
+http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# Requests parking count for the parking lot id 1 and 2 (in this case the `ch` used as parking lot id)
+http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
@@ -2611,7 +2618,7 @@ ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 # Requests parking count for all the parking lots
 ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
-# Requests parking count for the parking lot id 1 and 2
+# Requests parking count for the parking lot id 1 and 2 (in this case the `ch` used as parking lot id)
 ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
