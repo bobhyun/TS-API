@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.0
+TS-API@0.9.1
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -95,11 +95,15 @@ Table of contents
 
 <!-- /TOC -->
 
+
+<a id="markdown-get-started" name="get-started"></a>
 ## Get Started
 In this article, TS-API is abbreviated as **API**, and each product is simply called **server**.
 
 
+<a id="markdown-video-display" name="video-display"></a>
 ## Video display
+<a id="markdown-real-time-video-display" name="real-time-video-display"></a>
 ### Real-time video display
 Try to type the following in the Web browser address window.
 ```ruby
@@ -113,6 +117,7 @@ Do you see the video?
 > [Tips]
 The demonstration video used in this sample code may not be connected depending on the situation in the field.
 
+<a id="markdown-inserting-video-into-web-page" name="inserting-video-into-web-page"></a>
 ### Inserting video into web page
 Now let's insert the video into the web page.
 ```html
@@ -142,6 +147,7 @@ Select the menu item you are to use, the code will be copied to the clipboard an
 For security reasons, the `auth=ZGVtbzohMTIzNHF3ZXI%3D` part is excluded from this copied code. This code is required for authentication and is described in [Session Authentication](#session-authentication).
 In this example, we used only minimal code to display the video, so there are more parts that were not included in the copied code.
 
+<a id="markdown-connecting-to-a-real-server" name="connecting-to-a-real-server"></a>
 ### Connecting to a real server
 Now, let's see how to display the video of a real server, not a demonstration server.
 To connect to a real server, you need to know the following two things by default:
@@ -150,6 +156,7 @@ To connect to a real server, you need to know the following two things by defaul
 >* The port number can be found in the `HTTP Port` item in the `Web Service` tab in your product Settings window.
 2. **User ID** and **password** with **remote access privileges**
 
+<a id="markdown-user-authentication" name="user-authentication"></a>
 ### User authentication
 For example, assuming that you use the following connection information;
 
@@ -227,6 +234,7 @@ In this example, we will improve the way we access the login information using J
 ```
 [Run](./examples/ex2.html)
 
+<a id="markdown-change-channel" name="change-channel"></a>
 ### Change channel
 If you change the `ch=` part of the video source to the desired channel number as shown below, the video of that channel will be displayed.
 Channel numbers are integers starting at 1.
@@ -236,6 +244,7 @@ http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 Run: [Channel1](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel2](http://tssolution.ipdisk.co.kr:85/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel3](http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
+<a id="markdown-display-recorded-video" name="display-recorded-video"></a>
 ### Display recorded video
 To display the recorded video, you need the date and time information (time stamp) of the desired video.
 For example, to display a video recorded on `Channel 1` at 2:30:15 pm on February 1, 2018, you would need to add `when=2018-02-01T14%3a30%3a15%2b09%3a00`.
@@ -277,6 +286,7 @@ showPlayTime    # Whether the date and time are displayed (true, false)
 
 So far, We've seen how to display video using the `/watch`. Here we will see how to request various information using `/api`.
 
+<a id="markdown-json-data-indentation-050" name="json-data-indentation-050"></a>
 ## JSON data indentation `@0.5.0`
 All response data is in the [JSON format](#json-data-format) and the text is encoded as `utf8`. 
 The actual data being transferred uses an optimized format without line breaks and whitespace, but This is too uncomfortable for a person to read.
@@ -309,11 +319,13 @@ The server indents two blank characters and inserts a newline character to retur
 Of course, you can use the desired number as the indent value, and it can be used in the same way for all TS-APIs.
 This document uses a format with indentation of 2 to make it easier to read items in the data.
 
+<a id="markdown-session-authentication" name="session-authentication"></a>
 ## Session authentication
 The server maintains an HTTP session using Cookie until the client software (the web browser) logs in and logs out. Since the server maintains the authentication information while the session is being connected, the client software (web browser) does not need to sign in whenever makes request.
 
 *This process of sign-in is called **session authentication**.*
 
+<a id="markdown-sign-in" name="sign-in"></a>
 ### Sign in
 Here's how to use the API to authenticate your session.
 The server also supports Basic authentication which is a  traditional sign-in method using URL format, as shown in the code below, but for security reasons, most modern web browsers does not support this method anymore.
@@ -334,6 +346,7 @@ You can use `auth=` to sign in the same way as shown below.
 ```
 The `auth =` parameter is used in various APIs to be introduced later and can be used when making a request with user authentication information to the server without going through a separate login process.
 
+<a id="markdown-sign-out" name="sign-out"></a>
 ### Sign out
 After the session is connected, the following request can be used to terminate it.
 ```ruby
@@ -342,8 +355,10 @@ After the session is connected, the following request can be used to terminate i
 At the end of the session, the server returns an HTTP response code of 401 for requests that require authentication, indicating that authentication is required.
 
 
+<a id="markdown-request-server-information" name="request-server-information"></a>
 ## Request server information
 
+<a id="markdown-api-version" name="api-version"></a>
 ### API version
 This request works, even if it is not in [session suthenticated](#session-authentication) state.
 ```ruby
@@ -356,6 +371,7 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
+<a id="markdown-site-name" name="site-name"></a>
 ### Site name
 Use to get the server's site name. If you have multiple servers, you can give them a name that can be distinguished from each other.
 
@@ -373,6 +389,7 @@ The value of `siteName`, `"My%20home%20server"`, is what you entered in the web 
 Decoding the above[URL-encoded](#url-decoding) code will convert it to `"My home server"`.
 
 
+<a id="markdown-server-side-time-zone" name="server-side-time-zone"></a>
 ### Server-side time zone
 You can get the server-side time zone.
 It is used to distinguish between the client-side and server-side local time when they are used in different time zones.
@@ -392,6 +409,7 @@ For the request, the server returns JSON data in the following format with an HT
 ```
 UTC offset, for example, `UTC-05:00`, may be used instead of [IANA time zone name](#https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
+<a id="markdown-product-information" name="product-information"></a>
 ### Product information
 It is used to get the product name and version information of the server.
 
@@ -426,6 +444,7 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
+<a id="markdown-license-information" name="license-information"></a>
 ### License information
 Used to get license information installed on the server.
 
@@ -458,6 +477,7 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
+<a id="markdown-user-information" name="user-information"></a>
 ### User information
 Used to get sign-in user information.
 This request works only in the [session authenticated](#session-authentication) state.
@@ -499,6 +519,7 @@ If it is not in [session authenticated](#session-authentication) state, the serv
 }
 ```
 
+<a id="markdown-request-all-at-once" name="request-all-at-once"></a>
 ### Request all at once
 You can request information individually, but we also provide a way to request all the information at once for convenience.
 ```ruby
@@ -564,6 +585,7 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 }
 ```
 
+<a id="markdown-request-system-information-030" name="request-system-information-030"></a>
 ## Request system information `@0.3.0`
 Requests system information from the server.
 ```ruby
@@ -759,6 +781,7 @@ For the request of a list of supported items, the server response JSON data in t
   "all"
 ]
 ```
+<a id="markdown-requests-individual-items" name="requests-individual-items"></a>
 ### Requests individual items
 ```ruby
 /api/system?info=os   # requests OS only
@@ -768,6 +791,7 @@ For the request of a list of supported items, the server response JSON data in t
 /api/system?info=all  # requests all the items (Simply /api/system?info or /api/system)
 ```
 
+<a id="markdown-request-system-health-030" name="request-system-health-030"></a>
 ## Request system health `@0.3.0`
 Requests system health from the server.
 ```ruby
@@ -903,6 +927,7 @@ For the request of a list of supported items, the server response JSON data in t
   "all"
 ]
 ```
+<a id="markdown-requests-individual-items-1" name="requests-individual-items-1"></a>
 ### Requests individual items
 ```ruby
 /api/system?health=cpu   # requests CPU only
@@ -911,6 +936,7 @@ For the request of a list of supported items, the server response JSON data in t
 /api/system?health=all  # requests all the items (Simply /api/system?health)
 ```
 
+<a id="markdown-request-hdd-smart-060" name="request-hdd-smart-060"></a>
 ## Request HDD S.M.A.R.T. `@0.6.0`
 Requests S.M.A.R.T. infomation of each HDD.
 ```ruby
@@ -951,6 +977,7 @@ For the request of a list of supported items, the server response JSON data in t
 ]
 ```
 
+<a id="markdown-request-to-restart-server-process-060" name="request-to-restart-server-process-060"></a>
 ## Request to restart server process `@0.6.0`
 If you are logged in with administrator privileges, you can restart the server process.
 ```ruby
@@ -966,6 +993,7 @@ For the request of a list of supported items, the server response JSON data in t
 The server returns HTTP response code 403 (FORBIDDEN) if you do not have administrator rights.
 
 
+<a id="markdown-request-to-reboot-server-system-060" name="request-to-reboot-server-system-060"></a>
 ## Request to reboot server system `@0.6.0`
 If you are logged in with administrator privileges, you can reboot the server system.
 ```ruby
@@ -981,6 +1009,7 @@ For the request of a list of supported items, the server response JSON data in t
 The server returns HTTP response code 403 (FORBIDDEN) if you do not have administrator rights.
 
 
+<a id="markdown-request-channel-status-030" name="request-channel-status-030"></a>
 ## Request channel status `@0.3.0`
 Requests the status of each channel on the server.
 ```ruby
@@ -1092,9 +1121,11 @@ The complete list of status codes is shown below.
 503   # Camera service failure
 ```
 
+<a id="markdown-request-various-enumeration" name="request-various-enumeration"></a>
 ## Request various enumeration
 The following requests return the JSON data with an HTTP response code of 200 if it is in [session authenticated](#session-authentication) state, or an HTTP response code of 401 if the session is not authenticated.
 
+<a id="markdown-channel-list" name="channel-list"></a>
 ### Channel list
 To get a list of channels in use, request the following:
 ```ruby
@@ -1118,6 +1149,7 @@ For the request, the server returns JSON data in the following format with an HT
 > [Tips]
 Added `"ptzSupported"` item from `TS-API@0.5.0`.
 
+<a id="markdown-vehicle-number-recognition-device-list" name="vehicle-number-recognition-device-list"></a>
 ### Vehicle number recognition device list
 To get a list of vehicle identification devices in use, ask for the following:
 The vehicle number recognition device list includes used devices when an external device is interworked, and in case of TS-LPR with built-in car number recognition function, it includes preset car number recognition zones.
@@ -1169,6 +1201,7 @@ For the request, the server returns JSON data in the following format with an HT
 // then be calculated as (1920, 1080, 5760, 3240).
 ```
 
+<a id="markdown-emergency-call-device-list-030" name="emergency-call-device-list-030"></a>
 ### Emergency call device list `@0.3.0`
 To receive a list of registered emergency call devices on the server, request the following:
 
@@ -1192,6 +1225,7 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
+<a id="markdown-event-log-type-list" name="event-log-type-list"></a>
 ### Event log type list
 To get a list of supported event log types, request the following:
 ```ruby
@@ -1260,6 +1294,7 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
+<a id="markdown-parking-lot-list-090" name="parking-lot-list-090"></a>
 ### Parking lot list `@0.9.0`
 To get a list of registered parking lots on the server, request the followings:
 ```ruby
@@ -1297,10 +1332,12 @@ For the request, the server returns JSON data in the following format with an HT
 ```
 
 
+<a id="markdown-retrieve-recorded-data" name="retrieve-recorded-data"></a>
 ## Retrieve recorded data
 
 Use `/api/find` to search for recorded data.
 
+<a id="markdown-search-dates-with-recorded-video" name="search-dates-with-recorded-video"></a>
 ### Search dates with recorded video
 To get a list of dates with recorded videos, request the following:
 
@@ -1390,6 +1427,7 @@ If you specify a condition using parameters such as `ch`,`timeBegin`, or `timeEn
 }
 ```
 
+<a id="markdown-search-minutes-with-recorded-video-020" name="search-minutes-with-recorded-video-020"></a>
 ### Search minutes with recorded video `@0.2.0`
 To get a list of minutes with recorded videod, request the following:
 In the case of minute search, you can not request all of them because the amount of response data can be large, unlike date search.
@@ -1450,6 +1488,7 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
+<a id="markdown-search-event-log" name="search-event-log"></a>
 ### Search event log
 To retrieve the event log recorded on the server, request the following.
 ```ruby
@@ -1554,6 +1593,7 @@ type        # Event log type
 ```
 
 
+<a id="markdown-vehicle-number-log-search" name="vehicle-number-log-search"></a>
 ### Vehicle number log search
 If you use the car number recognition function, the recognized car number is saved with the video. To retrieve the car number log you will request as follows:
 
@@ -1714,6 +1754,7 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&a
 ```
 
 
+<a id="markdown-search-for-similar-vehicle-numbers-020" name="search-for-similar-vehicle-numbers-020"></a>
 ### Search for similar vehicle numbers `@0.2.0`
 Can be used to verify that a similar vehicle number exists.
 To retrieve similar vehicle numbers from the log, request the following:
@@ -1738,11 +1779,13 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
+<a id="markdown-search-for-video-sources" name="search-for-video-sources"></a>
 ## Search for video sources
 You can use this method if your application uses the video address directly instead of the video display feature using the API you used in [Inserting video into web page](#inserting-video-into-web-page).
 
 This way you can get video address instead of displaying video.
 
+<a id="markdown-real-time-video-source" name="real-time-video-source"></a>
 ### Real-time video source
 You can request a list of real-time video addresses that the server is streaming by requesting the following without any parameters:
 ```ruby
@@ -1841,6 +1884,7 @@ nameonly    # If true, only the channel name is requested without the video stre
 ```
 
 
+<a id="markdown-recorded-video-source" name="recorded-video-source"></a>
 ### Recorded video source
 In general, you will use the [Search date with recorded video](#search-date-with-recorded-video) function to access the recorded video, but here are some ways to get a video source recorded at a lower level.
 
@@ -1954,6 +1998,7 @@ When this request is made, the server returns JSON data in the following format 
 ]
 ```
 
+<a id="markdown-requesting-video-using-video-source-030" name="requesting-video-using-video-source-030"></a>
 ## Requesting video using video source `@0.3.0`
 For video request using video source without using `/watch` provided by API, authentication is supported by each protocol as follows.
 ```ruby 
@@ -1968,7 +2013,9 @@ http://userid:passwordn@host/api/path/to
 http://host/api/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
+<a id="markdown-real-time-event-monitoring-030" name="real-time-event-monitoring-030"></a>
 ## Real-time event monitoring `@0.3.0`
+<a id="markdown-server-sent-events-sse" name="server-sent-events-sse"></a>
 ### Server-Sent Events (SSE)
 Supports the ability to receive real-time event messsage using HTML5 Server-Sent Events (SSE) method.
 Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
@@ -2059,6 +2106,7 @@ If the authentication information is incorrect or is not a supported topic, it w
 }
 ```
 
+<a id="markdown-channel-status-change-events" name="channel-status-change-events"></a>
 ### Channel status change events
 You can receive channel status change events in real time by requesting `topics=channelStatus`.
 Unlike other topics, in case of the channel status topic, for status change management, the current channel status is sent once, immediately after issuing the subscriber id.
@@ -2147,6 +2195,7 @@ Channel status change event messages are received in JSON format as shown below.
 
 The list of channel status codes is the same as the status code list in [Request channel status `@0.3.0`](#request-channel-status-030).
 
+<a id="markdown-car-number-recognition-events" name="car-number-recognition-events"></a>
 ### Car number recognition events
 If you request `topics=LPR`, you can receive the car number recognition event in real time.
 The car number event message is received in JSON format as shown below.
@@ -2173,6 +2222,7 @@ The car number event message is received in JSON format as shown below.
 }
 ```
 
+<a id="markdown-emergency-call-events" name="emergency-call-events"></a>
 ### Emergency call events
 If you request `topics=emergencyCall`, you can receive the event messages at the start and end of the emergency call in real time.
 Emergency call event messages are received in JSON format as shown below.
@@ -2296,6 +2346,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.
 
+<a id="markdown-system-event-070" name="system-event-070"></a>
 ### System event `@0.7.0`
 If you request `topics = systemEvent`, you can receive system events in real time.
 System event is received in JSON format as below when "System log" data is generated from [Event log type list](#event-log-type-list).
@@ -2333,6 +2384,7 @@ Each data type is the same as those used in [Search event log](#search-event-log
 }
 ```
 
+<a id="markdown-motion-detection-status-change-event-080" name="motion-detection-status-change-event-080"></a>
 ### Motion Detection Status Change Event `@0.8.0`
 If you request `topics=motionChanges`, you can receive the event when changing the motion detection status for each channel in real time.
 Immediately after the request, the current motion detection status of all specified channels is received
@@ -2359,6 +2411,7 @@ No events occur for channels with the same motion detection status.
 }
 ```
 
+<a id="markdown-parking-count-event-090" name="parking-count-event-090"></a>
 ### Parking Count Event `@0.9.0`
 If you ask for `topics=parkingCount`, you can receive events in real time when the number of cars in each parking lot is changed.
 Immediately after the request, the current number of vehicles in all the specified parking lots will be received once.
@@ -2554,6 +2607,7 @@ Now, let's create an example that uses SSE to receive event messages.
 [Run](./examples/ex3.html)
 
 
+<a id="markdown-web-sockets-rfc6455" name="web-sockets-rfc6455"></a>
 ### Web Sockets (RFC6455)
 Supports the ability to receive real-time event messsage using HTML5 Web sockets (RFC6455) method.
 Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
@@ -2781,6 +2835,7 @@ Now, let's create an example that uses the Web socket to receive event messages.
 [Run](./examples/ex4.html)
 
 
+<a id="markdown-exporting-recorded-video-030" name="exporting-recorded-video-030"></a>
 ## Exporting recorded video `@0.3.0`
 You can use the web socket to receive recorded video from the server.
 The server creates the files one by one and deletes them when the client finishes downloading, and then creates the next file.
@@ -3478,6 +3533,7 @@ Now let's create an example that uses a web socket to export the recorded video.
 [Run](./examples/ex5.html)
 
 
+<a id="markdown-pushing-events-to-the-server-040" name="pushing-events-to-the-server-040"></a>
 ## Pushing events to the server `@0.4.0`
 You can send events from an external device or software to the server by `HTTP POST` method.
 
@@ -3552,10 +3608,12 @@ curl http://192.168.0.100/api/push -H "Content-Type: application/json; charset=U
 curl http://192.168.0.100/api/push?auth=ZGVtbzohMTIzNHF3ZXI%3D -H "Content-Type: application/json; charset=UTF-8" -X POST -d @test.json
 ```
 
+<a id="markdown-channel-information-and-device-control-050" name="channel-information-and-device-control-050"></a>
 ## Channel information and device control `@0.5.0`
 
 You can get a list of devices connected to each channel, a list of features supported by each device, and control each device.
 
+<a id="markdown-request-device-information-and-support-function-list" name="request-device-information-and-support-function-list"></a>
 ### Request Device Information and Support Function List
 The connected device information requests:
 ```ruby
@@ -3564,6 +3622,7 @@ The connected device information requests:
 # Parameters
 caps    # Only requested "caps" item, If not specified, includes all information
 ch      # specify channels, If not specified, all channels in use
+reload  # Request updated information with the latest information from your channel's camera (@0.9.1)
 
 # Examples
 # Only requests device capabilities for each channel in use
@@ -3574,6 +3633,9 @@ ch      # specify channels, If not specified, all channels in use
 
 # Only requests devices capabilities connected to channels 1, 2 and 3
 /api/channel/info?caps&ch=1,2,3
+
+# Request renewal of camera information of all channels to latest information
+/api/channel/info?caps&reload
 ```
 
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
@@ -3660,6 +3722,7 @@ You can specify the language for the parameter as shown below.
 For [a list of supported languages](#list-of-languages-supported), see the appendix.
 
 
+<a id="markdown-pan-tilt-control" name="pan-tilt-control"></a>
 ### Pan tilt control
 
 If your device supports the pan tilt function, you can control it with the following commands.
@@ -3710,6 +3773,7 @@ Likewise, you can express both the direction and velocity of movement from the c
 The physical travel limit and speed for the move command can vary depending on the unique characteristics of each device.
 
 
+<a id="markdown-pan-tilt-preset-control" name="pan-tilt-preset-control"></a>
 ### Pan tilt preset control
 
 Available when the device supports the pan tilt preset function.
@@ -3839,6 +3903,7 @@ To move to the preset position, `preset token` must be specified as a parameter.
 /api/channel/preset?ch=1&go=1 # Goes to the preset token 1
 ```
 
+<a id="markdown-relay-output" name="relay-output"></a>
 ### Relay output
 
 If your device supports relay output, you can request a list of relay outputs as follows:
@@ -3885,6 +3950,7 @@ Relay output command is specified using the `on` or` off` command and one or mor
 /api/channel/relay?ch=1&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
 ```
 
+<a id="markdown-aux-output" name="aux-output"></a>
 ### AUX output
 
 If your device supports AUX output, use the `on` or` off` command as `relay output`.
@@ -3908,6 +3974,7 @@ The AUX outputs are specified using a zero-based number instead of a token.
 /api/channel/aux?ch=1&off=1
 ```
 
+<a id="markdown-reboot-the-device" name="reboot-the-device"></a>
 ### Reboot the device
 
 If your device supports it, you can reboot it remotely with the following command:
@@ -3929,8 +3996,10 @@ Typically, the reboot takes approximately one minute to complete, which may vary
 From the perspective of the client software, it is necessary to monitor the completion of the reboot by attempting to reconnect periodically from the video connection is disconnected after sending the reboot command.
 
 
+<a id="markdown-appendix" name="appendix"></a>
 ## Appendix
 
+<a id="markdown-the-api-supported-versions-by-product" name="the-api-supported-versions-by-product"></a>
 ### The API-supported versions by product
 
 The versions of the products that support the API are as follows.
@@ -3949,6 +4018,7 @@ The versions of the products that support the API are as follows.
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
+<a id="markdown-the-features-table-by-product" name="the-features-table-by-product"></a>
 ### The features table by product
 
 | Features                                                                              | TS-CMS | TS-NVR                          | TS-LPR |
@@ -3971,6 +4041,7 @@ TS-NVR does not have built-in vehicle number recognition function and **vehicle 
 However, if you use the add-on license of **vehicle number recognition interworking**, you can use the **vehicle number log search** because it stores the car number log incoming from the external vehicle number recognition device.
 
 
+<a id="markdown-base64-encoding" name="base64-encoding"></a>
 ### base64 Encoding
 For more information on base64 encoding, see the links below.
 * https://www.base64encode.org/
@@ -3978,6 +4049,7 @@ For more information on base64 encoding, see the links below.
 * https://www.w3schools.com/jsref/met_win_btoa.asp
 
 
+<a id="markdown-url-encoding" name="url-encoding"></a>
 ### URL Encoding
 For more information on URL encoding, see the links below.
 * http://www.convertstring.com/ko/EncodeDecode/UrlEncode
@@ -3986,6 +4058,7 @@ For more information on URL encoding, see the links below.
 * https://www.w3schools.com/jsref/jsref_encodeuricomponent.asp
 
 
+<a id="markdown-url-decoding" name="url-decoding"></a>
 ### URL decoding
 For more information on URL decoding, see the links below.
 * http://www.convertstring.com/ko/EncodeDecode/UrlDecode
@@ -3994,6 +4067,7 @@ For more information on URL decoding, see the links below.
 * https://www.w3schools.com/jsref/jsref_decodeuricomponent.asp
 
 
+<a id="markdown-date-and-time-notation-in-iso-8601-format" name="date-and-time-notation-in-iso-8601-format"></a>
 ### Date and time notation in ISO 8601 format
 
 ```
@@ -4035,6 +4109,7 @@ If you want to use UTC time, you can use `Z` character instead of `+00:00`.
 
 
 
+<a id="markdown-list-of-languages-supported" name="list-of-languages-supported"></a>
 ### List of languages supported
 The server supports a total of 104 languages as follows:
 ```ruby
@@ -4144,6 +4219,7 @@ yo-NG       # Yorùbá, Yoruba
 zu-ZA       # isiZulu, Zulu
 ```
 
+<a id="markdown-json-data-format" name="json-data-format"></a>
 ### JSON data format
 The server does not use line breaks or white space characters in JSON data for data optimization. For example, use the following form of text:
 ```json
@@ -4179,6 +4255,7 @@ The readable JSON data has the following form:
 Of course, both are completely the same data in terms of content.
 
 
+<a id="markdown-feedback" name="feedback"></a>
 ### Feedback
 We are always listening to your feedback.
 If you have any development questions or want to improve, please leave them at https://github.com/bobhyun/TS-API/issues.
