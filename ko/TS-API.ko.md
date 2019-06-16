@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.1
+TS-API@0.9.2
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -2882,12 +2882,18 @@ submitter       # 동영상 제출자를 명시
 recipient       # 동영상 수령인을 명시
 purpose         # 제출할 동영상의 용도를 명시
 
+# md5 포함
+md5             # v0.9.2에 포함됨
+
 # 사용 예
 # 2018년 7월 27일 오전 9시 정각부터 9시 30분까지 녹화된 모든 동영상을 받아내기
 ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
 
 # 1번 채널에 녹화된 동영상을 받아내기
 ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
+
+# 1번 채널에 녹화된 동영상을 받아내기 (md5 포함)
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&md5=true
 
 # 1,2,3번 채널에 녹화된 동영상을 받아내기
 ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
@@ -3017,12 +3023,14 @@ ttl 이내에 클라이언트는 서버에로 명령을 보내어 흐름을 제�
         # 생성된 동영상 파일
         {
           "fileName": "CH1.2018-07-27T09.11.19.mp4",
-          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4"
+          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
+          "md5": "1125ee2c3d20f30b31166c821204603d" # md5=true로 요청시 포함됨
         },
         # 생성된 자막 파일
         {
           "fileName": "CH1.2018-07-27T09.11.19.vtt",
-          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt"
+          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt",
+          "md5": "9176eec58f3be777ae7bd188a1f14165" # md5=true로 요청시 포함됨
         }
       ]
     }
@@ -3192,6 +3200,9 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
           <option value='zh-TW'>중국어 (번체)</option>
         </select>
       </div>
+      <div>
+        <input type='checkbox' id='md5' value='md5'>md5
+      </div>
     </div>
     <div>
       <button type='button' onClick='onConnect()'>접속</button>
@@ -3333,7 +3344,11 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
       '&recipient=' + encodeURIComponent(recipient) +
       '&purpose=' + encodeURIComponent(purpose) +
       '&lang=' + encodeURIComponent(lang);
-
+     
+    var md5 = document.getElementById('md5');
+    if (md5.checked === true) {
+      url += '&md5=true';
+    }
     return url;
   }
 
@@ -3399,7 +3414,7 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
 
       case 'fileEnd':
         downloadFiles(msg.channel.file, function(bSuccess) {
-          sendCommand(bSuccess ? "next" : "cancel");          
+          sendCommand(bSuccess ? "next" : "cancel");
         });
         break;
 
@@ -3526,6 +3541,7 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
       ch[i].checked = el.checked;
   }
 </script>
+
 ````
 [실행하기](./examples/ex5.html)
 

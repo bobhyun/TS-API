@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.1
+TS-API@0.9.2
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -2885,12 +2885,19 @@ submitter       # Specify video submitter
 recipient       # Specify video recipient
 purpose         # Specify the purpose of the video to submit
 
+# including md5
+md5             # added at v0.9.2
+
+
 # Examples
 # July 27, 2018 to receive all recorded videos from 9:00 am to 9:30 am
 ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A
 
 # Exporting video recorded on channel 1
 ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1
+
+# Exporting video recorded on channel 1 with md5
+ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1&md5=true
 
 # Exporting video recorded on channel 1,2 and 3
 ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3A00%3A00%0D%0A&timeEnd=2018-07-27T09%3A30%3A00%0D%0A&ch=1,2,3
@@ -3021,12 +3028,14 @@ Within ttl, The client must send a command to the server to control the flow, ot
         # Created video file
         {
           "fileName": "CH1.2018-07-27T09.11.19.mp4",
-          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4"
+          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
+          "md5": "1125ee2c3d20f30b31166c821204603d" # md5=true
         },
         # Created subtitle file
         {
           "fileName": "CH1.2018-07-27T09.11.19.vtt",
-          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt"
+          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt",
+          "md5": "9176eec58f3be777ae7bd188a1f14165" # md5=true
         }
       ]
     }
@@ -3140,8 +3149,8 @@ Now let's create an example that uses a web socket to export the recorded video.
     </div>
     <div id='param'>
       <div>
-        Data range : <input type='datetime-local' id='timeBegin' step='1' value='2018-07-27T09:00:00'>
-        ~ <input type='datetime-local' id='timeEnd' step='1' value='2018-07-27T09:30:00'>
+        Data range : <input type='datetime-local' id='timeBegin' step='1' value='2019-06-16T09:00:00'>
+        ~ <input type='datetime-local' id='timeEnd' step='1' value='2019-06-16T16:30:00'>
       </div>
       <div>
         Channels: 
@@ -3194,6 +3203,9 @@ Now let's create an example that uses a web socket to export the recorded video.
           <option value='zh-CN'>Chinese (Simplified)</option>
           <option value='zh-TW'>Chinese (Traditional)</option>
         </select>
+      </div>
+      <div>
+        <input type='checkbox' id='md5' value='md5'>md5
       </div>
     </div>
     <div>
@@ -3336,7 +3348,11 @@ Now let's create an example that uses a web socket to export the recorded video.
       '&recipient=' + encodeURIComponent(recipient) +
       '&purpose=' + encodeURIComponent(purpose) +
       '&lang=' + encodeURIComponent(lang);
-
+     
+    var md5 = document.getElementById('md5');
+    if (md5.checked === true) {
+      url += '&md5=true';
+    }
     return url;
   }
 
@@ -3406,7 +3422,7 @@ Now let's create an example that uses a web socket to export the recorded video.
         });
         break;
 
-        case 'timeoutAlert':
+      case 'timeoutAlert':
         if( window.myApp.downloadJobs.length > 0)
           sendCommand("wait");
         break;
@@ -3496,7 +3512,7 @@ Now let's create an example that uses a web socket to export the recorded video.
       var pos = window.myApp.downloadJobs.indexOf(req);
       if(pos >= 0)
         window.myApp.downloadJobs.splice(pos, 1);
-              
+      
       if(onFinish)
         onFinish(true);
     };
@@ -3529,6 +3545,7 @@ Now let's create an example that uses a web socket to export the recorded video.
       ch[i].checked = el.checked;
   }
 </script>
+
 ````
 [Run](./examples/ex5.html)
 

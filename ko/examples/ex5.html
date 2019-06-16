@@ -79,6 +79,9 @@
           <option value='zh-TW'>중국어 (번체)</option>
         </select>
       </div>
+      <div>
+        <input type='checkbox' id='md5' value='md5'>md5
+      </div>
     </div>
     <div>
       <button type='button' onClick='onConnect()'>접속</button>
@@ -220,7 +223,11 @@
       '&recipient=' + encodeURIComponent(recipient) +
       '&purpose=' + encodeURIComponent(purpose) +
       '&lang=' + encodeURIComponent(lang);
-
+     
+    var md5 = document.getElementById('md5');
+    if (md5.checked === true) {
+      url += '&md5=true';
+    }
     return url;
   }
 
@@ -286,7 +293,7 @@
 
       case 'fileEnd':
         downloadFiles(msg.channel.file, function(bSuccess) {
-          sendCommand(bSuccess ? "next" : "cancel");          
+          sendCommand(bSuccess ? "next" : "cancel");
         });
         break;
 

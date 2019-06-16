@@ -27,6 +27,7 @@
       <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
       <input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
+      <input class='topic' type='checkbox' value="packing" checked>packing
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -91,13 +92,15 @@
     }
 
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
+    window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/api/subscribeEvents?topics=' + topics + 
-			'&auth=' + encodedData;
-    
-      if(document.getElementById('verbose').checked)
+    	hostName + '/wsapi/subscribeEvents?topics=' + topics;
+    if(document.getElementById('verbose').checked)
       url += '&verbose=true';
-      
+            
+		url +='&auth=' + window.myApp.auth;
+    
+
     //url += '&ch=4';
     return url;
   }

@@ -24,8 +24,8 @@
     </div>
     <div id='param'>
       <div>
-        Data range : <input type='datetime-local' id='timeBegin' step='1' value='2018-07-27T09:00:00'>
-        ~ <input type='datetime-local' id='timeEnd' step='1' value='2018-07-27T09:30:00'>
+        Data range : <input type='datetime-local' id='timeBegin' step='1' value='2019-06-16T09:00:00'>
+        ~ <input type='datetime-local' id='timeEnd' step='1' value='2019-06-16T16:30:00'>
       </div>
       <div>
         Channels: 
@@ -78,6 +78,9 @@
           <option value='zh-CN'>Chinese (Simplified)</option>
           <option value='zh-TW'>Chinese (Traditional)</option>
         </select>
+      </div>
+      <div>
+        <input type='checkbox' id='md5' value='md5'>md5
       </div>
     </div>
     <div>
@@ -220,7 +223,11 @@
       '&recipient=' + encodeURIComponent(recipient) +
       '&purpose=' + encodeURIComponent(purpose) +
       '&lang=' + encodeURIComponent(lang);
-
+     
+    var md5 = document.getElementById('md5');
+    if (md5.checked === true) {
+      url += '&md5=true';
+    }
     return url;
   }
 
@@ -290,7 +297,7 @@
         });
         break;
 
-        case 'timeoutAlert':
+      case 'timeoutAlert':
         if( window.myApp.downloadJobs.length > 0)
           sendCommand("wait");
         break;
@@ -380,7 +387,7 @@
       var pos = window.myApp.downloadJobs.indexOf(req);
       if(pos >= 0)
         window.myApp.downloadJobs.splice(pos, 1);
-              
+      
       if(onFinish)
         onFinish(true);
     };
