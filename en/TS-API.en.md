@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.2
+TS-API@0.9.3
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -1607,8 +1607,19 @@ For the request, the server returns JSON data in the following format with an HT
   "at": 0,            // Current data offset (0 means the first data)
   "data": [           // List of vehicle number log data
     {
-      "id": 64,                           // Vehicle number log number
-      "plateNo": "55EV96",                // Vehicle number text
+      "id": 64,                          	// Vehicle number log number
+      "plateNo": "55EV96",               	// Vehicle number text
+			"score":95,														// recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optioanl)
+			"roi": {                         		// License plate area
+				"offset":[821,473],									// Top left coordinates
+				"size":[173,43]											// License plate image size
+			},
+			"image": [															// an array for the same plates captured consecutively
+        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
+        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386146439.plate.jpg",
+        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386199445.plate.jpg",
+        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386510078.plate.jpg"
+      ],
       "timeRange": [                      // Date and time the vehicle number was recognized
         "2018-02-21T09:07:29.000-05:00",  // Starting timestamp
         "2018-02-21T09:07:34.057-05:00"   // Ending timestamp
@@ -1637,6 +1648,14 @@ For the request, the server returns JSON data in the following format with an HT
     {
       "id": 63,
       "plateNo": "DSP963",
+			"score":95,
+			"roi": {
+        "offset": [753,578],
+        "size": [150,38]
+      },
+			"image": [
+        "http://192.168.0.100/storage/e/0/0/0/39/39588.161141.1576732012342440.plate.jpg"
+      ],
       "timeRange": [
         "2018-02-21T08:00:00.915-05:00",
         "2018-02-21T08:00:01.714-05:00"
@@ -1666,6 +1685,10 @@ For the request, the server returns JSON data in the following format with an HT
     {
       "id": 15,
       "plateNo": "L647AN",
+			"roi": {
+        "offset": [832,380],
+        "size": [122,31]
+      },
       "timeRange": [
         "2018-02-20T18:12:05.828-05:00",
         "2018-02-20T18:12:06.253-05:00"
@@ -2216,7 +2239,13 @@ The car number event message is received in JSON format as shown below.
       "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" // The video at vehicle identification time
     }
   ],
-  "plateNo":"DSP963",                           // Car plate number
+	"image":"http://host/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // captured still cut image
+  "plateNo":"DSP963",                        	// License plate number
+	"score":98,																			// recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optional item)
+	"roi": {                         							// License plate area
+	  "offset":[964,560],														// Top left coordinates
+		"size":[187,51]																// License plate image size
+	},
   "timeBegin":"2018-06-27T10:42:02.573-05:00",  // First recognized time of the car
   "topic":"LPR"                                 // Topic name
 }
