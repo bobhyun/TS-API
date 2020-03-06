@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.3
+TS-API@0.9.4
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -49,7 +49,9 @@ Table of contents
 - [Request to reboot server system `@0.6.0`](#request-to-reboot-server-system-060)
 - [Request channel status `@0.3.0`](#request-channel-status-030)
 - [Request various enumeration](#request-various-enumeration)
-  - [Channel list](#channel-list)
+  - [Channel list `@0.9.4`](#channel-list-094)
+    - [Adding stream list `@0.9.4`](#adding-stream-list-094)
+    - [Adding camera capabilities `@0.9.4`](#adding-camera-capabilities-094)
   - [Vehicle number recognition device list](#vehicle-number-recognition-device-list)
   - [Emergency call device list `@0.3.0`](#emergency-call-device-list-030)
   - [Event log type list](#event-log-type-list)
@@ -1126,7 +1128,7 @@ The complete list of status codes is shown below.
 The following requests return the JSON data with an HTTP response code of 200 if it is in [session authenticated](#session-authentication) state, or an HTTP response code of 401 if the session is not authenticated.
 
 <a id="markdown-channel-list" name="channel-list"></a>
-### Channel list
+### Channel list `@0.9.4`
 To get a list of channels in use, request the following:
 ```ruby
 /api/enum?what=channel
@@ -1137,17 +1139,140 @@ For the request, the server returns JSON data in the following format with an HT
   {
     "chid": 1,              // Channel number
     "title": "Front door",  // Channel name
-    "ptzSupported": true    // Ptz capabilities
+    "displayName": "CH1. Front door",  // Added since TS-API@0.9.4
+    "ptzSupported": true    // Ptz capabilities (Added since TS-API@0.5.0)
   },
   {
     "chid": 2,              // Channel number
-    "title": "Garage",      // Channel name
-    "ptzSupported": true    // Ptz capabilities
+    "title": "",            // Channel name
+    "displayName": "CH2",   // Added since TS-API@0.9.4
+    "ptzSupported": true    // Ptz capabilities (Added since TS-API@0.5.0)
   }
 ]
 ```
-> [Tips]
-Added `"ptzSupported"` item from `TS-API@0.5.0`.
+
+#### Adding stream list `@0.9.4`
+You can add the `staticSrc` parameter to get the list of streams together.
+These streams may not be available depending on the camera connection.
+```ruby
+/api/enum?what=channel&staticSrc
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  {
+    "chid": 1,
+    "title": "Front door",
+    "displayName": "CH1. Front door",
+    "ptzSupported": true,
+    "src": [
+      {
+        "protocol": "rtmp",
+        "profile": "main",
+        "src": "rtmp://localhost/live/ch1main",
+        "type": "rtmp/mp4"
+      },
+      {
+        "protocol": "hls",
+        "profile": "main",
+        "src": "http://localhost/hls/ch1main/index.m3u8",
+        "type": "application/x-mpegurl"
+      },
+      {
+        "protocol": "rtmp",
+        "profile": "sub",
+        "src": "rtmp://localhost/live/ch1sub",
+        "type": "rtmp/mp4"
+      },
+      {
+        "protocol": "hls",
+        "profile": "sub",
+        "src": "http://localhost/hls/ch1sub/index.m3u8",
+        "type": "application/x-mpegurl"
+      }
+    ]
+  },
+  {
+    "chid": 2,
+    "title": "",
+    "displayName": "CH2",
+    "ptzSupported": true,
+    "src": [
+      {
+        "protocol": "rtmp",
+        "profile": "main",
+        "src": "rtmp://localhost/live/ch2main",
+        "type": "rtmp/mp4"
+      },
+      {
+        "protocol": "hls",
+        "profile": "main",
+        "src": "http://localhost/hls/ch2main/index.m3u8",
+        "type": "application/x-mpegurl"
+      },
+      {
+        "protocol": "rtmp",
+        "profile": "sub",
+        "src": "rtmp://localhost/live/ch2sub",
+        "type": "rtmp/mp4"
+      },
+      {
+        "protocol": "hls",
+        "profile": "sub",
+        "src": "http://localhost/hls/ch2sub/index.m3u8",
+        "type": "application/x-mpegurl"
+      }
+    ]
+  }
+]
+```
+
+#### Adding camera capabilities `@0.9.4`
+You can add the `caps` parameter to get camera capabilities together.
+```ruby
+/api/enum?what=channel&caps
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  {
+    "chid": 1,
+    "title": "Front door",
+    "displayName": "CH1. Front door",
+    "ptzSupported": true,
+    "caps": {
+      "pantilt": true,
+      "zoom": true,
+      "focus": false,
+      "iris": false,
+      "home": false,
+      "maxPreset": 128,
+      "aux": 0,
+      "digitalInputs": 1,
+      "relayOutputs": 1,
+      "reboot": true
+    }
+  },
+  {
+    "chid": 2,
+    "title": "",
+    "displayName": "CH2",
+    "ptzSupported": true,
+    "caps": {
+      "pantilt": true,
+      "zoom": true,
+      "focus": false,
+      "iris": false,
+      "home": false,
+      "maxPreset": 128,
+      "aux": 0,
+      "digitalInputs": 1,
+      "relayOutputs": 1,
+      "reboot": true
+    }
+  }
+]
+```
 
 <a id="markdown-vehicle-number-recognition-device-list" name="vehicle-number-recognition-device-list"></a>
 ### Vehicle number recognition device list
@@ -2153,18 +2278,136 @@ Channel status change event messages are received in JSON format as shown below.
     {
       "chid": 1,
       "title": "Camera1",
+      "displayName": "CH1. Camera1",  // Added since TS-API@0.9.4
       "status": {
         "code": 200,
         "message": "Connected"
-      }
+      },
+      "caps": {   // Camera capabilities (Added since TS-API@0.9.4)
+        "pantilt": true,
+        "zoom": true,
+        "focus": false,
+        "iris": false,
+        "home": false,
+        "maxPreset": 0,
+        "aux": 0,
+        "digitalInputs": 1,
+        "relayOutputs": 0,
+        "reboot": true
+      },
+      "src": [  // Available stream list (Added since TS-API@0.9.4)
+        {
+          "protocol": "rtmp",
+          "profile": "main",
+          "src": "rtmp://localhost/live/ch3main",
+          "type": "rtmp/mp4",
+          "label": "WXGA",
+          "size": [
+            1280,
+            960
+          ]
+        },
+        {
+          "protocol": "hls",
+          "profile": "main",
+          "src": "http://localhost/hls/ch3main/index.m3u8",
+          "type": "application/x-mpegurl",
+          "label": "WXGA",
+          "size": [
+            1280,
+            960
+          ]
+        },
+        {
+          "protocol": "rtmp",
+          "profile": "sub",
+          "src": "rtmp://localhost/live/ch3sub",
+          "type": "rtmp/mp4",
+          "label": "VGA",
+          "size": [
+            640,
+            480
+          ]
+        },
+        {
+          "protocol": "hls",
+          "profile": "sub",
+          "src": "http://localhost/hls/ch3sub/index.m3u8",
+          "type": "application/x-mpegurl",
+          "label": "VGA",
+          "size": [
+            640,
+            480
+          ]
+        }
+      ]
     },
     {
       "chid": 2,
       "title": "Camera2",
+      "displayName": "CH2. Camera2",
       "status": {
         "code": 200,
         "message": "Connected"
-      }
+      },
+      "caps": {
+        "pantilt": true,
+        "zoom": true,
+        "focus": false,
+        "iris": false,
+        "home": false,
+        "maxPreset": 128,
+        "aux": 0,
+        "digitalInputs": 1,
+        "relayOutputs": 1,
+        "reboot": true
+      },
+      "src": [
+        {
+          "protocol": "rtmp",
+          "profile": "main",
+          "src": "rtmp://localhost/live/ch1main",
+          "type": "rtmp/mp4",
+          "label": "1080p",
+          "size": [
+            1920,
+            1080
+          ]
+        },
+        {
+          "protocol": "hls",
+          "profile": "main",
+          "src": "http://localhost/hls/ch1main/index.m3u8",
+          "type": "application/x-mpegurl",
+          "label": "1080p",
+          "size": [
+            1920,
+            1080
+          ]
+        },
+        {
+          "protocol": "rtmp",
+          "profile": "sub",
+          "src": "rtmp://localhost/live/ch1sub",
+          "type": "rtmp/mp4",
+          "label": "360p",
+          "size": [
+            640,
+            360
+          ]
+        },
+        {
+          "protocol": "hls",
+          "profile": "sub",
+          "src": "http://localhost/hls/ch1sub/index.m3u8",
+          "type": "application/x-mpegurl",
+          "label": "360p",
+          "size": [
+            640,
+            360
+          ]
+        }
+      ]
     },
   // ... omitted
   ]
@@ -2176,7 +2419,8 @@ Channel status change event messages are received in JSON format as shown below.
   "topic": "channelStatus",
   "event": "nameChanged",
   "chid": 1,
-  "name": "Camera1"
+  "name": "Camera1",
+  "displayName: "CH1. Camera1"  // Added since TS-API@0.9.4
 }
 
 // When the video address modified
@@ -2192,7 +2436,53 @@ Channel status change event messages are received in JSON format as shown below.
   "timestamp": "2018-07-20T16:03:45.956-05:00",
   "topic": "channelStatus",
   "event": "videoStreamReady",
-  "chid": 1
+  "chid": 1,
+  "src": [  // Available stream list (Added since TS-API@0.9.4)
+    {
+      "protocol": "rtmp",
+      "profile": "main",
+      "src": "rtmp://localhost/live/ch1main",
+      "type": "rtmp/mp4",
+      "label": "1080p",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "protocol": "hls",
+      "profile": "main",
+      "src": "http://localhost/hls/ch1main/index.m3u8",
+      "type": "application/x-mpegurl",
+      "label": "1080p",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "protocol": "rtmp",
+      "profile": "sub",
+      "src": "rtmp://localhost/live/ch1sub",
+      "type": "rtmp/mp4",
+      "label": "360p",
+      "size": [
+        640,
+        360
+      ]
+    },
+    {
+      "protocol": "hls",
+      "profile": "sub",
+      "src": "http://localhost/hls/ch1sub/index.m3u8",
+      "type": "application/x-mpegurl",
+      "label": "360p",
+      "size": [
+        640,
+        360
+      ]
+    }
+  ]
 }
 
 // Video stream has the same address but needs to be reconnected
@@ -2203,7 +2493,7 @@ Channel status change event messages are received in JSON format as shown below.
   "chid": 1
 }
 
-// When camera connection status is changed, or channel is added or deleted
+// When the camera is connected
 {
   "timestamp": "2018-07-20T16:05:45.956-05:00",
   "topic": "channelStatus",
@@ -2213,6 +2503,33 @@ Channel status change event messages are received in JSON format as shown below.
     "code": 200,
     "message": "Connected"
   }
+}
+
+// When a channel was added (setting changed)
+// Added since TS-API@0.9.4
+{
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "channelAdded",
+  "chid": 1
+}
+
+// When a channel was removed (setting changed)
+// Added since TS-API@0.9.4
+{
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "channelRemoved",
+  "chid": 1
+}
+
+// When channel numbers of two channels are exchanged (setting changed)
+// Added since TS-API@0.9.4
+{
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "channelSwapped",
+  "chid": [1,2]
 }
 ```
 
@@ -2228,6 +2545,7 @@ The car number event message is received in JSON format as shown below.
   "chid": {                                     // Car number recognition channel
     "chid":1,
     "title":"Camera1",
+    "displayName":"CH1. Camera1", // Added since TS-API@0.9.4
     "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00"  // The video at vehicle identification time
   },
   "deviceCode":"1-1-7",                         // Car number identification device (zone) code
@@ -2236,6 +2554,7 @@ The car number event message is received in JSON format as shown below.
     {
       "chid":2,
       "title":"Camera2",
+      "displayName":"CH2. Camera2", // Added since TS-API@0.9.4
       "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" // The video at vehicle identification time
     }
   ],
@@ -2267,11 +2586,13 @@ Emergency call event messages are received in JSON format as shown below.
     {
       "chid":1,
       "title":"Camera1",
+      "displayName":"CH1. Camera1",             // Added since TS-API@0.9.4
       "src":"http://host/watch?ch=1"
     },
     {
       "chid":2,
       "title":"Camera2",
+      "displayName":"CH2. Camera2",             // Added since TS-API@0.9.4
       "src":"http://host/watch?ch=2"
     }
   ],
@@ -2295,6 +2616,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
     {
       "chid":1,
       "title":"Camera1",
+      "displayName":"CH1. Camera1",             // Added since TS-API@0.9.4
       "src":"http://host/watch?ch=1",
       "streams": [  // vidio stream sources
                 // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
@@ -2339,6 +2661,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
     {
       "chid":2,
       "title":"Camera2",
+      "displayName":"CH2. Camera2",             // Added since TS-API@0.9.4
       "src":"http://host/watch?ch=2",
       "streams":[
         // ... omitted
@@ -2361,11 +2684,13 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
     {
       "chid":1,
       "title":"Camera1",
+      "displayName":"CH1. Camera1",             // Added since TS-API@0.9.4
       "src":"http://host/watch?ch=1"
     },
     {
       "chid":2,
       "title":"Camera2",
+      "displayName":"CH2. Camera2",             // Added since TS-API@0.9.4
       "src":"http://host/watch?ch=2"
     }
   ],

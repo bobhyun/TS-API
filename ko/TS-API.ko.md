@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.3
+TS-API@0.9.4
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -48,7 +48,9 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 - [시스템 재부팅 요청 `@0.6.0`](#시스템-재부팅-요청-060)
 - [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)
 - [각종 목록 요청](#각종-목록-요청)
-  - [채널 목록](#채널-목록)
+  - [채널 목록 `@0.9.4`](#채널-목록-094)
+    - [스트림 목록 추가하기 `@0.9.4`](#스트림-목록-추가하기-094)
+    - [카메라 지원 기능 추가하기 `@0.9.4`](#카메라-지원-기능-추가하기-094)
   - [차량 번호 인식 장치 목록](#차량-번호-인식-장치-목록)
   - [비상 호출 장치 목록 `@0.3.0`](#비상-호출-장치-목록-030)
   - [이벤트 로그 종류 목록](#이벤트-로그-종류-목록)
@@ -1122,7 +1124,7 @@ lang      # 메시지에 사용될 언어 지정
 다음 요청들은 `auth=`를 사용하여 로그인 정보를 전달하거나 이미 로그인된 세션의 경우는 HTTP 응답 코드 200과 함께 JSON 데이터를 반환하며, 로그인 인증이 되지 않은 경우는 HTTP 응답 코드 401이 반환합니다.
 
 <a id="markdown-채널-목록" name="채널-목록"></a>
-### 채널 목록
+### 채널 목록 `@0.9.4`
 사용 중인 채널 목록을 얻기 위해 아래와 같이 요청합니다.
 ```ruby
 /api/enum?what=channel
@@ -1131,19 +1133,142 @@ lang      # 메시지에 사용될 언어 지정
 ```jsx
 [
   {
-    "chid": 1,            //채널 번호
-    "title": "카메라1",   //채널 이름
-    "ptzSupported": true  //PTZ 지원 여부
+    "chid": 1,            // 채널 번호
+    "title": "카메라1",     // 채널 이름
+    "displayName": "CH1. 카메라1",  // TS-API@0.9.4 이후 추가됨
+    "ptzSupported": true  // PTZ 지원 여부 (TS-API@0.5.0 이후 추가됨)
   },
   {
-    "chid": 2,            //채널 번호
-    "title": "카메라2",   //채널 이름
-    "ptzSupported": true  //PTZ 지원 여부
+    "chid": 2,            // 채널 번호
+    "title": "",          // 채널 이름
+    "displayName": "CH2", // TS-API@0.9.4 이후 추가됨
+    "ptzSupported": true  // PTZ 지원 여부 (TS-API@0.5.0 이후 추가됨)
   }
 ]
 ```
-> [참고]
-`TS-API@0.5.0`부터 `"ptzSupported"` 항목이 추가되었습니다.
+
+#### 스트림 목록 추가하기 `@0.9.4`
+스트림 목록을 함께 얻으려면 `staticSrc` 매개변수를 추가합니니다.
+이 스트림들은 카메라 접속 상태에 따라 가용하지 않을 수도 있습니다.
+```ruby
+/api/enum?what=channel&staticSrc
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  {
+    "chid": 1,
+    "title": "카메라1",
+    "displayName": "CH1. 카메라1",
+    "ptzSupported": true,
+    "src": [
+      {
+        "protocol": "rtmp",
+        "profile": "main",
+        "src": "rtmp://localhost/live/ch1main",
+        "type": "rtmp/mp4"
+      },
+      {
+        "protocol": "hls",
+        "profile": "main",
+        "src": "http://localhost/hls/ch1main/index.m3u8",
+        "type": "application/x-mpegurl"
+      },
+      {
+        "protocol": "rtmp",
+        "profile": "sub",
+        "src": "rtmp://localhost/live/ch1sub",
+        "type": "rtmp/mp4"
+      },
+      {
+        "protocol": "hls",
+        "profile": "sub",
+        "src": "http://localhost/hls/ch1sub/index.m3u8",
+        "type": "application/x-mpegurl"
+      }
+    ]
+  },
+  {
+    "chid": 2,
+    "title": "",
+    "displayName": "CH2",
+    "ptzSupported": true,
+    "src": [
+      {
+        "protocol": "rtmp",
+        "profile": "main",
+        "src": "rtmp://localhost/live/ch2main",
+        "type": "rtmp/mp4"
+      },
+      {
+        "protocol": "hls",
+        "profile": "main",
+        "src": "http://localhost/hls/ch2main/index.m3u8",
+        "type": "application/x-mpegurl"
+      },
+      {
+        "protocol": "rtmp",
+        "profile": "sub",
+        "src": "rtmp://localhost/live/ch2sub",
+        "type": "rtmp/mp4"
+      },
+      {
+        "protocol": "hls",
+        "profile": "sub",
+        "src": "http://localhost/hls/ch2sub/index.m3u8",
+        "type": "application/x-mpegurl"
+      }
+    ]
+  }
+]
+```
+
+#### 카메라 지원 기능 추가하기 `@0.9.4`
+카메라 지원 기능 목록을 함께 얻으려면 `caps` 매개변수를 추가합니니다.
+```ruby
+/api/enum?what=channel&caps
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  {
+    "chid": 1,
+    "title": "카메라1",
+    "displayName": "CH1. 카메라1",
+    "ptzSupported": true,
+    "caps": {
+      "pantilt": true,
+      "zoom": true,
+      "focus": false,
+      "iris": false,
+      "home": false,
+      "maxPreset": 128,
+      "aux": 0,
+      "digitalInputs": 1,
+      "relayOutputs": 1,
+      "reboot": true
+    }
+  },
+  {
+    "chid": 2,
+    "title": "",
+    "displayName": "CH2",
+    "ptzSupported": true,
+    "caps": {
+      "pantilt": true,
+      "zoom": true,
+      "focus": false,
+      "iris": false,
+      "home": false,
+      "maxPreset": 128,
+      "aux": 0,
+      "digitalInputs": 1,
+      "relayOutputs": 1,
+      "reboot": true
+    }
+  }
+]
+```
 
 <a id="markdown-차량-번호-인식-장치-목록" name="차량-번호-인식-장치-목록"></a>
 ### 차량 번호 인식 장치 목록
@@ -2146,18 +2271,136 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
     {
       "chid": 1,
       "title": "카메라1",
+      "displayName": "CH1. 카메라1", // TS-API@0.9.4 이후 추가됨
       "status": {
         "code": 200,
         "message": "연결됨"
-      }
+      },
+      "caps": {   // 카메라 지원 기능 (TS-API@0.9.4 이후 추가됨)
+        "pantilt": true,
+        "zoom": true,
+        "focus": false,
+        "iris": false,
+        "home": false,
+        "maxPreset": 0,
+        "aux": 0,
+        "digitalInputs": 1,
+        "relayOutputs": 0,
+        "reboot": true
+      },
+      "src": [  // 가용한 스트리밍 목록 (TS-API@0.9.4 이후 추가됨)
+        {
+          "protocol": "rtmp",
+          "profile": "main",
+          "src": "rtmp://localhost/live/ch3main",
+          "type": "rtmp/mp4",
+          "label": "WXGA",
+          "size": [
+            1280,
+            960
+          ]
+        },
+        {
+          "protocol": "hls",
+          "profile": "main",
+          "src": "http://localhost/hls/ch3main/index.m3u8",
+          "type": "application/x-mpegurl",
+          "label": "WXGA",
+          "size": [
+            1280,
+            960
+          ]
+        },
+        {
+          "protocol": "rtmp",
+          "profile": "sub",
+          "src": "rtmp://localhost/live/ch3sub",
+          "type": "rtmp/mp4",
+          "label": "VGA",
+          "size": [
+            640,
+            480
+          ]
+        },
+        {
+          "protocol": "hls",
+          "profile": "sub",
+          "src": "http://localhost/hls/ch3sub/index.m3u8",
+          "type": "application/x-mpegurl",
+          "label": "VGA",
+          "size": [
+            640,
+            480
+          ]
+        }
+      ]
     },
     {
       "chid": 2,
       "title": "카메라2",
+      "displayName": "CH2. 카메라2",
       "status": {
         "code": 200,
         "message": "연결됨"
-      }
+      },
+      "caps": {
+        "pantilt": true,
+        "zoom": true,
+        "focus": false,
+        "iris": false,
+        "home": false,
+        "maxPreset": 128,
+        "aux": 0,
+        "digitalInputs": 1,
+        "relayOutputs": 1,
+        "reboot": true
+      },
+      "src": [
+        {
+          "protocol": "rtmp",
+          "profile": "main",
+          "src": "rtmp://localhost/live/ch1main",
+          "type": "rtmp/mp4",
+          "label": "1080p",
+          "size": [
+            1920,
+            1080
+          ]
+        },
+        {
+          "protocol": "hls",
+          "profile": "main",
+          "src": "http://localhost/hls/ch1main/index.m3u8",
+          "type": "application/x-mpegurl",
+          "label": "1080p",
+          "size": [
+            1920,
+            1080
+          ]
+        },
+        {
+          "protocol": "rtmp",
+          "profile": "sub",
+          "src": "rtmp://localhost/live/ch1sub",
+          "type": "rtmp/mp4",
+          "label": "360p",
+          "size": [
+            640,
+            360
+          ]
+        },
+        {
+          "protocol": "hls",
+          "profile": "sub",
+          "src": "http://localhost/hls/ch1sub/index.m3u8",
+          "type": "application/x-mpegurl",
+          "label": "360p",
+          "size": [
+            640,
+            360
+          ]
+        }
+      ]
     },
   // ... 중략
   ]
@@ -2169,7 +2412,8 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
   "topic": "channelStatus",
   "event": "nameChanged",
   "chid": 1,
-  "name": "카메라1"
+  "name": "카메라1",
+  "displayName: "CH1. Camera1"  // TS-API@0.9.4 이후 추가됨
 }
 
 // 채널의 영상 주소가 변경시
@@ -2185,7 +2429,53 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
   "timestamp": "2018-07-20T16:03:45.956+09:00",
   "topic": "channelStatus",
   "event": "videoStreamReady",
-  "chid": 1
+  "chid": 1,
+  "src": [  // 가용한 스트림 목록 (TS-API@0.9.4 이후 추가됨)
+    {
+      "protocol": "rtmp",
+      "profile": "main",
+      "src": "rtmp://localhost/live/ch1main",
+      "type": "rtmp/mp4",
+      "label": "1080p",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "protocol": "hls",
+      "profile": "main",
+      "src": "http://localhost/hls/ch1main/index.m3u8",
+      "type": "application/x-mpegurl",
+      "label": "1080p",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "protocol": "rtmp",
+      "profile": "sub",
+      "src": "rtmp://localhost/live/ch1sub",
+      "type": "rtmp/mp4",
+      "label": "360p",
+      "size": [
+        640,
+        360
+      ]
+    },
+    {
+      "protocol": "hls",
+      "profile": "sub",
+      "src": "http://localhost/hls/ch1sub/index.m3u8",
+      "type": "application/x-mpegurl",
+      "label": "360p",
+      "size": [
+        640,
+        360
+      ]
+    }
+  ]
 }
 
 // 비디오 스트림이 주소는 동일하나 변경되어 다시 연결해야 하는 경우
@@ -2196,17 +2486,46 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
   "chid": 1
 }
 
-// 카메라 연결 상태가 변경되거나 채널이 추가, 삭제된 경우
+// 카메라가 접속된 경우
 {
-  "timestamp": "2018-07-20T16:05:45.956+09:00",
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
   "topic": "channelStatus",
   "event": "statusChanged",
   "chid": 1,
   "status": {
     "code": 200,
-    "message": "연결됨"
+    "message": "Connected"
   }
 }
+
+// 채널이 추가된 경우 (설정 변경)
+// TS-API@0.9.4 이후 추가됨
+{
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "channelAdded",
+  "chid": 1
+}
+
+// 채널이 삭제된 경우 (설정 변경)
+// TS-API@0.9.4 이후 추가됨
+{
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "channelRemoved",
+  "chid": 1
+}
+
+// 두 채널의 채널 번호가 서로 바뀐 경우 (설정 변경)
+// TS-API@0.9.4 이후 추가됨
+{
+  "timestamp": "2018-07-20T16:05:45.956-05:00",
+  "topic": "channelStatus",
+  "event": "channelSwapped",
+  "chid": [1,2]
+}
+
+
 ```
 
 채널 상태 코드 목록은 [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)의 상태 코드 목록과 동일합니다.
@@ -2222,6 +2541,7 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
   "chid": {                                     // 차량 번호 인식 채널
     "chid":1,
     "title":"카메라1",
+    "displayName":"CH1. 카메라1",                 // TS-API@0.9.4 이후 추가됨
     "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"  // 차량 번호 인식 시점의 영상
   },
   "srcCode":"1-1-7",                            	// 차량 번호 인식 장치(영역) 코드
@@ -2230,6 +2550,7 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
     {
       "chid":2,
       "title":"카메라2",
+      "displayName":"CH2. 카메라2",               // TS-API@0.9.4 이후 추가됨
       "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00" // 차량 번호 인식 시점의 영상
     }
   ],
@@ -2261,11 +2582,13 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
     {
       "chid":1,
       "title":"카메라1",
+      "displayName":"CH1. 카메라1",               // TS-API@0.9.4 이후 추가됨
       "src":"http://host/watch?ch=1"
     },
     {
       "chid":2,
       "title":"카메라2",
+      "displayName":"CH2. 카메라2",               // TS-API@0.9.4 이후 추가됨
       "src":"http://host/watch?ch=2"
     }
   ],
@@ -2289,6 +2612,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
     {
       "chid":1,
       "title":"카메라1",
+      "displayName":"CH1. 카메라1",               // TS-API@0.9.4 이후 추가됨
       "src":"http://host/watch?ch=1",
       "streams": [  // 동영상 소스 목록
                 // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨)
@@ -2333,6 +2657,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
     {
       "chid":2,
       "title":"카메라2",
+      "displayName":"CH2. 카메라2",               // TS-API@0.9.4 이후 추가됨
       "src":"http://host/watch?ch=2",
       "streams":[
         // ... 중략
@@ -2355,11 +2680,13 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
     {
       "chid":1,
       "title":"카메라1",
+      "displayName":"CH1. 카메라1",               // TS-API@0.9.4 이후 추가됨
       "src":"http://host/watch?ch=1"
     },
     {
       "chid":2,
       "title":"카메라2",
+      "displayName":"CH2. 카메라2",               // TS-API@0.9.4 이후 추가됨
       "src":"http://host/watch?ch=2"
     }
   ],
