@@ -1135,14 +1135,12 @@ lang      # 메시지에 사용될 언어 지정
   {
     "chid": 1,            // 채널 번호
     "title": "카메라1",     // 채널 이름
-    "displayName": "CH1. 카메라1",  // TS-API@0.9.4 이후 추가됨
-    "ptzSupported": true  // PTZ 지원 여부 (TS-API@0.5.0 이후 추가됨)
+    "displayName": "CH1. 카메라1"  // TS-API@0.9.4 이후 추가됨 ("ptzSupported" 항목 삭제됨)
   },
   {
     "chid": 2,            // 채널 번호
     "title": "",          // 채널 이름
-    "displayName": "CH2", // TS-API@0.9.4 이후 추가됨
-    "ptzSupported": true  // PTZ 지원 여부 (TS-API@0.5.0 이후 추가됨)
+    "displayName": "CH2"  // TS-API@0.9.4 이후 추가됨
   }
 ]
 ```
@@ -1160,7 +1158,6 @@ lang      # 메시지에 사용될 언어 지정
     "chid": 1,
     "title": "카메라1",
     "displayName": "CH1. 카메라1",
-    "ptzSupported": true,
     "src": [
       {
         "protocol": "rtmp",
@@ -1192,7 +1189,6 @@ lang      # 메시지에 사용될 언어 지정
     "chid": 2,
     "title": "",
     "displayName": "CH2",
-    "ptzSupported": true,
     "src": [
       {
         "protocol": "rtmp",
@@ -1235,7 +1231,6 @@ lang      # 메시지에 사용될 언어 지정
     "chid": 1,
     "title": "카메라1",
     "displayName": "CH1. 카메라1",
-    "ptzSupported": true,
     "caps": {
       "pantilt": true,
       "zoom": true,
@@ -1253,7 +1248,6 @@ lang      # 메시지에 사용될 언어 지정
     "chid": 2,
     "title": "",
     "displayName": "CH2",
-    "ptzSupported": true,
     "caps": {
       "pantilt": true,
       "zoom": true,
@@ -1941,7 +1935,7 @@ maxCount    # 최대 항목 개수
   {
     "chid": 1,                        // 채널 번호
     "title": "Profile1 (1920x1080)",  // 채널 이름
-    "ptzSupported": true,
+    "displayName": "CH1. Profile1 (1920x1080)",
     "src": [  // 동영상 소스 목록
               // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨)
       { // 1080p RTMP 스트림
@@ -1985,7 +1979,7 @@ maxCount    # 최대 항목 개수
   {
     "chid": 2,
     "title": "192.168.0.106",
-    "ptzSupported": false,
+    "displayName": "CH2. 192.168.0.106",
     "src": [
       // ... 중략
     ]

@@ -1139,14 +1139,12 @@ For the request, the server returns JSON data in the following format with an HT
   {
     "chid": 1,              // Channel number
     "title": "Front door",  // Channel name
-    "displayName": "CH1. Front door",  // Added since TS-API@0.9.4
-    "ptzSupported": true    // Ptz capabilities (Added since TS-API@0.5.0)
+    "displayName": "CH1. Front door"  // Added since TS-API@0.9.4 ("ptzSupported" removed)
   },
   {
     "chid": 2,              // Channel number
     "title": "",            // Channel name
-    "displayName": "CH2",   // Added since TS-API@0.9.4
-    "ptzSupported": true    // Ptz capabilities (Added since TS-API@0.5.0)
+    "displayName": "CH2"    // Added since TS-API@0.9.4
   }
 ]
 ```
@@ -1164,7 +1162,6 @@ For the request, the server returns JSON data in the following format with an HT
     "chid": 1,
     "title": "Front door",
     "displayName": "CH1. Front door",
-    "ptzSupported": true,
     "src": [
       {
         "protocol": "rtmp",
@@ -1196,7 +1193,6 @@ For the request, the server returns JSON data in the following format with an HT
     "chid": 2,
     "title": "",
     "displayName": "CH2",
-    "ptzSupported": true,
     "src": [
       {
         "protocol": "rtmp",
@@ -1239,7 +1235,6 @@ For the request, the server returns JSON data in the following format with an HT
     "chid": 1,
     "title": "Front door",
     "displayName": "CH1. Front door",
-    "ptzSupported": true,
     "caps": {
       "pantilt": true,
       "zoom": true,
@@ -1257,7 +1252,6 @@ For the request, the server returns JSON data in the following format with an HT
     "chid": 2,
     "title": "",
     "displayName": "CH2",
-    "ptzSupported": true,
     "caps": {
       "pantilt": true,
       "zoom": true,
@@ -1945,7 +1939,7 @@ The server returns JSON data in the following format with an HTTP response code 
   {
     "chid": 1,                        // Channel number
     "title": "Profile1 (1920x1080)",  // Channel name
-    "ptzSupported": true,
+    "display": "CH1: Profile1 (1920x1080)",
     "src": [  // List of video sources
               // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
       { // 1080p RTMP stream
@@ -1989,7 +1983,7 @@ The server returns JSON data in the following format with an HTTP response code 
   {
     "chid": 2,
     "title": "192.168.0.106",
-    "ptzSupported": false,
+    "display": "CH2: 192.168.0.106",
     "src": [
       // ... omitted
     ]
