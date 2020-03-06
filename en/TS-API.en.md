@@ -38,6 +38,7 @@ Table of contents
   - [Server-side time zone](#server-side-time-zone)
   - [Product information](#product-information)
   - [License information](#license-information)
+    - [`extension` list](#extension-list)
   - [User information](#user-information)
   - [Request all at once](#request-all-at-once)
 - [Request system information `@0.3.0`](#request-system-information-030)
@@ -478,6 +479,16 @@ For the request, the server returns JSON data in the following format with an HT
   }
 }
 ```
+
+#### `extension` list
+| `extension` | Description     |
+|-----------|------------|
+| `lprExt`  | License plate recognition |
+| `emergencyCall`  | Emergency call |
+| `lprKiosk`  | Kiosk - finding my car |
+| `packing`  | Packing API |
+| `objectDetection`  | Object detection |
+| `faceRecognition`  | Face recognition |
 
 <a id="markdown-user-information" name="user-information"></a>
 ### User information
