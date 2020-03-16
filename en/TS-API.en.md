@@ -20,81 +20,84 @@ Table of contents
 -----
 <!-- TOC -->
 
-- [Get Started](#get-started)
-- [Video display](#video-display)
-  - [Real-time video display](#real-time-video-display)
-  - [Inserting video into web page](#inserting-video-into-web-page)
-  - [Connecting to a real server](#connecting-to-a-real-server)
-  - [User authentication](#user-authentication)
-  - [Change channel](#change-channel)
-  - [Display recorded video](#display-recorded-video)
-- [JSON data indentation `@0.5.0`](#json-data-indentation-050)
-- [Session authentication](#session-authentication)
-  - [Sign in](#sign-in)
-  - [Sign out](#sign-out)
-- [Request server information](#request-server-information)
-  - [API version](#api-version)
-  - [Site name](#site-name)
-  - [Server-side time zone](#server-side-time-zone)
-  - [Product information](#product-information)
-  - [License information](#license-information)
-    - [`extension` list](#extension-list)
-  - [User information](#user-information)
-  - [Request all at once](#request-all-at-once)
-- [Request system information `@0.3.0`](#request-system-information-030)
-  - [Requests individual items](#requests-individual-items)
-- [Request system health `@0.3.0`](#request-system-health-030)
-  - [Requests individual items](#requests-individual-items-1)
-- [Request HDD S.M.A.R.T. `@0.6.0`](#request-hdd-smart-060)
-- [Request to restart server process `@0.6.0`](#request-to-restart-server-process-060)
-- [Request to reboot server system `@0.6.0`](#request-to-reboot-server-system-060)
-- [Request channel status `@0.3.0`](#request-channel-status-030)
-- [Request various enumeration](#request-various-enumeration)
-  - [Channel list `@0.9.4`](#channel-list-094)
-    - [Adding stream list `@0.9.4`](#adding-stream-list-094)
-    - [Adding camera capabilities `@0.9.4`](#adding-camera-capabilities-094)
-  - [Vehicle number recognition device list](#vehicle-number-recognition-device-list)
-  - [Emergency call device list `@0.3.0`](#emergency-call-device-list-030)
-  - [Event log type list](#event-log-type-list)
-  - [Parking lot list `@0.9.0`](#parking-lot-list-090)
-- [Retrieve recorded data](#retrieve-recorded-data)
-  - [Search dates with recorded video](#search-dates-with-recorded-video)
-  - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
-  - [Search event log](#search-event-log)
-  - [Vehicle number log search](#vehicle-number-log-search)
-  - [Search for similar vehicle numbers `@0.2.0`](#search-for-similar-vehicle-numbers-020)
-- [Search for video sources](#search-for-video-sources)
-  - [Real-time video source](#real-time-video-source)
-  - [Recorded video source](#recorded-video-source)
-- [Requesting video using video source `@0.3.0`](#requesting-video-using-video-source-030)
-- [Real-time event monitoring `@0.3.0`](#real-time-event-monitoring-030)
-  - [Server-Sent Events (SSE)](#server-sent-events-sse)
-  - [Channel status change events](#channel-status-change-events)
-  - [Car number recognition events](#car-number-recognition-events)
-  - [Emergency call events](#emergency-call-events)
-  - [System event `@0.7.0`](#system-event-070)
-  - [Motion Detection Status Change Event `@0.8.0`](#motion-detection-status-change-event-080)
-  - [Parking Count Event `@0.9.0`](#parking-count-event-090)
-  - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
-- [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
-- [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
-- [Channel information and device control `@0.5.0`](#channel-information-and-device-control-050)
-  - [Request Device Information and Support Function List](#request-device-information-and-support-function-list)
-  - [Pan tilt control](#pan-tilt-control)
-  - [Pan tilt preset control](#pan-tilt-preset-control)
-  - [Relay output](#[relay-output)
-  - [AUX output](#aux-output)
-  - [Reboot the device](#reboot-the-device)
-- [Appendix](#appendix)
-  - [The API-supported versions by product](#the-api-supported-versions-by-product)
-  - [The features table by product](#the-features-table-by-product)
-  - [base64 Encoding](#base64-encoding)
-  - [URL Encoding](#url-encoding)
-  - [URL decoding](#url-decoding)
-  - [Date and time notation in ISO 8601 format](#date-and-time-notation-in-iso-8601-format)
-  - [List of languages supported](#list-of-languages-supported)
-  - [JSON data format](#json-data-format)
-  - [Feedback](#feedback)
+- [TS-API Programmer's Guide](#ts-api-programmers-guide)
+  - [TS-API@0.9.4](#ts-api094)
+  - [Table of contents](#table-of-contents)
+  - [Get Started](#get-started)
+  - [Video display](#video-display)
+    - [Real-time video display](#real-time-video-display)
+    - [Inserting video into web page](#inserting-video-into-web-page)
+    - [Connecting to a real server](#connecting-to-a-real-server)
+    - [User authentication](#user-authentication)
+    - [Change channel](#change-channel)
+    - [Display recorded video](#display-recorded-video)
+  - [JSON data indentation `@0.5.0`](#json-data-indentation-050)
+  - [Session authentication](#session-authentication)
+    - [Sign in](#sign-in)
+    - [Sign out](#sign-out)
+  - [Request server information](#request-server-information)
+    - [API version](#api-version)
+    - [Site name](#site-name)
+    - [Server-side time zone](#server-side-time-zone)
+    - [Product information](#product-information)
+    - [License information](#license-information)
+      - [`extension` list](#extension-list)
+    - [User information](#user-information)
+    - [Request all at once](#request-all-at-once)
+  - [Request system information `@0.3.0`](#request-system-information-030)
+    - [Requests individual items](#requests-individual-items)
+  - [Request system health `@0.3.0`](#request-system-health-030)
+    - [Requests individual items](#requests-individual-items-1)
+  - [Request HDD S.M.A.R.T. `@0.6.0`](#request-hdd-smart-060)
+  - [Request to restart server process `@0.6.0`](#request-to-restart-server-process-060)
+  - [Request to reboot server system `@0.6.0`](#request-to-reboot-server-system-060)
+  - [Request channel status `@0.3.0`](#request-channel-status-030)
+  - [Request various enumeration](#request-various-enumeration)
+    - [Channel list `@0.9.4`](#channel-list-094)
+      - [Adding stream list `@0.9.4`](#adding-stream-list-094)
+      - [Adding camera capabilities `@0.9.4`](#adding-camera-capabilities-094)
+    - [Vehicle number recognition device list](#vehicle-number-recognition-device-list)
+    - [Emergency call device list `@0.3.0`](#emergency-call-device-list-030)
+    - [Event log type list](#event-log-type-list)
+    - [Parking lot list `@0.9.0`](#parking-lot-list-090)
+  - [Retrieve recorded data](#retrieve-recorded-data)
+    - [Search dates with recorded video](#search-dates-with-recorded-video)
+    - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
+    - [Search event log](#search-event-log)
+    - [Vehicle number log search](#vehicle-number-log-search)
+    - [Search for similar vehicle numbers `@0.2.0`](#search-for-similar-vehicle-numbers-020)
+  - [Search for video sources](#search-for-video-sources)
+    - [Real-time video source](#real-time-video-source)
+    - [Recorded video source](#recorded-video-source)
+  - [Requesting video using video source `@0.3.0`](#requesting-video-using-video-source-030)
+  - [Real-time event monitoring `@0.3.0`](#real-time-event-monitoring-030)
+    - [Server-Sent Events (SSE)](#server-sent-events-sse)
+    - [Channel status change events](#channel-status-change-events)
+    - [Car number recognition events](#car-number-recognition-events)
+    - [Emergency call events](#emergency-call-events)
+    - [System event `@0.7.0`](#system-event-070)
+    - [Motion Detection Status Change Event `@0.8.0`](#motion-detection-status-change-event-080)
+    - [Parking Count Event `@0.9.0`](#parking-count-event-090)
+    - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
+  - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
+  - [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
+  - [Channel information and device control `@0.5.0`](#channel-information-and-device-control-050)
+    - [Request Device Information and Support Function List](#request-device-information-and-support-function-list)
+    - [Pan tilt control](#pan-tilt-control)
+    - [Pan tilt preset control](#pan-tilt-preset-control)
+    - [Relay output](#relay-output)
+    - [AUX output](#aux-output)
+    - [Reboot the device](#reboot-the-device)
+  - [Appendix](#appendix)
+    - [The API-supported versions by product](#the-api-supported-versions-by-product)
+    - [The features table by product](#the-features-table-by-product)
+    - [base64 Encoding](#base64-encoding)
+    - [URL Encoding](#url-encoding)
+    - [URL decoding](#url-decoding)
+    - [Date and time notation in ISO 8601 format](#date-and-time-notation-in-iso-8601-format)
+    - [List of languages supported](#list-of-languages-supported)
+    - [JSON data format](#json-data-format)
+    - [Feedback](#feedback)
 
 <!-- /TOC -->
 
@@ -110,9 +113,9 @@ In this article, TS-API is abbreviated as **API**, and each product is simply ca
 ### Real-time video display
 Try to type the following in the Web browser address window.
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+[Run](http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 
 Do you see the video?
@@ -132,7 +135,7 @@ Now let's insert the video into the web page.
 
 <body>
 <h2>Example 1. Insert video</h2>
-<iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D' 
+<iframe src='http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D' 
   width='640' height='360' frameborder='0' allowfullscreen />
 </body>
 ```
@@ -172,7 +175,7 @@ For example, assuming that you use the following connection information;
 
 In the above example, you can change the address part as follows:
 ```html
-<iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D'
+<iframe src='http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D'
   width='640' height='360' frameborder='0' allowfullscreen></iframe>
 ```
 Here `ZGVtbzohMTIzNHF3ZXI%3D` following `auth=` is the [base64 encoded](#base64-encoding) part of user ID and password.
@@ -243,18 +246,18 @@ If you change the `ch=` part of the video source to the desired channel number a
 Channel numbers are integers starting at 1.
 For example, if you want to see channel 3, you can modify it like this:
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:81/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-Run: [Channel1](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel2](http://tssolution.ipdisk.co.kr:85/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel3](http://tssolution.ipdisk.co.kr:85/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+Run: [Channel1](http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel2](http://tssolution.iptime.org:81/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel3](http://tssolution.iptime.org:81/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 <a id="markdown-display-recorded-video" name="display-recorded-video"></a>
 ### Display recorded video
 To display the recorded video, you need the date and time information (time stamp) of the desired video.
 For example, to display a video recorded on `Channel 1` at 2:30:15 pm on February 1, 2018, you would need to add `when=2018-02-01T14%3a30%3a15%2b09%3a00`.
 ```ruby
-http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:81/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
+[Run](http://tssolution.iptime.org:81/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
 
 > [Tips]
 The recorded video of the old date may already be overwritten depending on the capacity of the storage device.
@@ -266,7 +269,7 @@ You can use `when=now` to request real-time video, but if omitted, it means real
 when=yesterday    // Local time on server yesterday 00:00:00
 when=today        // Local time on server today 00:00:00
 ```
-Run: [Yesterday](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US) [Today](http://tssolution.ipdisk.co.kr:85/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
+Run: [Yesterday](http://tssolution.iptime.org:81/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US) [Today](http://tssolution.iptime.org:81/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
 
 You can use the parameters to set the language of the subtitles displayed on the video.
 For a [list of supported languages](#list-of-languages-supported), refer to the appendix.

@@ -13,11 +13,11 @@ With this API, you can easily embed **CCTV video and search functionality** into
   <title>My Video</title>
 </head>
 <body>
-  <iframe src='http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D' 
+  <iframe src='http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D' 
   width='640' height='360' frameborder='0' allowfullscreen />
 </body>
 ```
-[Run](http://tssolution.ipdisk.co.kr:85/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+[Run](http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 For more information, refer to the following **TS-API Programmer's Guide**:
 [English](./en/TS-API.en.md)
@@ -25,4 +25,4 @@ For more information, refer to the following **TS-API Programmer's Guide**:
 
 License
 ------
-MIT, Copyright (c) 2018 TS Solution Corp.
+MIT, Copyright (c) 2018-2020 TS Solution Corp.
