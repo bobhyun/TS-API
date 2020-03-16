@@ -113,9 +113,9 @@ In this article, TS-API is abbreviated as **API**, and each product is simply ca
 ### Real-time video display
 Try to type the following in the Web browser address window.
 ```ruby
-http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[Run](http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+[Run](http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 
 Do you see the video?
@@ -135,7 +135,7 @@ Now let's insert the video into the web page.
 
 <body>
 <h2>Example 1. Insert video</h2>
-<iframe src='http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D' 
+<iframe src='http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D' 
   width='640' height='360' frameborder='0' allowfullscreen />
 </body>
 ```
@@ -175,7 +175,7 @@ For example, assuming that you use the following connection information;
 
 In the above example, you can change the address part as follows:
 ```html
-<iframe src='http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D'
+<iframe src='http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D'
   width='640' height='360' frameborder='0' allowfullscreen></iframe>
 ```
 Here `ZGVtbzohMTIzNHF3ZXI%3D` following `auth=` is the [base64 encoded](#base64-encoding) part of user ID and password.
@@ -246,18 +246,18 @@ If you change the `ch=` part of the video source to the desired channel number a
 Channel numbers are integers starting at 1.
 For example, if you want to see channel 3, you can modify it like this:
 ```ruby
-http://tssolution.iptime.org:81/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:83/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-Run: [Channel1](http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel2](http://tssolution.iptime.org:81/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel3](http://tssolution.iptime.org:81/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+Run: [Channel1](http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel2](http://tssolution.iptime.org:83/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel3](http://tssolution.iptime.org:83/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 <a id="markdown-display-recorded-video" name="display-recorded-video"></a>
 ### Display recorded video
 To display the recorded video, you need the date and time information (time stamp) of the desired video.
 For example, to display a video recorded on `Channel 1` at 2:30:15 pm on February 1, 2018, you would need to add `when=2018-02-01T14%3a30%3a15%2b09%3a00`.
 ```ruby
-http://tssolution.iptime.org:81/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:83/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[Run](http://tssolution.iptime.org:81/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
+[Run](http://tssolution.iptime.org:83/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
 
 > [Tips]
 The recorded video of the old date may already be overwritten depending on the capacity of the storage device.
@@ -269,7 +269,7 @@ You can use `when=now` to request real-time video, but if omitted, it means real
 when=yesterday    // Local time on server yesterday 00:00:00
 when=today        // Local time on server today 00:00:00
 ```
-Run: [Yesterday](http://tssolution.iptime.org:81/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US) [Today](http://tssolution.iptime.org:81/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
+Run: [Yesterday](http://tssolution.iptime.org:83/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US) [Today](http://tssolution.iptime.org:83/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI%3D&lang=en-US)
 
 You can use the parameters to set the language of the subtitles displayed on the video.
 For a [list of supported languages](#list-of-languages-supported), refer to the appendix.

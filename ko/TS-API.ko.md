@@ -108,9 +108,9 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 ### 실시간 영상 표시
 웹 브라우저 주소 창에 다음과 같이 입력해 보십시오.
 ```ruby
-http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[실행하기](http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+[실행하기](http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 
 동영상이 표시되나요?
@@ -130,7 +130,7 @@ http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 <body>
 <h2>예제1. 동영상 삽입하기</h2>
-<iframe src="http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D" 
+<iframe src="http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D" 
   width="640" height="360" frameborder="0" allowfullscreen />
 </body>
 ```
@@ -169,7 +169,7 @@ http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 위의 예제에서 주소 부분을 다음과 같이 변경하면 됩니다.
 ```html
-<iframe src="http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D"
+<iframe src="http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D"
   width="640" height="360" frameborder="0" allowfullscreen></iframe>
 ```
 여기서 `auth=` 다음에 있는 `ZGVtbzohMTIzNHF3ZXI%3D` 부분은 사용자 아이디와 비밀번호를 [base64 인코딩](#base64-인코딩)한 부분입니다.
@@ -239,9 +239,9 @@ http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 채널 번호는 1부터 시작하는 정수입니다.
 예를 들어, 채널 3번을 보고 싶다면 다음과 같이 수정하면 됩니다.
 ```ruby
-http://tssolution.iptime.org:81/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:83/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-실행하기: [채널1](http://tssolution.iptime.org:81/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [채널2](http://tssolution.iptime.org:81/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [채널3](http://tssolution.iptime.org:81/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+실행하기: [채널1](http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [채널2](http://tssolution.iptime.org:83/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [채널3](http://tssolution.iptime.org:83/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 
 <a id="markdown-녹화-영상-표시" name="녹화-영상-표시"></a>
@@ -249,9 +249,9 @@ http://tssolution.iptime.org:81/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 녹화된 영상을 표시하기 위해서는 원하는 동영상의 날짜, 시각 정보(타임스탬프)가 필요합니다.
 예를 들어, 위의 예제와 동일한 접속 정보로 `채널 1번`의 `2018년 2월 1일 오후 2시 30분 15초`에 녹화된 영상을 표시하기 위해서는 다음과 같이 `when=2018-02-01T14%3a30%3a15%2b09%3a00` 부분을 추가해야 합니다.
 ```ruby
-http://tssolution.iptime.org:81/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://tssolution.iptime.org:83/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
-[실행하기](http://tssolution.iptime.org:81/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+[실행하기](http://tssolution.iptime.org:83/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a00&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 > [참고]
 오래된 날짜의 녹화 영상은 저장장치의 용량에 따라 이미 덮어쓰기 되어 존재하지 않을 수 있습니다.
 
@@ -263,7 +263,7 @@ http://tssolution.iptime.org:81/watch?ch=1&when=2018-02-01T14%3a30%3a15%2b09%3a0
 when=yesterday    // 서버의 로컬 타임으로 어제 00시 00분 00초
 when=today        // 서버의 로컬 타임으로 오늘 00시 00분 00초
 ```
-실행하기: [어제 영상](http://tssolution.iptime.org:81/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI%3D) [오늘 영상](http://tssolution.iptime.org:81/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI%3D)
+실행하기: [어제 영상](http://tssolution.iptime.org:83/watch?ch=1&when=yesterday&auth=ZGVtbzohMTIzNHF3ZXI%3D) [오늘 영상](http://tssolution.iptime.org:83/watch?ch=1&when=today&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 매개변수를 사용하여 영상 위에 표시되는 자막의 언어를 설정할 수 있습니다.
 [지원하는 언어 목록](#지원하는-언어-목록)은 부록을 참고하십시오.
