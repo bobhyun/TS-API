@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.4
+TS-API@0.9.5
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -56,6 +56,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [비상 호출 장치 목록 `@0.3.0`](#비상-호출-장치-목록-030)
   - [이벤트 로그 종류 목록](#이벤트-로그-종류-목록)
   - [주차장 목록 `@0.9.0`](#주차장-목록-090)
+  - [수신 가능한 실시간 이벤트 목록 `@0.9.5`](#수신-가능한-실시간-이벤트-목록-095)
 - [저장 데이터 검색](#저장-데이터-검색)
   - [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색)
   - [녹화 영상이 있는 분 단위 검색 `@0.2.0`](#녹화-영상이-있는-분-단위-검색-020)
@@ -74,6 +75,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
   - [시스템 이벤트 `@0.7.0`](#시스템-이벤트-070)
   - [움직임 감지 이벤트 `@0.8.0`](#움직임-감지-이벤트-080)
   - [주차 카운트 이벤트 `@0.9.0`](#주차-카운트-이벤트-090)
+  - [녹화 상태 이벤트 `@0.9.5`](#녹화-상태-이벤트-095)
   - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
 - [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
 - [서버에 이벤트 밀어넣기 `@0.4.0`](#서버에-이벤트-밀어넣기-040)
@@ -1458,6 +1460,25 @@ lang      # 언어
 ]
 ```
 
+### 수신 가능한 실시간 이벤트 목록 `@0.9.5`
+서버에서 제공하는 실시간 이벤트 종류를 얻으려면 다음과 같이 요청합니다.
+```ruby
+/api/enum?what=realtimeEvent
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  "channelStatus",
+	"emergencyCall",
+	"LPR",
+  "systemEvent",
+  "motionChanges",
+	"recordingStatus",
+  "parkingCount",
+  "packing"
+]
+```
+
 <a id="markdown-저장-데이터-검색" name="저장-데이터-검색"></a>
 ## 저장 데이터 검색
 
@@ -2805,6 +2826,65 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
   ]
 }
 ```
+<a id="markdown-녹화-상태-이벤트-095" name="녹화-상태-이벤트-095"></a>
+### 녹화 상태 이벤트 `@0.9.5`
+`topics=recordingStatus`를 요청하면 각 채널별 녹화 상태를 실시간 이벤트를 수신할 수 있습니다.
+요청 직후 한 번은 모든 채널의 현재 상태가 수신되며 
+이 후 변동사항이 발생할 때마다 아래와 같이 JSON 형식으로 수신됩니다.
+
+- 최초 모든 채널 녹화 상태 데이터
+```jsx
+{
+  "timestamp" :"timestamp":"2020-03-25T10:01:53.841+09:00",
+  "topic": "recordingStatus",
+  "event": "currentStatus",
+  "channel": [
+    {
+      "chid":1,
+      "streaming":true,
+      "recording":true
+    },
+    {
+      "chid":2,
+      "streaming":false,
+      "recording":false
+    },
+    {
+      "chid":3,
+      "streaming":true,
+      "recording":false
+    },
+  ]
+}
+```
+
+- 변동사항 데이터
+```jsx
+{
+  "timestamp" :"timestamp":"2020-03-25T10:08:30.003+09:00",
+  "topic": "recordingStatus",
+  "event": "statusChanged",
+  "channel": [
+    {
+      "chid":1,
+      "streaming":true,
+      "recording":false
+    },
+    {
+      "chid":2,
+      "streaming":false,
+      "recording":false
+    },
+    {
+      "chid":3,
+      "streaming":true,
+      "recording":false,
+      // 녹화 장애 발생 시각 (이 값은 장애 상태에만 명시됨)
+      "timestampRecordingFailure":"2020-03-25T10:07:09.646+09:00"
+    },
+  ]
+}
+```
 
 
 이 번에는 SSE를 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
@@ -2835,9 +2915,11 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
       <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
       <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
-			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
-			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
-			<input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
+      <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
+      <input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
+      <input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
+      <input class='topic' type='checkbox' value="packing" checked>포장
+      <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>

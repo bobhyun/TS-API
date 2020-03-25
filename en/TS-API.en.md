@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.4
+TS-API@0.9.5
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.4](#ts-api094)
+  - [TS-API@0.9.5](#ts-api095)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -60,6 +60,7 @@ Table of contents
     - [Emergency call device list `@0.3.0`](#emergency-call-device-list-030)
     - [Event log type list](#event-log-type-list)
     - [Parking lot list `@0.9.0`](#parking-lot-list-090)
+    - [Real-time event list `@0.9.5`](#real-time-event-list-095)
   - [Retrieve recorded data](#retrieve-recorded-data)
     - [Search dates with recorded video](#search-dates-with-recorded-video)
     - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
@@ -78,6 +79,7 @@ Table of contents
     - [System event `@0.7.0`](#system-event-070)
     - [Motion Detection Status Change Event `@0.8.0`](#motion-detection-status-change-event-080)
     - [Parking Count Event `@0.9.0`](#parking-count-event-090)
+    - [Recording Status Event `@0.9.5`](#recording-status-event-095)
     - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
   - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
   - [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
@@ -1463,7 +1465,25 @@ For the request, the server returns JSON data in the following format with an HT
   }
 ]
 ```
-
+<a id="markdown-real-time-event-list-095" name="real-time-event-list-095"></a>
+### Real-time event list `@0.9.5`
+To get a list of real-time events provided by the server, request the followings:
+```ruby
+/api/enum?what=realtimeEvent
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  "channelStatus",
+	"emergencyCall",
+	"LPR",
+  "systemEvent",
+  "motionChanges",
+	"recordingStatus",
+  "parkingCount",
+  "packing"
+]
+```
 
 <a id="markdown-retrieve-recorded-data" name="retrieve-recorded-data"></a>
 ## Retrieve recorded data
@@ -2813,6 +2833,64 @@ The number of vehicles in the parking lot will be received in JSON format as sho
 }
 ```
 
+### Recording Status Event `@0.9.5`
+If you request `topics = recordingStatus`, you can receive real-time events for each channel's recording status.
+Immediately after the request, the current status of all channels is received.
+After this, whenever a change occurs, it is received in JSON format as shown below.
+
+- all channels
+```jsx
+{
+  "timestamp" :"timestamp":"2020-03-25T10:01:53.841-05:00",
+  "topic": "recordingStatus",
+  "event": "currentStatus",
+  "channel": [
+    {
+      "chid":1,
+      "streaming":true,
+      "recording":true
+    },
+    {
+      "chid":2,
+      "streaming":false,
+      "recording":false
+    },
+    {
+      "chid":3,
+      "streaming":true,
+      "recording":false
+    },
+  ]
+}
+```
+
+- On status changed
+```jsx
+{
+  "timestamp" :"timestamp":"2020-03-25T10:08:30.003-05:00",
+  "topic": "recordingStatus",
+  "event": "statusChanged",
+  "channel": [
+    {
+      "chid":1,
+      "streaming":true,
+      "recording":false
+    },
+    {
+      "chid":2,
+      "streaming":false,
+      "recording":false
+    },
+    {
+      "chid":3,
+      "streaming":true,
+      "recording":false,
+      // The time of recording failure (this value is specified only in the failure state)
+      "timestampRecordingFailure":"2020-03-25T10:07:09.646-05:00"
+    },
+  ]
+}
+```
 
 Now, let's create an example that uses SSE to receive event messages.
 ```html
@@ -2844,7 +2922,9 @@ Now, let's create an example that uses SSE to receive event messages.
       <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
       <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
-			<input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
+      <input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
+      <input class='topic' type='checkbox' value="packing" checked>packing
+      <input class='topic' type='checkbox' value="recordingStatus" checked>recordingStatus
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
