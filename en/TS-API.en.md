@@ -2217,6 +2217,8 @@ emergencyCall   # Emergency call
 systemEvent     # System Events (added @0.7.0)
 motionChanges   # Motion detection status changes (added @0.8.0)
 parkingCount    # Parking count events (added @0.9.0)
+packing         # Packing event (added @0.9.0)
+recordingStatus # Recording status event (added @0.9.5)
 ```
 
 SSE connection paths and parameters are as follows.
@@ -2871,16 +2873,6 @@ After this, whenever a change occurs, it is received in JSON format as shown bel
   "topic": "recordingStatus",
   "event": "statusChanged",
   "channel": [
-    {
-      "chid":1,
-      "streaming":true,
-      "recording":false
-    },
-    {
-      "chid":2,
-      "streaming":false,
-      "recording":false
-    },
     {
       "chid":3,
       "streaming":true,
