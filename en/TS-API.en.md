@@ -2217,6 +2217,8 @@ emergencyCall   # Emergency call
 systemEvent     # System Events (added @0.7.0)
 motionChanges   # Motion detection status changes (added @0.8.0)
 parkingCount    # Parking count events (added @0.9.0)
+packing         # Packing event (added @0.9.0)
+recordingStatus # Recording status event (added @0.9.5)
 ```
 
 SSE connection paths and parameters are as follows.

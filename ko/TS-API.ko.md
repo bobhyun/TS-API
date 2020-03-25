@@ -2206,6 +2206,8 @@ emergencyCall   # 비상 호출
 systemEvent     # 시스템 이벤트 (@0.7.0에서 추가됨)
 motionChanges   # 움직임 감지 상태 변경 (@0.8.0에서 추가됨)
 parkingCount    # 주차장 차량수 변동 이벤트 (@0.9.0에서 추가됨)
+packing         # 포장 이벤트 (@0.9.0에서 추가됨)
+recordingStatus # 녹화 상태 이벤트 (@0.9.5에서 추가됨)
 ```
 
 SSE 접속 경로와 매개변수들은 다음과 같습니다.
