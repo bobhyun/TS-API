@@ -2514,6 +2514,10 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
   "topic": "channelStatus",
   "event": "videoStreamReady",
   "chid": 1,
+  "status": {
+    "code": 2,
+    "message": "Video available"
+  },
   "src": [  // 가용한 스트림 목록 (TS-API@0.9.4 이후 추가됨)
     {
       "protocol": "rtmp",

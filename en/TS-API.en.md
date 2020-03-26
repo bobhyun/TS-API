@@ -2523,6 +2523,10 @@ Channel status change event messages are received in JSON format as shown below.
   "topic": "channelStatus",
   "event": "videoStreamReady",
   "chid": 1,
+    "status": {
+    "code": 2,
+    "message": "Video available"
+  },
   "src": [  // Available stream list (Added since TS-API@0.9.4)
     {
       "protocol": "rtmp",
