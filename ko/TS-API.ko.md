@@ -1063,6 +1063,7 @@ http://userid:password@host/path/to/
 ch        # 채널 번호 (여러 채널을 동시에 지정할 경우 쉼표 문자(,)로 구분)
 verbose   # 상태 코드에 해당하는 메시지 요청
 lang      # 메시지에 사용될 언어 지정
+recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 
 # 예제
 # 3번 채널만 지정
@@ -1076,6 +1077,12 @@ lang      # 메시지에 사용될 언어 지정
 
 # 상태 메시지를 스페인어로 포함
 /api/status?verbose=true&lang=es-ES
+
+# 모든 채널의 녹화 상태를 요청
+/api/status?recordingStatus
+
+# 1~4번 채널의 녹화 상태를 요청
+/api/status?ch=1,2,3,4&recordingStatus
 ```
 
 메시지를 포함하여 요청하면 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -1130,6 +1137,55 @@ lang      # 메시지에 사용될 언어 지정
 408 	# 카메라 응답 시간 초과
 410 	# 영상 입력 없음
 503   # 카메라 서비스 오류
+```
+
+녹화 상태를 포함하여 요청하면 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  {
+    "chid": 1,
+    "status": {
+      "code": 200
+    },
+    "recordingStatus": {
+      "streaming": true,
+      "recording": true
+    }
+  },
+  {
+    "chid": 2,
+    "status": {
+      "code": 200
+    },
+    "recordingStatus": {
+      "streaming": true,
+      "recording": true
+    }
+  },
+  {
+    "chid": 3,
+    "status": {
+      "code": 200
+    },
+    "recordingStatus": {
+      "streaming": true,
+      "recording": false
+    }
+  },
+  {
+    "chid": 4,
+    "status": {
+      "code": 200
+    },
+    "recordingStatus": {
+      "streaming": true,
+      "recording": false,
+      // 녹화 장애 발생 시각 (이 값은 장애 상태에만 명시됨)
+      "timestampRecordingFailure":"2020-03-25T10:07:09.646+09:00"
+    }
+  },
+  // ... 중략
+]
 ```
 
 <a id="markdown-각종-목록-요청" name="각종-목록-요청"></a>

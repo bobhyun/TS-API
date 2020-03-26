@@ -1070,6 +1070,7 @@ If necessary, the following parameters can be used.
 ch        # Channel number (You can specify multiple channels at the same time, which are separated by a comma (,).)
 verbose   # Request a message corresponding to a status code
 lang      # Specify the language to use for the message
+recordingStatus # Request recording status as well (Added since TS-API@0.9.5)
 
 # Examples
 # Specify channel 3 only
@@ -1083,6 +1084,12 @@ lang      # Specify the language to use for the message
 
 # Include status messages in Spanish
 /api/status?verbose=true&lang=es-ES
+
+# Request recording status of all channels
+/api/status?recordingStatus
+
+# Request the recording status of channels 1 to 4
+/api/status?ch=1,2,3,4&recordingStatus
 ```
 
 Requests, including messages, return JSON data in the following format:
@@ -1137,6 +1144,55 @@ The complete list of status codes is shown below.
 408 	# Camera response timeout
 410 	# No video input
 503   # Camera service failure
+```
+
+If requested, including the recording status, returns JSON data in the following format.
+```jsx
+[
+  {
+    "chid": 1,
+    "status": {
+      "code": 200
+    },
+    "recordingStatus": {
+      "streaming": true,
+      "recording": true
+    }
+  },
+  {
+    "chid": 2,
+    "status": {
+      "code": 200
+    },
+    "recordingStatus": {
+      "streaming": true,
+      "recording": true
+    }
+  },
+  {
+    "chid": 3,
+    "status": {
+      "code": 200
+    },
+    "recordingStatus": {
+      "streaming": true,
+      "recording": false
+    }
+  },
+  {
+    "chid": 4,
+    "status": {
+      "code": 200
+    },
+    "recordingStatus": {
+      "streaming": true,
+      "recording": false,
+      // The time of recording failure (this value is specified only in the failure state)
+      "timestampRecordingFailure":"2020-03-25T10:07:09.646-05:00"
+    }
+  },
+  // ... omitted
+]
 ```
 
 <a id="markdown-request-various-enumeration" name="request-various-enumeration"></a>
