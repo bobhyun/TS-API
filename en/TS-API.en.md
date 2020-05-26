@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.5
+TS-API@0.9.6
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.5](#ts-api095)
+  - [TS-API@0.9.6](#ts-api096)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -60,13 +60,19 @@ Table of contents
     - [Emergency call device list `@0.3.0`](#emergency-call-device-list-030)
     - [Event log type list](#event-log-type-list)
     - [Parking lot list `@0.9.0`](#parking-lot-list-090)
-    - [Real-time event list `@0.9.5`](#real-time-event-list-095)
+    - [Real-time event list `@0.9.6`](#real-time-event-list-096)
   - [Retrieve recorded data](#retrieve-recorded-data)
     - [Search dates with recorded video](#search-dates-with-recorded-video)
     - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
     - [Search event log](#search-event-log)
     - [Vehicle number log search](#vehicle-number-log-search)
     - [Search for similar vehicle numbers `@0.2.0`](#search-for-similar-vehicle-numbers-020)
+    - [Object Search `@0.9.6`](#object-search-096)
+      - [Common parameters](#common-parameters)
+      - [Parameters for `face`](#parameters-for-face)
+      - [Parameters for `human`](#parameters-for-human)
+      - [Parameters for `vehicle`](#parameters-for-vehicle)
+      - [Face Search `@0.9.6`](#face-search-096)
   - [Search for video sources](#search-for-video-sources)
     - [Real-time video source](#real-time-video-source)
     - [Recorded video source](#recorded-video-source)
@@ -80,9 +86,12 @@ Table of contents
     - [Motion Detection Status Change Event `@0.8.0`](#motion-detection-status-change-event-080)
     - [Parking Count Event `@0.9.0`](#parking-count-event-090)
     - [Recording Status Event `@0.9.5`](#recording-status-event-095)
+    - [Object Detection Event `@0.9.6`](#object-detection-event-096)
+      - [`face` object](#face-object)
+      - [`human` object](#human-object)
+      - [`vehicle` object](#vehicle-object)
     - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
   - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
-  - [Pushing events to the server `@0.4.0`](#pushing-events-to-the-server-040)
   - [Channel information and device control `@0.5.0`](#channel-information-and-device-control-050)
     - [Request Device Information and Support Function List](#request-device-information-and-support-function-list)
     - [Pan tilt control](#pan-tilt-control)
@@ -1521,8 +1530,8 @@ For the request, the server returns JSON data in the following format with an HT
   }
 ]
 ```
-<a id="markdown-real-time-event-list-095" name="real-time-event-list-095"></a>
-### Real-time event list `@0.9.5`
+<a id="markdown-real-time-event-list-096" name="real-time-event-list-096"></a>
+### Real-time event list `@0.9.6`
 To get a list of real-time events provided by the server, request the followings:
 ```ruby
 /api/enum?what=realtimeEvent
@@ -1531,13 +1540,14 @@ For the request, the server returns JSON data in the following format with an HT
 ```jsx
 [
   "channelStatus",
-	"emergencyCall",
-	"LPR",
+  "emergencyCall",
+  "LPR",
   "systemEvent",
   "motionChanges",
-	"recordingStatus",
+  "recordingStatus",
   "parkingCount",
-  "packing"
+  "packing",
+  "object"
 ]
 ```
 
@@ -2011,6 +2021,220 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
+### Object Search `@0.9.6`
+When using the object detection function, the detected objects (`face`,` human`, `vehicle`) are saved with the video. To search the object detection log, request as follows.
+
+```ruby
+/api/find?what=object
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+{
+  "totalCount": 100,
+  "at": 0,
+  "data": [
+    {
+      "timestamp": "2020-05-25T14:58:15.819-05:00",
+      "chid": 1,               # channel id
+      "objId": 837,            # object id (If the id is the same, it is divided into the same object)
+      "type": "face",          # object type
+      "likelihood": 82.59      # detection accuracy (%)
+      "attributes": {          # object attributes (list only detected attributes)
+        "gender": "female"     # gender
+      },
+      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412659.1590386295819221.object._c1_t2_s392x504.jpg" # image address
+    },
+    {
+      "timestamp": "2020-05-25T14:58:14.449-05:00",
+      "chid": 1,               # channel id
+      "objId": 842,            # object id (If the id is the same, it is divided into the same object)
+      "type": "face",          # object type
+      "likelihood": 90.09,     # detection accuracy (%)
+      "attributes": {          # object attributes (list only detected attributes)
+        "gender": "male"       # gender
+      },
+      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412660.1590386294449281.object._c1_t2_s744x624.jpg" # image address
+    },
+    {
+      "timestamp": "2020-05-25T14:58:14.185-05:00",
+      "chid": 1,               # channel id
+      "objId": 834,            # object id (If the id is the same, it is divided into the same object)
+      "type": "human",         # object type
+      "likelihood": 62.20,     # detection accuracy (%)
+      "attributes": {          # object attributes (list only detected attributes)
+        "gender": "male",      
+        "clothes": [           
+          {
+            "type": "tops",    
+            "length": "long",  # the length of sleeves
+            "colors": [        
+              "red"
+            ]
+          },
+          {
+            "type": "bottoms", 
+            "length": "long",  # the length of pants
+            "colors": [        
+              "red"
+            ]
+          }
+        ]
+      },
+      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412658.1590386294185653.object._c1_t1_s296x464.jpg" # image address
+    },
+    {
+      "timestamp": "2020-05-25T14:55:21.557-05:00",
+      "chid": 1,               # channel id
+      "objId": 748,            # object id (If the id is the same, it is divided into the same object)
+      "type": "vehicle",       # object type
+      "likelihood": 95.80,     # detection accuracy (%)
+      "attributes": {          object attributes (list only detected attributes)
+        "vehicleType": "car",  # vehicle type
+        "colors": [            
+          "gray"
+        ]
+      },
+      "image": "http://host/storage/e/0/0/7/7673/object/7673909/7673909.4412630.1590386121557955.object._c1_t3_s440x312.jpg" # image address
+    },
+    // ... omitted
+  ]
+}
+```
+
+The contents of the `data` item of the search result are the same as the contents of [Object Detection Event `@ 0.9.6`] (#object-detection-event-096).
+
+You can also search for conditions by specifying parameters for each object as shown below.
+
+#### Common parameters
+```ruby
+lang        # language
+timeBegin   # List of objects recorded after a specific date and time
+timeEnd     # List of objects recorded before a specific date and time
+ch          # The channel number, multiple numbers can be used using commas(,)
+objectType  # The type of object (One of face, human, and vehicle, if not specified, means all kinds of objects)
+at          # Offset from the first data
+maxCount    # Maximum number of items
+sort        # Sorting method (desc: Latest data order (default), asc: Oldest data order)
+
+
+# Requests for objects stored during January 2020
+# (2020-01-01T00:00:00-05:00 ~ 2020-01-31T23:59:59.999-05:00)
+/api/find?what=object&timeBegin=2020-01-01T00%3A00%3A00-05%3A00&timeEnd=2020-01-31T23%3A59%3A59.999-05%3A00
+
+# Request only objects of channels 1 and 2
+/api/find?what=object&ch=1,2
+
+# Request only face objects
+/api/find?what=object&objectType=face
+
+# Request 20 items from the 10th item of the search result
+/api/find?what=object&at=10&maxCount=20
+
+# Requests sorted by oldest data (ascending)
+/api/find?what=object&sort=asc
+```
+
+#### Parameters for `face`
+```ruby
+gender       # Gender designation (either male or female)
+age          # Age classification (one of young, adult, middle, senior)
+accessories  # Worn accessories (multiple choices among hat and glasses are possible)
+
+# Man only request
+/api/find?what=object&objectType=face&gender=male
+
+# Adults only
+/api/find?what=object&objectType=face&age=adult
+
+# Middle-aged woman only
+/api/find?what=object&objectType=face&gender=female&age=middle
+
+# Request only for people with glasses
+/api/find?what=object&objectType=face&accessories=glasses
+
+# Request only for people wearing glasses and hats
+/api/find?what=object&objectType=face&accessories=glasses,hat
+```
+
+
+#### Parameters for `human`
+```ruby
+gender        # Gender designation (either male or female)
+accessories   # Worn accessories (multiple choices among hat, glasses and bag are possible)
+topClothes    # Top length and colors (Separate multiples with comma (,))
+              # length (ether short or long)
+              # colors (multiple choices among brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, and other)
+bottomClothes # Bottom length and colors (The expressions are the same as topColors)
+
+# Woman only requests
+/api/find?what=object&objectType=human&gender=female
+
+# Request only for people with bags
+/api/find?what=object&objectType=human&accessories=bag
+
+# Request only for people with hats and bags
+/api/find?what=object&objectType=human&accessories=hat,bag
+
+# people in short-sleeved
+/api/find?what=object&objectType=human&topClothes=short
+
+# people in yellow top
+/api/find?what=object&objectType=human&topClothes=yellow
+
+# People in red and blue top
+/api/find?what=object&objectType=human&topClothes=red,blue
+
+# People in shorts
+/api/find?what=object&objectType=human&bottomClothes=short
+
+# People in black both upper and lower
+/api/find?what=object&objectType=human&topClothes=black&bottomClothes=black
+
+# Men in a white top wearing a hat and holding a bag
+/api/find?what=object&objectType=human&accessories=hat,bag&topClothes=white&gender=male
+```
+
+
+#### Parameters for `vehicle`
+```ruby
+vehicleType  # Vehicle type and colors, Separated by comma (,)
+             # Vehicle type (car, truck, bus, bicycle, motorcycle, train 중 하나) 
+             # Vehicle colors (multiple choices among brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, and other)
+
+# Bus only request
+/api/find?what=object&vehicle=bus
+
+# Yellow car only request
+/api/find?what=object&vehicle=car,yellow
+```
+
+### Face Search `@0.9.6`
+You can find faces that resemble using photo of faces.
+
+In order to send a photo image, it is requested using the `HTTP POST` method.
+Set search condition with CGI parameter and send only image as POST data.
+Supported image file formats are `jpg` (`Content-Type=image/jpeg`) and `png` (`Content-Type=image/png`).
+
+
+```ruby
+lang        # Language
+timeBegin   # Faces recorded after a specific date and time
+timeEnd     # Faces recorded before a specific date and time
+ch          # The channel number, multiple numbers can be used using commas(,)
+threshold   # Similarity (specified by 1 ~ 100 percentage)
+
+# Search faces recorded during January 2020
+# (2020-01-01T00:00:00-05:00 ~ 2020-01-31T23:59:59.999-059:00)
+/api/searchFace?timeBegin=2020-01-01T00%3A00%3A00-05%3A00&timeEnd=2020-01-31T23%3A59%3A59.999-05%3A00
+
+# Search faces of channels 1 and 2
+/api/searchFace?ch=1,2
+
+# 95% similar face search
+/api/searchFace?threshold=95
+```
+
+
 <a id="markdown-search-for-video-sources" name="search-for-video-sources"></a>
 ## Search for video sources
 You can use this method if your application uses the video address directly instead of the video display feature using the API you used in [Inserting video into web page](#inserting-video-into-web-page).
@@ -2275,6 +2499,7 @@ motionChanges   # Motion detection status changes (added @0.8.0)
 parkingCount    # Parking count events (added @0.9.0)
 packing         # Packing event (added @0.9.0)
 recordingStatus # Recording status event (added @0.9.5)
+object          # Object detection event (added @0.9.6)
 ```
 
 SSE connection paths and parameters are as follows.
@@ -2577,7 +2802,7 @@ Channel status change event messages are received in JSON format as shown below.
 
 // Video stream has the same address but needs to be reconnected
 {
-  "timestamp": "2018-07-20T16:03:45.956+09:00",
+  "timestamp": "2018-07-20T16:03:45.956-05:00",
   "topic": "channelStatus",
   "event": "videoStreamChanged",
   "chid": 1
@@ -2698,7 +2923,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 ```jsx
 {
-  "timestamp":"2018-06-27T10:56:16.316+09:00",  // Start time of the call
+  "timestamp":"2018-06-27T10:56:16.316-05:00",  // Start time of the call
   "caller":"0000002",                           // Emergency call device location code
   "device":"Sammul/Vizufon",                    // Emergency call device name
   "event":"callStart",                          // Call start event
@@ -2944,6 +3169,130 @@ After this, whenever a change occurs, it is received in JSON format as shown bel
 }
 ```
 
+### Object Detection Event `@0.9.6`
+If you request `topics = object`, you can receive real-time events at the time when the object is detected by each camera.
+The supported object types are as follows.
+- face
+- human
+- vehicle
+
+You can receive only the object you want by specifying the object type `objectType` as shown below.
+If not specified, all supported object types are sent.
+```ruby
+# requests only face
+http://host/api/subscribeEvents?topics=object&objectType=face&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# requests only vehicle
+http://host/api/subscribeEvents?topics=object&objectType=vehicle&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# requests face and human
+http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNHF3ZXI%3D
+```
+
+#### `face` object
+1. Example data
+```jsx
+{
+  "timestamp":"2020-05-25T13:56:02.558-05:00",
+  "chid": 1,              # channel id
+  "objId": 132,           # object id (If the id is the same, it is divided into the same object)
+  "parentId": 130,        # In the case of `face` objects, `human` can be the parent, Relationship of `face` (child) attached to `human` (parent) (exists only when two objects are detected simultaneously)
+  "type": "face",         # object type
+  "likelihood": 71.10,    # detection accuracy (%)
+  "attributes": {         # object attributes (list only detected attributes)
+    "gender": "female",   # gender
+    "age": "adult",       # age devision
+    "accessory": [        # worn accessories (multiple notation)
+      "hat", 
+      "glasses"
+    ]
+  },
+  "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411971.1590382562558672.object._c1_t2_s552x400.jpg" # image address
+}
+```
+2. `face` attributes
+    | key         | type     | list                                 |
+    |-------------|----------|--------------------------------------|
+    | `gender`    | `string` | `female`, `male`                     |
+    | `age`       | `string` | `young`, `adult`, `middle`, `senior` |
+    | `accessory` | `array` of `string` | `hat`, `glasses`          |
+
+#### `human` object
+1. Example data
+```jsx
+{
+  "timestamp": "2020-05-25T13:56:18.461-05:00",
+  "chid": 1,              # channel id
+  "objId": 142,           # object id (If the id is the same, it is divided into the same object)
+  "type": "human",        # object type
+  "likelihood": 74.80,    # detection accuracy (%)
+  "attributes": {         # object attributes (list only detected attributes)
+    "gender": "female",   # gender
+    "accessory": [        # worn accessories (multiple notation)
+      "hat", 
+      "glasses", 
+      "bag"
+    ], 
+    "clothes": [          # clothes (multiple notation)
+      {
+        "type": "tops",   # tops
+        "length": "long", # length of clothes
+        "colors": [       # colors of clothes (multiple notation)
+          "white"
+        ]
+      },
+      {
+        "type": "bottoms", # bottoms
+        "length": "long",  # length of clothes
+        "colors": [        # colors of clothes (multiple notations)
+          "blue"
+        ]
+      }
+    ]
+  },
+  "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411974.1590382578461739.object._c1_t1_s376x600.jpg" # image address
+}
+```
+2. `human` attributes
+    | key         | type         | list                            |
+    |-------------|--------------|---------------------------------|
+    | `gender`    | `string`     | `female`, `male`                |
+    | `accessory` | `array` of `string` | `hat`, `glasses`, `bag`        |
+    | `clothes`   | `array` of `object` | *refer to `clothes` attributeds*      |
+3. `clothes` attributes
+    | key         | type         | list                   | description        |
+    |-------------|--------------|------------------------|-------------|
+    | `type`      | `string`     | `tops`, `bottoms`      | tops or bottoms |
+    | `length`    | `string`     | `short`, `long`        | sleeve, pants length |
+    | `colors`    | `array` of `string` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  | colors of clothes |
+    
+    
+  
+#### `vehicle` object
+```jsx
+1. Example data
+{
+  "timestamp": "2020-05-25T14:23:58.768-05:00",
+  "chid": 1,              # channel id
+  "objId": 182,           # object id (If the id is the same, it is divided into the same object)
+  "type": "vehicle",      # object type
+  "likelihood": 99.60,    # detection accuracy (%)
+  "attributes": {         # object attributes (list only detected attributes)
+    "vehicleType": "car", # vehicle type
+    "colors": [           # vehicle colors (multiple notation)
+      "white"
+    ]
+  },
+  "image": "http://host/storage/e/0/0/7/7673/object/7673880/7673880.4412174.1590384238768802.object._c1_t3_s944x520.jpg" # image address
+}
+```
+2. `vehicle` attributes
+    | key           | type         | list                            |
+    |---------------|--------------|--------------------------------|
+    | `vehicleType` | `string`     | `car`, `truck`, `bus`, `bicycle`, `motorcycle`, `train`  |
+    | `colors`      | `array` of `string` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  |
+
+
 Now, let's create an example that uses SSE to receive event messages.
 ```html
 <!DOCTYPE>
@@ -2977,6 +3326,7 @@ Now, let's create an example that uses SSE to receive event messages.
       <input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
       <input class='topic' type='checkbox' value="packing" checked>packing
       <input class='topic' type='checkbox' value="recordingStatus" checked>recordingStatus
+      <input class='topic' type='checkbox' value="object" checked>object
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>
@@ -3203,6 +3553,9 @@ Now, let's create an example that uses the Web socket to receive event messages.
       <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
       <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
       <input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
+      <input class='topic' type='checkbox' value="packing" checked>packing
+      <input class='topic' type='checkbox' value="recordingStatus" checked>recordingStatus
+      <input class='topic' type='checkbox' value="object" checked>object
       <input id='verbose' type='checkbox' checked>Verbose
       <button type='button' onClick='onConnect()'>Connect</button>
       <button type='button' onClick='onDisconnect()'>Disconnect</button>

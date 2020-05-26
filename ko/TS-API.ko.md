@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.5
+TS-API@0.9.6
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -19,83 +19,95 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 -----
 <!-- TOC -->
 
-- [시작하기](#시작하기)
-- [영상 표시](#영상-표시)
-  - [실시간 영상 표시](#실시간-영상-표시)
-  - [웹 페이지에 영상 삽입하기](#웹-페이지에-영상-삽입하기)
-  - [실제 서버에 접속하기](#실제-서버에-접속하기)
-  - [사용자 인증](#사용자-인증)
-  - [채널 변경](#채널-변경)
-  - [녹화 영상 표시](#녹화-영상-표시)
-- [JSON 데이터 들여쓰기 `@0.5.0`](#json-데이터-들여쓰기-050)
-- [세션 인증](#세션-인증)
-  - [로그인](#로그인)
-  - [로그아웃](#로그아웃)
-- [서버 정보 요청](#서버-정보-요청)
-  - [API 버전](#api-버전)
-  - [사이트 이름](#사이트-이름)
-  - [서버 시간대](#서버-시간대)
-  - [제품 정보](#제품-정보)
-  - [라이센스 정보](#라이센스-정보)
-  - [사용자 정보](#사용자-정보)
-    - [부가 기능`extension` 목록](#부가-기능extension-목록)
-  - [모두 한 번에 요청](#모두-한-번에-요청)
-- [시스템 정보 요청 `@0.3.0`](#시스템-정보-요청-030)
-  - [개별 항목 요청](#개별-항목-요청)
-- [시스템 상태 요청 `@0.3.0`](#시스템-상태-요청-030)
-  - [개별 항목 요청](#개별-항목-요청-1)
-- [HDD S.M.A.R.T. 요청 `@0.6.0`](#hdd-smart-요청-060)
-- [서버 재시작 요청 `@0.6.0`](#서버-재시작-요청-060)
-- [시스템 재부팅 요청 `@0.6.0`](#시스템-재부팅-요청-060)
-- [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)
-- [각종 목록 요청](#각종-목록-요청)
-  - [채널 목록 `@0.9.4`](#채널-목록-094)
-    - [스트림 목록 추가하기 `@0.9.4`](#스트림-목록-추가하기-094)
-    - [카메라 지원 기능 추가하기 `@0.9.4`](#카메라-지원-기능-추가하기-094)
-  - [차량 번호 인식 장치 목록](#차량-번호-인식-장치-목록)
-  - [비상 호출 장치 목록 `@0.3.0`](#비상-호출-장치-목록-030)
-  - [이벤트 로그 종류 목록](#이벤트-로그-종류-목록)
-  - [주차장 목록 `@0.9.0`](#주차장-목록-090)
-  - [수신 가능한 실시간 이벤트 목록 `@0.9.5`](#수신-가능한-실시간-이벤트-목록-095)
-- [저장 데이터 검색](#저장-데이터-검색)
-  - [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색)
-  - [녹화 영상이 있는 분 단위 검색 `@0.2.0`](#녹화-영상이-있는-분-단위-검색-020)
-  - [이벤트 로그 검색](#이벤트-로그-검색)
-  - [차량 번호 로그 검색](#차량-번호-로그-검색)
-  - [유사 차량 번호 검색 `@0.2.0`](#유사-차량-번호-검색-020)
-- [동영상 소스 검색](#동영상-소스-검색)
-  - [실시간 영상 소스](#실시간-영상-소스)
-  - [녹화 영상 소스](#녹화-영상-소스)
-- [동영상 소스를 사용하여 영상 요청 `@0.3.0`](#동영상-소스를-사용하여-영상-요청-030)
-- [실시간 이벤트 모니터링 `@0.3.0`](#실시간-이벤트-모니터링-030)
-  - [Server-Sent Events (SSE)](#server-sent-events-sse)
-  - [채널 상태 변경 이벤트](#채널-상태-변경-이벤트)
-  - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
-  - [비상 호출 이벤트](#비상-호출-이벤트)
-  - [시스템 이벤트 `@0.7.0`](#시스템-이벤트-070)
-  - [움직임 감지 이벤트 `@0.8.0`](#움직임-감지-이벤트-080)
-  - [주차 카운트 이벤트 `@0.9.0`](#주차-카운트-이벤트-090)
-  - [녹화 상태 이벤트 `@0.9.5`](#녹화-상태-이벤트-095)
-  - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
-- [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
-- [서버에 이벤트 밀어넣기 `@0.4.0`](#서버에-이벤트-밀어넣기-040)
-- [채널 정보 및 장치 제어 `@0.5.0`](#채널-정보-및-장치-제어-050)
-  - [장치 정보 및 지원 기능 목록 요청](#장치-정보-및-지원-기능-목록-요청)
-  - [팬틸트 제어](#팬틸트-제어)
-  - [팬틸트 프리셋 제어](#팬틸트-프리셋-제어)
-  - [릴레이 출력](#릴레이-출력)
-  - [AUX 출력](#AUX-출력)
-  - [장치 재부팅](#장치-재부팅)
-- [부록](#부록)
-  - [제품별 API 지원 버전](#제품별-api-지원-버전)
-  - [제품별 기능 지원 표](#제품별-기능-지원-표)
-  - [base64 인코딩](#base64-인코딩)
-  - [URL 인코딩](#url-인코딩)
-  - [URL 디코딩](#url-디코딩)
-  - [ISO 8601 형식으로 날짜 시각 표현하기](#iso-8601-형식으로-날짜-시각-표현하기)
-  - [지원하는 언어 목록](#지원하는-언어-목록)
-  - [JSON 데이터 형식](#json-데이터-형식)
-  - [피드백](#피드백)
+- [TS-API 프로그래밍 안내서](#ts-api-프로그래밍-안내서)
+  - [TS-API@0.9.6](#ts-api096)
+  - [목차](#목차)
+  - [시작하기](#시작하기)
+  - [영상 표시](#영상-표시)
+    - [실시간 영상 표시](#실시간-영상-표시)
+    - [웹 페이지에 영상 삽입하기](#웹-페이지에-영상-삽입하기)
+    - [실제 서버에 접속하기](#실제-서버에-접속하기)
+    - [사용자 인증](#사용자-인증)
+    - [채널 변경](#채널-변경)
+    - [녹화 영상 표시](#녹화-영상-표시)
+  - [JSON 데이터 들여쓰기 `@0.5.0`](#json-데이터-들여쓰기-050)
+  - [세션 인증](#세션-인증)
+    - [로그인](#로그인)
+    - [로그아웃](#로그아웃)
+  - [서버 정보 요청](#서버-정보-요청)
+    - [API 버전](#api-버전)
+    - [사이트 이름](#사이트-이름)
+    - [서버 시간대](#서버-시간대)
+    - [제품 정보](#제품-정보)
+    - [라이센스 정보](#라이센스-정보)
+      - [부가 기능`extension` 목록](#부가-기능extension-목록)
+    - [사용자 정보](#사용자-정보)
+    - [모두 한 번에 요청](#모두-한-번에-요청)
+  - [시스템 정보 요청 `@0.3.0`](#시스템-정보-요청-030)
+    - [개별 항목 요청](#개별-항목-요청)
+  - [시스템 상태 요청 `@0.3.0`](#시스템-상태-요청-030)
+    - [개별 항목 요청](#개별-항목-요청-1)
+  - [HDD S.M.A.R.T. 요청 `@0.6.0`](#hdd-smart-요청-060)
+  - [서버 재시작 요청 `@0.6.0`](#서버-재시작-요청-060)
+  - [시스템 재부팅 요청 `@0.6.0`](#시스템-재부팅-요청-060)
+  - [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)
+  - [각종 목록 요청](#각종-목록-요청)
+    - [채널 목록 `@0.9.4`](#채널-목록-094)
+      - [스트림 목록 추가하기 `@0.9.4`](#스트림-목록-추가하기-094)
+      - [카메라 지원 기능 추가하기 `@0.9.4`](#카메라-지원-기능-추가하기-094)
+    - [차량 번호 인식 장치 목록](#차량-번호-인식-장치-목록)
+    - [비상 호출 장치 목록 `@0.3.0`](#비상-호출-장치-목록-030)
+    - [이벤트 로그 종류 목록](#이벤트-로그-종류-목록)
+    - [주차장 목록 `@0.9.0`](#주차장-목록-090)
+    - [수신 가능한 실시간 이벤트 목록 `@0.9.6`](#수신-가능한-실시간-이벤트-목록-096)
+  - [저장 데이터 검색](#저장-데이터-검색)
+    - [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색)
+    - [녹화 영상이 있는 분 단위 검색 `@0.2.0`](#녹화-영상이-있는-분-단위-검색-020)
+    - [이벤트 로그 검색](#이벤트-로그-검색)
+    - [차량 번호 로그 검색](#차량-번호-로그-검색)
+    - [유사 차량 번호 검색 `@0.2.0`](#유사-차량-번호-검색-020)
+    - [객체 검색 `@0.9.6`](#객체-검색-096)
+      - [공통 매개변수](#공통-매개변수)
+      - [face용 매개변수](#face용-매개변수)
+      - [human용 매개변수](#human용-매개변수)
+      - [vehicle용 매개변수](#vehicle용-매개변수)
+    - [얼굴 검색 `@0.9.6`](#얼굴-검색-096)
+  - [동영상 소스 검색](#동영상-소스-검색)
+    - [실시간 영상 소스](#실시간-영상-소스)
+    - [녹화 영상 소스](#녹화-영상-소스)
+  - [동영상 소스를 사용하여 영상 요청 `@0.3.0`](#동영상-소스를-사용하여-영상-요청-030)
+  - [실시간 이벤트 모니터링 `@0.3.0`](#실시간-이벤트-모니터링-030)
+    - [Server-Sent Events (SSE)](#server-sent-events-sse)
+    - [채널 상태 변경 이벤트](#채널-상태-변경-이벤트)
+    - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
+    - [비상 호출 이벤트](#비상-호출-이벤트)
+    - [시스템 이벤트 `@0.7.0`](#시스템-이벤트-070)
+    - [움직임 감지 이벤트 `@0.8.0`](#움직임-감지-이벤트-080)
+    - [주차 카운트 이벤트 `@0.9.0`](#주차-카운트-이벤트-090)
+    - [녹화 상태 이벤트 `@0.9.5`](#녹화-상태-이벤트-095)
+    - [객체 감지 이벤트 `@0.9.6`](#객체-감지-이벤트-096)
+      - [`face` 객체](#face-객체)
+      - [`human` 객체](#human-객체)
+      - [`vehicle` 객체](#vehicle-객체)
+    - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
+  - [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
+  - [채널 정보 및 장치 제어 `@0.5.0`](#채널-정보-및-장치-제어-050)
+    - [장치 정보 및 지원 기능 목록 요청](#장치-정보-및-지원-기능-목록-요청)
+    - [팬틸트 제어](#팬틸트-제어)
+    - [팬틸트 프리셋 제어](#팬틸트-프리셋-제어)
+    - [릴레이 출력](#릴레이-출력)
+    - [AUX 출력](#aux-출력)
+    - [장치 재부팅](#장치-재부팅)
+  - [부록](#부록)
+    - [제품별 API 지원 버전](#제품별-api-지원-버전)
+    - [제품별 기능 지원 표](#제품별-기능-지원-표)
+    - [base64 인코딩](#base64-인코딩)
+    - [URL 인코딩](#url-인코딩)
+    - [URL 디코딩](#url-디코딩)
+    - [ISO 8601 형식으로 날짜 시각 표현하기](#iso-8601-형식으로-날짜-시각-표현하기)
+    - [지원하는 언어 목록](#지원하는-언어-목록)
+    - [JSON 데이터 형식](#json-데이터-형식)
+    - [피드백](#피드백)
 
 <!-- /TOC -->
 
@@ -1516,7 +1528,7 @@ lang      # 언어
 ]
 ```
 
-### 수신 가능한 실시간 이벤트 목록 `@0.9.5`
+### 수신 가능한 실시간 이벤트 목록 `@0.9.6`
 서버에서 제공하는 실시간 이벤트 종류를 얻으려면 다음과 같이 요청합니다.
 ```ruby
 /api/enum?what=realtimeEvent
@@ -1525,13 +1537,14 @@ lang      # 언어
 ```jsx
 [
   "channelStatus",
-	"emergencyCall",
-	"LPR",
+  "emergencyCall",
+  "LPR",
   "systemEvent",
   "motionChanges",
-	"recordingStatus",
+  "recordingStatus",
   "parkingCount",
-  "packing"
+  "packing",
+  "object"
 ]
 ```
 
@@ -1814,7 +1827,7 @@ type        # 이벤트 로그 유형
 			"score":98,														// 인식 점수 (100점 만점): 차번인식 엔진에 따라 지원하지 않을 수 있음 (항목 없을 수 있음)
 			"roi": {																// 번호판 이미지 영역
         "offset": [943,635],								// 좌상단 좌표
-        "size": [132,31]										// 번호판 이미지 크기
+        "size": [132,31]										// 번호�� 이미지 크기
       },
 			"image": [															// 동일 번호판이 연속으로 저장된 경우를 위해 배열로 표현함 (항목 없을 수 있음)
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
@@ -2004,6 +2017,222 @@ maxCount    # 최대 항목 개수
     // ... 중략
 ]
 ```
+
+<a id="markdown-객체-검색-096" name="객체-검색-096"></a>
+### 객체 검색 `@0.9.6`
+객체 감지 기능을 사용하는 경우 감지된 객체들(`face`, `human`, `vehicle`)은 해당 동영상과 함께 저장됩니다. 객체 로그를 조회하기 위해서는 다음과 같이 요청합니다.
+
+```ruby
+/api/find?what=object
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+{
+  "totalCount": 100,
+  "at": 0,
+  "data": [
+    {
+      "timestamp": "2020-05-25T14:58:15.819+09:00",
+      "chid": 1,               # 채널 번호
+      "objId": 837,            # 객체 id (id가 같으면 동일 객체로 구분함)
+      "type": "face",          # 객체 종류 (얼굴)
+      "likelihood": 82.59      # 정확도 (%)
+      "attributes": {          # 객체 속성
+        "gender": "female"     # 성별 (여자)
+      },
+      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412659.1590386295819221.object._c1_t2_s392x504.jpg" # 이미지 주소
+    },
+    {
+      "timestamp": "2020-05-25T14:58:14.449+09:00",
+      "chid": 1,               # 채널 번호
+      "objId": 842,            # 객체 id (id가 같으면 동일 객체로 구분함)
+      "type": "face",          # 객체 종류 (얼굴)
+      "likelihood": 90.09,     # 정확도 (%)
+      "attributes": {          # 객체 속성
+        "gender": "male"       # 성별 (남자)
+      },
+      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412660.1590386294449281.object._c1_t2_s744x624.jpg" # 이미지 주소
+    },
+    {
+      "timestamp": "2020-05-25T14:58:14.185+09:00",
+      "chid": 1,               # 채널 번호
+      "objId": 834,            # 객체 id (id가 같으면 동일 객체로 구분함)
+      "type": "human",         # 객체 종류 (사람)
+      "likelihood": 62.20,     # 정확도 (%)
+      "attributes": {          # 객체 속성
+        "gender": "male",      # 성별 (남자)
+        "clothes": [           # 옷
+          {
+            "type": "tops",    # 상의
+            "length": "long",  # 소매 길이
+            "colors": [        # 색상
+              "red"
+            ]
+          },
+          {
+            "type": "bottoms", # 하의
+            "length": "long",  # 바지 길이
+            "colors": [        # 색상
+              "red"
+            ]
+          }
+        ]
+      },
+      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412658.1590386294185653.object._c1_t1_s296x464.jpg" # 이미지 주소
+    },
+    {
+      "timestamp": "2020-05-25T14:55:21.557+09:00",
+      "chid": 1,               # 채널 번호
+      "objId": 748,            # 객체 id (id가 같으면 동일 객체로 구분함)
+      "type": "vehicle",       # 객체 종류 (차량)
+      "likelihood": 95.80,     # 정확도 (%)
+      "attributes": {          # 객체 속성
+        "vehicleType": "Car",  # 차량 종류 (자동차)
+        "colors": [            # 색상
+          "gray"
+        ]
+      },
+      "image": "http://host/storage/e/0/0/7/7673/object/7673909/7673909.4412630.1590386121557955.object._c1_t3_s440x312.jpg" # 이미지 주소
+    },
+    // ... 중략
+  ]
+}
+```
+
+검색 결과의 `data` 항목의 내용은 [객체 감지 이벤트 `@0.9.6`](#객체-감지-이벤트-096)의 내용과 동일합니다.
+
+또한 아래와 같이 각 객체별 속성을 지정하여 조건 검색할 수 있습니다.
+
+#### 공통 매개변수
+```ruby
+lang        # 언어
+timeBegin   # 특정 날짜, 시각 이후에 기록된 객체 목록
+timeEnd     # 특정 날짜, 시각 이전에 기록된 객체 목록
+ch          # 채널 번호, 콤마(,) 사용해서 복수 표기 가능
+objectType  # 객체 종류 (face, human, vehicle 중 하나, 지정하지 않으면 모든 종류의 객체를 의미함)
+at          # 데이터 오프셋
+maxCount    # 최대 항목 개수
+sort        # 정렬 방식 (desc: 최신 데이터 순(기본값), asc: 오래된 데이터 순)
+
+
+# 2020년 1월 동안 저장된 객체 요청
+# (2020-01-01T00:00:00+09:00 ~ 2020-01-31T23:59:59.999+09:00)
+/api/find?what=object&timeBegin=2020-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2020-01-31T23%3A59%3A59.999%2B09%3A00
+
+# 1, 2번 채널의 객체만 요청
+/api/find?what=object&ch=1,2
+
+# face 객체만 요청
+/api/find?what=object&objectType=face
+
+# 검색 결과의 10번째 항목부터 20개를 요청
+/api/find?what=object&at=10&maxCount=20
+
+# 오래된 데이터 순(오름차순)으로 정렬하여 요청
+/api/find?what=object&sort=asc
+```
+
+#### face용 매개변수
+```ruby
+gender       # 성별 지정 (male, female 중 하나)
+age          # 나이 구분 (young, adult, middle, senior 중 하나)
+accessories  # 착용한 악세서리 지정 (hat, glasses 중 복수 지정 가능)
+
+# 남자만 요청
+/api/find?what=object&objectType=face&gender=male
+
+# 성인만 요청
+/api/find?what=object&objectType=face&age=adult
+
+# 중년 여자만 요청
+/api/find?what=object&objectType=face&gender=female&age=middle
+
+# 안경 쓴 사람만 요청
+/api/find?what=object&objectType=face&accessories=glasses
+
+# 안경 쓰고 모자 쓴 사람만 요청
+/api/find?what=object&objectType=face&accessories=glasses,hat
+```
+
+
+#### human용 매개변수
+```ruby
+gender        # 성별 지정 (male, female 중 하나)
+accessories   # 착용한 악세서리 지정 (hat, glasses, bag 중 복수 지정 가능)
+topClothes    # 상의 길이 및 색상을 콤마(,)로 구분해서 복수 지정
+              # 길이 (short, long 중 하나)
+              # 색상 (brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, other 중 복수 지정 가능)
+bottomClothes # 하의 색상 지정 (상동)
+
+# 여자만 요청
+/api/find?what=object&objectType=human&gender=female
+
+# 가방 든 사람만 요청
+/api/find?what=object&objectType=human&accessories=bag
+
+# 모자 쓰고 가방 든 사람만 요청
+/api/find?what=object&objectType=human&accessories=hat,bag
+
+# 반팔 상의를 입은 사람
+/api/find?what=object&objectType=human&topClothes=short
+
+# 노란색 상의를 입은 사람
+/api/find?what=object&objectType=human&topClothes=yellow
+
+# 빨강과 파랑색 상의를 입은 사람
+/api/find?what=object&objectType=human&topClothes=red,blue
+
+# 짧은 하의를 입은 사람
+/api/find?what=object&objectType=human&bottomClothes=short
+
+# 상하의 모두 검정색을 입은 사람
+/api/find?what=object&objectType=human&topClothes=black&bottomClothes=black
+
+# 모자 쓰고 가방 들고 흰색 상의를 입은 남자
+/api/find?what=object&objectType=human&accessories=hat,bag&topClothes=white&gender=male
+```
+
+
+#### vehicle용 매개변수
+```ruby
+vehicleType  # 차량 종류와 색상을 콤마(,)로 구분 표기
+             # 차량 종류 (car, truck, bus, bicycle, motorcycle, train 중 하나) 
+             # 차량 색상 (brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, other 중 복수 지정 가능)
+
+# 버스만 요청
+/api/find?what=object&vehicle=bus
+
+# 노란색 자동차만 요청
+/api/find?what=object&vehicle=car,yellow
+```
+
+
+### 얼굴 검색 `@0.9.6`
+얼굴 사진으로 닮은 얼굴은 찾을 수 있습니다.
+
+사진 이미지를 전송하기 위해 `HTTP POST` 방식으로 요청합니다.
+CGI parameter로 검색 조건을 설정하고 이미지만 POST data로 전송합니다.
+이미지 파일 형식은 `jpg` (`Content-Type=image/jpeg`), `png` (`Content-Type=image/png`)를 지원합니다.
+
+얼굴
+```ruby
+lang        # 언어
+timeBegin   # 특정 날짜, 시각 이후에 기록된 얼굴
+timeEnd     # 특정 날짜, 시각 이전에 기록된 얼굴
+ch          # 채널 번호, 콤마(,) 사용해서 복수 표기 가능
+threshold   # 닮은 정도 (1 ~ 100 사이의 퍼센트로 표기)
+
+# 2020년 1월 동안 저장된 얼굴에서 검색
+# (2020-01-01T00:00:00+09:00 ~ 2020-01-31T23:59:59.999+09:00)
+/api/searchFace?timeBegin=2020-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2020-01-31T23%3A59%3A59.999%2B09%3A00
+
+# 1, 2번 채널의 얼굴에서 검색
+/api/searchFace?ch=1,2
+
+# 95% 닮은 얼굴 검색
+/api/searchFace?threshold=95
+```
+
 
 <a id="markdown-동영상-소스-검색" name="동영상-소스-검색"></a>
 ## 동영상 소스 검색
@@ -2264,6 +2493,7 @@ motionChanges   # 움직임 감지 상태 변경 (@0.8.0에서 추가됨)
 parkingCount    # 주차장 차량수 변동 이벤트 (@0.9.0에서 추가됨)
 packing         # 포장 이벤트 (@0.9.0에서 추가됨)
 recordingStatus # 녹화 상태 이벤트 (@0.9.5에서 추가됨)
+object          # 객체 감지 이벤트 (@0.9.6에서 추가됨)
 ```
 
 SSE 접속 경로와 매개변수들은 다음과 같습니다.
@@ -2938,6 +3168,131 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 }
 ```
 
+### 객체 감지 이벤트 `@0.9.6`
+`topics=object`를 요청하면 각 카메라에서 객체가 감지되는 시점에 실시간 이벤트를 수신할 수 있습니다.
+
+지원하는 객체 종류는 다음과 같습니다.
+- face
+- human
+- vehicle
+
+아래와 같이 `objectType` (객체 종류)를 지정하여 원하는 객체만 수신할 수 있습니다. 
+지정하지 않으면 지원하는 모든 종류의 객체가 전송됩니다.
+```ruby
+# 얼굴만 요청
+http://host/api/subscribeEvents?topics=object&objectType=face&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# 차량만 요청
+http://host/api/subscribeEvents?topics=object&objectType=vehicle&auth=ZGVtbzohMTIzNHF3ZXI%3D
+
+# 얼굴과 사람만 요청
+http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNHF3ZXI%3D
+```
+
+#### `face` 객체
+1. 예제 데이터
+```jsx
+{
+  "timestamp":"2020-05-25T13:56:02.558+09:00",
+  "chid": 1,              # 채널 번호
+  "objId": 132,           # 객체 id (id가 같으면 동일 객체로 구분함)
+  "parentId": 130,        # `face` 객체의 경우 `human`이 부모가 될 수 있음, `human`(몸통:부모)에 딸린 `face`(얼굴:자식)의 관계 (두 객체가 동시에 감지된 경우에만 존재함)
+  "type": "face",         # 객체 종류
+  "likelihood": 71.10,    # 정확도 (%)
+  "attributes": {         # 객체 속성 (감지된 속성만 나열)
+    "gender": "female",   # 성별
+    "age": "adult",       # 나이 구분
+    "accessory": [        # 착용한 악세서리 (복수 표기)
+      "hat", 
+      "glasses"
+    ]
+  },
+  "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411971.1590382562558672.object._c1_t2_s552x400.jpg" # 이미지 주소
+}
+```
+2. `face` 객체 속성
+    | key         | 형식     | 목록                                 |
+    |-------------|----------|--------------------------------------|
+    | `gender`    | `string` | `female`, `male`                     |
+    | `age`       | `string` | `young`, `adult`, `middle`, `senior` |
+    | `accessory` | `string` `array`  | `hat`, `glasses`          |
+
+#### `human` 객체
+1. 예제 데이터
+```jsx
+{
+  "timestamp": "2020-05-25T13:56:18.461+09:00",
+  "chid": 1,              # 채널 번호
+  "objId": 142,           # 객체 id (id가 같으면 동일 객체로 구분함)
+  "type": "human",        # 객체 종류
+  "likelihood": 74.80,    # 정확도 (%)
+  "attributes": {         # 객체 속성 (감지된 속성만 나열)
+    "gender": "female",   # 성별
+    "accessory": [        # 착용한 악세서리 (복수 표기)
+      "hat", 
+      "glasses", 
+      "bag"
+    ], 
+    "clothes": [          # 옷 (복수 표기)
+      {
+        "type": "tops",   # 상의
+        "length": "long", # 길이
+        "colors": [       # 색상 (복수 표기)
+          "white"
+        ]
+      },
+      {
+        "type": "bottoms", # 하의
+        "length": "long",  # 길이
+        "colors": [        # 색상 (복수 표기)
+          "blue"
+        ]
+      }
+    ]
+  },
+  "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411974.1590382578461739.object._c1_t1_s376x600.jpg" # 이미지 주소
+}
+```
+2. `human` 객체 속성
+    | key        | 형식         | 목록                            |
+    |-------------|--------------|---------------------------------|
+    | `gender`    | `string`     | `female`, `male`                |
+    | `accessory` | `string` `array` | `hat`, `glasses`, `bag`        |
+    | `clothes`   | `object` `array` | *`clothes` 객체 속성 참조*      |
+3. `clothes` 객체 속성  
+    | key         | 형식         | 목록                   | 설명        |
+    |-------------|--------------|------------------------|-------------|
+    | `type`      | `string`     | `tops`, `bottoms`      | 상.하의 구분 |
+    | `length`    | `string`     | `short`, `long`        | 소매.바지 기장 |
+    | `colors`    | `string` `array` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  | 색상 |
+    
+    
+  
+#### `vehicle` 객체
+```jsx
+1. 예제 데이터
+{
+  "timestamp": "2020-05-25T14:23:58.768+09:00",
+  "chid": 1,              # 채널 번호
+  "objId": 182,           # 객체 id (id가 같으면 동일 객체로 구분함)
+  "type": "vehicle",      # 객체 종류
+  "likelihood": 99.60,    # 정확도 (%)
+  "attributes": {         # 객체 속성 (감지된 속성만 나열)
+    "vehicleType": "car", # 차량 종류
+    "colors": [           # 차량 색상
+      "white"
+    ]
+  },
+  "image": "http://host/storage/e/0/0/7/7673/object/7673880/7673880.4412174.1590384238768802.object._c1_t3_s944x520.jpg" # 이미지 주소
+}
+```
+2. `vehicle` 객체 속성
+    | key           | 형식         | 목록                            |
+    |---------------|--------------|--------------------------------|
+    | `vehicleType` | `string`     | `car`, `truck`, `bus`, `bicycle`, `motorcycle`, `train`  |
+    | `colors`    | `string` `array` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  |
+
+
 
 이 번에는 SSE를 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
 ```html
@@ -2972,6 +3327,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
       <input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
       <input class='topic' type='checkbox' value="packing" checked>포장
       <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
+      <input class='topic' type='checkbox' value="object" checked>객체 감지
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
@@ -3200,6 +3556,9 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
       <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
  			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
 			<input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
+      <input class='topic' type='checkbox' value="packing" checked>포장
+      <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
+      <input class='topic' type='checkbox' value="object" checked>객체 감지
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
