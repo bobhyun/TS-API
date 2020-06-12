@@ -216,7 +216,7 @@ http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
       alert("비밀번호를 입력하십시오.");
       return;
     }
-    var encodedData = window.btoa(userId + ':' + password);	// base64 인코딩
+    var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     var src = 'http://' + hostName + '/watch?ch=1&auth=' + encodedData;
     document.getElementById('result').innerText = src;
     document.getElementById('player').src = src;
@@ -1144,10 +1144,10 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 2     # 동영상 있음
 200   # 연결됨
 401   # 카메라 로그인 실패
-403 	# 카메라 차단됨
-404 	# 네트워크 접속 안됨
-408 	# 카메라 응답 시간 초과
-410 	# 영상 입력 없음
+403   # 카메라 차단됨
+404   # 네트워크 접속 안됨
+408   # 카메라 응답 시간 초과
+410   # 영상 입력 없음
 503   # 카메라 서비스 오류
 ```
 
@@ -1823,19 +1823,19 @@ type        # 이벤트 로그 유형
   "data": [           // 차량 번호 로그 데이터 목록
     {
       "id": 64,                          // 차량 번호 로그 번호
-      "plateNo": "13다5939",             	// 차량 번호 텍스트
-			"score":98,														// 인식 점수 (100점 만점): 차번인식 엔진에 따라 지원하지 않을 수 있음 (항목 없을 수 있음)
-			"roi": {																// 번호판 이미지 영역
-        "offset": [943,635],								// 좌상단 좌표
-        "size": [132,31]										// 번호�� 이미지 크기
+      "plateNo": "13다5939",               // 차량 번호 텍스트
+      "score":98,                           // 인식 점수 (100점 만점): 차번인식 엔진에 따라 지원하지 않을 수 있음 (항목 없을 수 있음)
+      "roi": {                                // 번호판 이미지 영역
+        "offset": [943,635],                // 좌상단 좌표
+        "size": [132,31]                    // 번호�� 이미지 크기
       },
-			"image": [															// 동일 번호판이 연속으로 저장된 경우를 위해 배열로 표현함 (항목 없을 수 있음)
+      "image": [                              // 동일 번호판이 연속으로 저장된 경우를 위해 배열로 표현함 (항목 없을 수 있음)
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386146439.plate.jpg",
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386199445.plate.jpg",
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386510078.plate.jpg"
       ],
-			"timeRange": [                      // 차량 번호 인식 날짜, 시각
+      "timeRange": [                      // 차량 번호 인식 날짜, 시각
         "2018-02-21T09:07:29.000+09:00",  // 시작 시점
         "2018-02-21T09:07:34.057+09:00"   // 종료 시점
       ],
@@ -1863,15 +1863,15 @@ type        # 이벤트 로그 유형
     {
       "id": 63,
       "plateNo": "02루2841",
-  		"score":95,
-			"roi": {
+      "score":95,
+      "roi": {
         "offset": [753,578],
         "size": [150,38]
       },
-			"image": [
+      "image": [
         "http://192.168.0.100/storage/e/0/0/0/39/39588.161141.1576732012342440.plate.jpg"
       ],
-			"timeRange": [
+      "timeRange": [
         "2018-02-21T08:00:00.915+09:00",
         "2018-02-21T08:00:01.714+09:00"
       ],
@@ -1900,7 +1900,7 @@ type        # 이벤트 로그 유형
     {
       "id": 15,
       "plateNo": "64다3736",
-			"roi": {
+      "roi": {
         "offset": [832,380],
         "size": [122,31]
       },
@@ -2862,9 +2862,9 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
     "displayName":"CH1. 카메라1",                 // TS-API@0.9.4 이후 추가됨
     "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"  // 차량 번호 인식 시점의 영상
   },
-  "srcCode":"1-1-7",                            	// 차량 번호 인식 장치(영역) 코드
-  "srcName":"B1주차장",                          	// 차량 번호 인식 장치(영역) 이름
-  "linkedChannel": [                           	// 연동된 채널
+  "srcCode":"1-1-7",                              // 차량 번호 인식 장치(영역) 코드
+  "srcName":"B1주차장",                            // 차량 번호 인식 장치(영역) 이름
+  "linkedChannel": [                            // 연동된 채널
     {
       "chid":2,
       "title":"카메라2",
@@ -2872,13 +2872,13 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
       "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00" // 차량 번호 인식 시점의 영상
     }
   ],
-	"image":"http://host/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // 캡쳐된 낱장 이미지
-  "plateNo":"11가1432",                        	// 차량 번호
-	"score":98,																			// 인식 점수 (100점 만점): 차번인식 엔진에 따라 지원하지 않을 수 있음 (항목 없을 수 있음)
-	"roi": {                         							// 번호판 이미지 영역
-	  "offset":[964,560],														// 좌상단 좌표
-		"size":[187,51]																// 번호판 이미지 크기
-	},
+  "image":"http://host/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // 캡쳐된 낱장 이미지
+  "plateNo":"11가1432",                          // 차량 번호
+  "score":98,                                     // 인식 점수 (100점 만점): 차번인식 엔진에 따라 지원하지 않을 수 있음 (항목 없을 수 있음)
+  "roi": {                                      // 번호판 이미지 영역
+    "offset":[964,560],                           // 좌상단 좌표
+    "size":[187,51]                               // 번호판 이미지 크기
+  },
   "timeBegin":"2018-06-27T10:42:02.573+09:00",  // 동일 차량 번호 최초 인식 시점 
   "topic":"LPR"                                 // 토픽 이름
 }
@@ -3032,9 +3032,9 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
     "2018-11-15T13:16:38.054+09:00"
   ],
   "param": {
-		"storagePathBefore": "D:\\recData\\",
-		"storagePathAfter": "E:\\recData\\"
-	},
+    "storagePathBefore": "D:\\recData\\",
+    "storagePathAfter": "E:\\recData\\"
+  },
   "comment": "D:\\recData\\에서 E:\\recData\\로 저장 경로 변경됨"  // 옵션
 }
 ```
@@ -3354,11 +3354,11 @@ http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzo
       return url;
     }
 
-		if(window.myApp.es !== null) {
-			alert('이미 접속 중입니다.');
-			return url;
-		}
-			
+    if(window.myApp.es !== null) {
+      alert('이미 접속 중입니다.');
+      return url;
+    }
+      
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('호스트를 입력하십시오.');
@@ -3392,8 +3392,8 @@ http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzo
 
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     url = (hostName.includes('http://', 0) ? '' : 'http://') +
-    	hostName + '/api/subscribeEvents?topics=' + topics + 
-			'&auth=' + encodedData;
+      hostName + '/api/subscribeEvents?topics=' + topics + 
+      '&auth=' + encodedData;
           
     if(document.getElementById('verbose').checked)
       url += '&verbose=true';
@@ -3417,27 +3417,27 @@ http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzo
     document.getElementById('url').innerText = url;
 
     // 이벤트 소스 인스턴스와 핸들러 함수들
-		var es = new EventSource(url);
-		es.onopen = function() {
-			addItem('open', '접속 성공');
-		};
-		es.onerror = function() {
-			addItem('error', '오류');
-			onDisconnect();
-		};
-		es.onmessage = function(e) {
-			var data = JSON.parse(e.data);
-			addItem('data', e.data);
-		}
-		window.myApp.es = es;
+    var es = new EventSource(url);
+    es.onopen = function() {
+      addItem('open', '접속 성공');
+    };
+    es.onerror = function() {
+      addItem('error', '오류');
+      onDisconnect();
+    };
+    es.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      addItem('data', e.data);
+    }
+    window.myApp.es = es;
   }
 
   function onDisconnect() {
-		if(	window.myApp.es !== null) {
-	    window.myApp.es.close();
-			window.myApp.es = null;
-			addItem('close', '접속 종료');
-		}
+    if( window.myApp.es !== null) {
+      window.myApp.es.close();
+      window.myApp.es = null;
+      addItem('close', '접속 종료');
+    }
   }
   
   function onClearAll() {
@@ -3445,7 +3445,7 @@ http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzo
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
-		document.getElementById('url').innerText = '';
+    document.getElementById('url').innerText = '';
   }
 </script>
 ```
@@ -3554,8 +3554,8 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
       <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
       <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
- 			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
-			<input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
+      <input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
+      <input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
       <input class='topic' type='checkbox' value="packing" checked>포장
       <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
       <input class='topic' type='checkbox' value="object" checked>객체 감지
@@ -3585,11 +3585,11 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
       return url;
     }
 
-		if(window.myApp.ws !== null) {
-			alert('이미 접속 중입니다.');
-			return url;
-		}
-			
+    if(window.myApp.ws !== null) {
+      alert('이미 접속 중입니다.');
+      return url;
+    }
+      
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('호스트를 입력하십시오.');
@@ -3624,8 +3624,8 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
 
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/subscribeEvents?topics=' + topics + 
-			'&auth=' + encodedData;
+      hostName + '/wsapi/subscribeEvents?topics=' + topics + 
+      '&auth=' + encodedData;
     
     if(document.getElementById('verbose').checked)
       url += '&verbose=true';
@@ -3655,7 +3655,7 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
     };
     ws.onclose = function(e) {
       addItem('close', '접속 종료: ' + e.code);
-			onDisconnect();
+      onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', '오류: ' + e.code);
@@ -3667,10 +3667,10 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
   }
 
   function onDisconnect() {
-		if(window.myApp.ws !== null) {
-	    window.myApp.ws.close();
-			window.myApp.ws = null;
-		}
+    if(window.myApp.ws !== null) {
+      window.myApp.ws.close();
+      window.myApp.ws = null;
+    }
   }
 
   function onClearAll() {
@@ -3678,7 +3678,7 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
-		document.getElementById('url').innerText = '';
+    document.getElementById('url').innerText = '';
   }
 </script>
 ```
@@ -3801,7 +3801,7 @@ ws://host/wsapi/dataExport?auth=ZGVtbzohMTIzNHF3ZXI%3D&timeBegin=2018-07-27T09%3
 0: 성공
 -1: 요청한 구간 내에 데이터 없음
 -2: 잘못된 매개변수
--5: 저장 공간 부족 (서버에 여유 공간이 없을 경우)		
+-5: 저장 공간 부족 (서버에 여유 공간이 없을 경우)   
 ```
 
 **stage:begin - 작업 시작**
@@ -4091,11 +4091,11 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
       return url;
     }
 
-		if(window.myApp.ws !== null) {
-			alert('이미 접속 중입니다.');
-			return url;
-		}
-		
+    if(window.myApp.ws !== null) {
+      alert('이미 접속 중입니다.');
+      return url;
+    }
+    
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('호스트를 입력하십시오.');
@@ -4185,7 +4185,7 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
+      hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
 
     url += 
       '&timeBegin=' + encodeURIComponent(timeBegin) +
@@ -4244,7 +4244,7 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
     };
     ws.onclose = function(e) {
       addItem('close', '접속 종료: ' + e.code);
-			onDisconnect();
+      onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', '오류: ' + e.code);
@@ -4286,10 +4286,10 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
   }
 
   function onDisconnect() {
-		if(window.myApp.ws !== null) {
-	    window.myApp.ws.close();
-			window.myApp.ws = null;
-		}
+    if(window.myApp.ws !== null) {
+      window.myApp.ws.close();
+      window.myApp.ws = null;
+    }
     document.getElementById('param').style.display = 'block';
   }
 
@@ -4302,27 +4302,27 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
   }
 
   function downloadFiles(file, onFinished) {
-		if(file.download.length <= 0) {
-			onFinished(false);
-			return;
-		}
+    if(file.download.length <= 0) {
+      onFinished(false);
+      return;
+    }
 
-		var downloadCnt = 0, successCnt = 0;
+    var downloadCnt = 0, successCnt = 0;
 
-		function onDone(bSuccess) {
-			if(bSuccess)
-				successCnt++;
+    function onDone(bSuccess) {
+      if(bSuccess)
+        successCnt++;
 
-			if(++downloadCnt < file.download.length) {
-				setTimeout(function() {
-					downloadFile(file.download[downloadCnt], onDone);
-				}, 1000);
-			}
-			else {
-				onFinished(successCnt == downloadCnt);
-			}
-		}
-		downloadFile(file.download[downloadCnt], onDone);
+      if(++downloadCnt < file.download.length) {
+        setTimeout(function() {
+          downloadFile(file.download[downloadCnt], onDone);
+        }, 1000);
+      }
+      else {
+        onFinished(successCnt == downloadCnt);
+      }
+    }
+    downloadFile(file.download[downloadCnt], onDone);
   }
 
   function downloadFile(download, onFinish) {
@@ -4335,16 +4335,16 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
     req.open('GET', download.src + '?auth=' + window.myApp.auth, true);
     req.responseType = "blob";
     req.onreadystatechange = function() {
-			if (req.readyState === 4 && req.status === 200) {
-				var a = document.createElement('a');
-				a.href = window.URL.createObjectURL(req.response);
-				a.download = download.fileName;
-				a.style.display = 'none';
-				document.body.appendChild(a);
-				a.click();
-				window.URL.revokeObjectURL(a.href);
-			}
-		},    
+      if (req.readyState === 4 && req.status === 200) {
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(req.response);
+        a.download = download.fileName;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      }
+    },    
     req.onprogress = function(e) {
       var prog = document.getElementById(window.myApp.task + '/' + download.fileName).firstChild;
       if(prog)
@@ -4567,13 +4567,13 @@ reload  # 채널의 카메라의 최신 정보로 갱신한 정보를 요청 (@0
 서버는 제어 명령을 보내고 나서 장치의 실행 결과를 기다리지 않고 장치와는 비동기로 HTTP 응답 코드 200으로 아래 코드 중 하나를 포함하는 JSON 데이터를 사용합니다.
 ```ruby
 0     # 성공
--1    #	사용자 권한 없음
+-1    # 사용자 권한 없음
 -2    # 장치가 지원하지 않는 기능
 -3    # 장치가 명령을 수행할 준비가 안됨
 -4    # 장치가 아직 이전 요청을 처리중 (busy)
 -5    # 잘못된 채널
 -6    # 잘못된 장치 토큰
--7    #	잘못된 요청
+-7    # 잘못된 요청
 -8    # 잘못된 매개변수
 -9    # 장치 응답 오류
 ```

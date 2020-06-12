@@ -220,7 +220,7 @@ In this example, we will improve the way we access the login information using J
       alert('Enter the password.');
       return;
     }
-    var encodedData = window.btoa(userId + ':' + password);	// base64 encoding
+    var encodedData = window.btoa(userId + ':' + password); // base64 encoding
     var src = 'http://' + hostName + '/watch?ch=1&auth=' + encodedData;
     document.getElementById('result').innerText = src;
     document.getElementById('player').src = src;
@@ -1148,10 +1148,10 @@ The complete list of status codes is shown below.
 2     # Has video
 200   # Connected
 401   # Camera login failed
-403 	# Camera blocked
-404 	# No network connection
-408 	# Camera response timeout
-410 	# No video input
+403   # Camera blocked
+404   # No network connection
+408   # Camera response timeout
+410   # No video input
 503   # Camera service failure
 ```
 
@@ -1826,14 +1826,14 @@ For the request, the server returns JSON data in the following format with an HT
   "at": 0,            // Current data offset (0 means the first data)
   "data": [           // List of vehicle number log data
     {
-      "id": 64,                          	// Vehicle number log number
-      "plateNo": "55EV96",               	// Vehicle number text
-			"score":95,														// recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optioanl)
-			"roi": {                         		// License plate area
-				"offset":[821,473],									// Top left coordinates
-				"size":[173,43]											// License plate image size
-			},
-			"image": [															// an array for the same plates captured consecutively
+      "id": 64,                           // Vehicle number log number
+      "plateNo": "55EV96",                // Vehicle number text
+      "score":95,                           // recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optioanl)
+      "roi": {                            // License plate area
+        "offset":[821,473],                 // Top left coordinates
+        "size":[173,43]                     // License plate image size
+      },
+      "image": [                              // an array for the same plates captured consecutively
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386146439.plate.jpg",
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386199445.plate.jpg",
@@ -1867,12 +1867,12 @@ For the request, the server returns JSON data in the following format with an HT
     {
       "id": 63,
       "plateNo": "DSP963",
-			"score":95,
-			"roi": {
+      "score":95,
+      "roi": {
         "offset": [753,578],
         "size": [150,38]
       },
-			"image": [
+      "image": [
         "http://192.168.0.100/storage/e/0/0/0/39/39588.161141.1576732012342440.plate.jpg"
       ],
       "timeRange": [
@@ -1904,7 +1904,7 @@ For the request, the server returns JSON data in the following format with an HT
     {
       "id": 15,
       "plateNo": "L647AN",
-			"roi": {
+      "roi": {
         "offset": [832,380],
         "size": [122,31]
       },
@@ -2873,13 +2873,13 @@ The car number event message is received in JSON format as shown below.
       "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" // The video at vehicle identification time
     }
   ],
-	"image":"http://host/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // captured still cut image
-  "plateNo":"DSP963",                        	// License plate number
-	"score":98,																			// recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optional item)
-	"roi": {                         							// License plate area
-	  "offset":[964,560],														// Top left coordinates
-		"size":[187,51]																// License plate image size
-	},
+  "image":"http://host/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // captured still cut image
+  "plateNo":"DSP963",                         // License plate number
+  "score":98,                                     // recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optional item)
+  "roi": {                                      // License plate area
+    "offset":[964,560],                           // Top left coordinates
+    "size":[187,51]                               // License plate image size
+  },
   "timeBegin":"2018-06-27T10:42:02.573-05:00",  // First recognized time of the car
   "topic":"LPR"                                 // Topic name
 }
@@ -3033,9 +3033,9 @@ Each data type is the same as those used in [Search event log](#search-event-log
     "2018-11-15T13:16:38.054-05:00"
   ],
   "param": {
-		"storagePathBefore": "D:\\recData\\",
-		"storagePathAfter": "E:\\recData\\"
-	},
+    "storagePathBefore": "D:\\recData\\",
+    "storagePathAfter": "E:\\recData\\"
+  },
   "comment": "Storage path changed from D:\\recData\\ to E:\\recData\\."  // optional
 }
 ```
@@ -3349,15 +3349,15 @@ Now, let's create an example that uses SSE to receive event messages.
     var url = '';
 
     if (typeof(EventSource) === 'undefined') {
-			alert('Your web browser does\'nt support Server-Sent Events.');
+      alert('Your web browser does\'nt support Server-Sent Events.');
       return url;
     }
 
-		if(window.myApp.es !== null) {
-			alert('Already connected');
-			return url;
-		}
-			
+    if(window.myApp.es !== null) {
+      alert('Already connected');
+      return url;
+    }
+      
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('Please enter the host.');
@@ -3391,8 +3391,8 @@ Now, let's create an example that uses SSE to receive event messages.
 
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
     url = (hostName.includes('http://', 0) ? '' : 'http://') +
-			hostName + '/api/subscribeEvents?topics=' + topics + 
-			'&auth=' + encodedData;
+      hostName + '/api/subscribeEvents?topics=' + topics + 
+      '&auth=' + encodedData;
           
     if(document.getElementById('verbose').checked)
       url += '&verbose=true';
@@ -3416,27 +3416,27 @@ Now, let's create an example that uses SSE to receive event messages.
     document.getElementById('url').innerText = url;
 
     // EventSource instance and it's handler functions
-		var es = new EventSource(url);
-		es.onopen = function() {
-			addItem('open', 'Connected');
-		};
-		es.onerror = function() {
-			addItem('error', 'Error');
-			onDisconnect();
-		};
-		es.onmessage = function(e) {
-			var data = JSON.parse(e.data);
-			addItem('data', e.data);
-		}
-		window.myApp.es = es;
+    var es = new EventSource(url);
+    es.onopen = function() {
+      addItem('open', 'Connected');
+    };
+    es.onerror = function() {
+      addItem('error', 'Error');
+      onDisconnect();
+    };
+    es.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      addItem('data', e.data);
+    }
+    window.myApp.es = es;
   }
 
   function onDisconnect() {
-		if(	window.myApp.es !== null) {
-	    window.myApp.es.close();
-			window.myApp.es = null;
-			addItem('close', 'Disconnected');
-		}
+    if( window.myApp.es !== null) {
+      window.myApp.es.close();
+      window.myApp.es = null;
+      addItem('close', 'Disconnected');
+    }
   }
     
   function onClearAll() {
@@ -3444,7 +3444,7 @@ Now, let's create an example that uses SSE to receive event messages.
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
-		document.getElementById('url').innerText = '';
+    document.getElementById('url').innerText = '';
   }
 </script>
 ```
@@ -3582,11 +3582,11 @@ Now, let's create an example that uses the Web socket to receive event messages.
       return url;
     }
 
-		if(window.myApp.ws !== null) {
-			alert('Already connected');
-			return url;
-		}
-			
+    if(window.myApp.ws !== null) {
+      alert('Already connected');
+      return url;
+    }
+      
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('Please enter the host.');
@@ -3621,8 +3621,8 @@ Now, let's create an example that uses the Web socket to receive event messages.
 
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/api/subscribeEvents?topics=' + topics + 
-			'&auth=' + encodedData;
+      hostName + '/api/subscribeEvents?topics=' + topics + 
+      '&auth=' + encodedData;
     
       if(document.getElementById('verbose').checked)
       url += '&verbose=true';
@@ -3652,7 +3652,7 @@ Now, let's create an example that uses the Web socket to receive event messages.
     };
     ws.onclose = function(e) {
       addItem('close', 'Disconnected: ' + e.code);
-			onDisconnect();
+      onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', 'Error: ' + e.code);
@@ -3664,10 +3664,10 @@ Now, let's create an example that uses the Web socket to receive event messages.
   }
 
   function onDisconnect() {
-		if(window.myApp.ws !== null) {
-	    window.myApp.ws.close();
-			window.myApp.ws = null;
-		}
+    if(window.myApp.ws !== null) {
+      window.myApp.ws.close();
+      window.myApp.ws = null;
+    }
   }
   
   function onClearAll() {
@@ -3675,7 +3675,7 @@ Now, let's create an example that uses the Web socket to receive event messages.
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
-		document.getElementById('url').innerText = '';
+    document.getElementById('url').innerText = '';
   }
 </script>
 ```
@@ -3798,7 +3798,7 @@ In some situations, it may fail and terminate immediately.
 0: Succcess
 -1: No data in the requested time range and channels
 -2: Invalid parameters
--5: Out of storage space (If there is no free space on the server)		
+-5: Out of storage space (If there is no free space on the server)    
 ```
 
 **stage:begin - Start task**
@@ -4088,11 +4088,11 @@ Now let's create an example that uses a web socket to export the recorded video.
       return url;
     }
 
-		if(window.myApp.ws !== null) {
-			alert('Already connected');
-			return url;
-		}
-		
+    if(window.myApp.ws !== null) {
+      alert('Already connected');
+      return url;
+    }
+    
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('Please enter the host.');
@@ -4182,7 +4182,7 @@ Now let's create an example that uses a web socket to export the recorded video.
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
     window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
+      hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
 
     url += 
       '&timeBegin=' + encodeURIComponent(timeBegin) +
@@ -4241,7 +4241,7 @@ Now let's create an example that uses a web socket to export the recorded video.
     };
     ws.onclose = function(e) {
       addItem('close', 'Disconnected: ' + e.code);
-			onDisconnect();
+      onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', 'Error: ' + e.code);
@@ -4283,10 +4283,10 @@ Now let's create an example that uses a web socket to export the recorded video.
   }
 
   function onDisconnect() {
-		if(window.myApp.ws !== null) {
-	    window.myApp.ws.close();
-			window.myApp.ws = null;
-		}
+    if(window.myApp.ws !== null) {
+      window.myApp.ws.close();
+      window.myApp.ws = null;
+    }
     document.getElementById('param').style.display = 'block';
   }
 
@@ -4299,27 +4299,27 @@ Now let's create an example that uses a web socket to export the recorded video.
   }
 
   function downloadFiles(file, onFinished) {
-		if(file.download.length <= 0) {
-			onFinished(false);
-			return;
-		}
+    if(file.download.length <= 0) {
+      onFinished(false);
+      return;
+    }
 
-		var downloadCnt = 0, successCnt = 0;
+    var downloadCnt = 0, successCnt = 0;
 
-		function onDone(bSuccess) {
-			if(bSuccess)
-				successCnt++;
+    function onDone(bSuccess) {
+      if(bSuccess)
+        successCnt++;
 
-			if(++downloadCnt < file.download.length) {
-				setTimeout(function() {
-					downloadFile(file.download[downloadCnt], onDone);
-				}, 1000);
-			}
-			else {
-				onFinished(successCnt == downloadCnt);
-			}
-		}
-		downloadFile(file.download[downloadCnt], onDone);
+      if(++downloadCnt < file.download.length) {
+        setTimeout(function() {
+          downloadFile(file.download[downloadCnt], onDone);
+        }, 1000);
+      }
+      else {
+        onFinished(successCnt == downloadCnt);
+      }
+    }
+    downloadFile(file.download[downloadCnt], onDone);
   }
 
   function downloadFile(download, onFinish) {
@@ -4332,16 +4332,16 @@ Now let's create an example that uses a web socket to export the recorded video.
     req.open('GET', download.src + '?auth=' + window.myApp.auth, true);
     req.responseType = "blob";
     req.onreadystatechange = function() {
-			if (req.readyState === 4 && req.status === 200) {
-				var a = document.createElement('a');
-				a.href = window.URL.createObjectURL(req.response);
-				a.download = download.fileName;
-				a.style.display = 'none';
-				document.body.appendChild(a);
-				a.click();
-				window.URL.revokeObjectURL(a.href);
-			}
-		},
+      if (req.readyState === 4 && req.status === 200) {
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(req.response);
+        a.download = download.fileName;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      }
+    },
     req.onprogress = function(e) {
       var prog = document.getElementById(window.myApp.task + '/' + download.fileName).firstChild;
       if(prog)
@@ -4565,7 +4565,7 @@ For the request, the server returns JSON data in the following format with an HT
 The server sends control commands and immediately resonse with JSON data, including one of the following codes, as an HTTP response code 200, asynchronously with the device, without waiting for the device's execution result.
 ```ruby
 0     # Sucess
--1    #	No user rights
+-1    # No user rights
 -2    # Features not supported by the device
 -3    # The device is not ready to execute the command
 -4    # Device is still processing previous command (busy status)

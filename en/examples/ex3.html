@@ -52,15 +52,15 @@
     var url = '';
 
     if (typeof(EventSource) === 'undefined') {
-			alert('Your web browser does\'nt support Server-Sent Events.');
+      alert('Your web browser does\'nt support Server-Sent Events.');
       return url;
     }
 
-		if(window.myApp.es !== null) {
-			alert('Already connected');
-			return url;
-		}
-			
+    if(window.myApp.es !== null) {
+      alert('Already connected');
+      return url;
+    }
+      
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('Please enter the host.');
@@ -94,8 +94,8 @@
 
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
     url = (hostName.includes('http://', 0) ? '' : 'http://') +
-			hostName + '/api/subscribeEvents?topics=' + topics + 
-			'&auth=' + encodedData;
+      hostName + '/api/subscribeEvents?topics=' + topics + 
+      '&auth=' + encodedData;
           
     if(document.getElementById('verbose').checked)
       url += '&verbose=true';
@@ -119,27 +119,27 @@
     document.getElementById('url').innerText = url;
 
     // EventSource instance and it's handler functions
-		var es = new EventSource(url);
-		es.onopen = function() {
-			addItem('open', 'Connected');
-		};
-		es.onerror = function() {
-			addItem('error', 'Error');
-			onDisconnect();
-		};
-		es.onmessage = function(e) {
-			var data = JSON.parse(e.data);
-			addItem('data', e.data);
-		}
-		window.myApp.es = es;
+    var es = new EventSource(url);
+    es.onopen = function() {
+      addItem('open', 'Connected');
+    };
+    es.onerror = function() {
+      addItem('error', 'Error');
+      onDisconnect();
+    };
+    es.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      addItem('data', e.data);
+    }
+    window.myApp.es = es;
   }
 
   function onDisconnect() {
-		if(	window.myApp.es !== null) {
-	    window.myApp.es.close();
-			window.myApp.es = null;
-			addItem('close', 'Disconnected');
-		}
+    if( window.myApp.es !== null) {
+      window.myApp.es.close();
+      window.myApp.es = null;
+      addItem('close', 'Disconnected');
+    }
   }
   
   function onClearAll() {
@@ -147,6 +147,6 @@
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
-		document.getElementById('url').innerText = '';
+    document.getElementById('url').innerText = '';
   }
 </script>

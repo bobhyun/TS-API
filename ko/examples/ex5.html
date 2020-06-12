@@ -116,11 +116,11 @@
       return url;
     }
 
-		if(window.myApp.ws !== null) {
-			alert('이미 접속 중입니다.');
-			return url;
-		}
-		
+    if(window.myApp.ws !== null) {
+      alert('이미 접속 중입니다.');
+      return url;
+    }
+    
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('호스트를 입력하십시오.');
@@ -210,7 +210,7 @@
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
+      hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
 
     url += 
       '&timeBegin=' + encodeURIComponent(timeBegin) +
@@ -269,7 +269,7 @@
     };
     ws.onclose = function(e) {
       addItem('close', '접속 종료: ' + e.code);
-			onDisconnect();
+      onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', '오류: ' + e.code);
@@ -311,10 +311,10 @@
   }
 
   function onDisconnect() {
-		if(window.myApp.ws !== null) {
-	    window.myApp.ws.close();
-			window.myApp.ws = null;
-		}
+    if(window.myApp.ws !== null) {
+      window.myApp.ws.close();
+      window.myApp.ws = null;
+    }
     document.getElementById('param').style.display = 'block';
   }
 
@@ -327,27 +327,27 @@
   }
 
   function downloadFiles(file, onFinished) {
-		if(file.download.length <= 0) {
-			onFinished(false);
-			return;
-		}
+    if(file.download.length <= 0) {
+      onFinished(false);
+      return;
+    }
 
-		var downloadCnt = 0, successCnt = 0;
+    var downloadCnt = 0, successCnt = 0;
 
-		function onDone(bSuccess) {
-			if(bSuccess)
-				successCnt++;
+    function onDone(bSuccess) {
+      if(bSuccess)
+        successCnt++;
 
-			if(++downloadCnt < file.download.length) {
-				setTimeout(function() {
-					downloadFile(file.download[downloadCnt], onDone);
-				}, 1000);
-			}
-			else {
-				onFinished(successCnt == downloadCnt);
-			}
-		}
-		downloadFile(file.download[downloadCnt], onDone);
+      if(++downloadCnt < file.download.length) {
+        setTimeout(function() {
+          downloadFile(file.download[downloadCnt], onDone);
+        }, 1000);
+      }
+      else {
+        onFinished(successCnt == downloadCnt);
+      }
+    }
+    downloadFile(file.download[downloadCnt], onDone);
   }
 
   function downloadFile(download, onFinish) {
@@ -360,16 +360,16 @@
     req.open('GET', download.src + '?auth=' + window.myApp.auth, true);
     req.responseType = "blob";
     req.onreadystatechange = function() {
-			if (req.readyState === 4 && req.status === 200) {
-				var a = document.createElement('a');
-				a.href = window.URL.createObjectURL(req.response);
-				a.download = download.fileName;
-				a.style.display = 'none';
-				document.body.appendChild(a);
-				a.click();
-				window.URL.revokeObjectURL(a.href);
-			}
-		},    
+      if (req.readyState === 4 && req.status === 200) {
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(req.response);
+        a.download = download.fileName;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      }
+    },    
     req.onprogress = function(e) {
       var prog = document.getElementById(window.myApp.task + '/' + download.fileName).firstChild;
       if(prog)

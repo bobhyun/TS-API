@@ -24,9 +24,9 @@
       <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
       <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
-			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
-			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
-			<input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
+      <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
+      <input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
+      <input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
       <input class='topic' type='checkbox' value="packing" checked>포장
       <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
       <input class='topic' type='checkbox' value="object" checked>객체 감지
@@ -56,11 +56,11 @@
       return url;
     }
 
-		if(window.myApp.es !== null) {
-			alert('이미 접속 중입니다.');
-			return url;
-		}
-			
+    if(window.myApp.es !== null) {
+      alert('이미 접속 중입니다.');
+      return url;
+    }
+      
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('호스트를 입력하십시오.');
@@ -94,8 +94,8 @@
 
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     url = (hostName.includes('http://', 0) ? '' : 'http://') +
-    	hostName + '/api/subscribeEvents?topics=' + topics + 
-			'&auth=' + encodedData;
+      hostName + '/api/subscribeEvents?topics=' + topics + 
+      '&auth=' + encodedData;
           
     if(document.getElementById('verbose').checked)
       url += '&verbose=true';
@@ -119,27 +119,27 @@
     document.getElementById('url').innerText = url;
 
     // 이벤트 소스 인스턴스와 핸들러 함수들
-		var es = new EventSource(url);
-		es.onopen = function() {
-			addItem('open', '접속 성공');
-		};
-		es.onerror = function() {
-			addItem('error', '오류');
-			onDisconnect();
-		};
-		es.onmessage = function(e) {
-			var data = JSON.parse(e.data);
-			addItem('data', e.data);
-		}
-		window.myApp.es = es;
+    var es = new EventSource(url);
+    es.onopen = function() {
+      addItem('open', '접속 성공');
+    };
+    es.onerror = function() {
+      addItem('error', '오류');
+      onDisconnect();
+    };
+    es.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      addItem('data', e.data);
+    }
+    window.myApp.es = es;
   }
 
   function onDisconnect() {
-		if(	window.myApp.es !== null) {
-	    window.myApp.es.close();
-			window.myApp.es = null;
-			addItem('close', '접속 종료');
-		}
+    if( window.myApp.es !== null) {
+      window.myApp.es.close();
+      window.myApp.es = null;
+      addItem('close', '접속 종료');
+    }
   }
   
   function onClearAll() {
@@ -147,6 +147,6 @@
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
-		document.getElementById('url').innerText = '';
+    document.getElementById('url').innerText = '';
   }
 </script>

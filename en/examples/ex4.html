@@ -56,11 +56,11 @@
       return url;
     }
 
-		if(window.myApp.ws !== null) {
-			alert('Already connected');
-			return url;
-		}
-			
+    if(window.myApp.ws !== null) {
+      alert('Already connected');
+      return url;
+    }
+      
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('Please enter the host.');
@@ -96,11 +96,11 @@
     var encodedData = window.btoa(userId + ':' + password); // base64 encoding
     window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/subscribeEvents?topics=' + topics;
+      hostName + '/wsapi/subscribeEvents?topics=' + topics;
     if(document.getElementById('verbose').checked)
       url += '&verbose=true';
             
-		url +='&auth=' + window.myApp.auth;
+    url +='&auth=' + window.myApp.auth;
     
 
     //url += '&ch=4';
@@ -128,7 +128,7 @@
     };
     ws.onclose = function(e) {
       addItem('close', 'Disconnected: ' + e.code);
-			onDisconnect();
+      onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', 'Error: ' + e.code);
@@ -141,10 +141,10 @@
   }
 
   function onDisconnect() {
-		if(window.myApp.ws !== null) {
-	    window.myApp.ws.close();
-			window.myApp.ws = null;
-		}
+    if(window.myApp.ws !== null) {
+      window.myApp.ws.close();
+      window.myApp.ws = null;
+    }
   }
 
   function onClearAll() {
@@ -152,6 +152,6 @@
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
-		document.getElementById('url').innerText = '';
+    document.getElementById('url').innerText = '';
   }
 </script>

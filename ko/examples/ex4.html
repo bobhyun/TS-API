@@ -24,9 +24,9 @@
       <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
       <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
       <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
-			<input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
-			<input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
-			<input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
+      <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
+      <input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
+      <input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
       <input class='topic' type='checkbox' value="packing" checked>포장
       <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
       <input class='topic' type='checkbox' value="object" checked>객체 감지
@@ -56,11 +56,11 @@
       return url;
     }
 
-		if(window.myApp.ws !== null) {
-			alert('이미 접속 중입니다.');
-			return url;
-		}
-			
+    if(window.myApp.ws !== null) {
+      alert('이미 접속 중입니다.');
+      return url;
+    }
+      
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('호스트를 입력하십시오.');
@@ -96,12 +96,12 @@
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-    	hostName + '/wsapi/subscribeEvents?topics=' + topics;
+      hostName + '/wsapi/subscribeEvents?topics=' + topics;
     if(document.getElementById('verbose').checked)
       url += '&verbose=true';
     
     //url += '&objectTypes=face,human'
-		url +='&auth=' + window.myApp.auth;
+    url +='&auth=' + window.myApp.auth;
         
     //url += '&ch=4&lang=ko-KR';
     return url;
@@ -128,7 +128,7 @@
     };
     ws.onclose = function(e) {
       addItem('close', '접속 종료: ' + e.code);
-			onDisconnect();
+      onDisconnect();
     };
     ws.onerror = function(e) {
       addItem('error', '오류: ' + e.code);
@@ -145,10 +145,10 @@
   }
 
   function onDisconnect() {
-		if(window.myApp.ws !== null) {
-	    window.myApp.ws.close();
-			window.myApp.ws = null;
-		}
+    if(window.myApp.ws !== null) {
+      window.myApp.ws.close();
+      window.myApp.ws = null;
+    }
   }
 
   function onClearAll() {
@@ -156,6 +156,6 @@
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
-		document.getElementById('url').innerText = '';
+    document.getElementById('url').innerText = '';
   }
 </script>
