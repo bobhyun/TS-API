@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.6
+TS-API@0.9.7
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -20,7 +20,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 <!-- TOC -->
 
 - [TS-API 프로그래밍 안내서](#ts-api-프로그래밍-안내서)
-  - [TS-API@0.9.6](#ts-api096)
+  - [TS-API@0.9.7](#ts-api097)
   - [목차](#목차)
   - [시작하기](#시작하기)
   - [영상 표시](#영상-표시)
@@ -98,6 +98,15 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
     - [릴레이 출력](#릴레이-출력)
     - [AUX 출력](#aux-출력)
     - [장치 재부팅](#장치-재부팅)
+  - [채널 추가 `@0.9.7`](#채널-추가-097)
+    - [요청 데이터](#요청-데이터)
+      - [카메라](#카메라)
+      - [동영상 스트림](#동영상-스트림)
+      - [동영상 파일](#동영상-파일)
+    - [응답](#응답)
+      - [응답 데이터](#응답-데이터)
+  - [채널 삭제 `@0.9.7`](#채널-삭제-097)
+      - [응답 데이터](#응답-데이터-1)
   - [부록](#부록)
     - [제품별 API 지원 버전](#제품별-api-지원-버전)
     - [제품별 기능 지원 표](#제품별-기능-지원-표)
@@ -111,14 +120,14 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 
 <!-- /TOC -->
 
-<a id="markdown-시작하기" name="시작하기"></a>
+
 ## 시작하기
 이 문서 내에서는 TS-API를 줄여서 **API**로 부르고, 각 제품들은 간단히 **서버**로 부르겠습니다.
 
 
-<a id="markdown-영상-표시" name="영상-표시"></a>
+
 ## 영상 표시
-<a id="markdown-실시간-영상-표시" name="실시간-영상-표시"></a>
+
 ### 실시간 영상 표시
 웹 브라우저 주소 창에 다음과 같이 입력해 보십시오.
 ```ruby
@@ -132,7 +141,7 @@ http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 > [참고]
 이 예제 코드에 사용된 시연용 영상은 현장 상황에 따라 접속되지 않을 수도 있습니다.
 
-<a id="markdown-웹-페이지에-영상-삽입하기" name="웹-페이지에-영상-삽입하기"></a>
+
 ### 웹 페이지에 영상 삽입하기
 이 번에는 이 영상을 웹 페이지에 삽입해 봅시다.
 ```html
@@ -161,7 +170,7 @@ http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 보안 상의 이유로 이렇게 복사한 코드에는 `auth=ZGVtbzohMTIzNHF3ZXI%3D` 부분이 제외됩니다. 이 부분은 로그인에 필요한 코드이며 [세션 인증](#세션-인증)에서 자세히 설명합니다.
 이 예제에서는 동영상을 표시하기 위한 최소한의 코드만을 사용했기 때문에 복사된 코드에 비해 빠진 부분이 더 있습니다.
 
-<a id="markdown-실제-서버에-접속하기" name="실제-서버에-접속하기"></a>
+
 ### 실제 서버에 접속하기
 이제 데모용 서버가 아닌 실제 서버의 영상을 표시하는 방법을 알아 보겠습니다.
 실제 서버에 접속하려면 기본적으로 아래 두 가지 정보를 알아야 합니다.
@@ -170,7 +179,7 @@ http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 >* 포트 번호는 사용하시는 제품 설정 창에서 `웹 서비스` 탭의 `HTTP 포트` 항목에서 확인할 수 있습니다.
 2. **원격 접속** 권한이 있는 **사용자 ID**와 **비밀번호**
 
-<a id="markdown-사용자-인증" name="사용자-인증"></a>
+
 ### 사용자 인증
 예를 들어, 다음과 같은 접속정보를 사용하는 것으로 가정하면
 
@@ -247,7 +256,7 @@ http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 [실행하기](./examples/ex2.html)
 
-<a id="markdown-채널-변경" name="채널-변경"></a>
+
 ### 채널 변경
 아래와 같이 동영상 소스의 `ch=` 부분을 원하는 채널 번호로 변경하면 해당 채널의 동영상이 표시됩니다.
 채널 번호는 1부터 시작하는 정수입니다.
@@ -258,7 +267,7 @@ http://tssolution.iptime.org:83/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 실행하기: [채널1](http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [채널2](http://tssolution.iptime.org:83/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [채널3](http://tssolution.iptime.org:83/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
 
-<a id="markdown-녹화-영상-표시" name="녹화-영상-표시"></a>
+
 ### 녹화 영상 표시
 녹화된 영상을 표시하기 위해서는 원하는 동영상의 날짜, 시각 정보(타임스탬프)가 필요합니다.
 예를 들어, 위의 예제와 동일한 접속 정보로 `채널 1번`의 `2018년 2월 1일 오후 2시 30분 15초`에 녹화된 영상을 표시하기 위해서는 다음과 같이 `when=2018-02-01T14%3a30%3a15%2b09%3a00` 부분을 추가해야 합니다.
@@ -300,14 +309,14 @@ showPlayTime    # 재생 날짜, 시각 표시 (true, false)
 
 지금까지는 `/watch` 호출을 통해 영상을 표시하는 방법들을 알아 보았습니다. 여기서부터는 `/api` 호출을 통해 각종 정보를 질의하는 방법을 알아보겠습니다.
 
-<a id="markdown-json-데이터-들여쓰기-050" name="json-데이터-들여쓰기-050"></a>
+
 ## JSON 데이터 들여쓰기 `@0.5.0`
 모든 응답 데이터는 [JSON](#JSON-데이터-형식) 형식이며 텍스트는 `utf8`로 인코딩되어 있습니다.
 
 데이터는 줄바꿈과 공백 문자없이 최적화된 형식을 사용하는 것이 성능을 위해서 좋지만 사람이 읽기에는 불편합니다.
 예를 들어, 아래와 같이 서버 시간대(timezone)를 얻기 위해 아래와 같이 요청하면
 ```ruby
-/api/info?timezone
+GET /api/info?timezone
 ```
 서버는 다음과 같이 줄바꿈과 공백 문자없이 최적화된 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -319,7 +328,7 @@ showPlayTime    # 재생 날짜, 시각 표시 (true, false)
 
 예를 들어, 들여쓰기를 2로 지정하여 요청하면
 ```ruby
-/api/info?timezone&indent=2
+GET /api/info?timezone&indent=2
 ```
 서버는 다음과 같이 공백 문자를 2개씩 들여쓰고 줄바꿈 문자를 넣어서 읽기 편한 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -334,13 +343,13 @@ showPlayTime    # 재생 날짜, 시각 표시 (true, false)
 이 문서에서는 데이터의 항목들을 쉽게 읽을 수 있도록 들여쓰기를 2로 지정한 형식을 사용합니다.
 
 
-<a id="markdown-세션-인증" name="세션-인증"></a>
+
 ## 세션 인증
 서버는 클라이언트 프로그램(웹 브라우저)이 로그인 한 이후부터 로그아웃할 때까지 쿠키를 사용하여 HTTP 세션을 유지합니다. 세션이 유지되는 동안은 인증 정보를 서버가 유지하고 있으므로 클라이언트 프로그램(웹 브라우저)에서는 서버에 어떤 요청을 할 때마다 매번 로그인할 필요가 없습니다.
 
 *이렇게 로그인하는 과정을 통칭하여 **세션 인증**이라고 부르겠습니다.*
 
-<a id="markdown-로그인" name="로그인"></a>
+
 ### 로그인
 여기서는 API를 사용하여 세션 인증하는 방법을 알아봅니다.
 서버에서는 아래 코드와 같이 전통적인 URL 형식으로 로그인하는 Basic authentication 방식도 지원하고 있지만, 대부분의 최신 웹 브라우저에서 로그인 정보가 그대로 노출되는 보안상의 이유로 더 이상 지원하지 않고 있습니다.
@@ -351,34 +360,34 @@ http://userid:password@host/path/to/
 이런 이유로 다음과 같이 추가적인 로그인 방식을 제공합니다.
 [사용자 인증](#사용자-인증)에서 사용했던 방법으로 사용자 아이디와 비빌번호를 암호화한 다음, 다음과 같이 `login=` 매개변수에 붙여서 사용합니다.
 ```ruby
-/api/auth?login=ZGVtbzohMTIzNHF3ZXI%3D    # http://host 부분 생략함
+GET /api/auth?login=ZGVtbzohMTIzNHF3ZXI%3D    # http://host 부분 생략함
 ```
 로그인이 성공한 경우 서버는 HTTP 응답 코드 200을 반환합니다.
 
 아래와 같이 `auth=`를 사용해도 동일하게 로그인할 수 있습니다.
 ```ruby
-/api/auth?auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/auth?auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 `auth=` 매개변수는 앞으로 소개할 다양한 API에 사용될 수 있으며, 별도의 로그인 과정을 거치지 않고 서버에 어떤 요청을 하면서 사용자 인증 정보를 한꺼번에 전달하는 용도로 사용할 수 있습니다.
 
 
-<a id="markdown-로그아웃" name="로그아웃"></a>
+
 ### 로그아웃
 [세션 인증](#세션-인증)된 상태에서 다음과 같이 요청하면 세션이 종료됩니다.
 ```ruby
-/api/auth?logout
+GET /api/auth?logout
 ```
 세션이 종료된 상태에서는 서버는 인증이 필요한 요청에 대해 HTTP 응답 코드 401을 반환하여 인증이 필요함을 알립니다.
 
 
-<a id="markdown-서버-정보-요청" name="서버-정보-요청"></a>
+
 ## 서버 정보 요청
 
-<a id="markdown-api-버전" name="api-버전"></a>
+
 ### API 버전
 이 요청은 [세션 인증](#세션-인증) 상태가 아니어도 정상적으로 응답합니다.
 ```ruby
-/api/info?apiVersion
+GET /api/info?apiVersion
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```json
@@ -387,13 +396,13 @@ http://userid:password@host/path/to/
 }
 ```
 
-<a id="markdown-사이트-이름" name="사이트-이름"></a>
+
 ### 사이트 이름
 서버의 사이트 이름을 얻기 위해 사용합니다. 서버가 여러 대일 경우 각각을 구분할 수 있는 이름을 부여해서 사용할 수 있습니다.
 
 이 요청은 [세션 인증](#세션-인증) 상태가 아니어도 정상적으로 응답합니다.
 ```ruby
-/api/info?siteName
+GET /api/info?siteName
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -402,14 +411,14 @@ http://userid:password@host/path/to/
 }
 ```
 
-<a id="markdown-서버-시간대" name="서버-시간대"></a>
+
 ### 서버 시간대
 서버 측 표준 시간대(타임 존)를 얻을 수 있습니다.
 클라이언트 측과 서버가 다른 시간대로 동작할 경우 구분하기 위해 사용합니다.
 
 이 요청은 [세션 인증](#세션-인증) 상태가 아니어도 정상적으로 응답합니다.
 ```ruby
-/api/info?timezone
+GET /api/info?timezone
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -422,13 +431,13 @@ http://userid:password@host/path/to/
 ```
 `Asia/Seoul` 부분은 `IANA` 형식의 타임 존 이름이며, 해당 서버의 운영체제에 따라 [IANA 타임 존 이름](#https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 대신 `UTC+09:00`와 같이 UTC 오프셋으로 표기될 수도 있습니다.
 
-<a id="markdown-제품-정보" name="제품-정보"></a>
+
 ### 제품 정보
 서버의 제품명과 버전 정보를 얻기 위해 사용합니다.
 
 이 요청은 [세션 인증](#세션-인증) 상태가 아니어도 정상적으로 응답합니다.
 ```ruby
-/api/info?product
+GET /api/info?product
 ````
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -457,13 +466,13 @@ http://userid:password@host/path/to/
 }
 ```
 
-<a id="markdown-라이센스-정보" name="라이센스-정보"></a>
+
 ### 라이센스 정보
 서버에 설치된 라이센스 정보를 얻기 위해 사용합니다.
 
 이 요청은 [세션 인증](#세션-인증) 상태가 아니어도 정상적으로 응답합니다.
 ```ruby
-/api/info?license
+GET /api/info?license
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -499,14 +508,15 @@ http://userid:password@host/path/to/
 | `packing`  | 포장 API |
 | `objectDetection`  | 객체 감지 |
 | `faceRecognition`  | 얼굴 인식 |
+| `sharedFrameBuffer`  | 공유 프레임 버퍼 `TS-API@0.9.7`| 
 
-<a id="markdown-사용자-정보" name="사용자-정보"></a>
+
 ### 사용자 정보
 로그인된 사용자 정보를 얻어오기 위해 사용됩니다.
 이 요청은 [세션 인증](#세션-인증) 상태에서만 정상적으로 응답합니다.
 여기서부터는 [세션 인증](#세션-인증)을 하기 위한 `auth=` 사용 부분은 생략하겠습니다. 
 ```ruby
-/api/info?whoAmI
+GET /api/info?whoAmI
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 만약 [세션 인증](#세션-인증) 상태가 아니라면 서버는 HTTP 응답 코드 401 에러를 보냅니다.
@@ -541,11 +551,11 @@ http://userid:password@host/path/to/
 }
 ```
 
-<a id="markdown-모두-한-번에-요청" name="모두-한-번에-요청"></a>
+
 ### 모두 한 번에 요청
 각각 정보를 개별적으로 요청할 수도 있지만, 편의상 모든 정보를 한 번에 요청하는 방법도 제공합니다.
 ```ruby
-/api/info?all
+GET /api/info?all
 ```
 이 요청은 세션 인증 상태인 경우는 HTTP 응답 코드 200과 함께 JSON 데이터를 반환하며, 인증이 되지 않은 경우는 HTTP 응답 코드 401과 함께 `"whoAmI"` 항목이 빠진 JSON 데이터를 반환합니다.
 ```jsx
@@ -607,12 +617,12 @@ http://userid:password@host/path/to/
 }
 ```
 
-<a id="markdown-시스템-정보-요청-030" name="시스템-정보-요청-030"></a>
+
 ## 시스템 정보 요청 `@0.3.0`
 서버의 시스템 정보를 요청합니다.
 ```ruby
-/api/system?info
-/api/system   # 생략 가능
+GET /api/system?info
+GET /api/system   # 생략 가능
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 *@0.7.0에서 disk 데이터 형식 수정됨*
@@ -787,7 +797,7 @@ http://userid:password@host/path/to/
 
 또는 아래와 같이 개별 항목을 지정해서 요청할 수 있습니다.
 ```ruby
-/api/system?info=supported  # 지원하는 항목 목록 요청
+GET /api/system?info=supported  # 지원하는 항목 목록 요청
 ```
 지원하는 항목 목록 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -803,22 +813,22 @@ http://userid:password@host/path/to/
   "all"
 ]
 ```
-<a id="markdown-개별-항목-요청" name="개별-항목-요청"></a>
+
 ### 개별 항목 요청
 ```ruby
-/api/system?info=os   # OS만 요청
-/api/system?info=cpu  # CPU만 요청
-/api/system?info=storage,network  # storage와 network항목을 요청
+GET /api/system?info=os   # OS만 요청
+GET /api/system?info=cpu  # CPU만 요청
+GET /api/system?info=storage,network  # storage와 network항목을 요청
 
-/api/system?info=all  # 모든 항목을 요청 (간단히 /api/system?info 또는 /api/system)
+GET /api/system?info=all  # 모든 항목을 요청 (간단히 /api/system?info 또는 /api/system)
 ```
 
 
-<a id="markdown-시스템-상태-요청-030" name="시스템-상태-요청-030"></a>
+
 ## 시스템 상태 요청 `@0.3.0`
 서버의 시스템 상태를 요청합니다.
 ```ruby
-/api/system?health
+GET /api/system?health
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 *@0.7.0에서 cpu 데이터 형식 수정됨*
@@ -938,7 +948,7 @@ http://userid:password@host/path/to/
 
 또는 아래와 같이 개별 항목을 지정해서 요청할 수 있습니다.
 ```ruby
-/api/system?health=supported  # 지원하는 항목 목록 요청
+GET /api/system?health=supported  # 지원하는 항목 목록 요청
 ```
 지원하는 항목 목록 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -951,22 +961,22 @@ http://userid:password@host/path/to/
   "all"
 ]
 ```
-<a id="markdown-개별-항목-요청-1" name="개별-항목-요청-1"></a>
+
 ### 개별 항목 요청
 ```ruby
-/api/system?health=os   # OS만 요청
-/api/system?health=cpu  # CPU만 요청
-/api/system?health=disk,recording,network  # disk, recording, network 항목을 요청
-/api/system?health=all  # 모든 항목을 요청 (간단히 /api/system?health)
+GET /api/system?health=os   # OS만 요청
+GET /api/system?health=cpu  # CPU만 요청
+GET /api/system?health=disk,recording,network  # disk, recording, network 항목을 요청
+GET /api/system?health=all  # 모든 항목을 요청 (간단히 /api/system?health)
 ```
 
-<a id="markdown-hdd-smart-요청-060" name="hdd-smart-요청-060"></a>
+
 ## HDD S.M.A.R.T. 요청 `@0.6.0`
 서버 각 하드 디스크의 S.M.A.R.T. 정보를 요청합니다.
 ```ruby
-/api/system?hddsmart    # 모든 하드 디스크의 S.M.A.R.T. 정보를 요청
-/api/system?hddsmart=1  # 첫번째 하드 디스크의 S.M.A.R.T. 정보를 요청
-/api/system?hddsmart=1,2  # 첫번째와 두번째 하드 디스크의 S.M.A.R.T. 정보를 요청
+GET /api/system?hddsmart    # 모든 하드 디스크의 S.M.A.R.T. 정보를 요청
+GET /api/system?hddsmart=1  # 첫번째 하드 디스크의 S.M.A.R.T. 정보를 요청
+GET /api/system?hddsmart=1,2  # 첫번째와 두번째 하드 디스크의 S.M.A.R.T. 정보를 요청
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1001,11 +1011,11 @@ http://userid:password@host/path/to/
 ]
 ```
 
-<a id="markdown-서버-재시작-요청-060" name="서버-재시작-요청-060"></a>
+
 ## 서버 재시작 요청 `@0.6.0`
 관리자 권한을 가진 계정으로 로그인 한 경우, 서버 프로세스를 재시작 시킬 수 있습니다.
 ```ruby
-/api/system?restart
+GET /api/system?restart
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1016,11 +1026,11 @@ http://userid:password@host/path/to/
 ```
 관리자 권한이 없는 경우에 대해 서버는 HTTP 응답 코드 403 (FORBIDDEN)을 반환합니다.
 
-<a id="markdown-시스템-재부팅-요청-060" name="시스템-재부팅-요청-060"></a>
+
 ## 시스템 재부팅 요청 `@0.6.0`
 관리자 권한을 가진 계정으로 로그인 한 경우, 서버 시스템을 재부팅 시킬 수 있습니다.
 ```ruby
-/api/system?reboot
+GET /api/system?reboot
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1032,11 +1042,11 @@ http://userid:password@host/path/to/
 관리자 권한이 없는 경우에 대해 서버는 HTTP 응답 코드 403 (FORBIDDEN)을 반환합니다.
 
 
-<a id="markdown-채널-상태-요청-030" name="채널-상태-요청-030"></a>
+
 ## 채널 상태 요청 `@0.3.0`
 서버의 각 채널 상태를 요청합니다.
 ```ruby
-/api/status
+GET /api/status
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1079,22 +1089,22 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 
 # 예제
 # 3번 채널만 지정
-/api/status?ch=3
+GET /api/status?ch=3
 
 # 1~4번 채널만 지정
-/api/status?ch=1,2,3,4
+GET /api/status?ch=1,2,3,4
 
 # 상태 메시지를 포함 (lang을 명시하지 않으면 서버 측 언어 설정을 따름)
-/api/status?verbose=true
+GET /api/status?verbose=true
 
 # 상태 메시지를 스페인어로 포함
-/api/status?verbose=true&lang=es-ES
+GET /api/status?verbose=true&lang=es-ES
 
 # 모든 채널의 녹화 상태를 요청
-/api/status?recordingStatus
+GET /api/status?recordingStatus
 
 # 1~4번 채널의 녹화 상태를 요청
-/api/status?ch=1,2,3,4&recordingStatus
+GET /api/status?ch=1,2,3,4&recordingStatus
 ```
 
 메시지를 포함하여 요청하면 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -1149,6 +1159,8 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 408   # 카메라 응답 시간 초과
 410   # 영상 입력 없음
 503   # 카메라 서비스 오류
+1000  # 동영상 재생 완료, TS-API@0.9.7
+1404  # 파일 없음, TS-API@0.9.7
 ```
 
 녹화 상태를 포함하여 요청하면 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -1200,15 +1212,15 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 ]
 ```
 
-<a id="markdown-각종-목록-요청" name="각종-목록-요청"></a>
+
 ## 각종 목록 요청
 다음 요청들은 `auth=`를 사용하여 로그인 정보를 전달하거나 이미 로그인된 세션의 경우는 HTTP 응답 코드 200과 함께 JSON 데이터를 반환하며, 로그인 인증이 되지 않은 경우는 HTTP 응답 코드 401이 반환합니다.
 
-<a id="markdown-채널-목록" name="채널-목록"></a>
+
 ### 채널 목록 `@0.9.4`
 사용 중인 채널 목록을 얻기 위해 아래와 같이 요청합니다.
 ```ruby
-/api/enum?what=channel
+GET /api/enum?what=channel
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1230,7 +1242,7 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 스트림 목록을 함께 얻으려면 `staticSrc` 매개변수를 추가합니니다.
 이 스트림들은 카메라 접속 상태에 따라 가용하지 않을 수도 있습니다.
 ```ruby
-/api/enum?what=channel&staticSrc
+GET /api/enum?what=channel&staticSrc
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1303,7 +1315,7 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 #### 카메라 지원 기능 추가하기 `@0.9.4`
 카메라 지원 기능 목록을 함께 얻으려면 `caps` 매개변수를 추가합니니다.
 ```ruby
-/api/enum?what=channel&caps
+GET /api/enum?what=channel&caps
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1345,13 +1357,13 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 ]
 ```
 
-<a id="markdown-차량-번호-인식-장치-목록" name="차량-번호-인식-장치-목록"></a>
+
 ### 차량 번호 인식 장치 목록
 사용 중인 차량 번호 인식 장치 목록을 얻기 위해 아래와 같이 요청합니다.
 차량 번호 인식 장치 목록에는 차량 번호 인식 장치 연동 기능을 사용하는 경우는 해당 장치들이 포함되고, 차량 번호 인식 기능이 내장된 TS-LPR의 경우는 설정된 차량 번호 인식 영역들이 포함됩니다.
 
 ```ruby
-/api/enum?what=lprSrc
+GET /api/enum?what=lprSrc
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1398,12 +1410,12 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 // (1920, 1080, 5760, 3240)으로 표현합니다.
 ```
 
-<a id="markdown-비상-호출-장치-목록-030" name="비상-호출-장치-목록-030"></a>
+
 ### 비상 호출 장치 목록 `@0.3.0`
 서버에 등록된 비상 호출 장치 목록을 얻기 위해 아래와 같이 요청합니다.
 
 ```ruby
-/api/enum?what=emergencyCall
+GET /api/enum?what=emergencyCall
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1422,11 +1434,11 @@ recordingStatus # 현재 녹화 상태  (@0.9.5부터 지원)
 ]
 ```
 
-<a id="markdown-이벤트-로그-종류-목록" name="이벤트-로그-종류-목록"></a>
+
 ### 이벤트 로그 종류 목록
 지원하는 이벤트 로그 종류 목록을 얻으려면 다음과 같이 요청합니다.
 ```ruby
-/api/enum?what=eventType
+GET /api/enum?what=eventType
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1461,7 +1473,7 @@ lang      # 언어
 
 # 예제
 # 영어로 요청한 경우
-/api/enum?what=eventType&lang=en-US
+GET /api/enum?what=eventType&lang=en-US
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1491,11 +1503,11 @@ lang      # 언어
 ]
 ```
 
-<a id="markdown-주차장-목록-090" name="주차장-목록-090"></a>
+
 ### 주차장 목록 `@0.9.0`
 서버에 등록된 주차장 목록을 얻으려면 다음과 같이 요청합니다.
 ```ruby
-/api/enum?what=parkingLot
+GET /api/enum?what=parkingLot
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1531,7 +1543,7 @@ lang      # 언어
 ### 수신 가능한 실시간 이벤트 목록 `@0.9.6`
 서버에서 제공하는 실시간 이벤트 종류를 얻으려면 다음과 같이 요청합니다.
 ```ruby
-/api/enum?what=realtimeEvent
+GET /api/enum?what=realtimeEvent
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1548,16 +1560,16 @@ lang      # 언어
 ]
 ```
 
-<a id="markdown-저장-데이터-검색" name="저장-데이터-검색"></a>
+
 ## 저장 데이터 검색
 
 녹화데이터를 검색하기 위해서는 `/api/find`를 사용합니다.
-<a id="markdown-녹화-영상이-있는-날짜-검색" name="녹화-영상이-있는-날짜-검색"></a>
+
 ### 녹화 영상이 있는 날짜 검색
 녹화된 영상이 있는 날짜 목록을 얻기 위해 다음과 같이 요청합니다.
 
 ```ruby
-/api/find?what=recDays      // 녹화된 영상이 있는 모든 날짜를 요청
+GET /api/find?what=recDays      // 녹화된 영상이 있는 모든 날짜를 요청
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1602,19 +1614,19 @@ timeEnd     # 특정 날짜, 시각 이전 녹화된 날짜 목록
 
 # 예제
 # 1번 채널이 녹화된 날짜 목록 요청
-/api/find?what=recDays&ch=1
+GET /api/find?what=recDays&ch=1
 # 1,2,3번 채널이 녹화된 날짜 목록 요청
-/api/find?what=recDays&ch=1,2,3
+GET /api/find?what=recDays&ch=1,2,3
 
 # 2018년 2월 (2018-02-01T00:00:00+09:00) 이후 녹화된 날짜 목록
-/api/find?what=recDays&timeBegin=2018-02-01T00%3A00%3A00%2B09%3A00
+GET /api/find?what=recDays&timeBegin=2018-02-01T00%3A00%3A00%2B09%3A00
 
 # 2018년 1월 중에 녹화된 날짜 목록
 # (2018-01-01T00:00:00+09:00 ~ 2018-01-31T23:59:59.999+09:00)
-/api/find?what=recDays&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00
+GET /api/find?what=recDays&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00
 
 # 2018년 1번 채널이 1월 중에 녹화된 날짜 목록
-/api/find?what=recDays&ch=1&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00
+GET /api/find?what=recDays&ch=1&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00
 ```
 
 `ch`, `timeBegin` 또는 `timeEnd`와 같은 매개변수를 사용하여 조건을 지정한 경우는 아래와 같이 요청받은 시간을 포함하여 결과가 반환됩니다.
@@ -1642,7 +1654,7 @@ timeEnd     # 특정 날짜, 시각 이전 녹화된 날짜 목록
 }
 ```
 
-<a id="markdown-녹화-영상이-있는-분-단위-검색-020" name="녹화-영상이-있는-분-단위-검색-020"></a>
+
 ### 녹화 영상이 있는 분 단위 검색 `@0.2.0`
 녹화된 영상이 있는 분 단위 목록을 얻기 위해 다음과 같이 요청합니다.
 분 단위 검색 경우는 날짜 검색과 달리 응답 데이터량이 클 수 있으므로 전체를 모두 요청할 수 없으며 반드시 시간을 명시해야 합니다.
@@ -1650,10 +1662,10 @@ timeBegin 또는 timeEnd 중 하나만 지정하면 저정한 날짜로 부터 �
 사용할 수 있는 매개변수들은 `/api/find?what=recDays`와 동일합니다.
 ```ruby
 # 로컬 타임을 사용하는 경우
-/api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00%2B09%3A00&timeEnd=2018-02-02T00%3A00%3A00%2B09%3A00
+GET /api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00%2B09%3A00&timeEnd=2018-02-02T00%3A00%3A00%2B09%3A00
 
 # UTC 타임을 사용하는 경우
-/api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00Z&timeEnd=2018-05-26T00%3A00%3A00Z
+GET /api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00Z&timeEnd=2018-05-26T00%3A00%3A00Z
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 
@@ -1704,11 +1716,11 @@ timeBegin 또는 timeEnd 중 하나만 지정하면 저정한 날짜로 부터 �
 }
 ```
 
-<a id="markdown-이벤트-로그-검색" name="이벤트-로그-검색"></a>
+
 ### 이벤트 로그 검색
 서버에 기록된 이벤트 로그를 검색하기 위해서는 다음과 같이 요청합니다.
 ```ruby
-/api/find?what=eventLog
+GET /api/find?what=eventLog
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1787,33 +1799,33 @@ type        # 이벤트 로그 유형
 
 # 예제
 # 아랍어로 요청한 경우
-/api/find?what=eventLog&lang=ar-AE
+GET /api/find?what=eventLog&lang=ar-AE
 
 # 2018년 1월 동안 기록된 이벤트 로그 요청
 # (2018-01-01T00:00:00+09:00 ~ 2018-01-31T23:59:59.999+09:00)
-/api/find?what=eventLog&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00
+GET /api/find?what=eventLog&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00
 
 # 검색 결과의 10번째 항목부터 20개를 요청
-/api/find?what=eventLog&at=10&maxCount=20
+GET /api/find?what=eventLog&at=10&maxCount=20
 
 # 오래된 데이터 순(오름차순)으로 정렬하여 요청
-/api/find?what=eventLog&sort=asc
+GET /api/find?what=eventLog&sort=asc
 
 # 시스템 로그 유형 id 목록 요청
-/api/enum?what=eventType
+GET /api/enum?what=eventType
 
 # 이벤트 로그 유형 중 시스템 로그(id: 0)만 요청
-/api/find?what=eventLog&type=0
+GET /api/find?what=eventLog&type=0
 
 ```
 
 
-<a id="markdown-차량-번호-로그-검색" name="차량-번호-로그-검색"></a>
+
 ### 차량 번호 로그 검색
 차량 번호 인식 기능을 사용하는 경우 인식된 차량 번호는 해당 동영상과 함께 저장됩니다. 차량 번호 로그를 조회하기 위해서는 다음과 같이 요청합니다.
 
 ```ruby
-/api/find?what=carNo
+GET /api/find?what=carNo
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -1941,23 +1953,23 @@ src         # 차량 번호 인식 장치 id (여러 장치를 동시에 지정�
 
 # 예제
 # "12"가 포함된 차량 번호를 검색 (키워드 검색)
-/api/find?what=carNo&keyword=12
+GET /api/find?what=carNo&keyword=12
 
 # 아랍어로 요청한 경우
-/api/find?what=carNo&lang=ar-AE
+GET /api/find?what=carNo&lang=ar-AE
 
 # 2018년 1월 동안 기록된 이벤트 로그 요청
 # (2018-01-01T00:00:00+09:00 ~ 2018-01-31T23:59:59.999+09:00)
-/api/find?what=carNo&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00
+GET /api/find?what=carNo&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00
 
 # 검색 결과의 10번째 항목부터 20개를 요청
-/api/find?what=carNo&at=10&maxCount=20
+GET /api/find?what=carNo&at=10&maxCount=20
 
 # 오래된 데이터 순(오름차순)으로 정렬하여 요청
-/api/find?what=carNo&sort=asc
+GET /api/find?what=carNo&sort=asc
 
 # 차량 번호 인식 장치 1, 2를 지정해서 검색
-/api/find?what=carNo&src=1,2
+GET /api/find?what=carNo&src=1,2
 ```
 
 검색된 결과 데이터에 있는 동영상을 표시하기 위해서는 [녹화 영상 표시](#녹화-영상-표시)에서 사용했던 방법을 쓰면 됩니다.
@@ -1993,12 +2005,12 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00
 http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00&auth=ZGV2MTpkZXZlbG9wZXIhMTIzNA==
 ```
 
-<a id="markdown-유사-차량-번호-검색-020" name="유사-차량-번호-검색-020"></a>
+
 ### 유사 차량 번호 검색 `@0.2.0`
 유사한 차량 번호가 존재하는지 확인하기 위해 사용할 수 있습니다. 인식된 차량 번호 로그에서 유사한 차량 번호를 조회하기 위해서는 다음과 같이 요청합니다.
 
 ```ruby
-/api/find?what=similarCarNo&keyword=1234
+GET /api/find?what=similarCarNo&keyword=1234
 
 # 매개변수
 keyword     # 검색할 차량 번호 (또는 일부 문자)
@@ -2006,7 +2018,7 @@ maxCount    # 최대 항목 개수
 
 # 예제
 # 최대 10개까지 결과를 요청
-/api/find?what=similarCarNo&keyword=1234&maxCount=10
+GET /api/find?what=similarCarNo&keyword=1234&maxCount=10
 ```
 
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -2018,12 +2030,12 @@ maxCount    # 최대 항목 개수
 ]
 ```
 
-<a id="markdown-객체-검색-096" name="객체-검색-096"></a>
+
 ### 객체 검색 `@0.9.6`
 객체 감지 기능을 사용하는 경우 감지된 객체들(`face`, `human`, `vehicle`)은 해당 동영상과 함께 저장됩니다. 객체 로그를 조회하기 위해서는 다음과 같이 요청합니다.
 
 ```ruby
-/api/find?what=object
+GET /api/find?what=object
 ```
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -2117,19 +2129,19 @@ sort        # 정렬 방식 (desc: 최신 데이터 순(기본값), asc: 오래�
 
 # 2020년 1월 동안 저장된 객체 요청
 # (2020-01-01T00:00:00+09:00 ~ 2020-01-31T23:59:59.999+09:00)
-/api/find?what=object&timeBegin=2020-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2020-01-31T23%3A59%3A59.999%2B09%3A00
+GET /api/find?what=object&timeBegin=2020-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2020-01-31T23%3A59%3A59.999%2B09%3A00
 
 # 1, 2번 채널의 객체만 요청
-/api/find?what=object&ch=1,2
+GET /api/find?what=object&ch=1,2
 
 # face 객체만 요청
-/api/find?what=object&objectType=face
+GET /api/find?what=object&objectType=face
 
 # 검색 결과의 10번째 항목부터 20개를 요청
-/api/find?what=object&at=10&maxCount=20
+GET /api/find?what=object&at=10&maxCount=20
 
 # 오래된 데이터 순(오름차순)으로 정렬하여 요청
-/api/find?what=object&sort=asc
+GET /api/find?what=object&sort=asc
 ```
 
 #### face용 매개변수
@@ -2139,19 +2151,19 @@ age          # 나이 구분 (young, adult, middle, senior 중 하나)
 accessories  # 착용한 악세서리 지정 (hat, glasses 중 복수 지정 가능)
 
 # 남자만 요청
-/api/find?what=object&objectType=face&gender=male
+GET /api/find?what=object&objectType=face&gender=male
 
 # 성인만 요청
-/api/find?what=object&objectType=face&age=adult
+GET /api/find?what=object&objectType=face&age=adult
 
 # 중년 여자만 요청
-/api/find?what=object&objectType=face&gender=female&age=middle
+GET /api/find?what=object&objectType=face&gender=female&age=middle
 
 # 안경 쓴 사람만 요청
-/api/find?what=object&objectType=face&accessories=glasses
+GET /api/find?what=object&objectType=face&accessories=glasses
 
 # 안경 쓰고 모자 쓴 사람만 요청
-/api/find?what=object&objectType=face&accessories=glasses,hat
+GET /api/find?what=object&objectType=face&accessories=glasses,hat
 ```
 
 
@@ -2165,31 +2177,31 @@ topClothes    # 상의 길이 및 색상을 콤마(,)로 구분해서 복수 지
 bottomClothes # 하의 색상 지정 (상동)
 
 # 여자만 요청
-/api/find?what=object&objectType=human&gender=female
+GET /api/find?what=object&objectType=human&gender=female
 
 # 가방 든 사람만 요청
-/api/find?what=object&objectType=human&accessories=bag
+GET /api/find?what=object&objectType=human&accessories=bag
 
 # 모자 쓰고 가방 든 사람만 요청
-/api/find?what=object&objectType=human&accessories=hat,bag
+GET /api/find?what=object&objectType=human&accessories=hat,bag
 
 # 반팔 상의를 입은 사람
-/api/find?what=object&objectType=human&topClothes=short
+GET /api/find?what=object&objectType=human&topClothes=short
 
 # 노란색 상의를 입은 사람
-/api/find?what=object&objectType=human&topClothes=yellow
+GET /api/find?what=object&objectType=human&topClothes=yellow
 
 # 빨강과 파랑색 상의를 입은 사람
-/api/find?what=object&objectType=human&topClothes=red,blue
+GET /api/find?what=object&objectType=human&topClothes=red,blue
 
 # 짧은 하의를 입은 사람
-/api/find?what=object&objectType=human&bottomClothes=short
+GET /api/find?what=object&objectType=human&bottomClothes=short
 
 # 상하의 모두 검정색을 입은 사람
-/api/find?what=object&objectType=human&topClothes=black&bottomClothes=black
+GET /api/find?what=object&objectType=human&topClothes=black&bottomClothes=black
 
 # 모자 쓰고 가방 들고 흰색 상의를 입은 남자
-/api/find?what=object&objectType=human&accessories=hat,bag&topClothes=white&gender=male
+GET /api/find?what=object&objectType=human&accessories=hat,bag&topClothes=white&gender=male
 ```
 
 
@@ -2200,10 +2212,10 @@ vehicleType  # 차량 종류와 색상을 콤마(,)로 구분 표기
              # 차량 색상 (brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, other 중 복수 지정 가능)
 
 # 버스만 요청
-/api/find?what=object&vehicle=bus
+GET /api/find?what=object&vehicle=bus
 
 # 노란색 자동차만 요청
-/api/find?what=object&vehicle=car,yellow
+GET /api/find?what=object&vehicle=car,yellow
 ```
 
 
@@ -2224,27 +2236,27 @@ threshold   # 닮은 정도 (1 ~ 100 사이의 퍼센트로 표기)
 
 # 2020년 1월 동안 저장된 얼굴에서 검색
 # (2020-01-01T00:00:00+09:00 ~ 2020-01-31T23:59:59.999+09:00)
-/api/searchFace?timeBegin=2020-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2020-01-31T23%3A59%3A59.999%2B09%3A00
+GET /api/searchFace?timeBegin=2020-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2020-01-31T23%3A59%3A59.999%2B09%3A00
 
 # 1, 2번 채널의 얼굴에서 검색
-/api/searchFace?ch=1,2
+GET /api/searchFace?ch=1,2
 
 # 95% 닮은 얼굴 검색
-/api/searchFace?threshold=95
+GET /api/searchFace?threshold=95
 ```
 
 
-<a id="markdown-동영상-소스-검색" name="동영상-소스-검색"></a>
+
 ## 동영상 소스 검색
 [웹 페이지에 영상 삽입하기](#웹-페이지에-영상-삽입하기)에서 사용했던 API를 사용한 동영상 표시 기능 대신 응용 프로그램에서 직접 동영상 주소 사용하는 경우 이 방법을 사용할 수 있습니다.
 
 이 방법은 동영상을 표시하는 대신 동영상 주소를 얻을 수 있습니다.
 
-<a id="markdown-실시간-영상-소스" name="실시간-영상-소스"></a>
+
 ### 실시간 영상 소스
 아무런 매개변수 없이 다음과 같이 호출하면 서버에서 스트리밍하고 있는 실시간 영상 주소 목록을 요청할 수 있습니다.
 ```ruby
-/api/vod
+GET /api/vod
 ```
 서버는 이에 대해 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 ```jsx
@@ -2312,7 +2324,7 @@ threshold   # 닮은 정도 (1 ~ 100 사이의 퍼센트로 표기)
 
 사실 위의 예제에는 실시간 영상을 의미하는 `when=now` 매개변수가 생략되어 있습니다.
 ```ruby
-/api/vod?when=now
+GET /api/vod?when=now
 ```
 
 필요한 경우 아래와 같은 매개변수들을 하나 또는 여러 개를 조합하여 검색 조건들을 지정할 수 있습니다.
@@ -2324,22 +2336,22 @@ nameonly    # true인 경우 동영상 스트림 데이터 부분 없이 채널 
 
 # 예제
 # 1번 채널만 요청
-/api/vod?ch=1
+GET /api/vod?ch=1
 
 # hls 프로토콜만 요청할 경우
-/api/vod?protocol=hls
+GET /api/vod?protocol=hls
 
 # 저해상도 스트림만 요청할 경우
-/api/vod?stream=sub
+GET /api/vod?stream=sub
 
 # 채널 이름만 요청할 경우
-/api/vod?nameonly=true
+GET /api/vod?nameonly=true
 # 또는 간단히
-/api/vod?nameonly
+GET /api/vod?nameonly
 ```
 
 
-<a id="markdown-녹화-영상-소스" name="녹화-영상-소스"></a>
+
 ### 녹화 영상 소스
 일반적으로는 [녹화 데이터 검색](#녹화-데이터-검색) 기능을 사용해서 녹화 영상에 접근하겠지만, 여기서는 좀 더 저수준으로 녹화된 동영상 소스를 얻는 방법들을 소개합니다.
 
@@ -2360,7 +2372,7 @@ otherwise   # 검색 결과가 없을 경우,
 # [중요]
 #   1. 녹화 영상의 경우는 ch=를 명시하지 않으면 HTTP 응답 코드 400(잘못된 요청) 발생함
 #   2. when=으로 지정한 시각에서 1초 이내의 데이터만 검색함
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00
 
 # 1번 채널에 대한민국 시각 2018년 1월 8일 오후 9시 30분 00초부터 1시간 이내의 데이터 검색
 # [duration에서 사용하는 시간 단위 표기법]
@@ -2373,32 +2385,32 @@ otherwise   # 검색 결과가 없을 경우,
 #   * 단위를 명시하지 않으면 기본적으로 초 단위가 적용됨
 #   * 여러 단위를 조합하는 표기(예: 1h30m)법은 지원되지 않으며
 #     필요하면 가장 작은 단위로 계산해서 표기(예: 90m)해야 함
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h
 
 # 녹화 파일 아이디를 사용하여 직접 요청
 # 영상이 있을 경우 해당 영상에서부터 10개(기본값)를 반환함
 # [참고]
 #   서버에 녹화된 동영상 파일은 각각 정수로 표현되는 일련 번호가 부여되어 있습니다.
-/api/vod?id=1304
+GET /api/vod?id=1304
 
 # 1번 채널의 현재 파일 아이디가 1034일 경우 같은 채널의 다음 파일을 요청 (연속 재생 시 유용함)
-/api/vod?ch=1&id=1304&next=true
+GET /api/vod?ch=1&id=1304&next=true
 # 또는 간단히
-/api/vod?ch=1&id=1304&next
+GET /api/vod?ch=1&id=1304&next
 
 # 1번 채널의 현재 파일 아이디가 1034일 경우 같은 채널의 이전 파일을 요청 (역방향 연속 재생 시 유용함)
-/api/vod?ch=1&id=1304&prev=true
+GET /api/vod?ch=1&id=1304&prev=true
 # 또는 간단히
-/api/vod?ch=1&id=1304&prev
+GET /api/vod?ch=1&id=1304&prev
 
 # 검색된 영상 소스를 30개 받기
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30
 
 # 검색 결과 해당 시간에 영상이 존재하지 않을 경우:
 # 검색 구간보다 이전에 녹화된 영상 중 가까운 것을 반환
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearBefore
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearBefore
 # 검색 구간보다 이후에 녹화된 영상 중 가까운 것을 반환
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearAfter
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearAfter
 ```
 이와 같은 방식으로 요청하면 서버는 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 
@@ -2448,7 +2460,7 @@ otherwise   # 검색 결과가 없을 경우,
 ]
 ```
 
-<a id="markdown-동영상-소스를-사용하여-영상-요청-030" name="동영상-소스를-사용하여-영상-요청-030"></a>
+
 ## 동영상 소스를 사용하여 영상 요청 `@0.3.0`
 API로 제공되는 `/watch`를 사용하지 않고 영상 소스를 사용하여 영상을 요청하는 경우에 대해, 각 프로토콜 별로 다음과 같은 방식으로 인증을 지원합니다.
 ```ruby 
@@ -2463,9 +2475,9 @@ http://userid:password@host/api/path/to
 http://host/api/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
-<a id="markdown-실시간-이벤트-모니터링-030" name="실시간-이벤트-모니터링-030"></a>
+
 ## 실시간 이벤트 모니터링 `@0.3.0`
-<a id="markdown-server-sent-events-sse" name="server-sent-events-sse"></a>
+
 ### Server-Sent Events (SSE)
 HTML5 Server-Sent Events (SSE) 방식으로 실시간 이벤트 메시지를 수신할 수 있는 기능을 지원합니다.
 서버와 클라이언트가 접속 상태를 유지하며 이벤트가 발생하면 서버가 클라이언트에게 메시지를 송신하는 방식으로 동작합니다.
@@ -2498,7 +2510,7 @@ object          # 객체 감지 이벤트 (@0.9.6에서 추가됨)
 
 SSE 접속 경로와 매개변수들은 다음과 같습니다.
 ```ruby
-/api/subscribeEvents
+GET /api/subscribeEvents
 
 # 필수 매개 변수들
 auth    # 인증 정보
@@ -2516,37 +2528,37 @@ lang    # 상태 메시지 표기 언어
 
 # 사용 예
 # 차량 번호 인식 이벤트 요청
-http://host/api/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 비상 호출 이벤트 요청
-http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 두 이벤트를 모두 요청
-http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
-http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+GET /api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # 모든 채널의 상태 변경 이벤트 요청
-http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 모든 채널의 상태 변경 이벤트시 메시지를 포함 요청
-http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
-http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
+GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
 
 # 모든 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
-http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 1, 2번 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
-http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+GET /api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 
 # 모든 주차장의 주차 카운트 변경시 이벤트 요청
-http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Id 1, 2번 주차장의 주차 카운트 변경시 이벤트 요청 (이때 ch는 주차장 id로 사용됨)
-http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+GET /api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
@@ -2561,7 +2573,7 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
 }
 ```
 
-<a id="markdown-채널-상태-변경-이벤트" name="채널-상태-변경-이벤트"></a>
+
 ### 채널 상태 변경 이벤트
 `topics=channelStatus`를 요청하면 실시간으로 채널 상태 변경 이벤트를 수신할 수 있습니다.
 채널 상태 토픽은 다른 토픽과 달리 상태 변경 관리를 위해 구독자 id 발급 직후 현재 채널 상태가 한 번 이벤트로 전송됩니다.
@@ -2849,7 +2861,7 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
 채널 상태 코드 목록은 [채널 상태 요청 `@0.3.0`](#채널-상태-요청-030)의 상태 코드 목록과 동일합니다.
 
 
-<a id="markdown-차량-번호-인식-이벤트" name="차량-번호-인식-이벤트"></a>
+
 ### 차량 번호 인식 이벤트
 `topics=LPR`를 요청하면 실시간으로 차량 번호 인식 이벤트를 수신할 수 있습니다.
 차량 번호 이벤트 메시지는 아래와 같이 JSON형식으로 수신됩니다.
@@ -2884,7 +2896,7 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
 }
 ```
 
-<a id="markdown-비상-호출-이벤트" name="비상-호출-이벤트"></a>
+
 ### 비상 호출 이벤트
 `topics=emergencyCall`을 요청하면 실시간으로 비상 호출에 의한 통화 시작과 종료 시점에  이벤트 메시지를 수신할 수 있습니다.
 비상 호출 이벤트 메시지는 아래와 같이 JSON형식으로 수신됩니다.
@@ -2918,7 +2930,7 @@ http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
 비상 호출 이벤트는 실시간 통화용 이벤트이므로 연동된 채널들은 모두 실시간 영상을 링크하고 있습니다. 
 아래와 같이 채널들의 동영상 스트림 소스를 자세히 요청한 경우는 동영상 스트림 항목들이 추가로 포함됩니다.
 ```ruby
-http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 ```
 ```jsx
 {
@@ -3014,7 +3026,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 비상 호출 메시지는 실시간 통화를 위한 용도로 사용되므로 연동된 채널의 영상 주소는 차량 번호 인식의 경우와 달리 실시간 영상으로 링크되어 있습니다.
 
-<a id="markdown-시스템-이벤트-070" name="시스템-이벤트-070"></a>
+
 ### 시스템 이벤트 `@0.7.0`
 `topics=systemEvent`를 요청하면 실시간으로 시스템 이벤트를 수신할 수 있습니다.
 시스템 이벤트는 [이벤트 로그 종류 목록](#이벤트-로그-종류-목록) 중에서 "시스템 로그" 데이터가 생성되면 아래와 같이 JSON형식으로 수신됩니다.
@@ -3052,7 +3064,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 }
 ```
 
-<a id="markdown-움직임-감지-이벤트-080" name="움직임-감지-이벤트-080"></a>
+
 ### 움직임 감지 이벤트 `@0.8.0`
 `topics=motionChanges`를 요청하면 실시간으로 각 채널별 움직임 감지 상태 변경시 이벤트를 수신할 수 있습니다.
 요청 직후 한번은 지정한 모든 채널의 현재 움직임 감지 상태가 수신되며 
@@ -3079,7 +3091,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 }
 ```
 
-<a id="markdown-주차-카운트-이벤트-090" name="주차-카운트-이벤트-090"></a>
+
 ### 주차 카운트 이벤트 `@0.9.0`
 `topics=parkingCount`를 요청하면 각 주차장의 차량 수가 변경시 실시간으로 이벤트를 수신할 수 있습니다.
 요청 직후 한번은 지정한 모든 주차장의 현재 차량 수가 수신되며 
@@ -3118,7 +3130,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
   ]
 }
 ```
-<a id="markdown-녹화-상태-이벤트-095" name="녹화-상태-이벤트-095"></a>
+
 ### 녹화 상태 이벤트 `@0.9.5`
 `topics=recordingStatus`를 요청하면 각 채널별 녹화 상태를 실시간 이벤트를 수신할 수 있습니다.
 요청 직후 한 번은 모든 채널의 현재 상태가 수신되며 
@@ -3180,13 +3192,13 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 지정하지 않으면 지원하는 모든 종류의 객체가 전송됩니다.
 ```ruby
 # 얼굴만 요청
-http://host/api/subscribeEvents?topics=object&objectType=face&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=object&objectType=face&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 차량만 요청
-http://host/api/subscribeEvents?topics=object&objectType=vehicle&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=object&objectType=vehicle&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 얼굴과 사람만 요청
-http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
 #### `face` 객체
@@ -3452,7 +3464,7 @@ http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzo
 [실행하기](./examples/ex3.html)
 
 
-<a id="markdown-웹-소켓-rfc6455" name="웹-소켓-rfc6455"></a>
+
 ### 웹 소켓 (RFC6455)
 웹 소켓 (RFC6455)으로 실시간 이벤트 데이터를 수신할 수 있는 기능을 지원합니다.
 서버와 클라이언트가 접속 상태를 유지하며 이벤트가 발생하면 서버가 클라이언트에게 메시지를 송신하는 방식으로 동작합니다.
@@ -3685,7 +3697,7 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
 [실행하기](./examples/ex4.html)
 
 
-<a id="markdown-녹화-영상-받아내기-030" name="녹화-영상-받아내기-030"></a>
+
 ## 녹화 영상 받아내기 `@0.3.0`
 웹 소켓을 사용하여 서버로 부터 녹화된 동영상을 받아낼 수 있습니다.
 서버 측에서는 파일은 하나씩 생성하고 클라이언트에서 다운로드를 완료하면 해당 파일을 삭제한 후
@@ -4400,7 +4412,7 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
 [실행하기](./examples/ex5.html)
 
 
-<a id="markdown-서버에-이벤트-밀어넣기-040" name="서버에-이벤트-밀어넣기-040"></a>
+
 ## 서버에 이벤트 밀어넣기 `@0.4.0`
 외부의 장치나 소프로트웨어로부터 서버에 이벤트를 `HTTP POST` 방식으로 송신할 수 있습니다.
 
@@ -4412,7 +4424,7 @@ emergencyCall   # 비상 호출
 
 서버로 이벤트를 송신하기 위한 경로와 매개변수들은 다음과 같습니다.
 ```ruby
-/api/push
+POST /api/push
 
 # 매개 변수들
 auth    # 인증 정보
@@ -4475,16 +4487,16 @@ curl http://192.168.0.100/api/push -H "Content-Type: application/json; charset=U
 curl http://192.168.0.100/api/push?auth=ZGVtbzohMTIzNHF3ZXI%3D -H "Content-Type: application/json; charset=UTF-8" -X POST -d @test.json
 ```
 
-<a id="markdown-채널-정보-및-장치-제어-050" name="채널-정보-및-장치-제어-050"></a>
+
 ## 채널 정보 및 장치 제어 `@0.5.0`
 
 각 채널에 연결된 장치 정보 및 각 장치가 지원하는 기능 목록을 확인하거나 각 장치를 제어할 수 있습니다.
 
-<a id="markdown-장치-정보-및-지원-기능-목록-요청" name="장치-정보-및-지원-기능-목록-요청"></a>
+
 ### 장치 정보 및 지원 기능 목록 요청
 연결된 장치 정보는 다음과 같이 요청합니다.
 ```ruby
-/api/channel/info
+GET /api/channel/info
 
 # 매개변수
 caps    # "caps" 항목만 요청함, 지정하지 않으면 모든 정보를 포함
@@ -4493,16 +4505,16 @@ reload  # 채널의 카메라의 최신 정보로 갱신한 정보를 요청 (@0
 
 # 예
 # 사용중인 각 채널 별로 연결된 장비의 지원 기능만 요청
-/api/channel/info?caps
+GET /api/channel/info?caps
 
 # 1번 채널에 연결된 장비의 지원 기능만 요청
-/api/channel/info?caps&ch=1
+GET /api/channel/info?caps&ch=1
 
 # 1,2,3번 채널에 연결된 장비의 지원 기능만 요청
-/api/channel/info?caps&ch=1,2,3
+GET /api/channel/info?caps&ch=1,2,3
 
 # 모든 채널의 카메라 정보를 최신 정보로 갱신 요청
-/api/channel/info?caps&reload
+GET /api/channel/info?caps&reload
 ```
 
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -4554,7 +4566,7 @@ reload  # 채널의 카메라의 최신 정보로 갱신한 정보를 요청 (@0
 장치 제어 명령은 `/api/channel/` 다음에 개별 명령과 대상 채널과 추가로 필요한 매개변수를 지정하는 형식입니다.
 여기서부터 사용할 예제에서는 대상 채널을 1번`ch=1`으로 가정했습니다.
 ```ruby
-/api/channel/ptz?ch=1&home&indent=2
+GET /api/channel/ptz?ch=1&home&indent=2
 ```
 
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -4583,12 +4595,12 @@ reload  # 채널의 카메라의 최신 정보로 갱신한 정보를 요청 (@0
 `message` 부분은 언어를 지정하지 않은 경우 서버 측에 설정된 언어가 사용됩니다.
 아래와 같이 매개변수에 언어를 지정하여 사용해도 됩니다.
 ```ruby
-/api/channel/ptz?ch=1&home&lang=en_US
+GET /api/channel/ptz?ch=1&home&lang=en_US
 ```
 [지원하는 언어 목록](#지원하는-언어-목록)은 부록을 참고하십시오.
 
 
-<a id="markdown-팬틸트-제어" name="팬틸트-제어"></a>
+
 ### 팬틸트 제어
 
 장치가 팬틸트 기능을 지원할 경우 아래 명령들로 제어할 수 있습니다.
@@ -4607,7 +4619,7 @@ iris    # 조리개 열기 / 닫기
 제어 명령은 반드시 하나의 대상 채널과 명령으로 구성됩니다.
 예를 들어 `home` 명령일 경우 대상 채널을 매개변수로 지정해야 합니다.
 ```ruby
-/api/channel/ptz?ch=1&home
+GET /api/channel/ptz?ch=1&home
 ```
 
 매개변수와 함께 사용하는 명령들은 이동 방향과 속도를 지정해야 합니다.
@@ -4619,28 +4631,28 @@ iris    # 조리개 열기 / 닫기
 ![Alt 이동 방향과 속도](../img/ptz.png)
 
 ```ruby
-/api/channel/ptz?ch=1&move=0.5,0.5  # 오른쪽 위 대각선 방향으로 중간 속도로 이동
-/api/channel/ptz?ch=1&move=-1       # 왼쪽으로 최대 속도로 이동 (세로가 0인 경우는 생략 가능)
-/api/channel/ptz?ch=1&move=0,0.1    # 아래쪽으로 느리게 이동
-/api/channel/ptz?ch=1&move          # 가로, 세로 모두 0인 경우 모두 생략 가능, 정지 명령 stop과 동일함
+GET /api/channel/ptz?ch=1&move=0.5,0.5  # 오른쪽 위 대각선 방향으로 중간 속도로 이동
+GET /api/channel/ptz?ch=1&move=-1       # 왼쪽으로 최대 속도로 이동 (세로가 0인 경우는 생략 가능)
+GET /api/channel/ptz?ch=1&move=0,0.1    # 아래쪽으로 느리게 이동
+GET /api/channel/ptz?ch=1&move          # 가로, 세로 모두 0인 경우 모두 생략 가능, 정지 명령 stop과 동일함
 ```
 
 나머지 `zoom`, `focus`, `iris` 명령은 모두 카메라 렌즈 제어 기능이며, 전진, 후진을 표현하기 위해 1개의 매개변수를 사용합니다.
 마찬가지로 이동 속도와 방향을 함께 표현하기 위해 `-1`에서 `1` 사이의 소수값 1개를 사용하여 
 1차원 공간에 대해 현 위치로부터 이동 방향과 속도를 모두 표현할 수 있습니다.
 ```ruby
-/api/channel/ptz?ch=1&zoom=0.5      # 중간 속도로 줌인
-/api/channel/ptz?ch=1&zoom=-0.5     # 중간 속도로 줌 아웃
-/api/channel/ptz?ch=1&focus=0.1     # 아주 느리게 초점 가까이
-/api/channel/ptz?ch=1&focus=-0.5    # 중간 속도로  초점 멀리
-/api/channel/ptz?ch=1&iris=-0.1    # 아주 느리게 조리개 닫기
-/api/channel/ptz?ch=1&iris=1       # 최대 속도로 조리개 열기
+GET /api/channel/ptz?ch=1&zoom=0.5      # 중간 속도로 줌인
+GET /api/channel/ptz?ch=1&zoom=-0.5     # 중간 속도로 줌 아웃
+GET /api/channel/ptz?ch=1&focus=0.1     # 아주 느리게 초점 가까이
+GET /api/channel/ptz?ch=1&focus=-0.5    # 중간 속도로  초점 멀리
+GET /api/channel/ptz?ch=1&iris=-0.1    # 아주 느리게 조리개 닫기
+GET /api/channel/ptz?ch=1&iris=1       # 최대 속도로 조리개 열기
 ```
 
 이동 명령에 대해 물리적인 이동 한계 지점과 속도는 각 장치의 고유 특성에 따라 다를 수 있습니다.
 
 
-<a id="markdown-팬틸트-프리셋-제어" name="팬틸트-프리셋-제어"></a>
+
 ### 팬틸트 프리셋 제어
 
 장치가 팬틸트 프리셋 기능을 지원할 경우 사용할 수 있습니다.
@@ -4649,13 +4661,13 @@ iris    # 조리개 열기 / 닫기
 이 명령은 서버가 이미 확보한 프리셋 목록을 요청합니다.
 ```ruby
 # 채널 1번의 프리셋 목록을 요청하기
-/api/channel/preset?ch=1&list
+GET /api/channel/preset?ch=1&list
 
 # 여러 채널의 프리셋 목록을 요청하기
-/api/channel/preset?ch=1,2,3&list
+GET /api/channel/preset?ch=1,2,3&list
 
 # 모든 채널의 프리셋 목록을 요청하기
-/api/channel/preset?list
+GET /api/channel/preset?list
 ```
 매번 장치로부터 다시 읽어서 전송하지 않으므로 응답 시간이 빠른 반면, 
 타 소프트웨어(예: 장치의 내장 웹 페이지)을 사용하여 프리셋 목록을 변경한 경우
@@ -4688,13 +4700,13 @@ iris    # 조리개 열기 / 닫기
 이 명령은 장치로부터 프리셋 목록을 다시 읽어서 전송합니다.
 ```ruby
 # 채널 1번의 프리셋 목록을 갱신 요청하기
-/api/channel/preset?ch=1&reload
+GET /api/channel/preset?ch=1&reload
 
 # 여러 채널의 프리셋 목록을 갱신 요청하기
-/api/channel/preset?ch=1,2,3&reload
+GET /api/channel/preset?ch=1,2,3&reload
 
 # 모든 채널의 프리셋 목록을 갱신 요청하기
-/api/channel/preset?reload
+GET /api/channel/preset?reload
 ```
 `list` 명령과 반대로 응답 시간이 느린 반면 항상 장치가 가지고 있는 프리셋 목록과 동일한 데이터를 받을 수 있습니다.
 
@@ -4714,13 +4726,13 @@ iris    # 조리개 열기 / 닫기
 
 ```ruby
 # 프리셋 이름: preset1 (프리셋 토큰은 카메라에서 생성되며 응답 데이터에 포함됩니다.)
-/api/channel/preset?ch=1&set=preset1 
+GET /api/channel/preset?ch=1&set=preset1 
 
 # 프리셋 이름을 생략
-/api/channel/preset?ch=1&set
+GET /api/channel/preset?ch=1&set
 
 # 프리셋 이름: 우리집 현관
-/api/channel/preset?ch=1&set=%EC%9A%B0%EB%A6%AC%EC%A7%91%20%ED%98%84%EA%B4%80
+GET /api/channel/preset?ch=1&set=%EC%9A%B0%EB%A6%AC%EC%A7%91%20%ED%98%84%EA%B4%80
 ```
 
 프리셋 지정 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -4741,10 +4753,10 @@ iris    # 조리개 열기 / 닫기
 프리셋을 삭제하기 위해서는 `프리셋 토큰`을 매개변수로 지정해야 합니다.
 ```ruby
 # 토큰 1의 프리셋을 삭제
-/api/channel/preset?ch=1&rm=1
+GET /api/channel/preset?ch=1&rm=1
 
 # 여러 개의 프리셋을 삭제
-/api/channel/preset?ch=1&rm=1,2,3
+GET /api/channel/preset?ch=1&rm=1,2,3
 ```
 
 프리셋 삭제 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -4769,23 +4781,23 @@ iris    # 조리개 열기 / 닫기
 
 프리셋 위치로 이동시키기 위해서는 `프리셋 토큰`을 매개변수로 지정해야 합니다.
 ```ruby
-/api/channel/preset?ch=1&go=1 # 프리셋 1번으로 이동
+GET /api/channel/preset?ch=1&go=1 # 프리셋 1번으로 이동
 ```
 
-<a id="markdown-릴레이-출력" name="릴레이-출력"></a>
+
 ### 릴레이 출력
 
 장치가 릴레이 출력을 지원할 경우 다음과 같이 릴레이 출력의 목록을 요청할 수 있습니다.
 릴레이 출력 목록을 얻기 위해서는 장치가 연결된 하나의 채널을 지정해야 합니다.
 ```ruby
 # 채널 1번에 연결된 릴레이 출력 목록 요청
-/api/channel/relay?ch=1&list
+GET /api/channel/relay?ch=1&list
 
 # 여러 채널의 릴레이 출력 목록을 요청하기
-/api/channel/relay?ch=1,2,3&list
+GET /api/channel/relay?ch=1,2,3&list
 
 # 모든 채널의 릴레이 출력 목록을 요청하기
-/api/channel/relay?list
+GET /api/channel/relay?list
 ```
 
 요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
@@ -4813,52 +4825,52 @@ iris    # 조리개 열기 / 닫기
 릴레이 출력 명령은 `on` 또는 `off` 명령과 하나 이상의 릴레이 출력 토큰을 사용하여 지정합니다.
 ```ruby
 # 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf 출력을 켜기
-/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+GET /api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
 
 # 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf 출력을 끄기
-/api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+GET /api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
 
 # 두 개의 출력을 동시에 켜기
-/api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf,cffd1289-cb2c-4d82-8c6f-c7634b432f57
+GET /api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf,cffd1289-cb2c-4d82-8c6f-c7634b432f57
 
 # on과 off를 인자에 동시 지정할 경우 off 명령은 무시됩니다.
-/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
+GET /api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
 
 # 하나는 켜고 하나는 끌 경우는 각각 명령을 나누어 각 각 보내야 합니다.
-/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
-/api/channel/relay?ch=1&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
+GET /api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+GET /api/channel/relay?ch=1&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
 ```
 
-<a id="markdown-aux-출력" name="aux-출력"></a>
+
 ### AUX 출력
 
 장치가 AUX 출력을 지원할 경우 `릴레이 출력`와 마찬가지로 `on` 또는 `off` 명령을 사용합니다.
 AUX 출력은 토큰 대신 0부터 시작하는 번호를 사용하여 지정합니다.
 ```ruby
 # AUX 0 출력을 켜기
-/api/channel/aux?ch=1&on=0
+GET /api/channel/aux?ch=1&on=0
 
 # AUX 1 출력을 끄기
-/api/channel/aux?ch=1&off=1
+GET /api/channel/aux?ch=1&off=1
 
 # 두 개의 출력을 동시에 켜기
-/api/channel/aux?ch=1&on=0,1
+GET /api/channel/aux?ch=1&on=0,1
 
 # on과 off를 인자에 동시 지정할 경우 off 명령은 무시됩니다.
-/api/channel/aux?ch=1&on=0&off=1
+GET /api/channel/aux?ch=1&on=0&off=1
 
 # 하나는 켜고 하나는 끌 경우는 각각 명령을 나누어 각 각 보내야 합니다.
-/api/channel/aux?ch=1&on=0
-/api/channel/aux?ch=1&off=1
+GET /api/channel/aux?ch=1&on=0
+GET /api/channel/aux?ch=1&off=1
 ```
 
-<a id="markdown-장치-재부팅" name="장치-재부팅"></a>
+
 ### 장치 재부팅
 
 장치가 지원할 경우 원격으로 아래 명령으로 재부팅 시킬 수 있습니다.
 
 ```ruby
-/api/channel/reboot?ch=1    # 1번 채널의 카메라 재부팅
+GET /api/channel/reboot?ch=1    # 1번 채널의 카메라 재부팅
 
 ```
 
@@ -4876,10 +4888,339 @@ AUX 출력은 토큰 대신 0부터 시작하는 번호를 사용하여 지정�
 주기적으로 재 접속을 시도해서 재부팅이 완료되는 과정을 모니터링할 필요가 있습니다.
 
 
-<a id="markdown-부록" name="부록"></a>
+## 채널 추가 `@0.9.7`
+
+아래와 같이 채널을 추가할 수 있습니다.
+```ruby
+POST /api/channel
+
+# 사용 가능한 매개변수
+auth  # 이미 로그인 상태가 아닌 경우 API 호출시 로그인
+lang  # 오류 코드 메시지에 사용될 언어 지정
+
+# 사용 예
+POST /api/channel?auth=ZGVtbzohMTIzNHF3ZXI%3D
+POST /api/channel?lang=vi-VN   # 베트남어로 지정
+```
+
+### 요청 데이터
+POST 데이터에 `JSON` 형식으로 추가할 채널 정보를 정의합니다.
+여러 채널을 지정할 수 있도록 배열 형식을 사용합니다.
+
+일부 데이터 항목들은 동영상 소스의 종류에 따라 다르게 정의되어 있습니다.
+#### 카메라
+`ONVIF` 프로토콜을 지원하는 카메라를 추가할 수 있습니다.
+선택 항목들은 명시하지 않으면 default 값으로 간주됩니다.
+```jsx
+[
+  {
+    "chid": 1,                                       # [선택] 1) 등록할 채널 번호 
+    "name": "내 동영상 스트림",                       # [선택] 등록할 채널 이름
+    "source": "rtsp://192.168.0.220:554/stream1",    # [필수] RTSP URL
+    "tcp": true,                                     # [선택] RTP 프로토콜, true: TCP (default), false: UDP
+    "substream": false,                              # [선택] 2) Substream 사용 여부, true: Substream 사용 (default), false: Substream 사용 안함
+    "uid": "admin",                                  # [선택] RTSP 인증 id
+    "password": "admin",                             # [선택] RTSP 인증 비밀번호
+    "device": {                                      # [필수] ONVIF 카메라로 등록 (ONVIF 기능 사용 가능)
+      "name": "내 카메라",                            # [선택] 등록할 카메라 이름
+      "url": "onvif://192.168.0.220:8000"            # [필수] 3) 카메라 장치 URL
+    }
+  }
+]
+```
+1. `chid`:
+   - 1부터 시작하는 채널 번호
+   - `chid`를 명시하지 않으면 앞 쪽부터 빈자리에 자동 할당됩니다.
+2. `substream`: 
+   - 카메라의 동일 입력 소스에서 등록된 동영상 스트림보다 저해상도 스트림이 있는 경우 분할 화면에서 디스플레이 영역이 작은 경우, 자동으로 저해상도 스트림을 표시하도록 동작합니다.
+   - 이 기능을 사용하지 않고 지정한 동영상 스트림만 사용하고자 할 경우, `substream` 항목을 `false`로 지정합니다.
+3. `url` (카메라 장치 URL):
+   - 원래 `http://192.168.0.220:8000` 형식이지만 `ONVIF` 장치임을 명시하기 위해 `onvif://192.168.0.220:8000` 로 표기합니다.
+
+
+#### 동영상 스트림 
+`RTSP` 프로토콜을 사용하는 동영상 스트림을 추가할 수 있습니다.
+카메라의 경우에도 동영상 스트림 외에 다른 기능을 사용하지 않을 경우 사용할 수 있습니다.
+
+```jsx
+[
+  {
+    "chid": 2,                                        # [선택] 등록할 채널 번호, 명시하지 않으면 자동 할당됨
+    "name": "내 동영상 스트림",                        # [선택] 등록할 채널 이름
+    "source": "rtsp://192.168.0.220:554/stream1",     # [필수] RTSP URL
+    "tcp": true,                                      # [선택] RTP 프로토콜, true: TCP (default), false: UDP
+    "uid": "admin",                                   # [선택] RTSP 인증 id
+    "password": "admin",                              # [선택] RTSP 인증 비밀번호    
+  }
+]
+```
+
+#### 동영상 파일
+로컬 PC 또는 윈도우 공유 폴더에 있는 동영상 파일을 추가할 수 있습니다.
+
+```jsx
+[
+  {
+    "chid": 1,                                         # [선택] 등록할 채널 번호, 명시하지 않으면 자동 할당됨
+    "name": "내 PC 동영상",                             # [선택] 등록할 채널 이름
+    "source": "C:\\videos\\sample.mp4",                # [필수] 1) 동영상 파일명 (full path)
+    "playback": "once"                                 # [선택] once: 한 번 재생, repeat: 반복 재생 (default)
+  },
+  {
+    "chid": 2,                                         # [선택] 등록할 채널 번호, 명시하지 않으면 자동 할당됨
+    "name": "친구 PC 공유 폴더 동영상",                  # [선택] 등록할 채널 이름
+    "source": "\\\\192.168.0.14\\videos\\sample.mp4",  # [필수] 1) 동영상 파일명 (full path)
+  }
+]
+```
+1. `videoSrc` (동영상 파일명): 
+   - `\`문자를 하나만 사용할 경우 `ESCAPE` 문자로 해석되므로 파일 경로를 표기할 때 `\\` 를 사용합니다.
+
+
+### 응답
+
+- 요청 데이터 예
+```jsx
+[
+  {
+    "name": "내 동영상 스트림",
+    "source": "rtsp://192.168.0.162:554/stream1",
+    "uid": "admin",
+    "password": "admin",
+    "tcp": true
+  },
+  {
+    "name": "내 카메라",
+    "source": "rtsp://192.168.0.30:554/stream1",
+    "tcp": true,
+    "substream": false,
+    "uid": "admin",
+    "password": "admin",
+    "device": {
+      "name": "내 카메라",
+      "url": "onvif://192.168.0.30:80"
+    }
+  },
+  {
+    "name": "내 동영상 파일",
+    "source": "C:\\video\\myVideo.mp4",
+    "playback": "once"
+  }
+]
+```
+
+#### 응답 데이터
+
+위 예제와 같이 요청한 경우 서버는 다음과 같이 HTTP 응답 코드와 함께 JSON 데이터로 응답합니다.
+
+```jsx
+{
+  "status": {
+    "code": 0,                               # 오류 코드
+    "message": "채널이 성공적으로 추가되었습니다."  # 오류 메시지
+  },
+  "added": [
+    {
+      "chid": 1,                             # 할당된 채널 번호
+      "name": "내 스트림",
+      "type": "rtsp",                        # 채널 종류 (RTSP 스트림)
+      "source": "rtsp://admin:admin@192.168.0.162:554/stream1",
+      "tcp": true,
+      "sharedFrameBuffer": {                 # 공유 프레임 버퍼 API 기능 사용시 프레임 버퍼 인터페이스
+        "data": "sfb_data_ch1",              # 프레임 버퍼의 공유 메모리 이름
+        "event": "sfb_event_ch1"             # 프레임 버퍼 갱신 이벤트 이름
+      }
+    },
+    {
+      "chid": 2,                             # 할당된 채널 번호
+      "name": "내 카메라",
+      "type": "onvif",                       # 채널 종류 (ONVIF 카메라)
+      "device": "onvif://192.168.0.30:80",   # 장치 URL
+      "source": "rtsp://192.168.0.30:554/stream1",
+      "tcp": true,                           # RTP 프로토콜 TCP 사용 여부 (false 이면 UDP)
+      "substream": false,                    # ONVIF 카메라의 경우 서브스트림 사용 여부
+      "sharedFrameBuffer": {
+        "data": "sfb_data_ch2",
+        "event": "sfb_event_ch2"
+      }
+    },
+    {
+      "chid": 3,                             # 할당된 채널 번호
+      "name": "내 동영상 파일",
+      "type": "file",                        # 채널 종류 (파일)
+      "source": "C:\\video\\myVideo.mp4",
+      "playback": "once",                    # once: 동영상 한 번 재생, repeat: 반복 재생
+      "sharedFrameBuffer": {
+        "data": "sfb_data_ch3",
+        "event": "sfb_event_ch3"
+      }
+    }
+  ]
+}
+```
+
+만약 오류가 발생할 경우 응답 데이터는 아래 예와 같습니다.
+- 요청한 채널 전체를 추가하지 못한 경우
+  
+```jsx
+{
+  "status": {
+    "code": -6,                              # 오류 코드
+    "message": "채널을 추가할 수 없습니다."    # 오류 메시지
+  },
+  "failed": [                                # 실패한 목록
+    {
+      "source": "rtsp://admin:admin@192.168.0.162:554/stream1",
+    },
+    {
+      "source": "C:\\video\\myVideo.mp4",
+    }
+  ]
+}
+```
+
+- 요청한 채널 중 일부를 추가하지 못한 경우
+
+```jsx
+{
+  "status": {
+    "code": -5,                              # 오류 코드
+    "message": "일부 채널만 추가되었습니다."   # 오류 메시지
+  },
+  "added": [                                 # 추가된 목록
+    {
+      "chid": 2,                             # 할당된 채널 번호
+      "name": "내 카메라",
+      "type": "onvif",                       # 채널 종류 (ONVIF 카메라)
+      "device": "onvif://192.168.0.30:80",   # 장치 URL
+      "source": "rtsp://192.168.0.30:554/stream1",
+      "tcp": true,                           # RTP 프로토콜 TCP 사용 여부 (false 이면 UDP)
+      "substream": false,                    # ONVIF 카메라의 경우 서브스트림 사용 여부
+      "sharedFrameBuffer": {
+        "data": "sfb_data_ch2",
+        "event": "sfb_event_ch2"
+      }
+    }
+  ],
+  "failed": [                                # 실패한 목록
+    {
+      "source": "rtsp://admin:admin@192.168.0.162:554/stream1",
+    },
+    {
+      "source": "C:\\video\\myVideo.mp4",
+    }
+  ]
+}
+```
+
+- 오류 코드
+`status`의 `code` 항목은 성공할 경우 이외에도 다음과 같은 오류 코드를 반환할 수 있습니다.
+
+    | 코드   | 설명                                                |
+    |------|------------------------------------------------------|
+    | `0`  | 성공                                                  |
+    | `-1` | 지정한 채널 번호가 이미 사용중인 경우                    |
+    | `-2` | 필수 항목인 `source`가 없는 경우                        |
+    | `-3` | `device` 항목이 있는 경우, 필수 항목인 `url`이 없는 경우 |
+    | `-4` | 라이센스 상 최대 채널 수를 초과하여 요청한 경우          |
+    | `-5` | 일부 채널을 추가하지 못한 경우                         |
+    | `-6` | 요청받은 채널 전체를 추가하지 못한 경우                 |
+
+ 
+
+## 채널 삭제 `@0.9.7`
+
+아래와 같이 채널을 삭제할 수 있습니다.
+요청 데이터는 사용하지 않고 매개변수 만으로 삭제할 채널을 지정합니다.
+```ruby
+DELETE /api/channel/{id}
+
+# {id} 부분에는 삭제할 채널 번호를 지정합니다.
+# 콤마(,) 문자를 사용하여 여러 채널을 지정할 수 있습니다.
+# 또는 all을 사용하여 전체 체널을 지정할 수 있습니다.
+DELETE /api/channel/1          # 1번 채널 삭제
+DELETE /api/channel/1,2,3      # 1,2,3번 채널 삭제
+DELETE /api/channel/all        # 모든 채널 삭제
+
+
+# 사용 가능한 매개변수
+auth  # 이미 로그인 상태가 아닌 경우 API 호출시 로그인
+lang  # 오류 코드 메시지에 사용될 언어 지정
+
+# 사용 예
+DELETE /api/channel/1,2,3?auth=ZGVtbzohMTIzNHF3ZXI%3D
+DELETE /api/channel/all?lang=vi-VN   # 베트남어로 지정
+```
+
+#### 응답 데이터
+
+채널 삭제 요청에 대해 서버는 다음과 같이 HTTP 응답 코드와 함께 JSON 데이터로 응답합니다.
+
+```jsx
+{
+  "status": {
+    "code": 0,    # 오류 코드
+    "message": "채널이 성공적으로 삭제되었습니다."  # 오류 메시지
+  },
+  "deleted": [    # 삭제된 채널 목록
+    1,
+    2,
+    3
+  ]
+}
+```
+
+만약 오류가 발생할 경우 응답 데이터는 아래 예와 같습니다.
+- 요청한 채널 전체를 삭제하지 못한 경우
+  
+```jsx
+{
+  "status": {
+    "code": -6,   # 오류 코드
+    "message": "채널을 삭제할 수 없습니다."  # 오류 메시지
+  },
+  "failed": [     # 실패한 채널 목록
+    1,
+    2,    
+    3
+  ]
+}
+```
+
+- 요청한 채널 중 일부를 삭제하지 못한 경우
+
+```jsx
+{
+  "status": {
+    "code": -5,   # 오류 코드
+    "message": "일부 채널만 삭제되었습니다."  # 오류 메시지
+  },
+  "deleted": [    # 삭제된 채널 목록
+    1
+  ],
+  "failed": [     # 실패한 채널 목록
+    2,
+    3
+  ]
+}
+```
+
+- 오류 코드
+`status`의 `code` 항목은 성공할 경우 이외에도 다음과 같은 오류 코드를 반환할 수 있습니다.
+
+    | 코드   | 설명                                 |
+    |------|---------------------------------------|
+    | `0`  | 성공                                   |
+    | `-7` | 삭제할 채널 번호가 지정되지 않은 경우    |
+    | `-8` | 지정한 채널이 존재하지 않는 경우         |
+    | `-9` | 일부 채널을 삭제하지 못한 경우          |
+    | `-10` | 요청받은 모든 채널을 삭제하지 못한 경우 |
+
+
+
 ## 부록
 
-<a id="markdown-제품별-api-지원-버전" name="제품별-api-지원-버전"></a>
+
 ### 제품별 API 지원 버전
 
 API를 지원하는 제품들의 버전은 다음과 같습니다.
@@ -4898,7 +5239,7 @@ API를 지원하는 제품들의 버전은 다음과 같습니다.
 
 API는 모든 제품군에 호환되지만, 제품별 또는 라이센스별로 일부 기능이 지원되지 않을 수 있습니다. 아래 목록 중에서 사용하는 제품이 어디에 해당하는지 확인하시기 바랍니다.
 
-<a id="markdown-제품별-기능-지원-표" name="제품별-기능-지원-표"></a>
+
 ### 제품별 기능 지원 표
 
 | 구분                                  | TS-CMS | TS-NVR          | TS-LPR |
@@ -4921,7 +5262,7 @@ TS-NVR은 자체적인 차량 번호 인식 기능이 없어 **차량 번호 로
 하지만 **차량 번호 인식 장치 연동** 부가 기능 라이센스를 사용하는 경우 별도의 차량 번호 인식 장치와 연동하여 차량 번호 로그를 저장하기 때문에 **차량 번호 로그 검색** 기능을 사용할 수 있습니다.
 
 
-<a id="markdown-base64-인코딩" name="base64-인코딩"></a>
+
 ### base64 인코딩
 base64 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
 * https://www.base64encode.org/
@@ -4929,7 +5270,7 @@ base64 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하
 * https://www.w3schools.com/jsref/met_win_btoa.asp
 
 
-<a id="markdown-url-인코딩" name="url-인코딩"></a>
+
 ### URL 인코딩
 URL 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
 
@@ -4939,7 +5280,7 @@ URL 인코딩 관련한 더 자세한 정보는 아래 링크들을 참고하십
 * https://www.w3schools.com/jsref/jsref_encodeuricomponent.asp
 
 
-<a id="markdown-url-디코딩" name="url-디코딩"></a>
+
 ### URL 디코딩
 URL 디코딩에 관련한 더 자세한 정보는 아래 링크들을 참고하십시오.
 * http://www.convertstring.com/ko/EncodeDecode/UrlDecode
@@ -4948,7 +5289,7 @@ URL 디코딩에 관련한 더 자세한 정보는 아래 링크들을 참고하
 * https://www.w3schools.com/jsref/jsref_decodeuricomponent.asp
 
 
-<a id="markdown-iso-8601-형식으로-날짜-시각-표현하기" name="iso-8601-형식으로-날짜-시각-표현하기"></a>
+
 ### ISO 8601 형식으로 날짜 시각 표현하기
 
 ```
@@ -4990,7 +5331,7 @@ YYYY-MM-DDThh:mm:ss.sss (서버의 로컬 타임)
 
 
 
-<a id="markdown-지원하는-언어-목록" name="지원하는-언어-목록"></a>
+
 ### 지원하는 언어 목록
 서버는 다음과 같이 총 104개 언어를 지원합니다.
 ```ruby
@@ -5100,7 +5441,7 @@ yo-NG       # 요루바어, Yorùbá, Yoruba
 zu-ZA       # 줄루어, isiZulu, Zulu
 ```
 
-<a id="markdown-json-데이터-형식" name="json-데이터-형식"></a>
+
 ### JSON 데이터 형식
 서버는 데이터의 전송 속도 향상을 위해 JSON 데이터 내에 줄 바꿈이나 공백 문자를 사용하지 않습니다. 예를 들면 다음과 같은 형태의 텍스트를 사용합니다.
 ```json
@@ -5136,7 +5477,7 @@ zu-ZA       # 줄루어, isiZulu, Zulu
 물론 내용면으로는 둘 다 완전히 같은 데이터입니다.
 
 
-<a id="markdown-피드백" name="피드백"></a>
+
 ### 피드백
 우리는 항상 고객의 의견에 항상 귀기울이고 있습니다.
 개발 관련 문의 사항이나 개선할 부분이 있으시면 https://github.com/bobhyun/TS-API/issues 에 남겨주시기 바랍니다.

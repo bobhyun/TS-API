@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.6
+TS-API@0.9.7
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.6](#ts-api096)
+  - [TS-API@0.9.7](#ts-api097)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -72,7 +72,7 @@ Table of contents
       - [Parameters for `face`](#parameters-for-face)
       - [Parameters for `human`](#parameters-for-human)
       - [Parameters for `vehicle`](#parameters-for-vehicle)
-      - [Face Search `@0.9.6`](#face-search-096)
+    - [Face Search `@0.9.6`](#face-search-096)
   - [Search for video sources](#search-for-video-sources)
     - [Real-time video source](#real-time-video-source)
     - [Recorded video source](#recorded-video-source)
@@ -99,6 +99,15 @@ Table of contents
     - [Relay output](#relay-output)
     - [AUX output](#aux-output)
     - [Reboot the device](#reboot-the-device)
+  - [Adding channels `@0.9.7`](#adding-channels-097)
+    - [Request data](#request-data)
+      - [Camera](#camera)
+      - [Video stream](#video-stream)
+      - [Video file](#video-file)
+    - [Response](#response)
+      - [Response data](#response-data)
+  - [Deleting channels `@0.9.7`](#deleting-channels-097)
+      - [Rsponse data](#rsponse-data)
   - [Appendix](#appendix)
     - [The API-supported versions by product](#the-api-supported-versions-by-product)
     - [The features table by product](#the-features-table-by-product)
@@ -113,14 +122,14 @@ Table of contents
 <!-- /TOC -->
 
 
-<a id="markdown-get-started" name="get-started"></a>
+
 ## Get Started
 In this article, TS-API is abbreviated as **API**, and each product is simply called **server**.
 
 
-<a id="markdown-video-display" name="video-display"></a>
+
 ## Video display
-<a id="markdown-real-time-video-display" name="real-time-video-display"></a>
+
 ### Real-time video display
 Try to type the following in the Web browser address window.
 ```ruby
@@ -134,7 +143,7 @@ Do you see the video?
 > [Tips]
 The demonstration video used in this sample code may not be connected depending on the situation in the field.
 
-<a id="markdown-inserting-video-into-web-page" name="inserting-video-into-web-page"></a>
+
 ### Inserting video into web page
 Now let's insert the video into the web page.
 ```html
@@ -164,7 +173,7 @@ Select the menu item you are to use, the code will be copied to the clipboard an
 For security reasons, the `auth=ZGVtbzohMTIzNHF3ZXI%3D` part is excluded from this copied code. This code is required for authentication and is described in [Session Authentication](#session-authentication).
 In this example, we used only minimal code to display the video, so there are more parts that were not included in the copied code.
 
-<a id="markdown-connecting-to-a-real-server" name="connecting-to-a-real-server"></a>
+
 ### Connecting to a real server
 Now, let's see how to display the video of a real server, not a demonstration server.
 To connect to a real server, you need to know the following two things by default:
@@ -173,7 +182,7 @@ To connect to a real server, you need to know the following two things by defaul
 >* The port number can be found in the `HTTP Port` item in the `Web Service` tab in your product Settings window.
 2. **User ID** and **password** with **remote access privileges**
 
-<a id="markdown-user-authentication" name="user-authentication"></a>
+
 ### User authentication
 For example, assuming that you use the following connection information;
 
@@ -251,7 +260,7 @@ In this example, we will improve the way we access the login information using J
 ```
 [Run](./examples/ex2.html)
 
-<a id="markdown-change-channel" name="change-channel"></a>
+
 ### Change channel
 If you change the `ch=` part of the video source to the desired channel number as shown below, the video of that channel will be displayed.
 Channel numbers are integers starting at 1.
@@ -261,7 +270,7 @@ http://tssolution.iptime.org:83/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 Run: [Channel1](http://tssolution.iptime.org:83/watch?ch=1&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel2](http://tssolution.iptime.org:83/watch?ch=2&auth=ZGVtbzohMTIzNHF3ZXI%3D) [Channel3](http://tssolution.iptime.org:83/watch?ch=3&auth=ZGVtbzohMTIzNHF3ZXI%3D)
 
-<a id="markdown-display-recorded-video" name="display-recorded-video"></a>
+
 ### Display recorded video
 To display the recorded video, you need the date and time information (time stamp) of the desired video.
 For example, to display a video recorded on `Channel 1` at 2:30:15 pm on February 1, 2018, you would need to add `when=2018-02-01T14%3a30%3a15%2b09%3a00`.
@@ -303,14 +312,14 @@ showPlayTime    # Whether the date and time are displayed (true, false)
 
 So far, We've seen how to display video using the `/watch`. Here we will see how to request various information using `/api`.
 
-<a id="markdown-json-data-indentation-050" name="json-data-indentation-050"></a>
+
 ## JSON data indentation `@0.5.0`
 All response data is in the [JSON format](#json-data-format) and the text is encoded as `utf8`. 
 The actual data being transferred uses an optimized format without line breaks and whitespace, but This is too uncomfortable for a person to read.
 
 For example, when request timezone as shown below:
 ```ruby
-/api/info?timezone
+GET /api/info?timezone
 ```
 The server returns JSON data in an optimized format with no line breaks and no whitespace, like this:
 ```jsx
@@ -322,7 +331,7 @@ The value of `indent` ranges from 0 to 8.
 
 For example, when request timezone using indentation of 2 as shown below:
 ```ruby
-/api/info?timezone&indent=2
+GET /api/info?timezone&indent=2
 ```
 The server indents two blank characters and inserts a newline character to return the JSON data in an easy-to-read format:
 ```jsx
@@ -336,13 +345,13 @@ The server indents two blank characters and inserts a newline character to retur
 Of course, you can use the desired number as the indent value, and it can be used in the same way for all TS-APIs.
 This document uses a format with indentation of 2 to make it easier to read items in the data.
 
-<a id="markdown-session-authentication" name="session-authentication"></a>
+
 ## Session authentication
 The server maintains an HTTP session using Cookie until the client software (the web browser) logs in and logs out. Since the server maintains the authentication information while the session is being connected, the client software (web browser) does not need to sign in whenever makes request.
 
 *This process of sign-in is called **session authentication**.*
 
-<a id="markdown-sign-in" name="sign-in"></a>
+
 ### Sign in
 Here's how to use the API to authenticate your session.
 The server also supports Basic authentication which is a  traditional sign-in method using URL format, as shown in the code below, but for security reasons, most modern web browsers does not support this method anymore.
@@ -353,33 +362,33 @@ http://userid:password@host/path/to/
 For this reason, we provide the following additional login methods:
 Using `login=` parameter after encrypting the user ID and password in the same way as in [User Authentication](#user-authentication).
 ```ruby
-/api/auth?login=ZGVtbzohMTIzNHF3ZXI%3D    # http://host omitted
+GET /api/auth?login=ZGVtbzohMTIzNHF3ZXI%3D    # http://host omitted
 ```
 If the login is successful, the server returns an HTTP response code of 200.
 
 You can use `auth=` to sign in the same way as shown below.
 ```ruby
-/api/auth?auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/auth?auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 The `auth =` parameter is used in various APIs to be introduced later and can be used when making a request with user authentication information to the server without going through a separate login process.
 
-<a id="markdown-sign-out" name="sign-out"></a>
+
 ### Sign out
 After the session is connected, the following request can be used to terminate it.
 ```ruby
-/api/auth?logout
+GET /api/auth?logout
 ```
 At the end of the session, the server returns an HTTP response code of 401 for requests that require authentication, indicating that authentication is required.
 
 
-<a id="markdown-request-server-information" name="request-server-information"></a>
+
 ## Request server information
 
-<a id="markdown-api-version" name="api-version"></a>
+
 ### API version
 This request works, even if it is not in [session suthenticated](#session-authentication) state.
 ```ruby
-/api/info?apiVersion
+GET /api/info?apiVersion
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```json
@@ -388,13 +397,13 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
-<a id="markdown-site-name" name="site-name"></a>
+
 ### Site name
 Use to get the server's site name. If you have multiple servers, you can give them a name that can be distinguished from each other.
 
 This request works, even if it is not in [session suthenticated](#session-authentication) state.
 ```ruby
-/api/info?siteName
+GET /api/info?siteName
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -406,14 +415,14 @@ The value of `siteName`, `"My%20home%20server"`, is what you entered in the web 
 Decoding the above[URL-encoded](#url-decoding) code will convert it to `"My home server"`.
 
 
-<a id="markdown-server-side-time-zone" name="server-side-time-zone"></a>
+
 ### Server-side time zone
 You can get the server-side time zone.
 It is used to distinguish between the client-side and server-side local time when they are used in different time zones.
 
 This request works, even if it is not in [session suthenticated](#session-authentication) state.
 ```ruby
-/api/info?timezone
+GET /api/info?timezone
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -426,13 +435,13 @@ For the request, the server returns JSON data in the following format with an HT
 ```
 UTC offset, for example, `UTC-05:00`, may be used instead of [IANA time zone name](#https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
-<a id="markdown-product-information" name="product-information"></a>
+
 ### Product information
 It is used to get the product name and version information of the server.
 
 This request works, even if it is not in [session suthenticated](#session-authentication) state.
 ```ruby
-/api/info?product
+GET /api/info?product
 ````
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -461,13 +470,13 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
-<a id="markdown-license-information" name="license-information"></a>
+
 ### License information
 Used to get license information installed on the server.
 
 This request works, even if it is not in [session suthenticated](#session-authentication) state.
 ```ruby
-/api/info?license
+GET /api/info?license
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -503,14 +512,15 @@ For the request, the server returns JSON data in the following format with an HT
 | `packing`  | Packing API |
 | `objectDetection`  | Object detection |
 | `faceRecognition`  | Face recognition |
+| `sharedFrameBuffer`  | Shared frame buffer `TS-API@0.9.7`| 
 
-<a id="markdown-user-information" name="user-information"></a>
+
 ### User information
 Used to get sign-in user information.
 This request works only in the [session authenticated](#session-authentication) state.
 From here on, the `auth =` part of [session authentication](#session-authentication) is omitted.
 ```ruby
-/api/info?whoAmI
+GET /api/info?whoAmI
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 If it is not in [session authenticated](#session-authentication) state, the server sends an HTTP response code 401 error.
@@ -546,11 +556,11 @@ If it is not in [session authenticated](#session-authentication) state, the serv
 }
 ```
 
-<a id="markdown-request-all-at-once" name="request-all-at-once"></a>
+
 ### Request all at once
 You can request information individually, but we also provide a way to request all the information at once for convenience.
 ```ruby
-/api/info?all
+GET /api/info?all
 ```
 This request returns JSON data with an HTTP response code of 200 if the session is authenticated, or JSON data with an HTTP response code of 401 with no `whoAmI` entries if it is not authenticated.
 ```jsx
@@ -612,12 +622,12 @@ This request returns JSON data with an HTTP response code of 200 if the session 
 }
 ```
 
-<a id="markdown-request-system-information-030" name="request-system-information-030"></a>
+
 ## Request system information `@0.3.0`
 Requests system information from the server.
 ```ruby
-/api/system?info
-/api/system   # omitted
+GET /api/system?info
+GET /api/system   # omitted
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 *@0.7.0 disk data format modified*
@@ -792,7 +802,7 @@ For the request, the server returns JSON data in the following format with an HT
 
 Or it can be requested individual items by specifying them as shown below.
 ```ruby
-/api/system?info=supported  # Request a list of supported items
+GET /api/system?info=supported  # Request a list of supported items
 ```
 For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -808,21 +818,21 @@ For the request of a list of supported items, the server response JSON data in t
   "all"
 ]
 ```
-<a id="markdown-requests-individual-items" name="requests-individual-items"></a>
+
 ### Requests individual items
 ```ruby
-/api/system?info=os   # requests OS only
-/api/system?info=cpu  # requests CPU only
-/api/system?info=storage,network  # requests both storage and network
+GET /api/system?info=os   # requests OS only
+GET /api/system?info=cpu  # requests CPU only
+GET /api/system?info=storage,network  # requests both storage and network
 
-/api/system?info=all  # requests all the items (Simply /api/system?info or /api/system)
+GET /api/system?info=all  # requests all the items (Simply /api/system?info or /api/system)
 ```
 
-<a id="markdown-request-system-health-030" name="request-system-health-030"></a>
+
 ## Request system health `@0.3.0`
 Requests system health from the server.
 ```ruby
-/api/system?health
+GET /api/system?health
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 *@0.7.0 cpu data format modified*
@@ -941,7 +951,7 @@ The `usage` value under `storage` in `recording` is one of the following:
 
 Or it can be requested individual items by specifying them as shown below.
 ```ruby
-/api/system?health=supported  # Request a list of supported items
+GET /api/system?health=supported  # Request a list of supported items
 ```
 For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -954,22 +964,22 @@ For the request of a list of supported items, the server response JSON data in t
   "all"
 ]
 ```
-<a id="markdown-requests-individual-items-1" name="requests-individual-items-1"></a>
+
 ### Requests individual items
 ```ruby
-/api/system?health=cpu   # requests CPU only
-/api/system?health=memory  # requests memory only
-/api/system?health=disk,recording,network  # requests disk, recording and network
-/api/system?health=all  # requests all the items (Simply /api/system?health)
+GET /api/system?health=cpu   # requests CPU only
+GET /api/system?health=memory  # requests memory only
+GET /api/system?health=disk,recording,network  # requests disk, recording and network
+GET /api/system?health=all  # requests all the items (Simply /api/system?health)
 ```
 
-<a id="markdown-request-hdd-smart-060" name="request-hdd-smart-060"></a>
+
 ## Request HDD S.M.A.R.T. `@0.6.0`
 Requests S.M.A.R.T. infomation of each HDD.
 ```ruby
-/api/system?hddsmart    # Request for all the HDDs
-/api/system?hddsmart=1  # Request for the first HDD
-/api/system?hddsmart=1,2  # Request for the first and second HDDs
+GET /api/system?hddsmart    # Request for all the HDDs
+GET /api/system?hddsmart=1  # Request for the first HDD
+GET /api/system?hddsmart=1,2  # Request for the first and second HDDs
 ```
 For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1004,11 +1014,11 @@ For the request of a list of supported items, the server response JSON data in t
 ]
 ```
 
-<a id="markdown-request-to-restart-server-process-060" name="request-to-restart-server-process-060"></a>
+
 ## Request to restart server process `@0.6.0`
 If you are logged in with administrator privileges, you can restart the server process.
 ```ruby
-/api/system?restart
+GET /api/system?restart
 ```
 For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1020,11 +1030,11 @@ For the request of a list of supported items, the server response JSON data in t
 The server returns HTTP response code 403 (FORBIDDEN) if you do not have administrator rights.
 
 
-<a id="markdown-request-to-reboot-server-system-060" name="request-to-reboot-server-system-060"></a>
+
 ## Request to reboot server system `@0.6.0`
 If you are logged in with administrator privileges, you can reboot the server system.
 ```ruby
-/api/system?reboot
+GET /api/system?reboot
 ```
 For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1036,11 +1046,11 @@ For the request of a list of supported items, the server response JSON data in t
 The server returns HTTP response code 403 (FORBIDDEN) if you do not have administrator rights.
 
 
-<a id="markdown-request-channel-status-030" name="request-channel-status-030"></a>
+
 ## Request channel status `@0.3.0`
 Requests the status of each channel on the server.
 ```ruby
-/api/status
+GET /api/status
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1083,22 +1093,22 @@ recordingStatus # Request recording status as well (Added since TS-API@0.9.5)
 
 # Examples
 # Specify channel 3 only
-/api/status?ch=3
+GET /api/status?ch=3
 
 # Specify only channels 1 to 4
-/api/status?ch=1,2,3,4
+GET /api/status?ch=1,2,3,4
 
 # Include status messages (if lang is not specified, the server-side language settings are applied.)
-/api/status?verbose=true
+GET /api/status?verbose=true
 
 # Include status messages in Spanish
-/api/status?verbose=true&lang=es-ES
+GET /api/status?verbose=true&lang=es-ES
 
 # Request recording status of all channels
-/api/status?recordingStatus
+GET /api/status?recordingStatus
 
 # Request the recording status of channels 1 to 4
-/api/status?ch=1,2,3,4&recordingStatus
+GET /api/status?ch=1,2,3,4&recordingStatus
 ```
 
 Requests, including messages, return JSON data in the following format:
@@ -1153,6 +1163,8 @@ The complete list of status codes is shown below.
 408   # Camera response timeout
 410   # No video input
 503   # Camera service failure
+1000  # Playback complete, TS-API@0.9.7
+1404  # No file found, TS-API@0.9.7
 ```
 
 If requested, including the recording status, returns JSON data in the following format.
@@ -1204,15 +1216,15 @@ If requested, including the recording status, returns JSON data in the following
 ]
 ```
 
-<a id="markdown-request-various-enumeration" name="request-various-enumeration"></a>
+
 ## Request various enumeration
 The following requests return the JSON data with an HTTP response code of 200 if it is in [session authenticated](#session-authentication) state, or an HTTP response code of 401 if the session is not authenticated.
 
-<a id="markdown-channel-list" name="channel-list"></a>
+
 ### Channel list `@0.9.4`
 To get a list of channels in use, request the following:
 ```ruby
-/api/enum?what=channel
+GET /api/enum?what=channel
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1234,7 +1246,7 @@ For the request, the server returns JSON data in the following format with an HT
 You can add the `staticSrc` parameter to get the list of streams together.
 These streams may not be available depending on the camera connection.
 ```ruby
-/api/enum?what=channel&staticSrc
+GET /api/enum?what=channel&staticSrc
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1307,7 +1319,7 @@ For the request, the server returns JSON data in the following format with an HT
 #### Adding camera capabilities `@0.9.4`
 You can add the `caps` parameter to get camera capabilities together.
 ```ruby
-/api/enum?what=channel&caps
+GET /api/enum?what=channel&caps
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1349,13 +1361,13 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
-<a id="markdown-vehicle-number-recognition-device-list" name="vehicle-number-recognition-device-list"></a>
+
 ### Vehicle number recognition device list
 To get a list of vehicle identification devices in use, ask for the following:
 The vehicle number recognition device list includes used devices when an external device is interworked, and in case of TS-LPR with built-in car number recognition function, it includes preset car number recognition zones.
 
 ```ruby
-/api/enum?what=lprSrc
+GET /api/enum?what=lprSrc
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1401,12 +1413,12 @@ For the request, the server returns JSON data in the following format with an HT
 // then be calculated as (1920, 1080, 5760, 3240).
 ```
 
-<a id="markdown-emergency-call-device-list-030" name="emergency-call-device-list-030"></a>
+
 ### Emergency call device list `@0.3.0`
 To receive a list of registered emergency call devices on the server, request the following:
 
 ```ruby
-/api/enum?what=emergencyCall
+GET /api/enum?what=emergencyCall
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1425,11 +1437,11 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
-<a id="markdown-event-log-type-list" name="event-log-type-list"></a>
+
 ### Event log type list
 To get a list of supported event log types, request the following:
 ```ruby
-/api/enum?what=eventType
+GET /api/enum?what=eventType
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1464,7 +1476,7 @@ lang      # Language
 
 # Example
 # Requesting Spanish
-/api/enum?what=eventType&lang=es-ES
+GET /api/enum?what=eventType&lang=es-ES
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1494,11 +1506,11 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
-<a id="markdown-parking-lot-list-090" name="parking-lot-list-090"></a>
+
 ### Parking lot list `@0.9.0`
 To get a list of registered parking lots on the server, request the followings:
 ```ruby
-/api/enum?what=parkingLot
+GET /api/enum?what=parkingLot
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1530,11 +1542,11 @@ For the request, the server returns JSON data in the following format with an HT
   }
 ]
 ```
-<a id="markdown-real-time-event-list-096" name="real-time-event-list-096"></a>
+
 ### Real-time event list `@0.9.6`
 To get a list of real-time events provided by the server, request the followings:
 ```ruby
-/api/enum?what=realtimeEvent
+GET /api/enum?what=realtimeEvent
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1551,17 +1563,17 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
-<a id="markdown-retrieve-recorded-data" name="retrieve-recorded-data"></a>
+
 ## Retrieve recorded data
 
 Use `/api/find` to search for recorded data.
 
-<a id="markdown-search-dates-with-recorded-video" name="search-dates-with-recorded-video"></a>
+
 ### Search dates with recorded video
 To get a list of dates with recorded videos, request the following:
 
 ```ruby
-/api/find?what=recDays      // Request all dates with recorded video
+GET /api/find?what=recDays      // Request all dates with recorded video
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1606,19 +1618,19 @@ timeEnd     # List of recorded dates before a specific date and time
 
 # Examples
 # Request date list of channels 1 recorded
-/api/find?what=recDays&ch=1
+GET /api/find?what=recDays&ch=1
 # Request date list of channels 1,2,3 recorded 
-/api/find?what=recDays&ch=1,2,3
+GET /api/find?what=recDays&ch=1,2,3
 
 # List of recorded dates since February 2018 (2018-02-01T00: 00:00-05:00)
-/api/find?what=recDays&timeBegin=2018-02-01T00%3A00%3A00-05%3A00
+GET /api/find?what=recDays&timeBegin=2018-02-01T00%3A00%3A00-05%3A00
 
 # List of dates recorded in January 2018
 # (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-05:00)
-/api/find?what=recDays&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00
+GET /api/find?what=recDays&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00
 
 # List of dates when channel 1 was recorded in January 2018
-/api/find?what=recDays&ch=1&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00
+GET /api/find?what=recDays&ch=1&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00
 ```
 
 If you specify a condition using parameters such as `ch`,`timeBegin`, or `timeEnd`, the result is returned, including the requested condition, as shown below.
@@ -1646,7 +1658,7 @@ If you specify a condition using parameters such as `ch`,`timeBegin`, or `timeEn
 }
 ```
 
-<a id="markdown-search-minutes-with-recorded-video-020" name="search-minutes-with-recorded-video-020"></a>
+
 ### Search minutes with recorded video `@0.2.0`
 To get a list of minutes with recorded videod, request the following:
 In the case of minute search, you can not request all of them because the amount of response data can be large, unlike date search.
@@ -1654,10 +1666,10 @@ Specifying only one of timeBegin or timeEnd returns the results of one day's sea
 The available parameters are the same as `/api/find?what=recDays`.
 ```ruby
 # When using local time
-/api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00-05%3A00&timeEnd=2018-02-02T00%3A00%3A00-05%3A00
+GET /api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00-05%3A00&timeEnd=2018-02-02T00%3A00%3A00-05%3A00
 
 # When using UTC time
-/api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00Z&timeEnd=2018-05-26T00%3A00%3A00Z
+GET /api/find?what=recMinutes&timeBegin=2018-05-25T00%3A00%3A00Z&timeEnd=2018-05-26T00%3A00%3A00Z
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1707,11 +1719,11 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
-<a id="markdown-search-event-log" name="search-event-log"></a>
+
 ### Search event log
 To retrieve the event log recorded on the server, request the following.
 ```ruby
-/api/find?what=eventLog
+GET /api/find?what=eventLog
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1790,34 +1802,34 @@ type        # Event log type
 
 # Examples
 # Requesting Arabic
-/api/find?what=eventLog&lang=ar-AE
+GET /api/find?what=eventLog&lang=ar-AE
 
 # Event log requests recorded during January 2018
 # (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-05:00)
-/api/find?what=eventLog&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00
+GET /api/find?what=eventLog&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00
 
 # Request 20 items from the 10th item in the search results
-/api/find?what=eventLog&at=10&maxCount=20
+GET /api/find?what=eventLog&at=10&maxCount=20
 
 # Sort by old data order (ascending order)
-/api/find?what=eventLog&sort=asc
+GET /api/find?what=eventLog&sort=asc
 
 # Request the system log type id list
-/api/enum?what=eventType
+GET /api/enum?what=eventType
 
 # Request only system log (id: 0) of event log types
-/api/find?what=eventLog&type=0
+GET /api/find?what=eventLog&type=0
 
 
 ```
 
 
-<a id="markdown-vehicle-number-log-search" name="vehicle-number-log-search"></a>
+
 ### Vehicle number log search
 If you use the car number recognition function, the recognized car number is saved with the video. To retrieve the car number log you will request as follows:
 
 ```ruby
-/api/find?what=carNo
+GET /api/find?what=carNo
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -1943,23 +1955,23 @@ src         # Vehicle number recognition device id (separated by a comma (,) if 
 
 # Examples
 # Search for vehicle number including "12" (keyword search)
-/api/find?what=carNo&keyword=12
+GET /api/find?what=carNo&keyword=12
 
 # Request Arabic
-/api/find?what=carNo&lang=ar-AE
+GET /api/find?what=carNo&lang=ar-AE
 
 # Request vehicle number logs recorded during January 2018
 # (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-059:00)
-/api/find?what=carNo&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00
+GET /api/find?what=carNo&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00
 
 # Request 20 items from the 10th item in the search results
-/api/find?what=carNo&at=10&maxCount=20
+GET /api/find?what=carNo&at=10&maxCount=20
 
 # Sort by old data order (ascending order)
-/api/find?what=carNo&sort=asc
+GET /api/find?what=carNo&sort=asc
 
 # Search by specifying vehicle number recognition device 1, 2
-/api/find?what=carNo&src=1,2
+GET /api/find?what=carNo&src=1,2
 ```
 
 To display the video in the retrieved result data, use the method used in [Display recorded video](#display-recorded-video).
@@ -1996,12 +2008,12 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&a
 ```
 
 
-<a id="markdown-search-for-similar-vehicle-numbers-020" name="search-for-similar-vehicle-numbers-020"></a>
+
 ### Search for similar vehicle numbers `@0.2.0`
 Can be used to verify that a similar vehicle number exists.
 To retrieve similar vehicle numbers from the log, request the following:
 ```ruby
-/api/find?what=similarCarNo&keyword=1234
+GET /api/find?what=similarCarNo&keyword=1234
 
 # Parameters
 keyword     # Vehicle number text to search (or some characters)
@@ -2009,7 +2021,7 @@ maxCount    # Maximum number of items
 
 # Examples
 # Request up to 10 results
-/api/find?what=similarCarNo&keyword=123&maxCount=10
+GET /api/find?what=similarCarNo&keyword=123&maxCount=10
 ```
 
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
@@ -2025,7 +2037,7 @@ For the request, the server returns JSON data in the following format with an HT
 When using the object detection function, the detected objects (`face`,` human`, `vehicle`) are saved with the video. To search the object detection log, request as follows.
 
 ```ruby
-/api/find?what=object
+GET /api/find?what=object
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -2119,19 +2131,19 @@ sort        # Sorting method (desc: Latest data order (default), asc: Oldest dat
 
 # Requests for objects stored during January 2020
 # (2020-01-01T00:00:00-05:00 ~ 2020-01-31T23:59:59.999-05:00)
-/api/find?what=object&timeBegin=2020-01-01T00%3A00%3A00-05%3A00&timeEnd=2020-01-31T23%3A59%3A59.999-05%3A00
+GET /api/find?what=object&timeBegin=2020-01-01T00%3A00%3A00-05%3A00&timeEnd=2020-01-31T23%3A59%3A59.999-05%3A00
 
 # Request only objects of channels 1 and 2
-/api/find?what=object&ch=1,2
+GET /api/find?what=object&ch=1,2
 
 # Request only face objects
-/api/find?what=object&objectType=face
+GET /api/find?what=object&objectType=face
 
 # Request 20 items from the 10th item of the search result
-/api/find?what=object&at=10&maxCount=20
+GET /api/find?what=object&at=10&maxCount=20
 
 # Requests sorted by oldest data (ascending)
-/api/find?what=object&sort=asc
+GET /api/find?what=object&sort=asc
 ```
 
 #### Parameters for `face`
@@ -2141,19 +2153,19 @@ age          # Age classification (one of young, adult, middle, senior)
 accessories  # Worn accessories (multiple choices among hat and glasses are possible)
 
 # Man only request
-/api/find?what=object&objectType=face&gender=male
+GET /api/find?what=object&objectType=face&gender=male
 
 # Adults only
-/api/find?what=object&objectType=face&age=adult
+GET /api/find?what=object&objectType=face&age=adult
 
 # Middle-aged woman only
-/api/find?what=object&objectType=face&gender=female&age=middle
+GET /api/find?what=object&objectType=face&gender=female&age=middle
 
 # Request only for people with glasses
-/api/find?what=object&objectType=face&accessories=glasses
+GET /api/find?what=object&objectType=face&accessories=glasses
 
 # Request only for people wearing glasses and hats
-/api/find?what=object&objectType=face&accessories=glasses,hat
+GET /api/find?what=object&objectType=face&accessories=glasses,hat
 ```
 
 
@@ -2167,31 +2179,31 @@ topClothes    # Top length and colors (Separate multiples with comma (,))
 bottomClothes # Bottom length and colors (The expressions are the same as topColors)
 
 # Woman only requests
-/api/find?what=object&objectType=human&gender=female
+GET /api/find?what=object&objectType=human&gender=female
 
 # Request only for people with bags
-/api/find?what=object&objectType=human&accessories=bag
+GET /api/find?what=object&objectType=human&accessories=bag
 
 # Request only for people with hats and bags
-/api/find?what=object&objectType=human&accessories=hat,bag
+GET /api/find?what=object&objectType=human&accessories=hat,bag
 
 # people in short-sleeved
-/api/find?what=object&objectType=human&topClothes=short
+GET /api/find?what=object&objectType=human&topClothes=short
 
 # people in yellow top
-/api/find?what=object&objectType=human&topClothes=yellow
+GET /api/find?what=object&objectType=human&topClothes=yellow
 
 # People in red and blue top
-/api/find?what=object&objectType=human&topClothes=red,blue
+GET /api/find?what=object&objectType=human&topClothes=red,blue
 
 # People in shorts
-/api/find?what=object&objectType=human&bottomClothes=short
+GET /api/find?what=object&objectType=human&bottomClothes=short
 
 # People in black both upper and lower
-/api/find?what=object&objectType=human&topClothes=black&bottomClothes=black
+GET /api/find?what=object&objectType=human&topClothes=black&bottomClothes=black
 
 # Men in a white top wearing a hat and holding a bag
-/api/find?what=object&objectType=human&accessories=hat,bag&topClothes=white&gender=male
+GET /api/find?what=object&objectType=human&accessories=hat,bag&topClothes=white&gender=male
 ```
 
 
@@ -2202,10 +2214,10 @@ vehicleType  # Vehicle type and colors, Separated by comma (,)
              # Vehicle colors (multiple choices among brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, and other)
 
 # Bus only request
-/api/find?what=object&vehicle=bus
+GET /api/find?what=object&vehicle=bus
 
 # Yellow car only request
-/api/find?what=object&vehicle=car,yellow
+GET /api/find?what=object&vehicle=car,yellow
 ```
 
 ### Face Search `@0.9.6`
@@ -2225,27 +2237,27 @@ threshold   # Similarity (specified by 1 ~ 100 percentage)
 
 # Search faces recorded during January 2020
 # (2020-01-01T00:00:00-05:00 ~ 2020-01-31T23:59:59.999-059:00)
-/api/searchFace?timeBegin=2020-01-01T00%3A00%3A00-05%3A00&timeEnd=2020-01-31T23%3A59%3A59.999-05%3A00
+GET /api/searchFace?timeBegin=2020-01-01T00%3A00%3A00-05%3A00&timeEnd=2020-01-31T23%3A59%3A59.999-05%3A00
 
 # Search faces of channels 1 and 2
-/api/searchFace?ch=1,2
+GET /api/searchFace?ch=1,2
 
 # 95% similar face search
-/api/searchFace?threshold=95
+GET /api/searchFace?threshold=95
 ```
 
 
-<a id="markdown-search-for-video-sources" name="search-for-video-sources"></a>
+
 ## Search for video sources
 You can use this method if your application uses the video address directly instead of the video display feature using the API you used in [Inserting video into web page](#inserting-video-into-web-page).
 
 This way you can get video address instead of displaying video.
 
-<a id="markdown-real-time-video-source" name="real-time-video-source"></a>
+
 ### Real-time video source
 You can request a list of real-time video addresses that the server is streaming by requesting the following without any parameters:
 ```ruby
-/api/vod
+GET /api/vod
 ```
 The server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
@@ -2313,7 +2325,7 @@ In the current version, it is streamed in two formats `RTMP` and` HLS`, and if t
 
 In fact, the `when=now` parameter, which means live video, is omitted in the example above.
 ```ruby
-/api/vod?when=now
+GET /api/vod?when=now
 ```
 
 If required, you can specify search parameters by combining one or more of the following parameters.
@@ -2325,22 +2337,22 @@ nameonly    # If true, only the channel name is requested without the video stre
 
 # Examples
 # Request channel 1 only
-/api/vod?ch=1
+GET /api/vod?ch=1
 
 # Request only hls protocol streams
-/api/vod?protocol=hls
+GET /api/vod?protocol=hls
 
 # Request only low-resolution streams
-/api/vod?stream=sub
+GET /api/vod?stream=sub
 
 # Only request channel name
-/api/vod?nameonly=true
+GET /api/vod?nameonly=true
 # Or simply
-/api/vod?nameonly
+GET /api/vod?nameonly
 ```
 
 
-<a id="markdown-recorded-video-source" name="recorded-video-source"></a>
+
 ### Recorded video source
 In general, you will use the [Search date with recorded video](#search-date-with-recorded-video) function to access the recorded video, but here are some ways to get a video source recorded at a lower level.
 
@@ -2361,7 +2373,7 @@ otherwise   # If there is no search result,
 # [Important!]
 #   1. For recorded video, HTTP response code 400 (invalid request) occurs if 'ch=' is not specified.
 #   2. Only data within 1 second is retrieved from the time specified by 'when='.
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00-05%3A00
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00-05%3A00
 
 # Search the channel 1 video source for data within 1 hour from 9:30 PM 00:00 on January 8, 2018
 # [Time unit notation used by duration]
@@ -2374,7 +2386,7 @@ otherwise   # If there is no search result,
 #   * If units are not specified, seconds is used by the default.
 #   * Notation combining multiple units (eg: 1h30m) is not supported and must be
 #     calculated (eg: 90m) in the smallest unit if necessary
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00-05%3A00&duration=1h
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00-05%3A00&duration=1h
 
 # Direct request using recording file ID
 # If there is a video, it returns 10 consecutive (by default) video sources 
@@ -2382,28 +2394,28 @@ otherwise   # If there is no search result,
 # [Tips]
 #   Each video file recorded on the server is assigned a unique serial number 
 #   that is represented by an integer.
-/api/vod?id=1304
+GET /api/vod?id=1304
 
 # If the current file ID of channel 1 is 1034, it requests the next file
 # of the same channel (useful for continuous playback)
-/api/vod?ch=1&id=1304&next=true
+GET /api/vod?ch=1&id=1304&next=true
 # Or simply
-/api/vod?ch=1&id=1304&next
+GET /api/vod?ch=1&id=1304&next
 
 # If the current file ID of channel 1 is 1034, it requests the previous file
 # of the same channel (useful for continuous backward playback)
-/api/vod?ch=1&id=1304&prev=true
+GET /api/vod?ch=1&id=1304&prev=true
 # Or simply
-/api/vod?ch=1&id=1304&prev
+GET /api/vod?ch=1&id=1304&prev
 
 # Receive 30 searched video sources
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00-05%3A00&duration=1h&limit=30
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00-05%3A00&duration=1h&limit=30
 
 # If there is no search result,
 # request near recorded video before the search time period
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearBefore
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearBefore
 # request near recorded video after the search time period
-/api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearAfter
+GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&otherwise=nearAfter
 ```
 
 When this request is made, the server returns JSON data in the following format with the HTTP response code 200:
@@ -2454,7 +2466,7 @@ When this request is made, the server returns JSON data in the following format 
 ]
 ```
 
-<a id="markdown-requesting-video-using-video-source-030" name="requesting-video-using-video-source-030"></a>
+
 ## Requesting video using video source `@0.3.0`
 For video request using video source without using `/watch` provided by API, authentication is supported by each protocol as follows.
 ```ruby 
@@ -2469,9 +2481,9 @@ http://userid:passwordn@host/api/path/to
 http://host/api/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
-<a id="markdown-real-time-event-monitoring-030" name="real-time-event-monitoring-030"></a>
+
 ## Real-time event monitoring `@0.3.0`
-<a id="markdown-server-sent-events-sse" name="server-sent-events-sse"></a>
+
 ### Server-Sent Events (SSE)
 Supports the ability to receive real-time event messsage using HTML5 Server-Sent Events (SSE) method.
 Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
@@ -2504,7 +2516,7 @@ object          # Object detection event (added @0.9.6)
 
 SSE connection paths and parameters are as follows.
 ```ruby
-/api/subscribeEvents
+GET /api/subscribeEvents
 
 # Required parameters
 auth    # Authentication Information
@@ -2520,37 +2532,37 @@ lang    # Specify language for status messages
 
 # Examples
 # Request car number recognition event
-http://host/api/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request emergency call event
-http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request both events
-http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request List the live video stream sources of the linked video channels
-http://host/api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+GET /api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # Request status change events for all channels
-http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests status change events for all channels including messages
-http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # Requests status change events of channels 1 and 2 including Spanish messages
-http://host/api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
+GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
 
 # Requests motion detection status change events of all channels
-http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests motion detection status change events of channels 1 and 2
-http://host/api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+GET /api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 
 # Requests parking count for all the parking lots
-http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests parking count for the parking lot id 1 and 2 (in this case the `ch` used as parking lot id)
-http://host/api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+GET /api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
@@ -2565,7 +2577,7 @@ If the authentication information is incorrect or is not a supported topic, it w
 }
 ```
 
-<a id="markdown-channel-status-change-events" name="channel-status-change-events"></a>
+
 ### Channel status change events
 You can receive channel status change events in real time by requesting `topics=channelStatus`.
 Unlike other topics, in case of the channel status topic, for status change management, the current channel status is sent once, immediately after issuing the subscriber id.
@@ -2850,7 +2862,7 @@ Channel status change event messages are received in JSON format as shown below.
 
 The list of channel status codes is the same as the status code list in [Request channel status `@0.3.0`](#request-channel-status-030).
 
-<a id="markdown-car-number-recognition-events" name="car-number-recognition-events"></a>
+
 ### Car number recognition events
 If you request `topics=LPR`, you can receive the car number recognition event in real time.
 The car number event message is received in JSON format as shown below.
@@ -2885,7 +2897,7 @@ The car number event message is received in JSON format as shown below.
 }
 ```
 
-<a id="markdown-emergency-call-events" name="emergency-call-events"></a>
+
 ### Emergency call events
 If you request `topics=emergencyCall`, you can receive the event messages at the start and end of the emergency call in real time.
 Emergency call event messages are received in JSON format as shown below.
@@ -2919,7 +2931,7 @@ Emergency call event messages are received in JSON format as shown below.
 Emergency call events are events for real-time communication, so all channels are linked to real-time video.
 If you request the video stream source of the channels as shown below, the video stream sources are additionally included.
 ```ruby
-http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 ```
 ```jsx
 {
@@ -3015,7 +3027,7 @@ http://host/api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.
 
-<a id="markdown-system-event-070" name="system-event-070"></a>
+
 ### System event `@0.7.0`
 If you request `topics = systemEvent`, you can receive system events in real time.
 System event is received in JSON format as below when "System log" data is generated from [Event log type list](#event-log-type-list).
@@ -3053,7 +3065,7 @@ Each data type is the same as those used in [Search event log](#search-event-log
 }
 ```
 
-<a id="markdown-motion-detection-status-change-event-080" name="motion-detection-status-change-event-080"></a>
+
 ### Motion Detection Status Change Event `@0.8.0`
 If you request `topics=motionChanges`, you can receive the event when changing the motion detection status for each channel in real time.
 Immediately after the request, the current motion detection status of all specified channels is received
@@ -3080,7 +3092,7 @@ No events occur for channels with the same motion detection status.
 }
 ```
 
-<a id="markdown-parking-count-event-090" name="parking-count-event-090"></a>
+
 ### Parking Count Event `@0.9.0`
 If you ask for `topics=parkingCount`, you can receive events in real time when the number of cars in each parking lot is changed.
 Immediately after the request, the current number of vehicles in all the specified parking lots will be received once.
@@ -3180,13 +3192,13 @@ You can receive only the object you want by specifying the object type `objectTy
 If not specified, all supported object types are sent.
 ```ruby
 # requests only face
-http://host/api/subscribeEvents?topics=object&objectType=face&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=object&objectType=face&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # requests only vehicle
-http://host/api/subscribeEvents?topics=object&objectType=vehicle&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=object&objectType=vehicle&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # requests face and human
-http://host/api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNHF3ZXI%3D
+GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
 #### `face` object
@@ -3451,7 +3463,7 @@ Now, let's create an example that uses SSE to receive event messages.
 [Run](./examples/ex3.html)
 
 
-<a id="markdown-web-sockets-rfc6455" name="web-sockets-rfc6455"></a>
+
 ### Web Sockets (RFC6455)
 Supports the ability to receive real-time event messsage using HTML5 Web sockets (RFC6455) method.
 Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
@@ -3682,7 +3694,7 @@ Now, let's create an example that uses the Web socket to receive event messages.
 [Run](./examples/ex4.html)
 
 
-<a id="markdown-exporting-recorded-video-030" name="exporting-recorded-video-030"></a>
+
 ## Exporting recorded video `@0.3.0`
 You can use the web socket to receive recorded video from the server.
 The server creates the files one by one and deletes them when the client finishes downloading, and then creates the next file.
@@ -4397,7 +4409,7 @@ Now let's create an example that uses a web socket to export the recorded video.
 [Run](./examples/ex5.html)
 
 
-<a id="markdown-pushing-events-to-the-server-040" name="pushing-events-to-the-server-040"></a>
+
 ## Pushing events to the server `@0.4.0`
 You can send events from an external device or software to the server by `HTTP POST` method.
 
@@ -4409,7 +4421,7 @@ emergencyCall   # Emergency call
 
 The path and parameters for sending events to the server are:
 ```ruby
-/api/push
+POST /api/push
 
 # Parameter
 auth    # authentication information
@@ -4472,16 +4484,16 @@ curl http://192.168.0.100/api/push -H "Content-Type: application/json; charset=U
 curl http://192.168.0.100/api/push?auth=ZGVtbzohMTIzNHF3ZXI%3D -H "Content-Type: application/json; charset=UTF-8" -X POST -d @test.json
 ```
 
-<a id="markdown-channel-information-and-device-control-050" name="channel-information-and-device-control-050"></a>
+
 ## Channel information and device control `@0.5.0`
 
 You can get a list of devices connected to each channel, a list of features supported by each device, and control each device.
 
-<a id="markdown-request-device-information-and-support-function-list" name="request-device-information-and-support-function-list"></a>
+
 ### Request Device Information and Support Function List
 The connected device information requests:
 ```ruby
-/api/channel/info
+GET /api/channel/info
 
 # Parameters
 caps    # Only requested "caps" item, If not specified, includes all information
@@ -4490,16 +4502,16 @@ reload  # Request updated information with the latest information from your chan
 
 # Examples
 # Only requests device capabilities for each channel in use
-/api/channel/info?caps
+GET /api/channel/info?caps
 
 # Only requests device capabilities connected to channels 1
-/api/channel/info?caps&ch=1
+GET /api/channel/info?caps&ch=1
 
 # Only requests devices capabilities connected to channels 1, 2 and 3
-/api/channel/info?caps&ch=1,2,3
+GET /api/channel/info?caps&ch=1,2,3
 
 # Request renewal of camera information of all channels to latest information
-/api/channel/info?caps&reload
+GET /api/channel/info?caps&reload
 ```
 
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
@@ -4551,7 +4563,7 @@ The remote control functions will only work if the logged-in user account has `D
 The device control commands are of the form `/api/channel/` followed by an individual command and a destination channel and additional required parameters.
 In the example we will use here, let's assume that the destination channel is `ch = 1 '.
 ```ruby
-/api/channel/ptz?ch=1&home&indent=2
+GET /api/channel/ptz?ch=1&home&indent=2
 ```
 
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
@@ -4581,12 +4593,12 @@ The above response codes are common to all device control commands.
 In the `message` part, if no language is specified, the language set on the server side is used.
 You can specify the language for the parameter as shown below.
 ```ruby
-/api/channel/ptz?ch=1&home&lang=en_US
+GET /api/channel/ptz?ch=1&home&lang=en_US
 ```
 For [a list of supported languages](#list-of-languages-supported), see the appendix.
 
 
-<a id="markdown-pan-tilt-control" name="pan-tilt-control"></a>
+
 ### Pan tilt control
 
 If your device supports the pan tilt function, you can control it with the following commands.
@@ -4605,7 +4617,7 @@ iris    # Open / close iris
 A control command consists of one target channel and a command.
 For example, for the `home` command, you must specify the target channel as a parameter.
 ```ruby
-/api/channel/ptz?ch=1&home
+GET /api/channel/ptz?ch=1&home
 ```
 
 Commands used with parameters must specify the direction and velocity of movement.
@@ -4617,27 +4629,27 @@ Two decimal values between `-1` and `1` can be used to express both the directio
 ![Alt Direction and velocity of movement](../img/ptz.png)
 
 ```ruby
-/api/channel/ptz?ch=1&move=0.5,0.5  # Moves at medium speed in the upper right diagonal
-/api/channel/ptz?ch=1&move=-1       # Moves to the left at maximum speed (can be omitted if vertical value is zero)
-/api/channel/ptz?ch=1&move=0,0.1    # Move slowly downward
-/api/channel/ptz?ch=1&move          # Can be omitted if both horizontal and vertical are 0, same as stop command
+GET /api/channel/ptz?ch=1&move=0.5,0.5  # Moves at medium speed in the upper right diagonal
+GET /api/channel/ptz?ch=1&move=-1       # Moves to the left at maximum speed (can be omitted if vertical value is zero)
+GET /api/channel/ptz?ch=1&move=0,0.1    # Move slowly downward
+GET /api/channel/ptz?ch=1&move          # Can be omitted if both horizontal and vertical are 0, same as stop command
 ```
 
 The rest of the `zoom`,` focus`, and `iris` commands are all camera lens controls and use one parameter to express forward and backward.
 Likewise, you can express both the direction and velocity of movement from the current position in a one-dimensional space, using one decimal value between `-1` and` 1` to express both the speed and direction of movement.
 ```ruby
-/api/channel/ptz?ch=1&zoom=0.5      # Zoom in at medium speed
-/api/channel/ptz?ch=1&zoom=-0.5     # Zoom out at medium speed
-/api/channel/ptz?ch=1&focus=0.1     # Focus near at very slow speed
-/api/channel/ptz?ch=1&focus=-0.5    # Focus far at medium speed
-/api/channel/ptz?ch=1&iris=-0.1    # Close iris at very slow speed
-/api/channel/ptz?ch=1&iris=1       # Open iris at maximum speed
+GET /api/channel/ptz?ch=1&zoom=0.5      # Zoom in at medium speed
+GET /api/channel/ptz?ch=1&zoom=-0.5     # Zoom out at medium speed
+GET /api/channel/ptz?ch=1&focus=0.1     # Focus near at very slow speed
+GET /api/channel/ptz?ch=1&focus=-0.5    # Focus far at medium speed
+GET /api/channel/ptz?ch=1&iris=-0.1    # Close iris at very slow speed
+GET /api/channel/ptz?ch=1&iris=1       # Open iris at maximum speed
 ```
 
 The physical travel limit and speed for the move command can vary depending on the unique characteristics of each device.
 
 
-<a id="markdown-pan-tilt-preset-control" name="pan-tilt-preset-control"></a>
+
 ### Pan tilt preset control
 
 Available when the device supports the pan tilt preset function.
@@ -4646,13 +4658,13 @@ Available when the device supports the pan tilt preset function.
 This command requests a list of presets that the server has already obtained (cached).
 ```ruby
 # Request a list of presets from channel 1
-/api/channel/preset?ch=1&list
+GET /api/channel/preset?ch=1&list
 
 # Request a list of presets from multiple channels
-/api/channel/preset?ch=1,2,3&list
+GET /api/channel/preset?ch=1,2,3&list
 
 # Request a preset list of all channels
-/api/channel/preset?list
+GET /api/channel/preset?list
 ```
 While the response time is fast because you do not reload from the device each time, if the preset list modified by the other software (for example, the embedded web page of the device), the server responds with the list of past.
 
@@ -4683,13 +4695,13 @@ If the request is successful, the server responds with JSON data in the followin
 This command reloads the preset list from the device and sends it back.
 ```ruby
 # Request to reload the preset list of channel 1
-/api/channel/preset?ch=1&reload
+GET /api/channel/preset?ch=1&reload
 
 #  Request to reload the preset list of multiple channels
-/api/channel/preset?ch=1,2,3&reload
+GET /api/channel/preset?ch=1,2,3&reload
 
 #  Request to reload the preset list of all channels
-/api/channel/preset?reload
+GET /api/channel/preset?reload
 ```
 Contrary to the `list` command, while the response time is slow, you can always receive the same data as the preset list that the device has.
 
@@ -4710,13 +4722,13 @@ Don't forget to URL-encode to send the text string normally.
 
 ```ruby
 # preset name: preset1 (The preset token is generated by the camera and included in the response data.)
-/api/channel/preset?ch=1&preset1 
+GET /api/channel/preset?ch=1&preset1 
 
 # Omit preset name
-/api/channel/preset?ch=1&set
+GET /api/channel/preset?ch=1&set
 
 # preset name: Sweet home ^^
-/api/channel/preset?ch=1&set=3,Sweet%20home%20%5E%5E
+GET /api/channel/preset?ch=1&set=3,Sweet%20home%20%5E%5E
 ```
 
 For a preset assignment request, the server returns JSON data in the following format with an HTTP response code of 200:
@@ -4737,10 +4749,10 @@ Removes the preset of the specified preset tokens.
 To remove presets, you must specify the `preset token` as a parameter.
 ```ruby
 # Remove presets token 1
-/api/channel/preset?ch=1&rm=1
+GET /api/channel/preset?ch=1&rm=1
 
 # Remove multiple presets
-/api/channel/preset?ch=1&rm=1,2,3
+GET /api/channel/preset?ch=1&rm=1,2,3
 ```
 
 For a preset removing request, the server returns JSON data in the following format with an HTTP response code of 200:
@@ -4764,16 +4776,16 @@ Goes to the preset position of the specified preset token.
 
 To move to the preset position, `preset token` must be specified as a parameter.
 ```ruby
-/api/channel/preset?ch=1&go=1 # Goes to the preset token 1
+GET /api/channel/preset?ch=1&go=1 # Goes to the preset token 1
 ```
 
-<a id="markdown-relay-output" name="relay-output"></a>
+
 ### Relay output
 
 If your device supports relay output, you can request a list of relay outputs as follows:
 To get a list of relay outputs, you must specify one channel to which the device is connected.
 ```ruby
-/api/channel/relay?ls&ch=1    # Request relay output list connected to channel 1
+GET /api/channel/relay?ls&ch=1    # Request relay output list connected to channel 1
 ```
 
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
@@ -4798,23 +4810,23 @@ For the request, the server returns JSON data in the following format with an HT
 Relay output command is specified using the `on` or` off` command and one or more relay output tokens.
 ```ruby
 # Turn on the relay output of 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
-/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+GET /api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
 
 # Turn off the relay output of 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
-/api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+GET /api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
 
 # Simultaneously turn on two relay outputs
-/api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf,cffd1289-cb2c-4d82-8c6f-c7634b432f57
+GET /api/channel/relay?ch=1&off=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf,cffd1289-cb2c-4d82-8c6f-c7634b432f57
 
 # If both on and off are specified at the same time, the off command is ignored.
-/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
+GET /api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
 
 # If one is turned on and the other is turned off, each must be sent separately for each command.
-/api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
-/api/channel/relay?ch=1&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
+GET /api/channel/relay?ch=1&on=7657b9aa-61d6-4b4f-a70a-c91e8657dfcf
+GET /api/channel/relay?ch=1&off=cffd1289-cb2c-4d82-8c6f-c7634b432f57
 ```
 
-<a id="markdown-aux-output" name="aux-output"></a>
+
 ### AUX output
 
 If your device supports AUX output, use the `on` or` off` command as `relay output`.
@@ -4822,29 +4834,29 @@ The AUX outputs are specified using a zero-based number instead of a token.
 
 ```ruby
 # Turn on AUX 1 output
-/api/channel/aux?ch=1&on=0
+GET /api/channel/aux?ch=1&on=0
 
 # Turn off AUX 1 output
-/api/channel/aux?ch=1&off=1
+GET /api/channel/aux?ch=1&off=1
 
 # Simultaneously turn on two AUX outputs
-/api/channel/aux?ch=1&on=0,1
+GET /api/channel/aux?ch=1&on=0,1
 
 # If both on and off are specified at the same time, the off command is ignored.
-/api/channel/aux?ch=1&on=0&off=1
+GET /api/channel/aux?ch=1&on=0&off=1
 
 # If one is turned on and the other is turned off, each must be sent separately for each command.
-/api/channel/aux?ch=1&on=0
-/api/channel/aux?ch=1&off=1
+GET /api/channel/aux?ch=1&on=0
+GET /api/channel/aux?ch=1&off=1
 ```
 
-<a id="markdown-reboot-the-device" name="reboot-the-device"></a>
+
 ### Reboot the device
 
 If your device supports it, you can reboot it remotely with the following command:
 
 ```ruby
-/api/channel/reboot?ch=1    # Reboot camera on channel 1
+GET /api/channel/reboot?ch=1    # Reboot camera on channel 1
 ```
 
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
@@ -4860,10 +4872,342 @@ Typically, the reboot takes approximately one minute to complete, which may vary
 From the perspective of the client software, it is necessary to monitor the completion of the reboot by attempting to reconnect periodically from the video connection is disconnected after sending the reboot command.
 
 
-<a id="markdown-appendix" name="appendix"></a>
+
+
+## Adding channels `@0.9.7`
+
+You can add channels as shown below.
+```ruby
+POST /api/channel
+
+# Available parameters
+auth  # If you are not already logged in, log in when calling the API
+lang  # Specify the language to be used for error code messages
+
+# Usage example
+POST /api/channel?auth=ZGVtbzohMTIzNHF3ZXI%3D
+POST /api/channel?lang=vi-VN   # Set in Vietnamese
+```
+
+### Request data
+
+Defines channels to be added in POST data as `JSON` format.
+Array format is used to specify multiple channels.
+
+Some data items are defined differently depending on the type of video source.
+
+#### Camera
+Cameras that support the `ONVIF` protocol can be added.
+If not specified, default values ​​are used.
+```jsx
+[
+  {
+    "chid": 1,                                        # [Optional] 1) Channel number to register 
+    "name": "My video stream",                        # [Optional] Channel name to register
+    "source": "rtsp://192.168.0.220:554/stream1",     # [Required] RTSP URL
+    "tcp": true,                                      # [Optional] RTP protocol, true: TCP (default), false: UDP
+    "substream": false,                               # [Optional] 2) Whether to use Substream, true: Use Substream (default), false: Not use Substream
+    "uid": "admin",                                   # [Optional] RTSP auth id
+    "password": "admin",                              # [Optional] RTSP auth password
+    "device": {                                       # [Required] Register as an ONVIF camera (ONVIF function available)
+      "name": "My camera",                            # [Optional] Camera name to register
+      "url": "onvif://192.168.0.220:8000"             # [Required] 3) Camera device URL
+    }
+  }
+]
+```
+1. `chid`:
+   - Channel number starting from 1
+   - If `chid` is not specified, it is automatically assigned from the front.
+2. `substream`: 
+   - When there is a lower resolution stream than the video stream registered from the same input source of the camera, if the display area on the split screen is small, it automatically operates to display the lower resolution stream.
+   - If you want to use only the designated video stream without using this function, set the `substream` item to `false`.
+3. `url` (Camera device URL):
+   - It is originally in the form of `http://192.168.0.220:8000`, but it is written as `onvif://192.168.0.220:8000` to indicate that it is a `ONVIF` device.
+
+
+#### Video stream
+You can add a video stream using the `RTSP` protocol.
+The camera can also be used when you are not using any function other than a video stream.
+
+```jsx
+[
+  {
+    "chid": 2,                                        # [Optional] Channel number to register, Automatically assigned if not specified
+    "name": "My video stream",                        # [Optional] Channel name to register
+    "source": "rtsp://192.168.0.220:554/stream1",     # [Required] RTSP URL
+    "tcp": true,                                      # [Optional] RTP protocol, true: TCP (default), false: UDP
+    "uid": "admin",                                   # [Optional] RTSP auth id
+    "password": "admin",                              # [Optional] RTSP auth password
+  }
+]
+```
+
+#### Video file
+You can add video files from a local PC or Windows shared folder.
+
+```jsx
+[
+  {
+    "chid": 1,                                         # [Optional] Channel number to register, Automatically assigned if not specified
+    "name": "Video file in my PC",                          # [Optional] Channel name to register
+    "source": "C:\\videos\\sample.mp4",                # [Required] 1) Video file name (full path)
+    "playback": "once"                                 # [Optional] once: Play once, repeat: Repeat play (default)
+  },
+  {
+    "chid": 2,                                         # [Optional] Channel number to register, Automatically assigned if not specified
+    "name": "Video file in my freind PC",                   # [Optional] Channel name to register
+    "source": "\\\\192.168.0.14\\videos\\sample.mp4",  # [Required] 1) Video file name (full path)
+  }
+]
+```
+1. `videoSrc` (Video file name): 
+   - If only one `\` character is used, it is interpreted as `ESCAPE` character, so `\\` is used to indicate the file path.
+
+
+### Response
+
+- Request data example
+```jsx
+[
+  {
+    "name": "My video stream",
+    "source": "rtsp://192.168.0.162:554/stream1",
+    "uid": "admin",
+    "password": "admin",
+    "tcp": true
+  },
+  {
+    "name": "My camera",
+    "source": "rtsp://192.168.0.30:554/stream1",
+    "tcp": true,
+    "substream": false,
+    "uid": "admin",
+    "password": "admin",
+    "device": {
+      "name": "My camera",
+      "url": "onvif://192.168.0.30:80"
+    }
+  },
+  {
+    "name": "Video file in my PC",
+    "source": "C:\\video\\myVideo.mp4",
+    "playback": "once"
+  }
+]
+```
+
+#### Response data
+
+When requested as in the example above, the server responds with JSON data with an HTTP response code as follows:
+```jsx
+{
+  "status": {
+    "code": 0,  # Error code
+    "message": "Channels were added successfully."  # Error message
+  },
+  "added": [
+    {
+      "chid": 1,                  # Assigned channel number
+      "name": "My video stream",
+      "type": "rtsp",             # Channel type (RTSP stream)
+      "source": "rtsp://admin:admin@192.168.0.162:554/stream1",
+      "tcp": true,
+      "sharedFrameBuffer": {      # Frame buffer interface when using the shared frame buffer API function
+        "data": "sfb_data_ch1",   # Shared memory name of frame buffer
+        "event": "sfb_event_ch1"  # Frame buffer update event name
+      }
+    },
+    {
+      "chid": 2,                  # Assigned channel number
+      "name": "My cmamea",
+      "type": "onvif",            # Channel type (ONVIF camera)
+      "device": "onvif://192.168.0.30:80",  # Device URL
+      "source": "rtsp://192.168.0.30:554/stream1",
+      "tcp": true,                # RTP protocol, true: use TCP, false: UDP
+      "substream": false,         # Whether to use substream for ONVIF cameras
+      "sharedFrameBuffer": {
+        "data": "sfb_data_ch2",
+        "event": "sfb_event_ch2"
+      }
+    },
+    {
+      "chid": 3,                  # Assigned channel number
+      "name": "My video file",
+      "type": "file",             # Channel type (file)
+      "source": "C:\\video\\myVideo.mp4",
+      "playback": "once",         # once: Play once, repeat: Repeat play
+      "sharedFrameBuffer": {
+        "data": "sfb_data_ch3",
+        "event": "sfb_event_ch3"
+      }
+    }
+  ]
+}
+```
+
+If an error occurs, the response data is shown in the example below.
+- If the entire requested channel cannot be added
+  
+```jsx
+{
+  "status": {
+    "code": -6,               # Error code
+    "message": "Channels cannot be added."  # Error message
+  },
+  "failed": [                 # List of failed channels
+    {
+      "source": "rtsp://admin:admin@192.168.0.162:554/stream1",
+    },
+    {
+      "source": "C:\\video\\myVideo.mp4",
+    }
+  ]
+}
+```
+
+- If some of the requested channels could not be added
+
+```jsx
+{
+  "status": {
+    "code": -5,               # Error code
+    "message": "Only some channels have been added."  # Error message
+  },
+  "added": [                  # List of failed channels
+    {
+      "chid": 2,              # Assigned channel number
+      "name": "My camera",
+      "type": "onvif",        # Channel type (ONVIF camera)
+      "device": "onvif://192.168.0.30:80",  # Device URL
+      "source": "rtsp://192.168.0.30:554/stream1",
+      "tcp": true,            # RTP protocol, true: use TCP, false: UDP
+      "substream": false,     # Whether to use substream for ONVIF cameras
+      "sharedFrameBuffer": {
+        "data": "sfb_data_ch2",
+        "event": "sfb_event_ch2"
+      }
+    }
+  ],
+  "failed": [                 # List of failed channels
+    {
+      "source": "rtsp://admin:admin@192.168.0.162:554/stream1",
+    },
+    {
+      "source": "C:\\video\\myVideo.mp4",
+    }
+  ]
+}
+```
+
+- Error code
+The `code` entry in `status` returns one of the following error codes.
+
+    | Code | Description                                                          |
+    |------|----------------------------------------------------------------------|
+    | `0`  | Success                                                              |
+    | `-1` | When the specified channel number is already in use                  |
+    | `-2` | If the required item `source` is missing                             |
+    | `-3` | If there is a `device` item, the required item `url` is missing      |
+    | `-4` | If the request exceeds the maximum number of channels in the license |
+    | `-5` | Some channels could not be added                                     |
+    | `-6` | If the entire requested channel cannot be added                      |
+
+
+## Deleting channels `@0.9.7`
+
+
+You can delete a channel as shown below.
+Specifies the channel to delete with only parameters, without using request data.
+```ruby
+DELETE /api/channel/{id}
+
+# In the {id} section, specify the channel numbers to be deleted.
+# Multiple channels can be specified using the comma (,) character.
+# Or 'all' can be used to specify the entire channel.
+DELETE /api/channel/1          # Delete channel 1
+DELETE /api/channel/1,2,3      # Delete channels 1,2,3
+DELETE /api/channel/all        # Delete all channels
+
+
+# Available parameters
+auth  # If you are not already logged in, log in when calling the API
+lang  # Specify the language to be used for error code messages
+
+# Usage example
+DELETE /api/channel/1,2,3?auth=ZGVtbzohMTIzNHF3ZXI%3D
+DELETE /api/channel/all?lang=vi-VN   # Set in Vietnamese
+```
+
+#### Rsponse data
+
+For channel delete requests, the server responds with JSON data with an HTTP response code as follows:
+
+```jsx
+{
+  "status": {
+    "code": 0,          # Error code
+    "message": "Channels were deleted successfully."  # Error message
+  },
+  "deleted": [          # List of deleted channels
+    1,
+    2,
+    3
+  ]
+}
+```
+
+If an error occurs, the response data is shown in the example below.
+- If the entire requested channel cannot be deleted
+  
+```jsx
+{
+  "status": {
+    "code": -6,         # Error code
+    "message": "Channels cannot be deleted."  # Error message
+  },
+  "failed": [           # List of failed channels
+    1,
+    2,    
+    3
+  ]
+}
+```
+
+- If some of the requested channels could not be deleted
+```jsx
+{
+  "status": {
+    "code": -5,         # Error code
+    "message": "Only some channels have been deleted."  # Error message
+  },
+  "deleted": [          # List of deleted channels
+    1
+  ],
+  "failed": [           # List of failed channels
+    2,
+    3
+  ]
+}
+```
+
+- Error code
+The `code` entry in `status` returns one of the following error codes.
+
+    | Code  | Description                                            |
+    |-------|--------------------------------------------------------|
+    | `0`   | Succcess                                               |
+    | `-7`  | When the channel number to be deleted is not specified |
+    | `-8`  | If the specified channel does not exist                |
+    | `-9`  | If some channels cannot be deleted                     |
+    | `-10` | If all requested channels cannot be deleted            |
+
+
+
+
 ## Appendix
 
-<a id="markdown-the-api-supported-versions-by-product" name="the-api-supported-versions-by-product"></a>
+
 ### The API-supported versions by product
 
 The versions of the products that support the API are as follows.
@@ -4882,7 +5226,7 @@ The versions of the products that support the API are as follows.
 
 APIs are compatible across all product lines, but some features may not be supported by product or by license. Please check the list below to see which products you are using.
 
-<a id="markdown-the-features-table-by-product" name="the-features-table-by-product"></a>
+
 ### The features table by product
 
 | Features                                                                              | TS-CMS | TS-NVR                          | TS-LPR |
@@ -4905,7 +5249,7 @@ TS-NVR does not have built-in vehicle number recognition function and **vehicle 
 However, if you use the add-on license of **vehicle number recognition interworking**, you can use the **vehicle number log search** because it stores the car number log incoming from the external vehicle number recognition device.
 
 
-<a id="markdown-base64-encoding" name="base64-encoding"></a>
+
 ### base64 Encoding
 For more information on base64 encoding, see the links below.
 * https://www.base64encode.org/
@@ -4913,7 +5257,7 @@ For more information on base64 encoding, see the links below.
 * https://www.w3schools.com/jsref/met_win_btoa.asp
 
 
-<a id="markdown-url-encoding" name="url-encoding"></a>
+
 ### URL Encoding
 For more information on URL encoding, see the links below.
 * http://www.convertstring.com/ko/EncodeDecode/UrlEncode
@@ -4922,7 +5266,7 @@ For more information on URL encoding, see the links below.
 * https://www.w3schools.com/jsref/jsref_encodeuricomponent.asp
 
 
-<a id="markdown-url-decoding" name="url-decoding"></a>
+
 ### URL decoding
 For more information on URL decoding, see the links below.
 * http://www.convertstring.com/ko/EncodeDecode/UrlDecode
@@ -4931,7 +5275,7 @@ For more information on URL decoding, see the links below.
 * https://www.w3schools.com/jsref/jsref_decodeuricomponent.asp
 
 
-<a id="markdown-date-and-time-notation-in-iso-8601-format" name="date-and-time-notation-in-iso-8601-format"></a>
+
 ### Date and time notation in ISO 8601 format
 
 ```
@@ -4973,7 +5317,7 @@ If you want to use UTC time, you can use `Z` character instead of `+00:00`.
 
 
 
-<a id="markdown-list-of-languages-supported" name="list-of-languages-supported"></a>
+
 ### List of languages supported
 The server supports a total of 104 languages as follows:
 ```ruby
@@ -5083,7 +5427,7 @@ yo-NG       # Yorùbá, Yoruba
 zu-ZA       # isiZulu, Zulu
 ```
 
-<a id="markdown-json-data-format" name="json-data-format"></a>
+
 ### JSON data format
 The server does not use line breaks or white space characters in JSON data for data optimization. For example, use the following form of text:
 ```json
@@ -5119,7 +5463,7 @@ The readable JSON data has the following form:
 Of course, both are completely the same data in terms of content.
 
 
-<a id="markdown-feedback" name="feedback"></a>
+
 ### Feedback
 We are always listening to your feedback.
 If you have any development questions or want to improve, please leave them at https://github.com/bobhyun/TS-API/issues.
