@@ -2471,14 +2471,14 @@ When this request is made, the server returns JSON data in the following format 
 For video request using video source without using `/watch` provided by API, authentication is supported by each protocol as follows.
 ```ruby 
 # RTMP (auth= parameter supported)
-rtmp://host/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
+rtmp://host/path/to&?auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # HTTP (Only basic authentication is supported for file-based resources such as m3u8, JPG, and MP4)
 http://userid:password@host/path/to
 
 # HTTP (The resources of sub path /api/ are supported in both ways)
 http://userid:passwordn@host/api/path/to
-http://host/api/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://host/api/path/to&?auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
 

@@ -2465,14 +2465,14 @@ GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&ot
 API로 제공되는 `/watch`를 사용하지 않고 영상 소스를 사용하여 영상을 요청하는 경우에 대해, 각 프로토콜 별로 다음과 같은 방식으로 인증을 지원합니다.
 ```ruby 
 # RTMP (auth= 매개변수가 지원됩니다.)
-rtmp://host/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
+rtmp://host/path/to?auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # HTTP (m3u8, JPG, MP4 와 같은 정적인 파일 기반 리소스들은 Basic Authentication만 지원됩니다.)
 http://userid:password@host/path/to
 
 # HTTP (/api/ 하위 경로는 두 가지 방법이 모두 지원됩니다.)
 http://userid:password@host/api/path/to
-http://host/api/path/to&auth=ZGVtbzohMTIzNHF3ZXI%3D
+http://host/api/path/to&?auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
 
