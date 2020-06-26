@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.7
+TS-API@0.9.8
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.7](#ts-api097)
+  - [TS-API@0.9.8](#ts-api098)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -59,7 +59,7 @@ Table of contents
     - [Vehicle number recognition device list](#vehicle-number-recognition-device-list)
     - [Emergency call device list `@0.3.0`](#emergency-call-device-list-030)
     - [Event log type list](#event-log-type-list)
-    - [Parking lot list `@0.9.0`](#parking-lot-list-090)
+    - [Parking lot list `@0.9.8`](#parking-lot-list-098)
     - [Real-time event list `@0.9.6`](#real-time-event-list-096)
   - [Retrieve recorded data](#retrieve-recorded-data)
     - [Search dates with recorded video](#search-dates-with-recorded-video)
@@ -1401,6 +1401,10 @@ For the request, the server returns JSON data in the following format with an HT
       "mode": "driving",      // Number recognition operation mode (driving: Driving mode, parking: Parking mode)
       "disabledOnly": false,  // True if the zone is Disabled parking, false otherwise
       "noParkingAllowed": false // True if the zone is prohibited for parking, false otherwise
+    },
+    "parkingLot": {           // Connected parking lot id (TS-API@0.9.8)
+      "entrance": 1,          // Parking lot entrance id
+      "exit": 2               // Parking lot exit id
     }
   }
 ]
@@ -1507,40 +1511,44 @@ For the request, the server returns JSON data in the following format with an HT
 ```
 
 
-### Parking lot list `@0.9.0`
+### Parking lot list `@0.9.8`
 To get a list of registered parking lots on the server, request the followings:
 ```ruby
 GET /api/enum?what=parkingLot
 ```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
-[
-  {
-    "id": 1,
-    "name": "B1 Parking Lot",
-    "type": "counter"     // parking area (in/out counter)
-    "count": 3,           // current entrances
-    "maxCount": 50,       // Maximum number of parking spaces
-  },
-  {
-    "id": 2,
-    "name": "B2 Parking Lot",
-    "type": "counter"     // parking area (in/out counter)
-    "count": 25,          // current entrances
-    "maxCount": 40,       // Maximum number of parking spaces
-  },
-  {
-    "id": 3,
-    "name": "Basement Parking Lot",
-    "type": "group",      // Group (a set of parking area)
-    "count": 28,          // Total number of current entrances
-    "maxCount": 90,       // Total number of parking spaces
-    "member": [           // id of the group menmbers
-      1,
-      2
-    ]
-  }
-]
+{
+  "counter": [
+    {
+      "id": 1,
+      "name": "B1 Parking Lot",
+      "type": "counter"     // parking area (in/out counter)
+      "count": 3,           // current entrances
+      "maxCount": 50,       // Maximum number of parking spaces
+    },
+    {
+      "id": 2,
+      "name": "B2 Parking Lot",
+      "type": "counter"     // parking area (in/out counter)
+      "count": 25,          // current entrances
+      "maxCount": 40,       // Maximum number of parking spaces
+    }
+  ],
+  "group": [
+    {
+      "id": 3,
+      "name": "Basement Parking Lot",
+      "type": "group",      // Group (a set of parking area)
+      "count": 28,          // Total number of current entrances
+      "maxCount": 90,       // Total number of parking spaces
+      "member": [           // id of the group menmbers
+        1,
+        2
+      ]
+    }
+  ]
+}
 ```
 
 ### Real-time event list `@0.9.6`
@@ -2881,19 +2889,23 @@ The car number event message is received in JSON format as shown below.
     {
       "chid":2,
       "title":"Camera2",
-      "displayName":"CH2. Camera2", // Added since TS-API@0.9.4
+      "displayName":"CH2. Camera2",             // Added since TS-API@0.9.4
       "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" // The video at vehicle identification time
     }
   ],
   "image":"http://host/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // captured still cut image
-  "plateNo":"DSP963",                         // License plate number
-  "score":98,                                     // recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optional item)
+  "plateNo":"DSP963",                           // License plate number
+  "score":98,                                   // recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optional item)
   "roi": {                                      // License plate area
-    "offset":[964,560],                           // Top left coordinates
-    "size":[187,51]                               // License plate image size
+    "offset":[964,560],                         // Top left coordinates
+    "size":[187,51]                             // License plate image size
   },
   "timeBegin":"2018-06-27T10:42:02.573-05:00",  // First recognized time of the car
-  "topic":"LPR"                                 // Topic name
+  "topic":"LPR",                                // Topic name
+  "parkingLot": {                               // Connected parking lot id (TS-API@0.9.8)
+    "entrance": 1,                              // Parking lot entrance id
+    "exit": 2                                   // Parking lot exit id
+  }
 }
 ```
 
