@@ -2220,10 +2220,10 @@ vehicleType  # 차량 종류와 색상을 콤마(,)로 구분 표기
              # 차량 색상 (brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, other 중 복수 지정 가능)
 
 # 버스만 요청
-GET /api/find?what=object&vehicle=bus
+GET /api/find?what=object&objectType=vehicle&vehicleType=bus
 
 # 노란색 자동차만 요청
-GET /api/find?what=object&vehicle=car,yellow
+GET /api/find?what=object&objectType=vehicle&vehicleType=car,yellow
 ```
 
 

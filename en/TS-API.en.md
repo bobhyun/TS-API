@@ -2222,10 +2222,10 @@ vehicleType  # Vehicle type and colors, Separated by comma (,)
              # Vehicle colors (multiple choices among brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, and other)
 
 # Bus only request
-GET /api/find?what=object&vehicle=bus
+GET /api/find?what=object&objectType=vehicle&vehicleType=bus
 
 # Yellow car only request
-GET /api/find?what=object&vehicle=car,yellow
+GET /api/find?what=object&objectType=vehicle&vehicleType=car,yellow
 ```
 
 ### Face Search `@0.9.6`
