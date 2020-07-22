@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.8
+TS-API@0.9.9
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -2375,6 +2375,7 @@ limit       # Specify the number of items in the search results (default 10, max
 otherwise   # If there is no search result,
             # If requested with 'nearBefore', near recorded video before the search time period will be returned.
             # If requested with 'nearAfter', near recorded video after the search time period will be returned.
+nolive      # Prevents search results from including real-time videos even timestamp is less than 1 minute from the current time (TS-API@0.9.9)
 
 # Examples
 # The channel 1 video source on channel 1 ecorded on January 8, 2018 at 9:30 PM EST
