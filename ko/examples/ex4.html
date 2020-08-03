@@ -4,48 +4,108 @@
   <title>ex4</title>
   <style>
     body {font-family:Arial, Helvetica, sans-serif}
-    div {padding:5px}
-    #control {background-color:beige}
+    div {padding:3px}
+    #control {background-color:beige;font-size:0.8em}
+    #param {background-color:wheat;font-size:11px}
+    #param * {font-size:10px}
     #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
     li.open, li.close {color:blue}
+    li.command {color:orange}
     li.error {color:red}
   </style>
 </head>
 <body>
-  <h2>예제4. 이벤트 수신하기 (Web Socket)</h2>
+  <h2>예제4. 녹화 영상 받아내기 (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
       <input type='text' id='user-id' placeholder='사용자 ID'> 
       <input type='password' id='password' placeholder='비밀번호'>
     </div>
+    <div id='param'>
+      <div>
+        데이터 구간 : <input type='datetime-local' id='timeBegin' step='1' value='2018-07-27T09:00:00'>
+        ~ <input type='datetime-local' id='timeEnd' step='1' value='2018-07-27T09:30:00'>
+      </div>
+      <div>
+        채널: 
+          <input type='checkbox' onclick='onSelectAllChannels(this)'>모두 선택
+          <input type='checkbox' class='chid' value='1' checked>1
+          <input type='checkbox' class='chid' value='2'>2
+          <input type='checkbox' class='chid' value='3'>3
+          <input type='checkbox' class='chid' value='4'>4    
+          <input type='checkbox' class='chid' value='5'>5
+          <input type='checkbox' class='chid' value='6'>6
+          <input type='checkbox' class='chid' value='7'>7
+          <input type='checkbox' class='chid' value='8'>8
+          <input type='checkbox' class='chid' value='9'>9
+          <input type='checkbox' class='chid' value='10'>10
+          <input type='checkbox' class='chid' value='11'>11
+          <input type='checkbox' class='chid' value='12'>12   
+          <input type='checkbox' class='chid' value='13'>13
+          <input type='checkbox' class='chid' value='14'>14
+          <input type='checkbox' class='chid' value='15'>15
+          <input type='checkbox' class='chid' value='16'>16
+      </div>
+      <div>
+        파일 크기: <input type='text' id='mediaSize' placeholder='예) 500MB'>
+      </div>
+      <div>
+        자막 형식: <select id='subtitleFormat'>
+          <option value='SRT' selected>SRT</option>
+          <option value='SMI'>SMI</option>
+          <option value='VTT'>VTT</option>
+          <option value='None'>사용안함</option>
+        </select>
+      </div>
+      <div>
+        제출자: <input type='text' id='submitter' placeholder='예) 흥부'>
+      </div>
+      <div>
+        수령인: <input type='text' id='recipient' placeholder='예) 놀부'>
+      </div>
+      <div>
+        용도: <textarea cols='40' rows='3' id='purpose' placeholder='예) 너무 배고파서...'></textarea>
+      </div>
+      <div>
+        진행 표시 주기: <input type='text' id='statusInterval' placeholder='예) 2s' value='2s'>
+      </div>
+      <div>
+        언어: <select id='lang'>
+          <option value='ko-KR'>한국어</option>
+          <option value='en-US'>영어</option>
+          <option value='es-ES'>스페인어</option>
+          <option value='zh-CN'>중국어 (간체)</option>
+          <option value='zh-TW'>중국어 (번체)</option>
+        </select>
+      </div>
+      <div>
+        <input type='checkbox' id='md5' value='md5'>md5
+      </div>
+    </div>
     <div>
-      토픽:
-      <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
-      <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
-      <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
-      <input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
-      <input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
-      <input class='topic' type='checkbox' value="packing" checked>포장
-      <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
-      <input class='topic' type='checkbox' value="object" checked>객체 감지
-      <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>
       <button type='button' onClick='onClearAll()'>모두 삭제</button>
+      <button type='button' onClick='onCancel()' id='cancel' style='visibility:hidden;color:red'>작업 취소</button>
     </div>
     <div id='url'>
     </div>
   </div>
-
   <div>
+
     <ul id='messages'></ul>
   </div>
 </body>
 <script type='text/javascript'>
   (function() {
-    window.myApp = { ws: null };
+    window.myApp = { 
+      ws: null,
+      task: '',
+      fname: '',
+      auth: '',
+      downloadJobs: []
+    };
   })();
 
   function getURL() {
@@ -60,7 +120,7 @@
       alert('이미 접속 중입니다.');
       return url;
     }
-      
+    
     var hostName = document.getElementById('host-name').value;
     if(hostName == '') {
       alert('호스트를 입력하십시오.');
@@ -77,33 +137,97 @@
       return url;
     }
 
-    var topics = '';
-    var el = document.getElementsByClassName('topic');
-    for(var i=0; i<el.length; i++) {
-      if(!el[i].checked)
-        continue;
 
-      if(topics.length > 0)
-        topics += ',';
-       topics += el[i].value;
+    // 매개 변수들
+    var timeBegin = document.getElementById('timeBegin').value;
+    if(timeBegin == '') {
+      alert('데이터 구간을 입력하십시오.');
+      return url;
     }
-  
-    if(topics.length == 0) {
-      alert('하나 이상의 토픽을 선택하십시오.');
+
+    var timeEnd = document.getElementById('timeEnd').value;
+    if(timeEnd == '') {
+      alert('데이터 구간을 입력하십시오.');
+      return url;
+    }
+
+    var ch = '';
+    var chk = document.getElementsByClassName('chid');
+    for (var i = 0; i < chk.length; i++) {
+      if (chk[i].checked === true) {
+        if(ch.length > 0)
+          ch += ',';
+        ch += chk[i].value;
+      }
+    }
+    if(ch.length == 0) {
+      alert('채널을 선택하십시오.');
+      return url;
+    }
+ 
+    var mediaSize = document.getElementById('mediaSize').value;
+    if(mediaSize == '') {
+      alert('동영상 파일의 최대 크기를 입력하십시오.');
+      return url;
+    }
+
+    var subtitleFormat = document.getElementById('subtitleFormat').value;
+    if(subtitleFormat == '') {
+      alert('자막 형식을 선택하십시오.');
+      return url;
+    }
+
+    var submitter = document.getElementById('submitter').value;
+    if(submitter == '') {
+      alert('제출자를 입력하십시오.');
+      return url;
+    }
+
+    var recipient = document.getElementById('recipient').value;
+    if(submitter == '') {
+      alert('수령인을 입력하십시오.');
+      return url;
+    }
+
+    var purpose = document.getElementById('purpose').value;
+    if(purpose == '') {
+      alert('용도를 입력하십시오.');
+      return url;
+    }
+
+    var statusInterval = document.getElementById('statusInterval').value;
+    if(statusInterval == '') {
+      alert('진행 표시 주기를 입력하십시오.');
+      return url;
+    }
+
+    var lang = document.getElementById('lang').value;
+    if(lang == '') {
+      alert('언어를 선택하십시오.');
       return url;
     }
 
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
-      hostName + '/wsapi/subscribeEvents?topics=' + topics;
-    if(document.getElementById('verbose').checked)
-      url += '&verbose=true';
-    
-    //url += '&objectTypes=face,human'
-    url +='&auth=' + window.myApp.auth;
-        
-    //url += '&ch=4&lang=ko-KR';
+      hostName + '/wsapi/dataExport?auth=' + window.myApp.auth;
+
+    url += 
+      '&timeBegin=' + encodeURIComponent(timeBegin) +
+      '&timeEnd=' + encodeURIComponent(timeEnd) +
+      '&ch=' + encodeURIComponent(ch) +
+      '&subtitleFormat=' + encodeURIComponent(subtitleFormat) +
+      '&mediaSize=' + encodeURIComponent(mediaSize) +
+      '&statusInterval=' + encodeURIComponent(statusInterval) +
+      '&submitter=' + encodeURIComponent(submitter) +
+      '&recipient=' + encodeURIComponent(recipient) +
+      '&purpose=' + encodeURIComponent(purpose) +
+      '&lang=' + encodeURIComponent(lang);
+     
+    var md5 = document.getElementById('md5');
+    if (md5.checked === true) {
+      url += '&md5=true';
+    }
     return url;
   }
 
@@ -112,6 +236,23 @@
     li.appendChild(document.createTextNode(msg));
     li.classList.add(tagClass); 
     document.getElementById('messages').appendChild(li);
+  }
+
+  function addDownloadItem(fname) {
+    var li = document.createElement('li');
+    var span = document.createElement('span');
+    span.innerHTML = '<progress value="0" max="100"></progress> <label>' + fname + '<label>';
+    span.setAttribute('id', window.myApp.task + '/' + fname);
+    li.appendChild(span);
+    document.getElementById('messages').appendChild(li);
+  }
+
+  function showCancelButton(bShow) {
+    var el = document.getElementById('param');
+    el.style.display = bShow ? 'none' : 'block';
+
+    el = document.getElementById('cancel');
+    el.style.visibility = bShow ? 'visible' : 'hidden';
   }
 
   function onConnect() {
@@ -134,11 +275,36 @@
       addItem('error', '오류: ' + e.code);
     };
     ws.onmessage = function(e) {
-      try {
-        var data = JSON.parse(e.data);
-        addItem('data', e.data);
-      } catch(ex) {
-        console.log(e.data);
+      addItem('data', e.data);
+      
+      var msg = JSON.parse(e.data);
+      switch(msg.stage) {
+      case 'ready':
+        if(msg.status.code != 0)
+          break;
+        window.myApp.task = msg.task.id;
+
+        showCancelButton(true);
+        break;
+
+      case 'fileBegin':
+        window.myApp.fname = msg.channel.file.name;
+        break;
+
+      case 'fileEnd':
+        downloadFiles(msg.channel.file, function(bSuccess) {
+          sendCommand(bSuccess ? "next" : "cancel");
+        });
+        break;
+
+      case 'timeoutAlert':
+        if( window.myApp.downloadJobs.length > 0)
+          sendCommand("wait");
+        break;
+
+      case 'end':
+        showCancelButton(false);
+        break;
       }
     };
     window.myApp.ws = ws;
@@ -149,13 +315,108 @@
       window.myApp.ws.close();
       window.myApp.ws = null;
     }
+    document.getElementById('param').style.display = 'block';
   }
 
   function onClearAll() {
     var el = document.getElementById("messages");
-    while (el.firstChild) {
+    while (el.firstChild)
       el.removeChild(el.firstChild);
-    }
     document.getElementById('url').innerText = '';
+    document.getElementById('param').style.display = 'block';
+  }
+
+  function downloadFiles(file, onFinished) {
+    if(file.download.length <= 0) {
+      onFinished(false);
+      return;
+    }
+
+    var downloadCnt = 0, successCnt = 0;
+
+    function onDone(bSuccess) {
+      if(bSuccess)
+        successCnt++;
+
+      if(++downloadCnt < file.download.length) {
+        setTimeout(function() {
+          downloadFile(file.download[downloadCnt], onDone);
+        }, 1000);
+      }
+      else {
+        onFinished(successCnt == downloadCnt);
+      }
+    }
+    downloadFile(file.download[downloadCnt], onDone);
+  }
+
+  function downloadFile(download, onFinish) {
+    addDownloadItem(download.fileName);
+
+    var req = new XMLHttpRequest();
+    window.myApp.downloadJobs.push(req);
+
+    // 다운로드 링크에 auth 매개변수를 붙여서 요청
+    req.open('GET', download.src + '?auth=' + window.myApp.auth, true);
+    req.responseType = "blob";
+    req.onreadystatechange = function() {
+      if (req.readyState === 4 && req.status === 200) {
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(req.response);
+        a.download = download.fileName;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      }
+    },    
+    req.onprogress = function(e) {
+      var prog = document.getElementById(window.myApp.task + '/' + download.fileName).firstChild;
+      if(prog)
+        prog.value = Math.ceil(e.loaded * 100 / e.total);
+    },
+    req.onerror = function(e) {
+      if(onFinish)
+        onFinish(false);
+
+      var pos = window.myApp.downloadJobs.indexOf(req);
+      if(pos >= 0)
+        window.myApp.downloadJobs.splice(pos, 1);
+    },
+    req.onloadend = function (event) {
+      var pos = window.myApp.downloadJobs.indexOf(req);
+      if(pos >= 0)
+        window.myApp.downloadJobs.splice(pos, 1);
+      
+      if(onFinish)
+        onFinish(true);
+    };
+    req.send();
+  }
+
+  function sendCommand(command) {
+    var str = JSON.stringify({
+      task: window.myApp.task,
+      cmd: command
+    });
+
+    addItem('command', str)
+    window.myApp.ws.send(str);
+  }
+
+  function onCancel() {
+    // 다운로드 작업을 모두 중단
+    window.myApp.downloadJobs.forEach(function(jobs) {
+      jobs.abort();
+    });
+    window.myApp.downloadJobs = [];
+
+    sendCommand("cancel");
+  }
+
+  function onSelectAllChannels(el) {
+    var ch = document.getElementsByClassName('chid');
+    for(var i=0, cnt=ch.length; i<cnt; i++)
+      ch[i].checked = el.checked;
   }
 </script>

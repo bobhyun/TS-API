@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.9
+TS-API@0.9.10
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -78,7 +78,7 @@ Table of contents
     - [Recorded video source](#recorded-video-source)
   - [Requesting video using video source `@0.3.0`](#requesting-video-using-video-source-030)
   - [Real-time event monitoring `@0.3.0`](#real-time-event-monitoring-030)
-    - [Server-Sent Events (SSE)](#server-sent-events-sse)
+    - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
     - [Channel status change events](#channel-status-change-events)
     - [Car number recognition events](#car-number-recognition-events)
     - [Emergency call events](#emergency-call-events)
@@ -90,7 +90,6 @@ Table of contents
       - [`face` object](#face-object)
       - [`human` object](#human-object)
       - [`vehicle` object](#vehicle-object)
-    - [Web Sockets (RFC6455)](#web-sockets-rfc6455)
   - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
   - [Channel information and device control `@0.5.0`](#channel-information-and-device-control-050)
     - [Request Device Information and Support Function List](#request-device-information-and-support-function-list)
@@ -2493,12 +2492,12 @@ http://host/api/path/to&?auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 ## Real-time event monitoring `@0.3.0`
 
-### Server-Sent Events (SSE)
-Supports the ability to receive real-time event messsage using HTML5 Server-Sent Events (SSE) method.
+### Web Sockets (RFC6455)
+Supports the ability to receive real-time event messsage using HTML5 Web sockets (RFC6455) method.
 Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
 
 The step-by-step communication procedure is as follows:
->1. Client connects to the server.
+>1. Client connects to the server via Web Sockets.
 >2. If the authentication to the server succeeds, the subscriber ID is issued.
 >3. The client then remains connected and enters the message waiting state.
 >>* The server sends a ping message every 30 seconds to keep the connection even if there is no message to send.
@@ -2506,8 +2505,8 @@ The step-by-step communication procedure is as follows:
 >5. Repeat steps 3 through 4 until the client ends the connection itself.
 
 > [Tips]
-Microsoft Internet Explorer and Microsoft Edge do not support the SSE standard. If you need to work with Microsoft browsers, use the Web socket (RFC6455).
-https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
+The web socket method is supported by all web browsers including Microsoft web browsers.
+https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
 
 
 The following event topics are supported:
@@ -2523,56 +2522,58 @@ recordingStatus # Recording status event (added @0.9.5)
 object          # Object detection event (added @0.9.6)
 ```
 
-SSE connection paths and parameters are as follows.
+The web socket connection path and parameters are as follows.
 ```ruby
-GET /api/subscribeEvents
+/wsapi/subscribeEvents
 
 # Required parameters
-auth    # Authentication Information
+auth    # Authentication Information (Requires authentication per individual web socket, independent of session authentication)
 topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
 
 # Optional argument
 verbose # For emergencyCall, request List the live video stream sources of the linked video channels
-        # For channelStatus, request status messages (Include "title" in initial message immediately after issuing subscriber id)
+        # For channelStatus, request status messages (Include "title" in initial message immediately after issuing subscriber id
+session # Can pass authentication credentials by passing session cookie already connected
 
 # channelStatus-specific parameters (optional)
 ch      # Used when specifying specific channels (separated by a comma (,) if multiple channels are specified at the same time)
 lang    # Specify language for status messages
 
-# Examples
+# Example
 # Request car number recognition event
-GET /api/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request emergency call event
-GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Request both events
-GET /api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
-# Request List the live video stream sources of the linked video channels
-GET /api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+# request List the live video stream sources of the linked video channels
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # Request status change events for all channels
-GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests status change events for all channels including messages
-GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # Requests status change events of channels 1 and 2 including Spanish messages
-GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
 
-# Requests motion detection status change events of all channels
-GET /api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
+# Requests motion detection status change events for all channels
+ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests motion detection status change events of channels 1 and 2
-GET /api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 
 # Requests parking count for all the parking lots
-GET /api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Requests parking count for the parking lot id 1 and 2 (in this case the `ch` used as parking lot id)
-GET /api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
+
 
 The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.
 If the authentication information is incorrect or is not a supported topic, it will be disconnected immediately.
@@ -3318,7 +3319,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
     | `colors`      | `array` of `string` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  |
 
 
-Now, let's create an example that uses SSE to receive event messages.
+Now, let's create an example that uses the Web socket to receive event messages.
 ```html
 <!DOCTYPE>
 <head>
@@ -3334,236 +3335,7 @@ Now, let's create an example that uses SSE to receive event messages.
   </style>
 </head>
 <body>
-  <h2>Ex3. Receiving Events (Server-Sent Events)</h2>
-  <div id='control'>
-    <div>
-      <input type='text' id='host-name' placeholder='Server IP address:port'>
-      <input type='text' id='user-id' placeholder='User ID'> 
-      <input type='password' id='password' placeholder='Password'>
-    </div>
-    <div>
-      Topics:
-      <input class='topic' type='checkbox' value="channelStatus" checked>channelStatus
-      <input class='topic' type='checkbox' value="LPR" checked>LPR 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>emergencyCall
-      <input class='topic' type='checkbox' value="systemEvent" checked>systemEvent
-      <input class='topic' type='checkbox' value="motionChanges" checked>motionChanges
-      <input class='topic' type='checkbox' value="parkingCount" checked>parkingCount
-      <input class='topic' type='checkbox' value="packing" checked>packing
-      <input class='topic' type='checkbox' value="recordingStatus" checked>recordingStatus
-      <input class='topic' type='checkbox' value="object" checked>object
-      <input id='verbose' type='checkbox' checked>Verbose
-      <button type='button' onClick='onConnect()'>Connect</button>
-      <button type='button' onClick='onDisconnect()'>Disconnect</button>
-      <button type='button' onClick='onClearAll()'>Clear all</button>
-    </div>
-    <div id='url'>
-    </div>
-  </div>
-
-  <div>
-    <ul id='messages'></ul>
-  </div>
-</body>
-<script type='text/javascript'>
-  (function() {
-    window.myApp = { es: null };
-  })();
-
-  function getURL() {
-    var url = '';
-
-    if (typeof(EventSource) === 'undefined') {
-      alert('Your web browser does\'nt support Server-Sent Events.');
-      return url;
-    }
-
-    if(window.myApp.es !== null) {
-      alert('Already connected');
-      return url;
-    }
-      
-    var hostName = document.getElementById('host-name').value;
-    if(hostName == '') {
-      alert('Please enter the host.');
-      return url;
-    }
-    var userId = document.getElementById('user-id').value;
-    if(userId == '') {
-      alert('Please enter your user ID.');
-      return url;
-    }
-    var password = document.getElementById('password').value;
-    if(password == '') {
-      alert('Please enter your password.');
-      return url;
-    }
-
-    var topics = '';
-    var el = document.getElementsByClassName('topic');
-    for(var i=0; i<el.length; i++) {
-      if(!el[i].checked)
-        continue;
-
-      if(topics.length > 0)
-        topics += ',';
-       topics += el[i].value;
-    }
-    if(topics.length == 0) {
-      alert('Please select at least one topic.');
-      return url;
-    }
-
-    var encodedData = window.btoa(userId + ':' + password); // base64 encoding
-    url = (hostName.includes('http://', 0) ? '' : 'http://') +
-      hostName + '/api/subscribeEvents?topics=' + topics + 
-      '&auth=' + encodedData;
-          
-    if(document.getElementById('verbose').checked)
-      url += '&verbose=true';
-
-    //url += '&ch=4&lang=es-ES';
-    return url;
-  }
-
-  function addItem(tagClass, msg) {    
-    var li = document.createElement('li');
-    li.appendChild(document.createTextNode(msg));
-    li.classList.add(tagClass); 
-    document.getElementById('messages').appendChild(li);
-  }
-
-  function onConnect() {
-    var url = getURL();
-    if(url.length == 0)
-      return;
-
-    document.getElementById('url').innerText = url;
-
-    // EventSource instance and it's handler functions
-    var es = new EventSource(url);
-    es.onopen = function() {
-      addItem('open', 'Connected');
-    };
-    es.onerror = function() {
-      addItem('error', 'Error');
-      onDisconnect();
-    };
-    es.onmessage = function(e) {
-      var data = JSON.parse(e.data);
-      addItem('data', e.data);
-    }
-    window.myApp.es = es;
-  }
-
-  function onDisconnect() {
-    if( window.myApp.es !== null) {
-      window.myApp.es.close();
-      window.myApp.es = null;
-      addItem('close', 'Disconnected');
-    }
-  }
-    
-  function onClearAll() {
-    var el = document.getElementById("messages");
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
-    }
-    document.getElementById('url').innerText = '';
-  }
-</script>
-```
-[Run](./examples/ex3.html)
-
-
-
-### Web Sockets (RFC6455)
-Supports the ability to receive real-time event messsage using HTML5 Web sockets (RFC6455) method.
-Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.
-
-The step-by-step communication procedure is as follows:
->1. Client connects to the server via Web Sockets.
->2. If the authentication to the server succeeds, the subscriber ID is issued.
->3. The client then remains connected and enters the message waiting state.
->>* The server sends a ping message every 30 seconds to keep the connection even if there is no message to send.
->4. When an event occurs, the server sends a message to the client.
->5. Repeat steps 3 through 4 until the client ends the connection itself.
-
-> [Tips]
-The web socket method is supported by all web browsers including Microsoft web browsers.
-https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
-
-The web socket connection path and parameters are as follows.
-```ruby
-/wsapi/subscribeEvents
-
-# Required parameters
-auth    # Authentication Information (Requires authentication per individual web socket, independent of session authentication)
-topics  # Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)
-
-# Optional argument
-verbose # For emergencyCall, request List the live video stream sources of the linked video channels
-        # For channelStatus, request status messages (Include "title" in initial message immediately after issuing subscriber id
-session # Can pass authentication credentials by passing session cookie already connected
-
-# channelStatus-specific parameters (optional)
-ch      # Used when specifying specific channels (separated by a comma (,) if multiple channels are specified at the same time)
-lang    # Specify language for status messages
-
-# Example
-# Request car number recognition event
-ws://host/wsapi/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# Request emergency call event
-ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# Request both events
-ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# request List the live video stream sources of the linked video channels
-ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
-
-# Request status change events for all channels
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# Requests status change events for all channels including messages
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
-
-# Requests status change events of channels 1 and 2 including Spanish messages
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
-
-# Requests motion detection status change events for all channels
-ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# Requests motion detection status change events of channels 1 and 2
-ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
-
-# Requests parking count for all the parking lots
-ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# Requests parking count for the parking lot id 1 and 2 (in this case the `ch` used as parking lot id)
-ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
-```
-
-The event data format received after a Web socket connection is exactly the same as Server-Sent Events (SSE) and is not described here again.
-
-Now, let's create an example that uses the Web socket to receive event messages.
-```html
-<!DOCTYPE>
-<head>
-  <meta charset='utf-8'>
-  <title>ex4</title>
-  <style>
-    body {font-family:Arial, Helvetica, sans-serif}
-    div {padding:5px}
-    #control {background-color:beige}
-    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
-    li.open, li.close {color:blue}
-    li.error {color:red}
-  </style>
-</head>
-<body>
-  <h2>Ex4. Receiving Events (Web Socket)</h2>
+  <h2>Ex3. Receiving Events (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='Server IP address:port'>
@@ -3704,7 +3476,7 @@ Now, let's create an example that uses the Web socket to receive event messages.
   }
 </script>
 ```
-[Run](./examples/ex4.html)
+[Run](./examples/ex3.html)
 
 
 
@@ -3998,7 +3770,7 @@ Now let's create an example that uses a web socket to export the recorded video.
 <!DOCTYPE>
 <head>
   <meta charset='utf-8'>
-  <title>ex5</title>
+  <title>ex4</title>
   <style>
     body {font-family:Arial, Helvetica, sans-serif}
     div {padding:3px}
@@ -4012,7 +3784,7 @@ Now let's create an example that uses a web socket to export the recorded video.
   </style>
 </head>
 <body>
-    <h2>Ex5. Exporting recorded video (Web Socket)</h2>
+    <h2>Ex4. Exporting recorded video (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='Server IP address:port'>
@@ -4419,7 +4191,7 @@ Now let's create an example that uses a web socket to export the recorded video.
 </script>
 
 ````
-[Run](./examples/ex5.html)
+[Run](./examples/ex4.html)
 
 
 

@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.9
+TS-API@0.9.10
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -17,10 +17,11 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 
 목차
 -----
+
 <!-- TOC -->
 
 - [TS-API 프로그래밍 안내서](#ts-api-프로그래밍-안내서)
-  - [TS-API@0.9.8](#ts-api098)
+  - [TS-API@0.9.10](#ts-api0910)
   - [목차](#목차)
   - [시작하기](#시작하기)
   - [영상 표시](#영상-표시)
@@ -77,7 +78,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
     - [녹화 영상 소스](#녹화-영상-소스)
   - [동영상 소스를 사용하여 영상 요청 `@0.3.0`](#동영상-소스를-사용하여-영상-요청-030)
   - [실시간 이벤트 모니터링 `@0.3.0`](#실시간-이벤트-모니터링-030)
-    - [Server-Sent Events (SSE)](#server-sent-events-sse)
+    - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
     - [채널 상태 변경 이벤트](#채널-상태-변경-이벤트)
     - [차량 번호 인식 이벤트](#차량-번호-인식-이벤트)
     - [비상 호출 이벤트](#비상-호출-이벤트)
@@ -89,7 +90,6 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
       - [`face` 객체](#face-객체)
       - [`human` 객체](#human-객체)
       - [`vehicle` 객체](#vehicle-객체)
-    - [웹 소켓 (RFC6455)](#웹-소켓-rfc6455)
   - [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
   - [채널 정보 및 장치 제어 `@0.5.0`](#채널-정보-및-장치-제어-050)
     - [장치 정보 및 지원 기능 목록 요청](#장치-정보-및-지원-기능-목록-요청)
@@ -1842,14 +1842,14 @@ GET /api/find?what=carNo
   "at": 0,            // 데이터 오프셋 표시 (0이므로 첫 번째 위치의 데이터를 의미함)
   "data": [           // 차량 번호 로그 데이터 목록
     {
-      "id": 64,                          // 차량 번호 로그 번호
-      "plateNo": "13다5939",               // 차량 번호 텍스트
-      "score":98,                           // 인식 점수 (100점 만점): 차번인식 엔진에 따라 지원하지 않을 수 있음 (항목 없을 수 있음)
-      "roi": {                                // 번호판 이미지 영역
-        "offset": [943,635],                // 좌상단 좌표
-        "size": [132,31]                    // 번호�� 이미지 크기
+      "id": 64,                           // 차량 번호 로그 번호
+      "plateNo": "13다5939",              // 차량 번호 텍스트
+      "score":98,                         // 인식 점수 (100점 만점): 차번인식 엔진에 따라 지원하지 않을 수 있음 (항목 없을 수 있음)
+      "roi": {                            // 번호판 이미지 영역
+        "offset": [943,635],              // 좌상단 좌표
+        "size": [132,31]                  // 번호판 이미지 크기
       },
-      "image": [                              // 동일 번호판이 연속으로 저장된 경우를 위해 배열로 표현함 (항목 없을 수 있음)
+      "image": [                          // 동일 번호판이 연속으로 저장된 경우를 위해 배열로 표현함 (항목 없을 수 있음)
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386146439.plate.jpg",
         "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386199445.plate.jpg",
@@ -2487,12 +2487,12 @@ http://host/api/path/to&?auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 ## 실시간 이벤트 모니터링 `@0.3.0`
 
-### Server-Sent Events (SSE)
-HTML5 Server-Sent Events (SSE) 방식으로 실시간 이벤트 메시지를 수신할 수 있는 기능을 지원합니다.
+### 웹 소켓 (RFC6455)
+웹 소켓 (RFC6455)으로 실시간 이벤트 데이터를 수신할 수 있는 기능을 지원합니다.
 서버와 클라이언트가 접속 상태를 유지하며 이벤트가 발생하면 서버가 클라이언트에게 메시지를 송신하는 방식으로 동작합니다.
 
 단계별 통신 절차는 다음과 같습니다.
->1. 클라이언트가 서버에 접속
+>1. 클라이언트가 웹 소켓으로 서버에 접속
 >2. 서버에 인증에 성공하면 구독자 ID를 발급
 >3. 이후 클라이언트는 접속을 유지하며 메시지 대기 상태로 들어감
 >>* 서버는 전송할 메시지가 없더라도 접속을 유지하기 위해 30초에 한번씩 ping 메시지를 송신함
@@ -2500,8 +2500,8 @@ HTML5 Server-Sent Events (SSE) 방식으로 실시간 이벤트 메시지를 수
 >5. 클라이언트 스스로 접속을 종료하기 전까지 위의 3번에서 4번 과정을 반복
 
 > [참고]
-Microsoft Internet Explorer와 Microsoft Edge는 SSE 표준을 지원하지 않습니다. 만약 Microsoft 브라우저와 호환되도록 작업해야 하는 경우는 웹 소켓 (RFC6455) 방식을 사용하십시오.
-https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
+웹 소켓 방식은 Microsoft 웹 브라우저들을 포함한 모든 웹 브라우저에서 지원합니다.
+https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
 
 
 지원하는 이벤트 토픽은 다음과 같습니다.
@@ -2517,17 +2517,19 @@ recordingStatus # 녹화 상태 이벤트 (@0.9.5에서 추가됨)
 object          # 객체 감지 이벤트 (@0.9.6에서 추가됨)
 ```
 
-SSE 접속 경로와 매개변수들은 다음과 같습니다.
+ 
+웹 소켓 접속 경로와 매개변수들은 다음과 같습니다.
 ```ruby
-GET /api/subscribeEvents
+/wsapi/subscribeEvents
 
 # 필수 매개 변수들
-auth    # 인증 정보
+auth    # 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)
 topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
 
 # 공용 매개 변수들 (선택 사항)
-verbose # emergencyCall의 경우 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 나열
+verbose # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 나열
         # channelStatus의 경우 텍스트 메시지를 포함 (구독자 id 발급 직후 최초 메시지에 "title" 포함)
+session # 이미 연결된 session cookie를 전달하여 인증 정보를 대신할 수 있음
 
 # channelStatus 전용 매개 변수들 (선택 사항)
 ch      # 특정 채널을 지정할 경우 (여러 채널을 동시에 지정할 경우 쉼표 문자(,)로 구분)
@@ -2537,37 +2539,37 @@ lang    # 상태 메시지 표기 언어
 
 # 사용 예
 # 차량 번호 인식 이벤트 요청
-GET /api/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 비상 호출 이벤트 요청
-GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 두 이벤트를 모두 요청
-GET /api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
-GET /api/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # 모든 채널의 상태 변경 이벤트 요청
-GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 모든 채널의 상태 변경 이벤트시 메시지를 포함 요청
-GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
 
 # 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
-GET /api/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
+ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
 
 # 모든 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
-GET /api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # 1, 2번 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
-GET /api/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 
 # 모든 주차장의 주차 카운트 변경시 이벤트 요청
-GET /api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
+ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
 
 # Id 1, 2번 주차장의 주차 카운트 변경시 이벤트 요청 (이때 ch는 주차장 id로 사용됨)
-GET /api/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
+ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
 ```
 
 서버는 요청한 인증 정보와 토픽이 올바른 경우 아래와 같이 JSON형식으로 구독자 ID를 발급합니다.
@@ -3318,8 +3320,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
     | `colors`    | `string` `array` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  |
 
 
-
-이 번에는 SSE를 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
+이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
 ```html
 <!DOCTYPE>
 <head>
@@ -3335,238 +3336,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
   </style>
 </head>
 <body>
-  <h2>예제3. 이벤트 수신하기 (Server-Sent Events)</h2>
-  <div id='control'>
-    <div>
-      <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
-      <input type='text' id='user-id' placeholder='사용자 ID'> 
-      <input type='password' id='password' placeholder='비밀번호'>
-    </div>
-    <div>
-      토픽:
-      <input class='topic' type='checkbox' value="channelStatus" checked>채널 상태 
-      <input class='topic' type='checkbox' value="LPR" checked>차량 번호 인식 
-      <input class='topic' type='checkbox' value="emergencyCall" checked>비상 호출
-      <input class='topic' type='checkbox' value="systemEvent" checked>시스템 이벤트
-      <input class='topic' type='checkbox' value="motionChanges" checked>움직임 감지
-      <input class='topic' type='checkbox' value="parkingCount" checked>주차 카운트
-      <input class='topic' type='checkbox' value="packing" checked>포장
-      <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
-      <input class='topic' type='checkbox' value="object" checked>객체 감지
-      <input id='verbose' type='checkbox' checked>자세히
-      <button type='button' onClick='onConnect()'>접속</button>
-      <button type='button' onClick='onDisconnect()'>접속 종료</button>
-      <button type='button' onClick='onClearAll()'>모두 삭제</button>
-    </div>
-    <div id='url'>
-    </div>
-  </div>
-
-  <div>
-    <ul id='messages'></ul>
-  </div>
-</body>
-<script type='text/javascript'>
-  (function() {
-    window.myApp = { es: null };
-  })();
-
-  function getURL() {
-    var url = '';
-
-    if (typeof(EventSource) === 'undefined') {
-      alert('Server-Sent Events를 지원하지 않는 웹 브라우저입니다.');
-      return url;
-    }
-
-    if(window.myApp.es !== null) {
-      alert('이미 접속 중입니다.');
-      return url;
-    }
-      
-    var hostName = document.getElementById('host-name').value;
-    if(hostName == '') {
-      alert('호스트를 입력하십시오.');
-      return url;
-    }
-    var userId = document.getElementById('user-id').value;
-    if(userId == '') {
-      alert('사용자 아이디를 입력하십시오.');
-      return url;
-    }
-    var password = document.getElementById('password').value;
-    if(password == '') {
-      alert('비밀번호를 입력하십시오.');
-      return url;
-    }
-
-    var topics = '';
-    var el = document.getElementsByClassName('topic');
-    for(var i=0; i<el.length; i++) {
-      if(!el[i].checked)
-        continue;
-
-      if(topics.length > 0)
-        topics += ',';
-       topics += el[i].value;
-    }
-    if(topics.length == 0) {
-      alert('하나 이상의 토픽을 선택하십시오.');
-      return url;
-    }
-
-    var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
-    url = (hostName.includes('http://', 0) ? '' : 'http://') +
-      hostName + '/api/subscribeEvents?topics=' + topics + 
-      '&auth=' + encodedData;
-          
-    if(document.getElementById('verbose').checked)
-      url += '&verbose=true';
-
-    //url += '&ch=4&lang=ko-KR';
-    return url;
-  }
-
-  function addItem(tagClass, msg) {    
-    var li = document.createElement('li');
-    li.appendChild(document.createTextNode(msg));
-    li.classList.add(tagClass); 
-    document.getElementById('messages').appendChild(li);
-  }
-
-  function onConnect() {
-    var url = getURL();
-    if(url.length == 0)
-      return;
-
-    document.getElementById('url').innerText = url;
-
-    // 이벤트 소스 인스턴스와 핸들러 함수들
-    var es = new EventSource(url);
-    es.onopen = function() {
-      addItem('open', '접속 성공');
-    };
-    es.onerror = function() {
-      addItem('error', '오류');
-      onDisconnect();
-    };
-    es.onmessage = function(e) {
-      var data = JSON.parse(e.data);
-      addItem('data', e.data);
-    }
-    window.myApp.es = es;
-  }
-
-  function onDisconnect() {
-    if( window.myApp.es !== null) {
-      window.myApp.es.close();
-      window.myApp.es = null;
-      addItem('close', '접속 종료');
-    }
-  }
-  
-  function onClearAll() {
-    var el = document.getElementById("messages");
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
-    }
-    document.getElementById('url').innerText = '';
-  }
-</script>
-```
-[실행하기](./examples/ex3.html)
-
-
-
-### 웹 소켓 (RFC6455)
-웹 소켓 (RFC6455)으로 실시간 이벤트 데이터를 수신할 수 있는 기능을 지원합니다.
-서버와 클라이언트가 접속 상태를 유지하며 이벤트가 발생하면 서버가 클라이언트에게 메시지를 송신하는 방식으로 동작합니다.
-
-단계별 통신 절차는 다음과 같습니다.
->1. 클라이언트가 웹 소켓으로 서버에 접속
->2. 서버에 인증에 성공하면 구독자 ID를 발급
->3. 이후 클라이언트는 접속을 유지하며 메시지 대기 상태로 들어감
->>* 서버는 전송할 메시지가 없더라도 접속을 유지하기 위해 30초에 한번씩 ping 메시지를 송신함
->4. 이벤트 발생시 서버는 클라이언트에게 메시지를 송신
->5. 클라이언트 스스로 접속을 종료하기 전까지 위의 3번에서 4번 과정을 반복
-
-> [참고]
-웹 소켓 방식은 Microsoft 웹 브라우저들을 포함한 모든 웹 브라우저에서 지원합니다.
-https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
- 
-웹 소켓 접속 경로와 매개변수들은 다음과 같습니다.
-```ruby
-/wsapi/subscribeEvents
-
-# 필수 매개 변수들
-auth    # 인증 정보 (세션 인증과 별도로 개별 웹 소켓마다 인증 필요)
-topics  # 수신할 토픽 지정 (여러 토픽을 동시에 지정할 경우 쉼표 문자(,)로 구분)
-
-# 공용 매개 변수들 (선택 사항)
-verbose # 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 나열
-        # channelStatus의 경우 텍스트 메시지를 포함 (구독자 id 발급 직후 최초 메시지에 "title" 포함)
-session # 이미 연결된 session cookie를 전달하여 인증 정보를 대신할 수 있음
-
-# channelStatus 전용 매개 변수들 (선택 사항)
-ch      # 특정 채널을 지정할 경우 (여러 채널을 동시에 지정할 경우 쉼표 문자(,)로 구분)
-        # 채널을 명시하지 않으면 모든 채널을 의미
-lang    # 상태 메시지 표기 언어
-
-
-# 사용 예
-# 차량 번호 인식 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=LPR&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# 비상 호출 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# 두 이벤트를 모두 요청
-ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# 연동된 실시간 영상 채널들의 동영상 스트림 소스를 자세히 요청
-ws://host/wsapi/subscribeEvents?topics=LPR,emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
-
-# 모든 채널의 상태 변경 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# 모든 채널의 상태 변경 이벤트시 메시지를 포함 요청
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbose=true
-
-# 1, 2번 채널의 상태 변경 이벤트시 스페인어 메시지를 포함 요청
-ws://host/wsapi/subscribeEvents?topics=channelStatus&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2&verbose=true&lang=es-ES
-
-# 모든 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# 1, 2번 채널에 대해 움직임 감지 상태 변경시 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=motionChanges&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
-
-# 모든 주차장의 주차 카운트 변경시 이벤트 요청
-ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D
-
-# Id 1, 2번 주차장의 주차 카운트 변경시 이벤트 요청 (이때 ch는 주차장 id로 사용됨)
-ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&ch=1,2
-```
-
-웹 소켓으로 접속된 이후 수신되는 이벤트 데이터 형식은 Server-Sent Events (SSE)와 완전히 동일하므로 여기서는 설명을 생략합니다.
-
-이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
-```html
-<!DOCTYPE>
-<head>
-  <meta charset='utf-8'>
-  <title>ex4</title>
-  <style>
-    body {font-family:Arial, Helvetica, sans-serif}
-    div {padding:5px}
-    #control {background-color:beige}
-    #url, #messages {font-size:0.8em;font-family:'Courier New', Courier, monospace}
-    li.open, li.close {color:blue}
-    li.error {color:red}
-  </style>
-</head>
-<body>
-  <h2>예제4. 이벤트 수신하기 (Web Socket)</h2>
+  <h2>예제3. 이벤트 수신하기 (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
@@ -3707,7 +3477,7 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
   }
 </script>
 ```
-[실행하기](./examples/ex4.html)
+[실행하기](./examples/ex3.html)
 
 
 
@@ -4001,7 +3771,7 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
 <!DOCTYPE>
 <head>
   <meta charset='utf-8'>
-  <title>ex5</title>
+  <title>ex4</title>
   <style>
     body {font-family:Arial, Helvetica, sans-serif}
     div {padding:3px}
@@ -4015,7 +3785,7 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
   </style>
 </head>
 <body>
-  <h2>예제5. 녹화 영상 받아내기 (Web Socket)</h2>
+  <h2>예제4. 녹화 영상 받아내기 (Web Socket)</h2>
   <div id='control'>
     <div>
       <input type='text' id='host-name' placeholder='서버 IP주소:포트'>
@@ -4422,7 +4192,7 @@ http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.1
 </script>
 
 ````
-[실행하기](./examples/ex5.html)
+[실행하기](./examples/ex4.html)
 
 
 
