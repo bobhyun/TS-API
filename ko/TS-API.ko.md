@@ -2107,7 +2107,7 @@ GET /api/find?what=object
       "type": "vehicle",       # 객체 종류 (차량)
       "likelihood": 95.80,     # 정확도 (%)
       "attributes": {          # 객체 속성
-        "vehicleType": "Car",  # 차량 종류 (자동차)
+        "vehicleType": "Car",  # 차량 종류 (승용차)
         "colors": [            # 색상
           "gray"
         ]
@@ -2222,7 +2222,7 @@ vehicleType  # 차량 종류와 색상을 콤마(,)로 구분 표기
 # 버스만 요청
 GET /api/find?what=object&objectType=vehicle&vehicleType=bus
 
-# 노란색 자동차만 요청
+# 노란색 승용차만 요청
 GET /api/find?what=object&objectType=vehicle&vehicleType=car,yellow
 ```
 
