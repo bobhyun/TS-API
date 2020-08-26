@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.10
+TS-API@0.9.11
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -21,7 +21,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 <!-- TOC -->
 
 - [TS-API 프로그래밍 안내서](#ts-api-프로그래밍-안내서)
-  - [TS-API@0.9.10](#ts-api0910)
+  - [TS-API@0.9.11](#ts-api0911)
   - [목차](#목차)
   - [시작하기](#시작하기)
   - [영상 표시](#영상-표시)
@@ -61,13 +61,15 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
     - [이벤트 로그 종류 목록](#이벤트-로그-종류-목록)
     - [주차장 목록 `@0.9.8`](#주차장-목록-098)
     - [수신 가능한 실시간 이벤트 목록 `@0.9.6`](#수신-가능한-실시간-이벤트-목록-096)
+    - [지원하는 객체 목록 `@0.9.11`](#지원하는-객체-목록-0911)
+    - [지원하는 객체별 속성 목록 `@0.9.11`](#지원하는-객체별-속성-목록-0911)
   - [저장 데이터 검색](#저장-데이터-검색)
     - [녹화 영상이 있는 날짜 검색](#녹화-영상이-있는-날짜-검색)
     - [녹화 영상이 있는 분 단위 검색 `@0.2.0`](#녹화-영상이-있는-분-단위-검색-020)
     - [이벤트 로그 검색](#이벤트-로그-검색)
     - [차량 번호 로그 검색](#차량-번호-로그-검색)
     - [유사 차량 번호 검색 `@0.2.0`](#유사-차량-번호-검색-020)
-    - [객체 검색 `@0.9.6`](#객체-검색-096)
+    - [객체 검색 `@0.9.11`](#객체-검색-0911)
       - [공통 매개변수](#공통-매개변수)
       - [face용 매개변수](#face용-매개변수)
       - [human용 매개변수](#human용-매개변수)
@@ -86,7 +88,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
     - [움직임 감지 이벤트 `@0.8.0`](#움직임-감지-이벤트-080)
     - [주차 카운트 이벤트 `@0.9.0`](#주차-카운트-이벤트-090)
     - [녹화 상태 이벤트 `@0.9.5`](#녹화-상태-이벤트-095)
-    - [객체 감지 이벤트 `@0.9.6`](#객체-감지-이벤트-096)
+    - [객체 감지 이벤트 `@0.9.11`](#객체-감지-이벤트-0911)
       - [`face` 객체](#face-객체)
       - [`human` 객체](#human-객체)
       - [`vehicle` 객체](#vehicle-객체)
@@ -1568,6 +1570,89 @@ GET /api/enum?what=realtimeEvent
 ]
 ```
 
+### 지원하는 객체 목록 `@0.9.11`
+서버에서 지원하는 객체 종류를 얻으려면 다음과 같이 요청합니다.
+```ruby
+GET /api/enum?what=objectType
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+```jsx
+[
+  "face",
+  "human",
+  "vehicle"
+]
+```
+
+### 지원하는 객체별 속성 목록 `@0.9.11`
+서버에서 지원하는 객체별 속성을 얻으려면 다음과 같이 요청합니다.
+```ruby
+GET /api/enum?what=objectAttr&type=face  # 얼굴 객체의 속성
+GET /api/enum?what=objectAttr            # type을 명시하지 않으면 모든 객체별 속성
+```
+요청에 대해 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
+
+얼굴 객체의 속성을 요청한 경우:
+```jsx
+{
+  "age": [
+    "young",
+    "adult",
+    "middle",
+    "senior"
+  ],
+  "gender": [
+    "female",
+    "male"
+  ],
+  "glasses": [
+    true,
+    false
+  ],
+  "hat": [
+    true,
+    false
+  ],
+  "mask": [
+    true,
+    false
+  ]
+}
+```
+
+모든 객체의 속성을 요청한 경우:
+```jsx
+{
+  "face": {
+    "age": [
+      "young",
+      "adult",
+      "middle",
+      "senior"
+    ],
+    // ... 중략
+  },
+  "human": {
+    "bag": [
+      true,
+      false
+    ],
+     // ... 중략
+  },
+  "vehicle": {
+    "vehicleType": [
+      "car",
+      "truck",
+      "bus",
+      "bicycle",
+      "motorcycle",
+      "train"
+    ],
+    // ... 중략
+  }
+}
+```
+
 
 ## 저장 데이터 검색
 
@@ -2039,7 +2124,7 @@ GET /api/find?what=similarCarNo&keyword=1234&maxCount=10
 ```
 
 
-### 객체 검색 `@0.9.6`
+### 객체 검색 `@0.9.11`
 객체 감지 기능을 사용하는 경우 감지된 객체들(`face`, `human`, `vehicle`)은 해당 동영상과 함께 저장됩니다. 객체 로그를 조회하기 위해서는 다음과 같이 요청합니다.
 
 ```ruby
@@ -2058,7 +2143,10 @@ GET /api/find?what=object
       "type": "face",          # 객체 종류 (얼굴)
       "likelihood": 82.59      # 정확도 (%)
       "attributes": {          # 객체 속성
-        "gender": "female"     # 성별 (여자)
+        "gender": "female",    # 성별 (여자)
+        "age": "middle",       # 나이 (중년)
+        "glasses": true,       # 안경 (착용)
+        "mask": false          # 마스크 (미착용)
       },
       "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412659.1590386295819221.object._c1_t2_s392x504.jpg" # 이미지 주소
     },
@@ -2069,7 +2157,8 @@ GET /api/find?what=object
       "type": "face",          # 객체 종류 (얼굴)
       "likelihood": 90.09,     # 정확도 (%)
       "attributes": {          # 객체 속성
-        "gender": "male"       # 성별 (남자)
+        "gender": "male",      # 성별 (남자)
+        "hat": true            # 모자 (착용)
       },
       "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412660.1590386294449281.object._c1_t2_s744x624.jpg" # 이미지 주소
     },
@@ -2119,7 +2208,7 @@ GET /api/find?what=object
 }
 ```
 
-검색 결과의 `data` 항목의 내용은 [객체 감지 이벤트 `@0.9.6`](#객체-감지-이벤트-096)의 내용과 동일합니다.
+검색 결과의 `data` 항목의 내용은 [객체 감지 이벤트 `@0.9.11`](#객체-감지-이벤트-0911)의 내용과 동일합니다.
 
 또한 아래와 같이 각 객체별 속성을 지정하여 조건 검색할 수 있습니다.
 
@@ -2156,7 +2245,9 @@ GET /api/find?what=object&sort=asc
 ```ruby
 gender       # 성별 지정 (male, female 중 하나)
 age          # 나이 구분 (young, adult, middle, senior 중 하나)
-accessories  # 착용한 악세서리 지정 (hat, glasses 중 복수 지정 가능)
+hat          # 모자 착용 여부 (true, false 중 하나, 또는 0, 1 중 하나)
+glasses      # 안경 착용 여부 (true, false 중 하나, 또는 0, 1 중 하나)
+mask         # 마스크 착용 여부 (true, false 중 하나, 또는 0, 1 중 하나)
 
 # 남자만 요청
 GET /api/find?what=object&objectType=face&gender=male
@@ -2168,17 +2259,24 @@ GET /api/find?what=object&objectType=face&age=adult
 GET /api/find?what=object&objectType=face&gender=female&age=middle
 
 # 안경 쓴 사람만 요청
-GET /api/find?what=object&objectType=face&accessories=glasses
+GET /api/find?what=object&objectType=face&glasses=true
 
 # 안경 쓰고 모자 쓴 사람만 요청
-GET /api/find?what=object&objectType=face&accessories=glasses,hat
+GET /api/find?what=object&objectType=face&glasses=1&hat=1
+
+# 마스크 안 쓴 사람만 요청
+GET /api/find?what=object&objectType=face&mask=false
+
+# 안경 쓰고 마스크 안 쓴 사람만 요청
+GET /api/find?what=object&objectType=face&glasses=true&mask=false
 ```
 
 
 #### human용 매개변수
 ```ruby
 gender        # 성별 지정 (male, female 중 하나)
-accessories   # 착용한 악세서리 지정 (hat, glasses, bag 중 복수 지정 가능)
+hat           # 모자 착용 여부 (true, false 중 하나, 또는 0, 1 중 하나)
+bag           # 가방 소지 여부 (true, false 중 하나, 또는 0, 1 중 하나)
 topClothes    # 상의 길이 및 색상을 콤마(,)로 구분해서 복수 지정
               # 길이 (short, long 중 하나)
               # 색상 (brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, other 중 복수 지정 가능)
@@ -2188,10 +2286,10 @@ bottomClothes # 하의 색상 지정 (상동)
 GET /api/find?what=object&objectType=human&gender=female
 
 # 가방 든 사람만 요청
-GET /api/find?what=object&objectType=human&accessories=bag
+GET /api/find?what=object&objectType=human&bag=true
 
 # 모자 쓰고 가방 든 사람만 요청
-GET /api/find?what=object&objectType=human&accessories=hat,bag
+GET /api/find?what=object&objectType=human&hat=true&bag=true
 
 # 반팔 상의를 입은 사람
 GET /api/find?what=object&objectType=human&topClothes=short
@@ -2209,7 +2307,7 @@ GET /api/find?what=object&objectType=human&bottomClothes=short
 GET /api/find?what=object&objectType=human&topClothes=black&bottomClothes=black
 
 # 모자 쓰고 가방 들고 흰색 상의를 입은 남자
-GET /api/find?what=object&objectType=human&accessories=hat,bag&topClothes=white&gender=male
+GET /api/find?what=object&objectType=human&hat=1&bag=1&topClothes=white&gender=male
 ```
 
 
@@ -3164,7 +3262,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
       "recording":true
     },
     {
-      "chid":2,
+      "chid":2, /*
       "streaming":false,
       "recording":false
     },
@@ -3195,7 +3293,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
 }
 ```
 
-### 객체 감지 이벤트 `@0.9.6`
+### 객체 감지 이벤트 `@0.9.11`
 `topics=object`를 요청하면 각 카메라에서 객체가 감지되는 시점에 실시간 이벤트를 수신할 수 있습니다.
 
 지원하는 객체 종류는 다음과 같습니다.
@@ -3229,20 +3327,22 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
   "attributes": {         # 객체 속성 (감지된 속성만 나열)
     "gender": "female",   # 성별
     "age": "adult",       # 나이 구분
-    "accessory": [        # 착용한 악세서리 (복수 표기)
-      "hat", 
-      "glasses"
-    ]
+    "hat": true,          # 모자 (착용) 
+    "glasses": false,     # 안경 (미착용)
+    "mask": false         # 마스크 (미착용)
   },
   "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411971.1590382562558672.object._c1_t2_s552x400.jpg" # 이미지 주소
 }
 ```
 2. `face` 객체 속성
-    | key         | 형식     | 목록                                 |
-    |-------------|----------|--------------------------------------|
-    | `gender`    | `string` | `female`, `male`                     |
-    | `age`       | `string` | `young`, `adult`, `middle`, `senior` |
-    | `accessory` | `string` `array`  | `hat`, `glasses`          |
+    | key         | 형식       | 목록                                  |
+    |-------------|-----------|--------------------------------------|
+    | `gender`    | `string`  | `female`, `male`                     |
+    | `age`       | `string`  | `young`, `adult`, `middle`, `senior` |
+    | `hat`       | `boolean` | true, false                          |
+    | `glasses`   | `boolean` | true, false                          |
+    | `mask`      | `boolean` | true, false                          |
+    
 
 #### `human` 객체
 1. 예제 데이터
@@ -3255,11 +3355,8 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
   "likelihood": 74.80,    # 정확도 (%)
   "attributes": {         # 객체 속성 (감지된 속성만 나열)
     "gender": "female",   # 성별
-    "accessory": [        # 착용한 악세서리 (복수 표기)
-      "hat", 
-      "glasses", 
-      "bag"
-    ], 
+    "hat": true,          # 모자 (착용) 
+    "bag": true,          # 가방 (소지)
     "clothes": [          # 옷 (복수 표기)
       {
         "type": "tops",   # 상의
@@ -3281,16 +3378,17 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
 }
 ```
 2. `human` 객체 속성
-    | key        | 형식         | 목록                            |
-    |-------------|--------------|---------------------------------|
-    | `gender`    | `string`     | `female`, `male`                |
-    | `accessory` | `string` `array` | `hat`, `glasses`, `bag`        |
-    | `clothes`   | `object` `array` | *`clothes` 객체 속성 참조*      |
+    | key         | 형식              | 목록                            |
+    |-------------|------------------|--------------------------------|
+    | `gender`    | `string`         | `female`, `male`               |
+    | `hat`       | `boolean`        | true, false                    |
+    | `bag`       | `boolean`        | true, false                    |
+    | `clothes`   | `object` `array` | *`clothes` 객체 속성 참조*        |
 3. `clothes` 객체 속성  
-    | key         | 형식         | 목록                   | 설명        |
-    |-------------|--------------|------------------------|-------------|
-    | `type`      | `string`     | `tops`, `bottoms`      | 상.하의 구분 |
-    | `length`    | `string`     | `short`, `long`        | 소매.바지 기장 |
+    | key         | 형식              | 목록                    | 설명         |
+    |-------------|------------------|------------------------|-------------|
+    | `type`      | `string`         | `tops`, `bottoms`      | 상.하의 구분   |
+    | `length`    | `string`         | `short`, `long`        | 소매.바지 기장 |
     | `colors`    | `string` `array` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  | 색상 |
     
     
@@ -3314,10 +3412,10 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
 }
 ```
 2. `vehicle` 객체 속성
-    | key           | 형식         | 목록                            |
+    | key           | 형식          | 목록                            |
     |---------------|--------------|--------------------------------|
     | `vehicleType` | `string`     | `car`, `truck`, `bus`, `bicycle`, `motorcycle`, `train`  |
-    | `colors`    | `string` `array` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  |
+    | `colors`      | `string` `array` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  |
 
 
 이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.

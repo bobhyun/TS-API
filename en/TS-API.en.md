@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.10
+TS-API@0.9.11
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.8](#ts-api098)
+  - [TS-API@0.9.11](#ts-api0911)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -61,13 +61,15 @@ Table of contents
     - [Event log type list](#event-log-type-list)
     - [Parking lot list `@0.9.8`](#parking-lot-list-098)
     - [Real-time event list `@0.9.6`](#real-time-event-list-096)
+    - [Supported object types `@0.9.11`](#Supported-object-types-0911)
+    - [Supported object attributes `@0.9.11`](#Supported-object-attributes-0911)
   - [Retrieve recorded data](#retrieve-recorded-data)
     - [Search dates with recorded video](#search-dates-with-recorded-video)
     - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
     - [Search event log](#search-event-log)
     - [Vehicle number log search](#vehicle-number-log-search)
     - [Search for similar vehicle numbers `@0.2.0`](#search-for-similar-vehicle-numbers-020)
-    - [Object Search `@0.9.6`](#object-search-096)
+    - [Object Search `@0.9.11`](#object-search-0911)
       - [Common parameters](#common-parameters)
       - [Parameters for `face`](#parameters-for-face)
       - [Parameters for `human`](#parameters-for-human)
@@ -86,7 +88,7 @@ Table of contents
     - [Motion Detection Status Change Event `@0.8.0`](#motion-detection-status-change-event-080)
     - [Parking Count Event `@0.9.0`](#parking-count-event-090)
     - [Recording Status Event `@0.9.5`](#recording-status-event-095)
-    - [Object Detection Event `@0.9.6`](#object-detection-event-096)
+    - [Object Detection Event `@0.9.11`](#object-detection-event-0911)
       - [`face` object](#face-object)
       - [`human` object](#human-object)
       - [`vehicle` object](#vehicle-object)
@@ -1570,6 +1572,91 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
+### Supported object types `@0.9.11`
+To get a list of object types supported by the server, request the followings:
+```ruby
+GET /api/enum?what=objectType
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+```jsx
+[
+  "face",
+  "human",
+  "vehicle"
+]
+```
+
+### Supported object attributes `@0.9.11`
+To get a list of object attributes supported by the server, request the followings:
+```ruby
+GET /api/enum?what=objectAttr&type=face  # attributes for face
+GET /api/enum?what=objectAttr            # attributes for all
+```
+For the request, the server returns JSON data in the following format with an HTTP response code of 200:
+
+In case of attributes for face:
+```jsx
+{
+  "age": [
+    "young",
+    "adult",
+    "middle",
+    "senior"
+  ],
+  "gender": [
+    "female",
+    "male"
+  ],
+  "glasses": [
+    true,
+    false
+  ],
+  "hat": [
+    true,
+    false
+  ],
+  "mask": [
+    true,
+    false
+  ]
+}
+```
+
+In case of attributes for all:
+```jsx
+{
+  "face": {
+    "age": [
+      "young",
+      "adult",
+      "middle",
+      "senior"
+    ],
+    // ... omitted
+  },
+  "human": {
+    "bag": [
+      true,
+      false
+    ],
+     // ... omitted
+  },
+  "vehicle": {
+    "vehicleType": [
+      "car",
+      "truck",
+      "bus",
+      "bicycle",
+      "motorcycle",
+      "train"
+    ],
+    // ... omitted
+  }
+}
+```
+
+
+
 
 ## Retrieve recorded data
 
@@ -2040,7 +2127,7 @@ For the request, the server returns JSON data in the following format with an HT
 ]
 ```
 
-### Object Search `@0.9.6`
+### Object Search `@0.9.11`
 When using the object detection function, the detected objects (`face`,` human`, `vehicle`) are saved with the video. To search the object detection log, request as follows.
 
 ```ruby
@@ -2059,8 +2146,11 @@ For the request, the server returns JSON data in the following format with an HT
       "type": "face",          # object type
       "likelihood": 82.59      # detection accuracy (%)
       "attributes": {          # object attributes (list only detected attributes)
-        "gender": "female"     # gender
-      },
+        "gender": "female",    # gender
+        "age": "middle",       # age 
+        "glasses": true,       # glasses (wearing)
+        "mask": false          # mask (not wearing)
+      },  
       "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412659.1590386295819221.object._c1_t2_s392x504.jpg" # image address
     },
     {
@@ -2120,7 +2210,7 @@ For the request, the server returns JSON data in the following format with an HT
 }
 ```
 
-The contents of the `data` item of the search result are the same as the contents of [Object Detection Event `@ 0.9.6`] (#object-detection-event-096).
+The contents of the `data` item of the search result are the same as the contents of [Object Detection Event `@ 0.9.11`] (#object-detection-event-0911).
 
 You can also search for conditions by specifying parameters for each object as shown below.
 
@@ -2157,7 +2247,9 @@ GET /api/find?what=object&sort=asc
 ```ruby
 gender       # Gender designation (either male or female)
 age          # Age classification (one of young, adult, middle, senior)
-accessories  # Worn accessories (multiple choices among hat and glasses are possible)
+hat          # Wearing a hat (either true or false)
+glasses      # Wearing glasses (either true or false)
+mask         # Wearing a mask (either true or false)
 
 # Man only request
 GET /api/find?what=object&objectType=face&gender=male
@@ -2169,17 +2261,24 @@ GET /api/find?what=object&objectType=face&age=adult
 GET /api/find?what=object&objectType=face&gender=female&age=middle
 
 # Request only for people with glasses
-GET /api/find?what=object&objectType=face&accessories=glasses
+GET /api/find?what=object&objectType=face&glasses=true
 
 # Request only for people wearing glasses and hats
-GET /api/find?what=object&objectType=face&accessories=glasses,hat
+GET /api/find?what=object&objectType=face&glasses=1&hat=1
+
+# Request only for people not wearing a mask
+GET /api/find?what=object&objectType=face&mask=false
+
+# Request only for people wearing glasses but mask
+GET /api/find?what=object&objectType=face&glasses=true&mask=false
 ```
 
 
 #### Parameters for `human`
 ```ruby
 gender        # Gender designation (either male or female)
-accessories   # Worn accessories (multiple choices among hat, glasses and bag are possible)
+hat           # Wearing a hat (either true or false, or either 1 or 0)
+bag           # Beloing a bag (either true or false, or either 1 or 0)
 topClothes    # Top length and colors (Separate multiples with comma (,))
               # length (ether short or long)
               # colors (multiple choices among brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, and other)
@@ -2189,10 +2288,10 @@ bottomClothes # Bottom length and colors (The expressions are the same as topCol
 GET /api/find?what=object&objectType=human&gender=female
 
 # Request only for people with bags
-GET /api/find?what=object&objectType=human&accessories=bag
+GET /api/find?what=object&objectType=human&bag=true
 
 # Request only for people with hats and bags
-GET /api/find?what=object&objectType=human&accessories=hat,bag
+GET /api/find?what=object&objectType=human&hat=true&bag=true
 
 # people in short-sleeved
 GET /api/find?what=object&objectType=human&topClothes=short
@@ -2210,7 +2309,7 @@ GET /api/find?what=object&objectType=human&bottomClothes=short
 GET /api/find?what=object&objectType=human&topClothes=black&bottomClothes=black
 
 # Men in a white top wearing a hat and holding a bag
-GET /api/find?what=object&objectType=human&accessories=hat,bag&topClothes=white&gender=male
+GET /api/find?what=object&objectType=human&hat=1&bag=1&topClothes=white&gender=male
 ```
 
 
@@ -3195,7 +3294,7 @@ After this, whenever a change occurs, it is received in JSON format as shown bel
 }
 ```
 
-### Object Detection Event `@0.9.6`
+### Object Detection Event `@0.9.11`
 If you request `topics = object`, you can receive real-time events at the time when the object is detected by each camera.
 The supported object types are as follows.
 - face
@@ -3228,10 +3327,9 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
   "attributes": {         # object attributes (list only detected attributes)
     "gender": "female",   # gender
     "age": "adult",       # age devision
-    "accessory": [        # worn accessories (multiple notation)
-      "hat", 
-      "glasses"
-    ]
+    "hat": true,          # hat (wearing) 
+    "glasses": false,     # glasses (not wearing)
+    "mask": false         # mask (not wearing)
   },
   "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411971.1590382562558672.object._c1_t2_s552x400.jpg" # image address
 }
@@ -3241,7 +3339,9 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
     |-------------|----------|--------------------------------------|
     | `gender`    | `string` | `female`, `male`                     |
     | `age`       | `string` | `young`, `adult`, `middle`, `senior` |
-    | `accessory` | `array` of `string` | `hat`, `glasses`          |
+    | `hat`       | `boolean` | true, false                         |
+    | `glasses`   | `boolean` | true, false                         |
+    | `mask`      | `boolean` | true, false                         |
 
 #### `human` object
 1. Example data
@@ -3254,11 +3354,8 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
   "likelihood": 74.80,    # detection accuracy (%)
   "attributes": {         # object attributes (list only detected attributes)
     "gender": "female",   # gender
-    "accessory": [        # worn accessories (multiple notation)
-      "hat", 
-      "glasses", 
-      "bag"
-    ], 
+    "hat": true,          # hat (wearing) 
+    "bag": true,          # bag (carring)
     "clothes": [          # clothes (multiple notation)
       {
         "type": "tops",   # tops
@@ -3280,16 +3377,17 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
 }
 ```
 2. `human` attributes
-    | key         | type         | list                            |
-    |-------------|--------------|---------------------------------|
-    | `gender`    | `string`     | `female`, `male`                |
-    | `accessory` | `array` of `string` | `hat`, `glasses`, `bag`        |
-    | `clothes`   | `array` of `object` | *refer to `clothes` attributeds*      |
+    | key         | type                | list                             |
+    |-------------|---------------------|----------------------------------|
+    | `gender`    | `string`            | `female`, `male`                 |
+    | `hat`       | `boolean`           | true, false                      |
+    | `bag`       | `boolean`           | true, false                      |
+    | `clothes`   | `array` of `object` | *refer to `clothes` attributeds* |
 3. `clothes` attributes
-    | key         | type         | list                   | description        |
-    |-------------|--------------|------------------------|-------------|
-    | `type`      | `string`     | `tops`, `bottoms`      | tops or bottoms |
-    | `length`    | `string`     | `short`, `long`        | sleeve, pants length |
+    | key         | type                | list                   | description          |
+    |-------------|---------------------|------------------------|----------------------|
+    | `type`      | `string`            | `tops`, `bottoms`      | tops or bottoms      |
+    | `length`    | `string`            | `short`, `long`        | sleeve, pants length |
     | `colors`    | `array` of `string` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  | colors of clothes |
     
     
