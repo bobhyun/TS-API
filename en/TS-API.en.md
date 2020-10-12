@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.11
+TS-API@0.9.12
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.11](#ts-api0911)
+  - [TS-API@0.9.12](#ts-api0912)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -484,11 +484,18 @@ For the request, the server returns JSON data in the following format with an HT
 // for a genuine lincense:
 {
   "license": {
-    "type": "genuine",    // Genuine lincense
-    "maxChannels": 36,    // Maximum channels available
-    "extension": [        // Add-ons
-      "lprExt",           // Interworking the vehicle number recognition
-      "emergencyCall"     // supports emergency call devices
+    "type": "genuine",         // Genuine lincense
+    "maxChannels": 36,         // Maximum channels available
+    "nLprZone": 36,            // Maximum license plate recognition zones available (TS-API@0.9.12)
+    "nDevEmCall": 50,          // Maximum emergency call buttons available (TS-API@0.9.12)
+    "nChObjDetection": 36,     // Maximum channels available for object detection (TS-API@0.9.12)
+    "nChFaceRecognition": 10,  // Maximum channels available for face recognition (TS-API@0.9.12)
+    "nChTrafficCount": 10,     // Maximum channels available for vehicle traffic count (TS-API@0.9.12)
+    "nChSpeedometer": 10,      // Maximum channels available for vehicle speedometer (TS-API@0.9.12)
+    "mediaType": "USB dongle", // License media type ("USB dongle" or "Software") (TS-API@0.9.12)
+    "extension": [             // Add-ons
+      "lprExt",                // Interworking the vehicle number recognition
+      "emergencyCall"          // supports emergency call devices
     ]
   }
 }

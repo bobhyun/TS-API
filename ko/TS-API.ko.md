@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.11
+TS-API@0.9.12
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -21,7 +21,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 <!-- TOC -->
 
 - [TS-API 프로그래밍 안내서](#ts-api-프로그래밍-안내서)
-  - [TS-API@0.9.11](#ts-api0911)
+  - [TS-API@0.9.12](#ts-api0912)
   - [목차](#목차)
   - [시작하기](#시작하기)
   - [영상 표시](#영상-표시)
@@ -481,11 +481,18 @@ GET /api/info?license
 // 정품인 경우:
 {
   "license": {
-    "type": "genuine",    // 정품 라이센스
-    "maxChannels": 36,    // 최대 사용할 수 있는 채널 수
-    "extension": [        // 부가 기능
-      "lprExt",           // 차량 번호 인식 장치 연동
-      "emergencyCall"     // 비상 호출 장치 연동
+    "type": "genuine",         // 정품 라이센스
+    "maxChannels": 36,         // 최대 사용할 수 있는 채널 수
+    "nLprZone": 36,            // 차번 인식 영역 수 (TS-API@0.9.12)
+    "nDevEmCall": 50,          // 비상 호출 비상벨 수 (TS-API@0.9.12)
+    "nChObjDetection": 36,     // 객체 감지 채널 수 (TS-API@0.9.12)
+    "nChFaceRecognition": 10,  // 얼굴 인식 채널 수 (TS-API@0.9.12)
+    "nChTrafficCount": 10,     // 차량 통행량 집계 채널 수 (TS-API@0.9.12)
+    "nChSpeedometer": 10,      // 차량 속도 측정 채널 (TS-API@0.9.12)
+    "mediaType": "USB dongle", // 라이센스 미디어 종류 ("USB dongle" 또는 "Software") (TS-API@0.9.12)
+    "extension": [             // 부가 기능
+      "lprExt",                // 차량 번호 인식 장치 연동
+      "emergencyCall"          // 비상 호출 장치 연동
     ]
   }
 }
