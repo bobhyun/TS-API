@@ -21,7 +21,6 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.13](#ts-api0913)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
