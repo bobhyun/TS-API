@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.12
+TS-API@0.9.13
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -1003,6 +1003,7 @@ For the request of a list of supported items, the server response JSON data in t
         "critical": true,
         "id": 5,
         "raw": 100,
+        "rawHex": "000000000064",   // added @0.9.13 (hexa decimal text string of raw value)
         "threshold": 0,
         "value": 0,
         "worst": 100
@@ -1012,6 +1013,7 @@ For the request of a list of supported items, the server response JSON data in t
         "critical": false,
         "id": 9,
         "raw": 100,
+        "rawHex": "000000000064",   // added @0.9.13 (hexa decimal text string of raw value)
         "threshold": 0,
         "value": 1819,
         "worst": 100
