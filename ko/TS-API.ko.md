@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.13
+TS-API@0.9.14
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -91,6 +91,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
       - [`face` 객체](#face-객체)
       - [`human` 객체](#human-객체)
       - [`vehicle` 객체](#vehicle-객체)
+    - [체온 감지 이벤트 `@0.9.14`](#체온-감지-이벤트-0914)
   - [녹화 영상 받아내기 `@0.3.0`](#녹화-영상-받아내기-030)
   - [채널 정보 및 장치 제어 `@0.5.0`](#채널-정보-및-장치-제어-050)
     - [장치 정보 및 지원 기능 목록 요청](#장치-정보-및-지원-기능-목록-요청)
@@ -3426,6 +3427,70 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
     | `colors`      | `string` `array` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  |
 
 
+### 체온 감지 이벤트 `@0.9.14`
+`topics=bodyTemperature`를 요청하면 각 체온 감지용 열화상 카메라에서 고온이 감지되는 시점에 실시간 이벤트를 수신할 수 있습니다.
+
+체온 감지 이벤트를 수신하려면 아래와 같이 요청합니다.
+```ruby
+GET /api/subscribeEvents?topics=object&objectType=bodyTemperature&auth=ZGVtbzohMTIzNHF3ZXI%3D
+```
+예제 데이터
+```jsx
+{
+  "timestamp": "2020-05-25T14:23:58.768-05:00",
+  "chid": 1,              # 채널 id
+  "objId": 182,           # 객체 id (id가 동일하면 같은 사람임)
+  "likelihood": 99.60,    # 인식 신뢰도 (%)
+  "linkedChannel":[                             // 채널 정보
+    {
+      "chid":1,
+      "title":"카메라1",
+      "displayName":"CH1. 카메라1",             // TS-API@0.9.4
+      "src":"http://host/watch?ch=1",
+      "streams": [  // 동영상 스트림 정보
+                // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨)
+        { // 1080p RTMP 스트림
+          "src": "rtmp://host/live/ch1main",  // 동영상 주소
+          "type": "rtmp/mp4",     // MIME 형식: RTMP 프로토콜 (Adobe Flash 방식)
+          "label": "1080p FHD",   // 해상도 이름
+          "size": [               // 해상도
+            1920,                 // 가로 픽셀 수
+            1080                  // 세로 픽셀 수
+          ]
+        },
+        { // 1080p HLS 스트림
+          "src": "http://host/hls/ch1main/index.m3u8", // 동영상 주소
+          "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
+          "label": "1080p FHD",   // 해상도 이름
+          "size": [               // 해상도
+            1920,                 // 가로 픽셀 수
+            1080                  // 세로 픽셀 수
+          ]
+        },
+        { // VGA RTMP 스트림
+          "src": "rtmp://host/live/ch1sub",   // RTMP 프로토콜 (Adobe Flash 방식)
+          "type": "rtmp/mp4",   // MIME 형식: RTMP 프로토콜 (Adobe Flash 방식)
+          "label": "VGA",
+          "size": [
+            640,
+            480
+          ]
+        },
+        { // VGA HLS 스트림
+          "src": "http://host/hls/ch1sub/index.m3u8", // 동영상 주소
+          "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
+          "label": "VGA",       // 해상도 이름
+          "size": [             // 해상도
+            640,                // 가로 픽셀 수
+            480                 // 세로 픽셀 수
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
 이 번에는 웹 소켓을 이용하여 이벤트 메시지를 수신하는 예제를 만들어 봅시다.
 ```html
 <!DOCTYPE>
@@ -3460,6 +3525,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
       <input class='topic' type='checkbox' value="packing" checked>포장
       <input class='topic' type='checkbox' value="recordingStatus" checked>녹화 상태
       <input class='topic' type='checkbox' value="object" checked>객체 감지
+      <input class='topic' type='checkbox' value="bodyTemperature" checked>체온 감지
       <input id='verbose' type='checkbox' checked>자세히
       <button type='button' onClick='onConnect()'>접속</button>
       <button type='button' onClick='onDisconnect()'>접속 종료</button>

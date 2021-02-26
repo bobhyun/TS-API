@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.13
+TS-API@0.9.14
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -91,6 +91,7 @@ Table of contents
       - [`face` object](#face-object)
       - [`human` object](#human-object)
       - [`vehicle` object](#vehicle-object)
+    - [Body Temperature Event `@0.9.14`](#body-temperature-event-0914)    
   - [Exporting recorded video `@0.3.0`](#exporting-recorded-video-030)
   - [Channel information and device control `@0.5.0`](#channel-information-and-device-control-050)
     - [Request Device Information and Support Function List](#request-device-information-and-support-function-list)
@@ -3423,6 +3424,71 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
     |---------------|--------------|--------------------------------|
     | `vehicleType` | `string`     | `car`, `truck`, `bus`, `bicycle`, `motorcycle`, `train`  |
     | `colors`      | `array` of `string` | `brown`, `black`, `red`, `orange`, `yellow`, `green`, `cyan`, `blue`, `purple`, `magenta`, `gray`, `pink`, `beige`, `white`, `other`  |
+
+### Body Temperature Event `@0.9.14`
+If you request `topics=bodyTemperature`, you can receive real-time events when high temperatures are detected by each thermal imaging camera for body temperature detection.
+
+To receive body temperature detection events, make a request as follows:
+```ruby
+GET /api/subscribeEvents?topics=object&objectType=bodyTemperature&auth=ZGVtbzohMTIzNHF3ZXI%3D
+```
+Example data
+```jsx
+{
+  "timestamp": "2020-05-25T14:23:58.768-05:00",
+  "chid": 1,              # channel id
+  "objId": 182,           # object id (If the id is the same, it is divided into the same person)
+  "type": "vehicle",      # object type
+  "likelihood": 99.60,    # detection accuracy (%)
+  "linkedChannel":[                             // Linked channels
+    {
+      "chid":1,
+      "title":"Camera1",
+      "displayName":"CH1. Camera1",             // Added since TS-API@0.9.4
+      "src":"http://host/watch?ch=1",
+      "streams": [  // vidio stream sources
+                // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
+        { // 1080p RTMP stream
+          "src": "rtmp://host/live/ch1main",  // video address
+          "type": "rtmp/mp4",     // MIME type: RTMP protocol (Adobe Flash format)
+          "label": "1080p FHD",   // resolution name
+          "size": [               // resolution
+            1920,                 // the number of horizontal pixels
+            1080                  // the number of verical pixels
+          ]
+        },
+        { // 1080p HLS stream
+          "src": "http://host/hls/ch1main/index.m3u8", // video address
+          "type": "application/x-mpegurl",  // MIME type: HLS protocol (format)
+          "label": "1080p FHD",   // resolution name
+          "size": [               // resolution
+            1920,                 // the number of horizontal pixels
+            1080                  // the number of verical pixels
+          ]
+        },
+        { // VGA RTMP stream
+          "src": "rtmp://host/live/ch1sub",   // RTMP protocol (Adobe Flash format)
+          "type": "rtmp/mp4",   // MIME type: RTMP protocol (Adobe Flash format)
+          "label": "VGA",
+          "size": [
+            640,
+            480
+          ]
+        },
+        { // VGA HLS stream
+          "src": "http://host/hls/ch1sub/index.m3u8", // video address
+          "type": "application/x-mpegurl",  // MIME type: HLS protocol (HTML5 format)
+          "label": "VGA",       // resolution name
+          "size": [             // resolution
+            640,                // the number of horizontal pixels
+            480                 // the number of verical pixels
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
 
 
 Now, let's create an example that uses the Web socket to receive event messages.
