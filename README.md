@@ -25,4 +25,4 @@ For more information, refer to the following **TS-API Programmer's Guide**:
 
 License
 ------
-MIT, Copyright (c) 2018-2020 TS Solution Corp.
+MIT, Copyright (c) 2018-2022 TS Solution Corp.

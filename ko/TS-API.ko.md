@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.14
+TS-API@0.9.16
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -21,6 +21,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 <!-- TOC -->
 
 - [TS-API 프로그래밍 안내서](#ts-api-프로그래밍-안내서)
+  - [TS-API@0.9.16](#ts-api0916)
   - [목차](#목차)
   - [시작하기](#시작하기)
   - [영상 표시](#영상-표시)
@@ -2383,24 +2384,52 @@ GET /api/vod
     "src": [  // 동영상 소스 목록
               // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨)
       { // 1080p RTMP 스트림
+        "protocol": "rtmp",
+        "profile": "main",
         "src": "rtmp://192.168.0.100/live/ch1main",  // 동영상 주소
         "type": "rtmp/mp4",     // MIME 형식: RTMP 프로토콜 (Adobe Flash 방식)
-        "label": "1080p FHD",   // 해상도 이름
+        "label": "1080p",       // 해상도 이름
         "size": [               // 해상도
           1920,                 // 가로 픽셀 수
           1080                  // 세로 픽셀 수
         ]
       },
       { // 1080p HLS 스트림
-        "src": "http://192.168.0.100/hls/ch1main/index.m3u8", // 동영상 주소
+        "protocol": "hls",
+        "profile": "main",
+        "src": "http://192.168.0.100/live/ch1main/index.m3u8", // 동영상 주소
         "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
-        "label": "1080p FHD",   // 해상도 이름
+        "label": "1080p",       // 해상도 이름
         "size": [               // 해상도
           1920,                 // 가로 픽셀 수
           1080                  // 세로 픽셀 수
         ]
       },
-      { // VGA RTMP 스트림
+      { // 1080p HTTP 스트림
+        "protocol": "flv",
+        "profile": "main",
+        "src": "http://192.168.0.100/live/ch1main.flv", // 동영상 주소
+        "type": "video/x-flv",  // MIME 형식: FLV (HTTP 프로토콜)
+        "label": "1080p",       // 해상도 이름
+        "size": [               // 해상도
+          1920,                 // 가로 픽셀 수
+          1080                  // 세로 픽셀 수
+        ]
+      },
+      { // 1080p 웹 소켓 스트림
+        "protocol": "websocket-flv",
+        "profile": "main",
+        "src": "ws://192.168.0.100/live/ch1main.flv", // 동영상 주소
+        "type": "video/x-flv",  // MIME 형식: FLV (HTTP 프로토콜)
+        "label": "1080p",       // 해상도 이름
+        "size": [               // 해상도
+          1920,                 // 가로 픽셀 수
+          1080                  // 세로 픽셀 수
+        ]
+      },      
+      { // VGA RTMP 스트
+        "protocol": "rtmp",
+        "profile": "sub",
         "src": "rtmp://192.168.0.100/live/ch1sub",   // RTMP 프로토콜 (Adobe Flash 방식)
         "type": "rtmp/mp4",   // MIME 형식: RTMP 프로토콜 (Adobe Flash 방식)
         "label": "VGA",
@@ -2410,10 +2439,34 @@ GET /api/vod
         ]
       },
       { // VGA HLS 스트림
-        "src": "http://192.168.0.100/hls/ch1sub/index.m3u8", // 동영상 주소
+        "protocol": "hls",
+        "profile": "sub",
+        "src": "http://192.168.0.100/live/ch1sub/index.m3u8", // 동영상 주소
         "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
         "label": "VGA",       // 해상도 이름
         "size": [             // 해상도
+          640,                // 가로 픽셀 수
+          480                 // 세로 픽셀 수
+        ]
+      },
+      { // VGA HTTP 스트림
+        "protocol": "flv",
+        "profile": "sub",
+        "src": "http://192.168.0.100/live/ch1sub.flv", // 동영상 주소
+        "type": "video/x-flv",  // MIME 형식: FLV
+        "label": "VGA",   // 해상도 이름
+        "size": [               // 해상도
+          640,                // 가로 픽셀 수
+          480                 // 세로 픽셀 수
+        ]
+      },
+      { // VGA 웹 소켓 스트림
+        "protocol": "websocket-flv",
+        "profile": "sub",
+        "src": "ws://192.168.0.100/live/ch1sub.flv", // 동영상 주소
+        "type": "video/x-flv",  // MIME 형식: FLV
+        "label": "VGA",         // 해상도 이름
+        "size": [               // 해상도
           640,                // 가로 픽셀 수
           480                 // 세로 픽셀 수
         ]
@@ -3221,7 +3274,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
 
 ```jsx
 {
-  "timestamp" :"2019-02-18T23:11:12.119+09:00",
+  "timestamp": "2019-02-18T23:11:12.119+09:00",
   "topic": "parkingCount",
   "updated": [
     {
@@ -3261,7 +3314,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
 - 최초 모든 채널 녹화 상태 데이터
 ```jsx
 {
-  "timestamp" :"timestamp":"2020-03-25T10:01:53.841+09:00",
+  "timestamp": "2020-03-25T10:01:53.841+09:00",
   "topic": "recordingStatus",
   "event": "currentStatus",
   "channel": [
@@ -3271,7 +3324,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
       "recording":true
     },
     {
-      "chid":2, /*
+      "chid":2,
       "streaming":false,
       "recording":false
     },
@@ -3287,7 +3340,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
 - 변동사항 데이터
 ```jsx
 {
-  "timestamp" :"timestamp":"2020-03-25T10:08:30.003+09:00",
+  "timestamp": "2020-03-25T10:08:30.003+09:00",
   "topic": "recordingStatus",
   "event": "statusChanged",
   "channel": [

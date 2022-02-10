@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.14
+TS-API@0.9.16
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -2384,24 +2384,52 @@ The server returns JSON data in the following format with an HTTP response code 
     "src": [  // List of video sources
               // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
       { // 1080p RTMP stream
+        "protocol": "rtmp",
+        "profile": "main",
         "src": "rtmp://192.168.0.100/live/ch1main",  // Video address
         "type": "rtmp/mp4",     // MIME type: RTMP protocol (Adobe Flash)
-        "label": "1080p FHD",   // Resolution name
+        "label": "1080p",       // Resolution name
         "size": [               // Resolution
           1920,                 // Number of horizontal pixels
           1080                  // Number of vertical pixels
         ]
       },
       { // 1080p HLS stream
-        "src": "http://192.168.0.100/hls/ch1main/index.m3u8", // Video address
+        "protocol": "hls",
+        "profile": "main",
+        "src": "http://192.168.0.100/live/ch1main/index.m3u8", // Video address
         "type": "application/x-mpegurl",  // MIME type: HLS protocol (HTML5)
-        "label": "1080p FHD",   // Resolution name
+        "label": "1080p",       // Resolution name
+        "size": [               // Resolution
+          1920,                 // Number of horizontal pixels
+          1080                  // Number of vertical pixels
+        ]
+      },
+      { // 1080p HTTP stream
+        "protocol": "flv",
+        "profile": "main",
+        "src": "http://192.168.0.100/live/ch1main.flv", // Video address
+        "type": "video/x-flv",  // MIME type: FLV (HTTP protocol)
+        "label": "1080p",       // Resolution name
+        "size": [               // Resolution
+          1920,                 // Number of horizontal pixels
+          1080                  // Number of vertical pixels
+        ]
+      },
+      { // 1080p websocket stream
+        "protocol": "websocket-flv",
+        "profile": "main",
+        "src": "ws://192.168.0.100/live/ch1main.flv", // Video address
+        "type": "video/x-flv",  // MIME type: FLV (HTTP protocol)
+        "label": "1080p",       // Resolution name
         "size": [               // Resolution
           1920,                 // Number of horizontal pixels
           1080                  // Number of vertical pixels
         ]
       },
       { // VGA RTMP stream
+        "protocol": "rtmp",
+        "profile": "sub",
         "src": "rtmp://192.168.0.100/live/ch1sub",   // RTMP protocol (Adobe Flash)
         "type": "rtmp/mp4",   // MIME type: RTMP protocol (Adobe Flash)
         "label": "VGA",
@@ -2411,10 +2439,34 @@ The server returns JSON data in the following format with an HTTP response code 
         ]
       },
       { // VGA HLS stream
-        "src": "http://192.168.0.100/hls/ch1sub/index.m3u8", // Video address
+        "protocol": "hlv",
+        "profile": "sub",
+        "src": "http://192.168.0.100/live/ch1sub/index.m3u8", // Video address
         "type": "application/x-mpegurl",  // MIME type: HLS protocol (HTML5)
         "label": "VGA",       // Resolution name
         "size": [             // Resolution
+          640,                // Number of horizontal pixels
+          480                 // Number of vertical pixels
+        ]
+      },
+      { // VGA HTTP stream
+        "protocol": "flv",
+        "profile": "sub",
+        "src": "http://192.168.0.100/live/ch1sub.flv", // Video address
+        "type": "video/x-flv",  // MIME type: FLV
+        "label": "VGA",       // Resolution name
+        "size": [             // Resolution
+          640,                // Number of horizontal pixels
+          480                 // Number of vertical pixels
+        ]
+      },
+      { // VGA websocket stream
+        "protocol": "websocket-flv",
+        "profile": "sub",
+        "src": "ws://stream.168.0.100/live/ch1sub.flv", // Video address
+        "type": "video/x-flv",  // MIME type: FLV
+        "label": "VGA",         // Resolution name
+        "size": [               // Resolution
           640,                // Number of horizontal pixels
           480                 // Number of vertical pixels
         ]
@@ -3262,7 +3314,7 @@ After this, whenever a change occurs, it is received in JSON format as shown bel
 - all channels
 ```jsx
 {
-  "timestamp" :"timestamp":"2020-03-25T10:01:53.841-05:00",
+  "timestamp": "2020-03-25T10:01:53.841-05:00",
   "topic": "recordingStatus",
   "event": "currentStatus",
   "channel": [
@@ -3288,7 +3340,7 @@ After this, whenever a change occurs, it is received in JSON format as shown bel
 - On status changed
 ```jsx
 {
-  "timestamp" :"timestamp":"2020-03-25T10:08:30.003-05:00",
+  "timestamp": "2020-03-25T10:08:30.003-05:00",
   "topic": "recordingStatus",
   "event": "statusChanged",
   "channel": [
