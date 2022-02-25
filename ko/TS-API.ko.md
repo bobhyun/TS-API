@@ -1267,60 +1267,73 @@ GET /api/enum?what=channel&staticSrc
       {
         "protocol": "rtmp",
         "profile": "main",
-        "src": "rtmp://localhost/live/ch1main",
-        "type": "rtmp/mp4"
+        "src": "rtmp://192.168.0.100/live/ch1main",
+        "type": "rtmp/mp4",
+        "label": "1080p",
+        "size": [
+          1920,
+          1080
+        ]
+      },
+      {
+        "protocol": "flv",
+        "profile": "main",
+        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1main",
+        "type": "application/x-mpegurl",
+        "label": "1080p",
+        "size": [
+          1920,
+          1080
+        ]
       },
       {
         "protocol": "hls",
         "profile": "main",
-        "src": "http://localhost/hls/ch1main/index.m3u8",
-        "type": "application/x-mpegurl"
+        "src": "http://192.168.0.100/hls/ch1main/index.m3u8",
+        "type": "application/x-mpegurl",
+        "label": "1080p",
+        "size": [
+          1920,
+          1080
+        ]
       },
       {
         "protocol": "rtmp",
         "profile": "sub",
-        "src": "rtmp://localhost/live/ch1sub",
-        "type": "rtmp/mp4"
+        "src": "rtmp://192.168.0.100/live/ch1sub",
+        "type": "rtmp/mp4",        
+        "label": "360p",
+        "size": [
+          640,
+          360
+        ]
       },
+      {
+        "protocol": "flv",
+        "profile": "main",
+        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1sub",
+        "type": "application/x-mpegurl",
+        "label": "360p",
+        "size": [
+          640,
+          360
+        ]
+      },
+      
       {
         "protocol": "hls",
         "profile": "sub",
-        "src": "http://localhost/hls/ch1sub/index.m3u8",
-        "type": "application/x-mpegurl"
+        "src": "http://192.168.0.100/hls/ch1sub/index.m3u8",
+        "type": "application/x-mpegurl",        
+        "label": "360p",
+        "size": [
+          640,
+          360
+        ]
       }
     ]
   },
-  {
-    "chid": 2,
-    "title": "",
-    "displayName": "CH2",
-    "src": [
-      {
-        "protocol": "rtmp",
-        "profile": "main",
-        "src": "rtmp://localhost/live/ch2main",
-        "type": "rtmp/mp4"
-      },
-      {
-        "protocol": "hls",
-        "profile": "main",
-        "src": "http://localhost/hls/ch2main/index.m3u8",
-        "type": "application/x-mpegurl"
-      },
-      {
-        "protocol": "rtmp",
-        "profile": "sub",
-        "src": "rtmp://localhost/live/ch2sub",
-        "type": "rtmp/mp4"
-      },
-      {
-        "protocol": "hls",
-        "profile": "sub",
-        "src": "http://localhost/hls/ch2sub/index.m3u8",
-        "type": "application/x-mpegurl"
-      }
-    ]
-  }
+  // 중략
 ]
 ```
 
@@ -2394,10 +2407,21 @@ GET /api/vod
           1080                  // 세로 픽셀 수
         ]
       },
+      { // 1080p HTTP-FLV 스트림
+        "protocol": "flv",
+        "profile": "main",
+        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1main", // 동영상 주소
+        "type": "video/x-flv",  // MIME 형식: FLV (HTTP 프로토콜)
+        "label": "1080p",       // 해상도 이름
+        "size": [               // 해상도
+          1920,                 // 가로 픽셀 수
+          1080                  // 세로 픽셀 수
+        ]
+      },
       { // 1080p HLS 스트림
         "protocol": "hls",
         "profile": "main",
-        "src": "http://192.168.0.100/live/ch1main/index.m3u8", // 동영상 주소
+        "src": "http://192.168.0.100/hls/ch1main/index.m3u8", // 동영상 주소
         "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
         "label": "1080p",       // 해상도 이름
         "size": [               // 해상도
@@ -2405,28 +2429,6 @@ GET /api/vod
           1080                  // 세로 픽셀 수
         ]
       },
-      { // 1080p HTTP 스트림
-        "protocol": "flv",
-        "profile": "main",
-        "src": "http://192.168.0.100/live/ch1main.flv", // 동영상 주소
-        "type": "video/x-flv",  // MIME 형식: FLV (HTTP 프로토콜)
-        "label": "1080p",       // 해상도 이름
-        "size": [               // 해상도
-          1920,                 // 가로 픽셀 수
-          1080                  // 세로 픽셀 수
-        ]
-      },
-      { // 1080p 웹 소켓 스트림
-        "protocol": "websocket-flv",
-        "profile": "main",
-        "src": "ws://192.168.0.100/live/ch1main.flv", // 동영상 주소
-        "type": "video/x-flv",  // MIME 형식: FLV (HTTP 프로토콜)
-        "label": "1080p",       // 해상도 이름
-        "size": [               // 해상도
-          1920,                 // 가로 픽셀 수
-          1080                  // 세로 픽셀 수
-        ]
-      },      
       { // VGA RTMP 스트
         "protocol": "rtmp",
         "profile": "sub",
@@ -2438,21 +2440,10 @@ GET /api/vod
           480
         ]
       },
-      { // VGA HLS 스트림
-        "protocol": "hls",
-        "profile": "sub",
-        "src": "http://192.168.0.100/live/ch1sub/index.m3u8", // 동영상 주소
-        "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
-        "label": "VGA",       // 해상도 이름
-        "size": [             // 해상도
-          640,                // 가로 픽셀 수
-          480                 // 세로 픽셀 수
-        ]
-      },
-      { // VGA HTTP 스트림
+      { // VGA HTTP-FLV 스트림
         "protocol": "flv",
         "profile": "sub",
-        "src": "http://192.168.0.100/live/ch1sub.flv", // 동영상 주소
+        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1sub", // 동영상 주소
         "type": "video/x-flv",  // MIME 형식: FLV
         "label": "VGA",   // 해상도 이름
         "size": [               // 해상도
@@ -2460,13 +2451,13 @@ GET /api/vod
           480                 // 세로 픽셀 수
         ]
       },
-      { // VGA 웹 소켓 스트림
-        "protocol": "websocket-flv",
+      { // VGA HLS 스트림
+        "protocol": "hls",
         "profile": "sub",
-        "src": "ws://192.168.0.100/live/ch1sub.flv", // 동영상 주소
-        "type": "video/x-flv",  // MIME 형식: FLV
-        "label": "VGA",         // 해상도 이름
-        "size": [               // 해상도
+        "src": "http://192.168.0.100/hls/ch1sub/index.m3u8", // 동영상 주소
+        "type": "application/x-mpegurl",  // MIME 형식: HLS 프로토콜 (HTML5 방식)
+        "label": "VGA",       // 해상도 이름
+        "size": [             // 해상도
           640,                // 가로 픽셀 수
           480                 // 세로 픽셀 수
         ]

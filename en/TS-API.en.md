@@ -1269,60 +1269,73 @@ For the request, the server returns JSON data in the following format with an HT
       {
         "protocol": "rtmp",
         "profile": "main",
-        "src": "rtmp://localhost/live/ch1main",
-        "type": "rtmp/mp4"
+        "src": "rtmp://192.168.0.100/live/ch1main",
+        "type": "rtmp/mp4",
+        "label": "1080p",
+        "size": [
+          1920,
+          1080
+        ]
+      },
+      {
+        "protocol": "flv",
+        "profile": "main",
+        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1main",
+        "type": "application/x-mpegurl",
+        "label": "1080p",
+        "size": [
+          1920,
+          1080
+        ]
       },
       {
         "protocol": "hls",
         "profile": "main",
-        "src": "http://localhost/hls/ch1main/index.m3u8",
-        "type": "application/x-mpegurl"
+        "src": "http://192.168.0.100/hls/ch1main/index.m3u8",
+        "type": "application/x-mpegurl",
+        "label": "1080p",
+        "size": [
+          1920,
+          1080
+        ]
       },
       {
         "protocol": "rtmp",
         "profile": "sub",
-        "src": "rtmp://localhost/live/ch1sub",
-        "type": "rtmp/mp4"
+        "src": "rtmp://192.168.0.100/live/ch1sub",
+        "type": "rtmp/mp4",        
+        "label": "360p",
+        "size": [
+          640,
+          360
+        ]
       },
+      {
+        "protocol": "flv",
+        "profile": "main",
+        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1sub",
+        "type": "application/x-mpegurl",
+        "label": "360p",
+        "size": [
+          640,
+          360
+        ]
+      },
+      
       {
         "protocol": "hls",
         "profile": "sub",
-        "src": "http://localhost/hls/ch1sub/index.m3u8",
-        "type": "application/x-mpegurl"
+        "src": "http://192.168.0.100/hls/ch1sub/index.m3u8",
+        "type": "application/x-mpegurl",
+        "label": "360p",
+        "size": [
+          640,
+          360
+        ]
       }
     ]
   },
-  {
-    "chid": 2,
-    "title": "",
-    "displayName": "CH2",
-    "src": [
-      {
-        "protocol": "rtmp",
-        "profile": "main",
-        "src": "rtmp://localhost/live/ch2main",
-        "type": "rtmp/mp4"
-      },
-      {
-        "protocol": "hls",
-        "profile": "main",
-        "src": "http://localhost/hls/ch2main/index.m3u8",
-        "type": "application/x-mpegurl"
-      },
-      {
-        "protocol": "rtmp",
-        "profile": "sub",
-        "src": "rtmp://localhost/live/ch2sub",
-        "type": "rtmp/mp4"
-      },
-      {
-        "protocol": "hls",
-        "profile": "sub",
-        "src": "http://localhost/hls/ch2sub/index.m3u8",
-        "type": "application/x-mpegurl"
-      }
-    ]
-  }
+  // omitted
 ]
 ```
 
@@ -2394,33 +2407,22 @@ The server returns JSON data in the following format with an HTTP response code 
           1080                  // Number of vertical pixels
         ]
       },
+      { // 1080p HTTP-FLV stream
+        "protocol": "flv",
+        "profile": "main",
+        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1main", // Video address
+        "type": "video/x-flv",  // MIME type: FLV (HTTP protocol)
+        "label": "1080p",       // Resolution name
+        "size": [               // Resolution
+          1920,                 // Number of horizontal pixels
+          1080                  // Number of vertical pixels
+        ]
+      },
       { // 1080p HLS stream
         "protocol": "hls",
         "profile": "main",
         "src": "http://192.168.0.100/live/ch1main/index.m3u8", // Video address
         "type": "application/x-mpegurl",  // MIME type: HLS protocol (HTML5)
-        "label": "1080p",       // Resolution name
-        "size": [               // Resolution
-          1920,                 // Number of horizontal pixels
-          1080                  // Number of vertical pixels
-        ]
-      },
-      { // 1080p HTTP stream
-        "protocol": "flv",
-        "profile": "main",
-        "src": "http://192.168.0.100/live/ch1main.flv", // Video address
-        "type": "video/x-flv",  // MIME type: FLV (HTTP protocol)
-        "label": "1080p",       // Resolution name
-        "size": [               // Resolution
-          1920,                 // Number of horizontal pixels
-          1080                  // Number of vertical pixels
-        ]
-      },
-      { // 1080p websocket stream
-        "protocol": "websocket-flv",
-        "profile": "main",
-        "src": "ws://192.168.0.100/live/ch1main.flv", // Video address
-        "type": "video/x-flv",  // MIME type: FLV (HTTP protocol)
         "label": "1080p",       // Resolution name
         "size": [               // Resolution
           1920,                 // Number of horizontal pixels
@@ -2438,6 +2440,17 @@ The server returns JSON data in the following format with an HTTP response code 
           480
         ]
       },
+      { // VGA HTTP-FLV stream
+        "protocol": "flv",
+        "profile": "sub",
+        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1sub", // Video address
+        "type": "video/x-flv",  // MIME type: FLV
+        "label": "VGA",       // Resolution name
+        "size": [             // Resolution
+          640,                // Number of horizontal pixels
+          480                 // Number of vertical pixels
+        ]
+      },
       { // VGA HLS stream
         "protocol": "hlv",
         "profile": "sub",
@@ -2445,28 +2458,6 @@ The server returns JSON data in the following format with an HTTP response code 
         "type": "application/x-mpegurl",  // MIME type: HLS protocol (HTML5)
         "label": "VGA",       // Resolution name
         "size": [             // Resolution
-          640,                // Number of horizontal pixels
-          480                 // Number of vertical pixels
-        ]
-      },
-      { // VGA HTTP stream
-        "protocol": "flv",
-        "profile": "sub",
-        "src": "http://192.168.0.100/live/ch1sub.flv", // Video address
-        "type": "video/x-flv",  // MIME type: FLV
-        "label": "VGA",       // Resolution name
-        "size": [             // Resolution
-          640,                // Number of horizontal pixels
-          480                 // Number of vertical pixels
-        ]
-      },
-      { // VGA websocket stream
-        "protocol": "websocket-flv",
-        "profile": "sub",
-        "src": "ws://stream.168.0.100/live/ch1sub.flv", // Video address
-        "type": "video/x-flv",  // MIME type: FLV
-        "label": "VGA",         // Resolution name
-        "size": [               // Resolution
           640,                // Number of horizontal pixels
           480                 // Number of vertical pixels
         ]
