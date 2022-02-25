@@ -3,7 +3,7 @@ TS-API
 
 ![Alt TS-CMS](img/tscms.png) ![Alt TS-NVR](img/tsnvr.png) ![Alt TS-IVR](img/tsivr.png)
 
-**TS-API** is a web API built into the TS series video software lineup, which are **TS-CMS**, **TS-NVR** and **TS-IVR** of TS Solutions Corp..
+**TS-API** is a web API built into the TS series video software lineup, which are **TS-CMS**, **TS-NVR** and **TS-IVR** of TS Solution Corp.
 
 With this API, you can easily embed **CCTV video and search functionality** into your web page, like this:
 ```html
