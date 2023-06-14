@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.17
+TS-API@0.9.18
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -2126,7 +2126,20 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00
 http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
-
+#### Export the search result of vehicle numbers log `@0.9.18`
+You can download the searched vehicle numbers log as Excel files.
+```ruby
+GET /api/find?what=carNo&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00&export=true
+```
+If you request by adding `export=true` parameter to vehicle number log search
+The server returns JSON data in the format shown below with an HTTP response code of 200 as follows:
+```jsx
+[
+  "http://host/download/2018-01-01T00.00.00.xls",
+  "http://host/download/2018-01-01T00.00.00(2).xls",
+    // ... omitted
+]
+```
 
 ### Search for similar vehicle numbers `@0.2.0`
 Can be used to verify that a similar vehicle number exists.
