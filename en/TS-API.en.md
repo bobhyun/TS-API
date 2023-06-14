@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.17](#ts-api0917)
+  - [TS-API@0.9.18](#ts-api0918)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -68,6 +68,7 @@ Table of contents
     - [Search minutes with recorded video `@0.2.0`](#search-minutes-with-recorded-video-020)
     - [Search event log](#search-event-log)
     - [Vehicle number log search](#vehicle-number-log-search)
+    - [Export the search result of vehicle numbers log `@0.9.18`](#export-the-search-result-of-vehicle-numbers-log-0918)
     - [Search for similar vehicle numbers `@0.2.0`](#search-for-similar-vehicle-numbers-020)
     - [Object Search `@0.9.11`](#object-search-0911)
       - [Common parameters](#common-parameters)
@@ -2126,7 +2127,7 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00
 http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00&auth=ZGVtbzohMTIzNHF3ZXI%3D
 ```
 
-#### Export the search result of vehicle numbers log `@0.9.18`
+### Export the search result of vehicle numbers log `@0.9.18`
 You can download the searched vehicle numbers log as Excel files.
 ```ruby
 GET /api/find?what=carNo&timeBegin=2018-01-01T00%3A00%3A00-05%3A00&timeEnd=2018-01-31T23%3A59%3A59.999-05%3A00&export=true
