@@ -2136,7 +2136,7 @@ If you request by adding `export=true` parameter to vehicle number log search
 The server returns JSON data in the format shown below with an HTTP response code of 200 as follows:
 ```jsx
 [
-  "http://host/download/2018-01-01T00.00.00.xls",
+  "http://host/download/2018-01-01T00.00.00.xls",   // Excel file download URL
   "http://host/download/2018-01-01T00.00.00(2).xls",
     // ... omitted
 ]

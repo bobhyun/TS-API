@@ -2126,12 +2126,12 @@ http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00
 ```ruby
 GET /api/find?what=carNo&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=2018-01-31T23%3A59%3A59.999%2B09%3A00&export=true
 ```
-차량 번호 로그 검색에 `export=true` 파라메터를 추가하해서 요청하면
+차량 번호 로그 검색에 `export=true` 파라메터를 추가해서 요청하면
 서버는 다음과 같이 HTTP 응답 코드 200과 함께 아래와 같은 형식의 JSON 데이터를 반환합니다.
 
 ```jsx
 [
-  "http://host/download/2018-01-01T00.00.00.xls",
+  "http://host/download/2018-01-01T00.00.00.xls",   // 엑셀 파일 다운로드 주소
   "http://host/download/2018-01-01T00.00.00(2).xls",
     // ... 중략
 ]
