@@ -1,7 +1,7 @@
 TS-API 프로그래밍 안내서
 ======
 
-TS-API@0.9.18
+TS-API@0.9.19
 -----
 
 이 문서는 **(주)티에스 솔루션**의 **TS-CMS**, **TS-NVR**, **TS-LPR**에 내장된 **TS-API**를 사용하여 응용 소프트웨어를 개발하는 분들을 위한 프로그래밍 안내서입니다.
@@ -18,7 +18,7 @@ API와 본 문서는 개발 지원 및 기능 향상을 위해 공지 없이 변
 <!-- TOC -->
 
 - [TS-API 프로그래밍 안내서](#ts-api-프로그래밍-안내서)
-  - [TS-API@0.9.18](#ts-api0918)
+  - [TS-API@0.9.19](#ts-api0919)
   - [목차](#목차)
   - [시작하기](#시작하기)
   - [영상 표시](#영상-표시)
@@ -1969,6 +1969,7 @@ GET /api/find?what=carNo
       ],
       "srcCode": "1-1-1",                 // 차량 번호 인식 장치 (또는 영역) 코드
       "srcName": "정문 입구",              // 차량 번호 인식 장치 (또는 영역) 이름
+      "direction": "entry",               // 차량 이동 방향 ("entry": 입차, "exit": 출차), 이 항목은 이동 방향 데이터가 없는 경우 생략됨
       "vod": [  // 인식된 시점의 영상 (연동 채널이 설정된 경우 여러 개가 될 수 있음)
         {
           "chid": 1,
@@ -2005,6 +2006,7 @@ GET /api/find?what=carNo
       ],
       "srcCode": "1-1-1",
       "srcName": "1-1-1",
+      "direction": "exit",
       "vod": [
         {
           "chid": 1,
@@ -3074,7 +3076,8 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
   "parkingLot": {                                // 연결된 주차장 id (TS-API@0.9.8)
     "entrance": 1,                               // 주차장 입구 id
     "exit": 2                                    // 주차장 출구 id
-  }
+  },
+  "direction": "entry"                           // 차량 이동 방향 ("entry": 입차, "exit": 출차), 이 항목은 이동 방향 데이터가 없는 경우 생략됨
 }
 ```
 
@@ -4466,6 +4469,7 @@ Contents에 JSON 형식으로 이벤트 데이터를 명시합니다.
   "device": "vendor/device",  // 비상 호출 장치 모델명
   "src": "0000001",           // 비상 호출 장치 위치 코드
   "event": "callStart",       // 통화 시작 (또는 통화 종료시 "callEnd")
+  "camera": "1,2,3,4",        // 팝업 카메라 목록 (화면 복귀는 "camera": "") (@0.9.19)
   "when": "2018-02-01T14:30:15+09:00" // 이벤트 발생 시각
 }
 ```
@@ -4485,6 +4489,7 @@ Contents에 JSON 형식으로 이벤트 데이터를 명시합니다.
     "device": "vendor/device",
     "src": "0000001",
     "event": "callStart",
+    "camera": "1,2,3,4",
     "when": "2018-02-01T14:30:15+09:00"
   }
 ]

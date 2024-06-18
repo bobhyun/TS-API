@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.18
+TS-API@0.9.19
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.18](#ts-api0918)
+  - [TS-API@0.9.19](#ts-api0919)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -1976,7 +1976,8 @@ For the request, the server returns JSON data in the following format with an HT
         "2018-02-21T09:07:34.057-05:00"   // Ending timestamp
       ],
       "srcCode": "1-1-1",                 // Vehicle number recognition device (or zone) code
-      "srcName": "The%20Empire%20State",  // Vehicle number recognition device (or zone) name
+      "srcName": "The%20Empire%20State",  // Vehicle number recognition device (or zone) name,
+      "direction": "entry",               // Vehicle movement direction ("entry" or "exit"), this item can be omitted when there is no movement direction data.
       "vod": [  // The Video at the recognized point (may be several if linked channels are set)
         {
           "chid": 1,
@@ -2012,7 +2013,8 @@ For the request, the server returns JSON data in the following format with an HT
         "2018-02-21T08:00:01.714-05:00"
       ],
       "srcCode": "1-1-1",
-      "srcName": "1-1-1",
+      "srcName": "1-1-1",,
+      "direction": "exit"
       "vod": [
         {
           "chid": 1,
@@ -3075,7 +3077,8 @@ The car number event message is received in JSON format as shown below.
   "parkingLot": {                               // Connected parking lot id (TS-API@0.9.8)
     "entrance": 1,                              // Parking lot entrance id
     "exit": 2                                   // Parking lot exit id
-  }
+  },
+  "direction": "entry"                          // Vehicle movement direction ("entry" or "exit"), this item can be omitted when there is no movement direction data.
 }
 ```
 
@@ -4465,6 +4468,7 @@ Specify event data in JSON format in contents data.
   "device": "vendor/device",  // Emergency call device model name
   "src": "0000001",           // Emergency call device location code
   "event": "callStart",       // call start (or "callEnd" for call end)
+  "camera": "1,2,3,4",        // Camera list to popup screen (to restore "camera": "") (@0.9.19)
   "when": "2018-02-01T14:30:15-05:00" // Event occurrence time
 }
 ```
@@ -4484,6 +4488,7 @@ It can be created as multiple events in the array as shown below and sent at onc
     "device": "vendor/device",
     "src": "0000001",
     "event": "callStart",
+    "camera": "1,2,3,4",
     "when": "2018-02-01T14:30:15-05:00"
   }
 ]
