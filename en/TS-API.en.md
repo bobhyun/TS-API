@@ -1,7 +1,7 @@
 TS-API Programmer's Guide
 ======
 
-TS-API@0.9.19
+TS-API@0.9.20
 -----
 
 This article is a programming guide for those who develop application software using **TS-API**, which is built in **TS-CMS**, **TS-NVR**, **TS-LPR** of TS Solution Corp..
@@ -21,7 +21,7 @@ Table of contents
 <!-- TOC -->
 
 - [TS-API Programmer's Guide](#ts-api-programmers-guide)
-  - [TS-API@0.9.19](#ts-api0919)
+  - [TS-API@0.9.20](#ts-api0920)
   - [Table of contents](#table-of-contents)
   - [Get Started](#get-started)
   - [Video display](#video-display)
@@ -447,7 +447,7 @@ It is used to get the product name and version information of the server.
 This request works, even if it is not in [session suthenticated](#session-authentication) state.
 ```ruby
 GET /api/info?product
-````
+```
 For the request, the server returns JSON data in the following format with an HTTP response code of 200:
 ```jsx
 // for TS-CMS:
@@ -3767,6 +3767,8 @@ purpose         # Specify the purpose of the video to submit
 # including md5
 md5             # added at v0.9.2
 
+# data encryption
+password        # added at v0.9.20. (password should be encoded using base64)
 
 # Examples
 # July 27, 2018 to receive all recorded videos from 9:00 am to 9:30 am

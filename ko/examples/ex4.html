@@ -82,6 +82,9 @@
       <div>
         <input type='checkbox' id='md5' value='md5'>md5
       </div>
+			<div>
+        압축 파일 비밀번호: <input type='password' id='zipPassword' value=''>
+      </div>
     </div>
     <div>
       <button type='button' onClick='onConnect()'>접속</button>
@@ -207,6 +210,7 @@
       return url;
     }
 
+    		
     var encodedData = window.btoa(userId + ':' + password); // base64 인코딩
     window.myApp.auth = encodeURIComponent(encodedData);
     url = (hostName.includes('ws://', 0) ? '' : 'ws://') +
@@ -223,6 +227,10 @@
       '&recipient=' + encodeURIComponent(recipient) +
       '&purpose=' + encodeURIComponent(purpose) +
       '&lang=' + encodeURIComponent(lang);
+
+		var zipPassword = document.getElementById('zipPassword').value;
+		if (zipPassword)
+      url += '&password=' + encodeURIComponent(window.btoa(zipPassword));
      
     var md5 = document.getElementById('md5');
     if (md5.checked === true) {

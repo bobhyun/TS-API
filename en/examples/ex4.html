@@ -81,6 +81,9 @@
       </div>
       <div>
         <input type='checkbox' id='md5' value='md5'>md5
+      </div>      
+			<div>
+        Zip file password: <input type='password' id='zipPassword' value=''>
       </div>
     </div>
     <div>
@@ -224,6 +227,10 @@
       '&purpose=' + encodeURIComponent(purpose) +
       '&lang=' + encodeURIComponent(lang);
      
+    var zipPassword = document.getElementById('zipPassword').value;
+		if (zipPassword)
+      url += '&password=' + encodeURIComponent(window.btoa(zipPassword));
+    
     var md5 = document.getElementById('md5');
     if (md5.checked === true) {
       url += '&md5=true';

@@ -25,7 +25,7 @@
       <div class="crossnote markdown-preview  ">
       
 <h1>TS-API Programmer's Guide</h1>
-<h2>TS-API@0.9.19</h2>
+<h2>TS-API@0.9.20</h2>
 <p>This article is a programming guide for those who develop application software using <strong>TS-API</strong>, which is built in <strong>TS-CMS</strong>, <strong>TS-NVR</strong>, <strong>TS-LPR</strong> of TS Solution Corp..</p>
 <p>You can easily embed the real-time video, recorded video, and video search functions into your application software with the API.</p>
 <p>It would be helpful if you have some experience using simple <code>HTML</code> and <code>JavaScript</code> to use the API.</p>
@@ -39,7 +39,7 @@ The API and this article are subject to change without notice for better develop
 <ul>
 <li><a href="#ts-api-programmers-guide">TS-API Programmer's Guide</a>
 <ul>
-<li><a href="#ts-api0919">TS-API@0.9.19</a></li>
+<li><a href="#ts-api0920">TS-API@0.9.20</a></li>
 <li><a href="#table-of-contents">Table of contents</a></li>
 <li><a href="#get-started">Get Started</a></li>
 <li><a href="#video-display">Video display</a>
@@ -489,7 +489,7 @@ It is used to distinguish between the client-side and server-side local time whe
     <span class="token string-property property">"version"</span><span class="token operator">:</span> <span class="token string">"v0.2.0A (64-bit)"</span>   <span class="token comment">// Version information</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>License information</h3>
+</code></pre><h3 id="license-information">License information </h3>
 <p>Used to get license information installed on the server.</p>
 <p>This request works, even if it is not in <a href="#session-authentication">session suthenticated</a> state.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>license
@@ -522,7 +522,7 @@ It is used to distinguish between the client-side and server-side local time whe
     <span class="token string-property property">"leftDays"</span><span class="token operator">:</span> <span class="token number">15</span>      <span class="token comment">// 15 days left</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</code></pre><h4><code>extension</code> list</h4>
+</code></pre><h4 id="extension-list"><code>extension</code> list </h4>
 <table>
 <thead>
 <tr>
@@ -561,7 +561,7 @@ It is used to distinguish between the client-side and server-side local time whe
 </tr>
 </tbody>
 </table>
-<h3>User information</h3>
+<h3 id="user-information">User information </h3>
 <p>Used to get sign-in user information.<br>
 This request works only in the <a href="#session-authentication">session authenticated</a> state.<br>
 From here on, the <code>auth =</code> part of <a href="#session-authentication">session authentication</a> is omitted.</p>
@@ -596,7 +596,7 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
     <span class="token punctuation">]</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Request all at once</h3>
+</code></pre><h3 id="request-all-at-once">Request all at once </h3>
 <p>You can request information individually, but we also provide a way to request all the information at once for convenience.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>info<span class="token operator">?</span>all
 </code></pre><p>This request returns JSON data with an HTTP response code of 200 if the session is authenticated, or JSON data with an HTTP response code of 401 with no <code>whoAmI</code> entries if it is not authenticated.</p>
@@ -656,7 +656,7 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
     <span class="token punctuation">]</span>
   <span class="token punctuation">}</span>     <span class="token comment">// whoAmI is not included</span>
 <span class="token punctuation">}</span>
-</code></pre><h2>Request system information <code>@0.3.0</code></h2>
+</code></pre><h2 id="request-system-information-030">Request system information <code>@0.3.0</code> </h2>
 <p>Requests system information from the server.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>info
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system   <span class="token comment"># omitted</span>
@@ -842,13 +842,13 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
   <span class="token string">"networkAdapter"</span><span class="token punctuation">,</span>
   <span class="token string">"all"</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Requests individual items</h3>
+</code></pre><h3 id="requests-individual-items">Requests individual items </h3>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>info<span class="token operator">=</span>os   <span class="token comment"># requests OS only</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>info<span class="token operator">=</span>cpu  <span class="token comment"># requests CPU only</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>info<span class="token operator">=</span>storage<span class="token punctuation">,</span>network  <span class="token comment"># requests both storage and network</span>
 
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>info<span class="token operator">=</span>all  <span class="token comment"># requests all the items (Simply /api/system?info or /api/system)</span>
-</code></pre><h2>Request system health <code>@0.3.0</code></h2>
+</code></pre><h2 id="request-system-health-030">Request system health <code>@0.3.0</code> </h2>
 <p>Requests system health from the server.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>health
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:<br>
@@ -971,12 +971,12 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
   <span class="token string">"network"</span><span class="token punctuation">,</span>
   <span class="token string">"all"</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Requests individual items</h3>
+</code></pre><h3 id="requests-individual-items-1">Requests individual items </h3>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>health<span class="token operator">=</span>cpu   <span class="token comment"># requests CPU only</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>health<span class="token operator">=</span>memory  <span class="token comment"># requests memory only</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>health<span class="token operator">=</span>disk<span class="token punctuation">,</span>recording<span class="token punctuation">,</span>network  <span class="token comment"># requests disk, recording and network</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>health<span class="token operator">=</span>all  <span class="token comment"># requests all the items (Simply /api/system?health)</span>
-</code></pre><h2>Request HDD S.M.A.R.T. <code>@0.6.0</code></h2>
+</code></pre><h2 id="request-hdd-smart-060">Request HDD S.M.A.R.T. <code>@0.6.0</code> </h2>
 <p>Requests S.M.A.R.T. infomation of each HDD.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>hddsmart    <span class="token comment"># Request for all the HDDs</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>hddsmart<span class="token operator">=</span><span class="token number">1</span>  <span class="token comment"># Request for the first HDD</span>
@@ -1013,7 +1013,7 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
     <span class="token punctuation">]</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">]</span>
-</code></pre><h2>Request to restart server process <code>@0.6.0</code></h2>
+</code></pre><h2 id="request-to-restart-server-process-060">Request to restart server process <code>@0.6.0</code> </h2>
 <p>If you are logged in with administrator privileges, you can restart the server process.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>restart
 </code></pre><p>For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:</p>
@@ -1022,7 +1022,7 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
     <span class="token string-property property">"message"</span><span class="token operator">:</span> <span class="token string">"The server restarts in a few seconds."</span>
   <span class="token punctuation">}</span>
 </code></pre><p>The server returns HTTP response code 403 (FORBIDDEN) if you do not have administrator rights.</p>
-<h2>Request to reboot server system <code>@0.6.0</code></h2>
+<h2 id="request-to-reboot-server-system-060">Request to reboot server system <code>@0.6.0</code> </h2>
 <p>If you are logged in with administrator privileges, you can reboot the server system.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>system<span class="token operator">?</span>reboot
 </code></pre><p>For the request of a list of supported items, the server response JSON data in the following format with an HTTP response code of 200:</p>
@@ -1031,7 +1031,7 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
     <span class="token string-property property">"message"</span><span class="token operator">:</span> <span class="token string">"The system will shut down in less than a minute and then restart."</span>
   <span class="token punctuation">}</span>
 </code></pre><p>The server returns HTTP response code 403 (FORBIDDEN) if you do not have administrator rights.</p>
-<h2>Request channel status <code>@0.3.0</code></h2>
+<h2 id="request-channel-status-030">Request channel status <code>@0.3.0</code> </h2>
 <p>Requests the status of each channel on the server.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>status
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1063,29 +1063,29 @@ If it is not in <a href="#session-authentication">session authenticated</a> stat
   <span class="token comment">// ... omitted</span>
 <span class="token punctuation">]</span>
 </code></pre><p>If necessary, the following parameters can be used.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameters {#parameters }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameters</span>
 ch        <span class="token comment"># Channel number (You can specify multiple channels at the same time, which are separated by a comma (,).)</span>
 verbose   <span class="token comment"># Request a message corresponding to a status code</span>
 lang      <span class="token comment"># Specify the language to use for the message</span>
 recordingStatus <span class="token comment"># Request recording status as well (Added since TS-API@0.9.5)</span>
 
-<span class="token comment"># Examples {#examples }</span>
-<span class="token comment"># Specify channel 3 only {#specify-channel-3-only }</span>
+<span class="token comment"># Examples</span>
+<span class="token comment"># Specify channel 3 only</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>status<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">3</span>
 
-<span class="token comment"># Specify only channels 1 to 4 {#specify-only-channels-1-to-4 }</span>
+<span class="token comment"># Specify only channels 1 to 4</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>status<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">4</span>
 
-<span class="token comment"># Include status messages (if lang is not specified, the server-side language settings are applied.) {#include-status-messages-if-lang-is-not-specified-the-server-side-language-settings-are-applied }</span>
+<span class="token comment"># Include status messages (if lang is not specified, the server-side language settings are applied.)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>status<span class="token operator">?</span>verbose<span class="token operator">=</span><span class="token boolean">true</span>
 
-<span class="token comment"># Include status messages in Spanish {#include-status-messages-in-spanish }</span>
+<span class="token comment"># Include status messages in Spanish</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>status<span class="token operator">?</span>verbose<span class="token operator">=</span><span class="token boolean">true</span><span class="token operator">&amp;</span>lang<span class="token operator">=</span>es<span class="token operator">-</span><span class="token constant">ES</span>
 
-<span class="token comment"># Request recording status of all channels {#request-recording-status-of-all-channels }</span>
+<span class="token comment"># Request recording status of all channels</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>status<span class="token operator">?</span>recordingStatus
 
-<span class="token comment"># Request the recording status of channels 1 to 4 {#request-the-recording-status-of-channels-1-to-4 }</span>
+<span class="token comment"># Request the recording status of channels 1 to 4</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>status<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token operator">&amp;</span>recordingStatus
 </code></pre><p>Requests, including messages, return JSON data in the following format:</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">[</span>
@@ -1183,9 +1183,9 @@ recordingStatus <span class="token comment"># Request recording status as well (
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token comment">// ... omitted</span>
 <span class="token punctuation">]</span>
-</code></pre><h2>Request various enumeration</h2>
+</code></pre><h2 id="request-various-enumeration">Request various enumeration </h2>
 <p>The following requests return the JSON data with an HTTP response code of 200 if it is in <a href="#session-authentication">session authenticated</a> state, or an HTTP response code of 401 if the session is not authenticated.</p>
-<h3>Channel list <code>@0.9.4</code></h3>
+<h3 id="channel-list-094">Channel list <code>@0.9.4</code> </h3>
 <p>To get a list of channels in use, request the following:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>channel
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1201,7 +1201,7 @@ recordingStatus <span class="token comment"># Request recording status as well (
     <span class="token string-property property">"displayName"</span><span class="token operator">:</span> <span class="token string">"CH2"</span>    <span class="token comment">// Added since TS-API@0.9.4</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">]</span>
-</code></pre><h4>Adding stream list <code>@0.9.4</code></h4>
+</code></pre><h4 id="adding-stream-list-094">Adding stream list <code>@0.9.4</code> </h4>
 <p>You can add the <code>staticSrc</code> parameter to get the list of streams together.<br>
 These streams may not be available depending on the camera connection.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>channel<span class="token operator">&amp;</span>staticSrc
@@ -1283,7 +1283,7 @@ These streams may not be available depending on the camera connection.</p>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token comment">// omitted</span>
 <span class="token punctuation">]</span>
-</code></pre><h4>Adding camera capabilities <code>@0.9.4</code></h4>
+</code></pre><h4 id="adding-camera-capabilities-094">Adding camera capabilities <code>@0.9.4</code> </h4>
 <p>You can add the <code>caps</code> parameter to get camera capabilities together.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>channel<span class="token operator">&amp;</span>caps
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1323,7 +1323,7 @@ These streams may not be available depending on the camera connection.</p>
     <span class="token punctuation">}</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Vehicle number recognition device list</h3>
+</code></pre><h3 id="vehicle-number-recognition-device-list">Vehicle number recognition device list </h3>
 <p>To get a list of vehicle identification devices in use, ask for the following:<br>
 The vehicle number recognition device list includes used devices when an external device is interworked, and in case of TS-LPR with built-in car number recognition function, it includes preset car number recognition zones.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>lprSrc
@@ -1372,7 +1372,7 @@ The vehicle number recognition device list includes used devices when an externa
 <span class="token comment">// For example, if the video is 1920x1080 resolution and the zone is (480, 270, 1440, 810),</span>
 <span class="token comment">// the abscissas are multiplied by 7680/1920, and the ordinates are multiplied by 4320/1080, </span>
 <span class="token comment">// then be calculated as (1920, 1080, 5760, 3240).</span>
-</code></pre><h3>Emergency call device list <code>@0.3.0</code></h3>
+</code></pre><h3 id="emergency-call-device-list-030">Emergency call device list <code>@0.3.0</code> </h3>
 <p>To receive a list of registered emergency call devices on the server, request the following:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>emergencyCall
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1389,7 +1389,7 @@ The vehicle number recognition device list includes used devices when an externa
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token comment">// ... omitted</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Event log type list</h3>
+</code></pre><h3 id="event-log-type-list">Event log type list </h3>
 <p>To get a list of supported event log types, request the following:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>eventType
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1416,11 +1416,11 @@ The vehicle number recognition device list includes used devices when an externa
 </code></pre><p>The list of event log codes is defined by each type.</p>
 <p>If you do not specify a language, the default is to return results based on the server's language setting.<br>
 If needed, you can change the language using the parameters below.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameter {#parameter }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameter</span>
 lang      <span class="token comment"># Language</span>
 
-<span class="token comment"># Example {#example }</span>
-<span class="token comment"># Requesting Spanish {#requesting-spanish }</span>
+<span class="token comment"># Example</span>
+<span class="token comment"># Requesting Spanish</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>eventType<span class="token operator">&amp;</span>lang<span class="token operator">=</span>es<span class="token operator">-</span><span class="token constant">ES</span>
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">[</span>
@@ -1447,7 +1447,7 @@ lang      <span class="token comment"># Language</span>
     <span class="token string-property property">"name"</span><span class="token operator">:</span> <span class="token string">"Evento definido por el usuario"</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Parking lot list <code>@0.9.8</code></h3>
+</code></pre><h3 id="parking-lot-list-098">Parking lot list <code>@0.9.8</code> </h3>
 <p>To get a list of registered parking lots on the server, request the followings:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>parkingLot
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1482,7 +1482,7 @@ lang      <span class="token comment"># Language</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Real-time event list <code>@0.9.6</code></h3>
+</code></pre><h3 id="real-time-event-list-096">Real-time event list <code>@0.9.6</code> </h3>
 <p>To get a list of real-time events provided by the server, request the followings:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>realtimeEvent
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1497,7 +1497,7 @@ lang      <span class="token comment"># Language</span>
   <span class="token string">"packing"</span><span class="token punctuation">,</span>
   <span class="token string">"object"</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Supported object types <code>@0.9.11</code></h3>
+</code></pre><h3 id="supported-object-types-0911">Supported object types <code>@0.9.11</code> </h3>
 <p>To get a list of object types supported by the server, request the followings:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>objectType
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1506,7 +1506,7 @@ lang      <span class="token comment"># Language</span>
   <span class="token string">"human"</span><span class="token punctuation">,</span>
   <span class="token string">"vehicle"</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Supported object attributes <code>@0.9.11</code></h3>
+</code></pre><h3 id="supported-object-attributes-0911">Supported object attributes <code>@0.9.11</code> </h3>
 <p>To get a list of object attributes supported by the server, request the followings:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>objectAttr<span class="token operator">&amp;</span>type<span class="token operator">=</span>face  <span class="token comment"># attributes for face</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>objectAttr            <span class="token comment"># attributes for all</span>
@@ -1566,9 +1566,9 @@ lang      <span class="token comment"># Language</span>
     <span class="token comment">// ... omitted</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</code></pre><h2>Retrieve recorded data</h2>
+</code></pre><h2 id="retrieve-recorded-data">Retrieve recorded data </h2>
 <p>Use <code>/api/find</code> to search for recorded data.</p>
-<h3>Search dates with recorded video</h3>
+<h3 id="search-dates-with-recorded-video">Search dates with recorded video </h3>
 <p>To get a list of dates with recorded videos, request the following:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays      <span class="token operator">/</span><span class="token operator">/</span> Request all dates with recorded video
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1601,7 +1601,7 @@ lang      <span class="token comment"># Language</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </code></pre><p>You can request to meet certain criteria by adding the following parameters:</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameters {#parameters-1 }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameters</span>
 ch          <span class="token comment"># List of dates on which a specific channel was recorded </span>
             <span class="token comment"># (Multiple channels are listed using commas)</span>
 timeBegin   <span class="token comment"># List of dates recorded after a specific date and time</span>
@@ -1609,20 +1609,20 @@ timeEnd     <span class="token comment"># List of recorded dates before a specif
             <span class="token comment"># (If the request is made in UTC time, the date based on UTC is returned, </span>
             <span class="token comment"># otherwise the date based on the server's local time is returned.)</span>
 
-<span class="token comment"># Examples {#examples-1 }</span>
-<span class="token comment"># Request date list of channels 1 recorded {#request-date-list-of-channels-1-recorded }</span>
+<span class="token comment"># Examples</span>
+<span class="token comment"># Request date list of channels 1 recorded</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span>
-<span class="token comment"># Request date list of channels 1,2,3 recorded {#request-date-list-of-channels-123-recorded }</span>
+<span class="token comment"># Request date list of channels 1,2,3 recorded </span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span>
 
-<span class="token comment"># List of recorded dates since February 2018 (2018-02-01T00: 00:00-05:00) {#list-of-recorded-dates-since-february-2018-2018-02-01t00-0000-0500 }</span>
+<span class="token comment"># List of recorded dates since February 2018 (2018-02-01T00: 00:00-05:00)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">02</span><span class="token operator">-</span><span class="token number">01</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># List of dates recorded in January 2018 {#list-of-dates-recorded-in-january-2018 }</span>
-<span class="token comment"># (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-05:00) {#2018-01-01t000000-0500--2018-01-31t235959999-0500 }</span>
+<span class="token comment"># List of dates recorded in January 2018</span>
+<span class="token comment"># (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-05:00)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">01</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">31</span>T23<span class="token operator">%</span><span class="token number">3</span>A59<span class="token operator">%</span><span class="token number">3</span>A59<span class="token punctuation">.</span><span class="token number">999</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># List of dates when channel 1 was recorded in January 2018 {#list-of-dates-when-channel-1-was-recorded-in-january-2018 }</span>
+<span class="token comment"># List of dates when channel 1 was recorded in January 2018</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recDays<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">01</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">31</span>T23<span class="token operator">%</span><span class="token number">3</span>A59<span class="token operator">%</span><span class="token number">3</span>A59<span class="token punctuation">.</span><span class="token number">999</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 </code></pre><p>If you specify a condition using parameters such as <code>ch</code>,<code>timeBegin</code>, or <code>timeEnd</code>, the result is returned, including the requested condition, as shown below.</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">{</span>
@@ -1646,15 +1646,15 @@ timeEnd     <span class="token comment"># List of recorded dates before a specif
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Search minutes with recorded video <code>@0.2.0</code></h3>
+</code></pre><h3 id="search-minutes-with-recorded-video-020">Search minutes with recorded video <code>@0.2.0</code> </h3>
 <p>To get a list of minutes with recorded videod, request the following:<br>
 In the case of minute search, you can not request all of them because the amount of response data can be large, unlike date search.<br>
 Specifying only one of timeBegin or timeEnd returns the results of one day's search from the specified date. The date range you can specify is limited to a maximum of 3 days.<br>
 The available parameters are the same as <code>/api/find?what=recDays</code>.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># When using local time {#when-using-local-time }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># When using local time</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recMinutes<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">25</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">02</span><span class="token operator">-</span><span class="token number">02</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># When using UTC time {#when-using-utc-time }</span>
+<span class="token comment"># When using UTC time</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>recMinutes<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">25</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00Z<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">-</span><span class="token number">26</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00Z
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">{</span>
@@ -1701,7 +1701,7 @@ The available parameters are the same as <code>/api/find?what=recDays</code>.</p
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Search event log</h3>
+</code></pre><h3 id="search-event-log">Search event log </h3>
 <p>To retrieve the event log recorded on the server, request the following.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1766,7 +1766,7 @@ The available parameters are the same as <code>/api/find?what=recDays</code>.</p
 You can use <code>totalCount</code>,<code> at</code>, and <code>maxCount</code> to refer to each page of search results.</p>
 <p>If you do not specify a language, the default is to return results based on the server's language setting.<br>
 If required, you can specify search parameters by combining one or more of the following parameters.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameters {#parameters-2 }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameters</span>
 lang        <span class="token comment"># Language</span>
 timeBegin   <span class="token comment"># List of events recorded after a specific date and time</span>
 timeEnd     <span class="token comment"># List of events recorded before a specific date and time</span>
@@ -1775,28 +1775,28 @@ maxCount    <span class="token comment"># Maximum number of items</span>
 sort        <span class="token comment"># Sorting method (desc: Latest data order (default), asc: Oldest data order)</span>
 type        <span class="token comment"># Event log type</span>
 
-<span class="token comment"># Examples {#examples-2 }</span>
-<span class="token comment"># Requesting Arabic {#requesting-arabic }</span>
+<span class="token comment"># Examples</span>
+<span class="token comment"># Requesting Arabic</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog<span class="token operator">&amp;</span>lang<span class="token operator">=</span>ar<span class="token operator">-</span><span class="token constant">AE</span>
 
-<span class="token comment"># Event log requests recorded during January 2018 {#event-log-requests-recorded-during-january-2018 }</span>
-<span class="token comment"># (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-05:00) {#2018-01-01t000000-0500--2018-01-31t235959999-0500-1 }</span>
+<span class="token comment"># Event log requests recorded during January 2018</span>
+<span class="token comment"># (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-05:00)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">01</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">31</span>T23<span class="token operator">%</span><span class="token number">3</span>A59<span class="token operator">%</span><span class="token number">3</span>A59<span class="token punctuation">.</span><span class="token number">999</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># Request 20 items from the 10th item in the search results {#request-20-items-from-the-10th-item-in-the-search-results }</span>
+<span class="token comment"># Request 20 items from the 10th item in the search results</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog<span class="token operator">&amp;</span>at<span class="token operator">=</span><span class="token number">10</span><span class="token operator">&amp;</span>maxCount<span class="token operator">=</span><span class="token number">20</span>
 
-<span class="token comment"># Sort by old data order (ascending order) {#sort-by-old-data-order-ascending-order }</span>
+<span class="token comment"># Sort by old data order (ascending order)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog<span class="token operator">&amp;</span>sort<span class="token operator">=</span>asc
 
-<span class="token comment"># Request the system log type id list {#request-the-system-log-type-id-list }</span>
+<span class="token comment"># Request the system log type id list</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>enum<span class="token operator">?</span>what<span class="token operator">=</span>eventType
 
-<span class="token comment"># Request only system log (id: 0) of event log types {#request-only-system-log-id-0-of-event-log-types }</span>
+<span class="token comment"># Request only system log (id: 0) of event log types</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>eventLog<span class="token operator">&amp;</span>type<span class="token operator">=</span><span class="token number">0</span>
 
 
-</code></pre><h3>Vehicle number log search</h3>
+</code></pre><h3 id="vehicle-number-log-search">Vehicle number log search </h3>
 <p>If you use the car number recognition function, the recognized car number is saved with the video. To retrieve the car number log you will request as follows:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -1823,7 +1823,8 @@ type        <span class="token comment"># Event log type</span>
         <span class="token string">"2018-02-21T09:07:34.057-05:00"</span>   <span class="token comment">// Ending timestamp</span>
       <span class="token punctuation">]</span><span class="token punctuation">,</span>
       <span class="token string-property property">"srcCode"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>                 <span class="token comment">// Vehicle number recognition device (or zone) code</span>
-      <span class="token string-property property">"srcName"</span><span class="token operator">:</span> <span class="token string">"The%20Empire%20State"</span><span class="token punctuation">,</span>  <span class="token comment">// Vehicle number recognition device (or zone) name</span>
+      <span class="token string-property property">"srcName"</span><span class="token operator">:</span> <span class="token string">"The%20Empire%20State"</span><span class="token punctuation">,</span>  <span class="token comment">// Vehicle number recognition device (or zone) name,</span>
+      <span class="token string-property property">"direction"</span><span class="token operator">:</span> <span class="token string">"entry"</span><span class="token punctuation">,</span>               <span class="token comment">// Vehicle movement direction ("entry" or "exit"), this item can be omitted when there is no movement direction data.</span>
       <span class="token string-property property">"vod"</span><span class="token operator">:</span> <span class="token punctuation">[</span>  <span class="token comment">// The Video at the recognized point (may be several if linked channels are set)</span>
         <span class="token punctuation">{</span>
           <span class="token string-property property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
@@ -1859,7 +1860,8 @@ type        <span class="token comment"># Event log type</span>
         <span class="token string">"2018-02-21T08:00:01.714-05:00"</span>
       <span class="token punctuation">]</span><span class="token punctuation">,</span>
       <span class="token string-property property">"srcCode"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
-      <span class="token string-property property">"srcName"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span>
+      <span class="token string-property property">"srcName"</span><span class="token operator">:</span> <span class="token string">"1-1-1"</span><span class="token punctuation">,</span><span class="token punctuation">,</span>
+      <span class="token string-property property">"direction"</span><span class="token operator">:</span> <span class="token string">"exit"</span>
       <span class="token string-property property">"vod"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
         <span class="token punctuation">{</span>
           <span class="token string-property property">"chid"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
@@ -1906,7 +1908,7 @@ type        <span class="token comment"># Event log type</span>
 You can use <code>totalCount</code>,<code> at</code>, and <code>maxCount</code> to refer to each page of search results.</p>
 <p>If you do not specify a language, the default is to return results based on the server's language setting.<br>
 If required, you can specify search parameters by combining one or more of the following parameters.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameters {#parameters-3 }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Parameters</span>
 keyword     <span class="token comment"># Vehicle number text to search (or some characters)</span>
 lang        <span class="token comment"># Language</span>
 timeBegin   <span class="token comment"># List of vehicle numbers recorded after a specific date and time</span>
@@ -1916,24 +1918,24 @@ maxCount    <span class="token comment"># Maximum number of items</span>
 sort        <span class="token comment"># Sorting method (desc: Latest data order (default), asc: Oldest data order)</span>
 src         <span class="token comment"># Vehicle number recognition device id (separated by a comma (,) if multiple channels are specified at the same time)</span>
 
-<span class="token comment"># Examples {#examples-3 }</span>
-<span class="token comment"># Search for vehicle number including "12" (keyword search) {#search-for-vehicle-number-including-12-keyword-search }</span>
+<span class="token comment"># Examples</span>
+<span class="token comment"># Search for vehicle number including "12" (keyword search)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo<span class="token operator">&amp;</span>keyword<span class="token operator">=</span><span class="token number">12</span>
 
-<span class="token comment"># Request Arabic {#request-arabic }</span>
+<span class="token comment"># Request Arabic</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo<span class="token operator">&amp;</span>lang<span class="token operator">=</span>ar<span class="token operator">-</span><span class="token constant">AE</span>
 
-<span class="token comment"># Request vehicle number logs recorded during January 2018 {#request-vehicle-number-logs-recorded-during-january-2018 }</span>
-<span class="token comment"># (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-059:00) {#2018-01-01t000000-0500--2018-01-31t235959999-05900 }</span>
+<span class="token comment"># Request vehicle number logs recorded during January 2018</span>
+<span class="token comment"># (2018-01-01T00:00:00-05:00 ~ 2018-01-31T23:59:59.999-059:00)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">01</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">31</span>T23<span class="token operator">%</span><span class="token number">3</span>A59<span class="token operator">%</span><span class="token number">3</span>A59<span class="token punctuation">.</span><span class="token number">999</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># Request 20 items from the 10th item in the search results {#request-20-items-from-the-10th-item-in-the-search-results-1 }</span>
+<span class="token comment"># Request 20 items from the 10th item in the search results</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo<span class="token operator">&amp;</span>at<span class="token operator">=</span><span class="token number">10</span><span class="token operator">&amp;</span>maxCount<span class="token operator">=</span><span class="token number">20</span>
 
-<span class="token comment"># Sort by old data order (ascending order) {#sort-by-old-data-order-ascending-order-1 }</span>
+<span class="token comment"># Sort by old data order (ascending order)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo<span class="token operator">&amp;</span>sort<span class="token operator">=</span>asc
 
-<span class="token comment"># Search by specifying vehicle number recognition device 1, 2 {#search-by-specifying-vehicle-number-recognition-device-1-2 }</span>
+<span class="token comment"># Search by specifying vehicle number recognition device 1, 2</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo<span class="token operator">&amp;</span>src<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span>
 </code></pre><p>To display the video in the retrieved result data, use the method used in <a href="#display-recorded-video">Display recorded video</a>.</p>
 <p>For example, if you want to display a video of the following search results</p>
@@ -1956,12 +1958,12 @@ src         <span class="token comment"># Vehicle number recognition device id (
   <span class="token punctuation">}</span>
   <span class="token comment">// ... omitted</span>
 </code></pre><p>In here, you can display video using  <code>http://192.168.0.100/watch?ch=1&amp;when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00</code> corresponding to the value of <code>"videoSrc"</code> in <code>"vod"</code>.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># If the session is authenticated, use it as it is {#if-the-session-is-authenticated-use-it-as-it-is }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># If the session is authenticated, use it as it is</span>
 <span class="token symbol">http</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">192.168</span><span class="token number">.0</span><span class="token number">.100</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword keyword-when">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">%</span><span class="token number">2</span>D02<span class="token operator">%</span><span class="token number">2</span>D20T18<span class="token operator">%</span><span class="token number">3</span>A12<span class="token operator">%</span><span class="token number">3</span>A05<span class="token operator">%</span><span class="token number">2E828</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># If the session is not authenticated, add the auth parameter {#if-the-session-is-not-authenticated-add-the-auth-parameter }</span>
+<span class="token comment"># If the session is not authenticated, add the auth parameter</span>
 <span class="token symbol">http</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span><span class="token number">192.168</span><span class="token number">.0</span><span class="token number">.100</span><span class="token operator">/</span>watch<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword keyword-when">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">%</span><span class="token number">2</span>D02<span class="token operator">%</span><span class="token number">2</span>D20T18<span class="token operator">%</span><span class="token number">3</span>A12<span class="token operator">%</span><span class="token number">3</span>A05<span class="token operator">%</span><span class="token number">2E828</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
-</code></pre><h3>Export the search result of vehicle numbers log <code>@0.9.18</code></h3>
+</code></pre><h3 id="export-the-search-result-of-vehicle-numbers-log-0918">Export the search result of vehicle numbers log <code>@0.9.18</code> </h3>
 <p>You can download the searched vehicle numbers log as Excel files.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>carNo<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">01</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">31</span>T23<span class="token operator">%</span><span class="token number">3</span>A59<span class="token operator">%</span><span class="token number">3</span>A59<span class="token punctuation">.</span><span class="token number">999</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>export<span class="token operator">=</span><span class="token boolean">true</span>
 </code></pre><p>If you request by adding <code>export=true</code> parameter to vehicle number log search<br>
@@ -1971,17 +1973,17 @@ The server returns JSON data in the format shown below with an HTTP response cod
   <span class="token string">"http://host/download/2018-01-01T00.00.00(2).xls"</span><span class="token punctuation">,</span>
     <span class="token comment">// ... omitted</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Search for similar vehicle numbers <code>@0.2.0</code></h3>
+</code></pre><h3 id="search-for-similar-vehicle-numbers-020">Search for similar vehicle numbers <code>@0.2.0</code> </h3>
 <p>Can be used to verify that a similar vehicle number exists.<br>
 To retrieve similar vehicle numbers from the log, request the following:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>similarCarNo<span class="token operator">&amp;</span>keyword<span class="token operator">=</span><span class="token number">1234</span>
 
-<span class="token comment"># Parameters {#parameters-4 }</span>
+<span class="token comment"># Parameters</span>
 keyword     <span class="token comment"># Vehicle number text to search (or some characters)</span>
 maxCount    <span class="token comment"># Maximum number of items</span>
 
-<span class="token comment"># Examples {#examples-4 }</span>
-<span class="token comment"># Request up to 10 results {#request-up-to-10-results }</span>
+<span class="token comment"># Examples</span>
+<span class="token comment"># Request up to 10 results</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>similarCarNo<span class="token operator">&amp;</span>keyword<span class="token operator">=</span><span class="token number">123</span><span class="token operator">&amp;</span>maxCount<span class="token operator">=</span><span class="token number">10</span>
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">[</span>
@@ -1989,7 +1991,7 @@ maxCount    <span class="token comment"># Maximum number of items</span>
   <span class="token string">"123MTB"</span><span class="token punctuation">,</span>
     <span class="token comment">// ... omitted</span>
 <span class="token punctuation">]</span>
-</code></pre><h3>Object Search <code>@0.9.11</code></h3>
+</code></pre><h3 id="object-search-0911">Object Search <code>@0.9.11</code> </h3>
 <p>When using the object detection function, the detected objects (<code>face</code>,<code> human</code>, <code>vehicle</code>) are saved with the video. To search the object detection log, request as follows.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -2068,7 +2070,7 @@ maxCount    <span class="token comment"># Maximum number of items</span>
 <span class="token punctuation">}</span>
 </code></pre><p>The contents of the <code>data</code> item of the search result are the same as the contents of [Object Detection Event <code>@ 0.9.11</code>] (#object-detection-event-0911).</p>
 <p>You can also search for conditions by specifying parameters for each object as shown below.</p>
-<h4>Common parameters</h4>
+<h4 id="common-parameters">Common parameters </h4>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code>lang        <span class="token comment"># language</span>
 timeBegin   <span class="token comment"># List of objects recorded after a specific date and time</span>
 timeEnd     <span class="token comment"># List of objects recorded before a specific date and time</span>
@@ -2079,49 +2081,49 @@ maxCount    <span class="token comment"># Maximum number of items</span>
 sort        <span class="token comment"># Sorting method (desc: Latest data order (default), asc: Oldest data order)</span>
 
 
-<span class="token comment"># Requests for objects stored during January 2020 {#requests-for-objects-stored-during-january-2020 }</span>
-<span class="token comment"># (2020-01-01T00:00:00-05:00 ~ 2020-01-31T23:59:59.999-05:00) {#2020-01-01t000000-0500--2020-01-31t235959999-0500 }</span>
+<span class="token comment"># Requests for objects stored during January 2020</span>
+<span class="token comment"># (2020-01-01T00:00:00-05:00 ~ 2020-01-31T23:59:59.999-05:00)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">01</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">31</span>T23<span class="token operator">%</span><span class="token number">3</span>A59<span class="token operator">%</span><span class="token number">3</span>A59<span class="token punctuation">.</span><span class="token number">999</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># Request only objects of channels 1 and 2 {#request-only-objects-of-channels-1-and-2 }</span>
+<span class="token comment"># Request only objects of channels 1 and 2</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span>
 
-<span class="token comment"># Request only face objects {#request-only-face-objects }</span>
+<span class="token comment"># Request only face objects</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face
 
-<span class="token comment"># Request 20 items from the 10th item of the search result {#request-20-items-from-the-10th-item-of-the-search-result }</span>
+<span class="token comment"># Request 20 items from the 10th item of the search result</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>at<span class="token operator">=</span><span class="token number">10</span><span class="token operator">&amp;</span>maxCount<span class="token operator">=</span><span class="token number">20</span>
 
-<span class="token comment"># Requests sorted by oldest data (ascending) {#requests-sorted-by-oldest-data-ascending }</span>
+<span class="token comment"># Requests sorted by oldest data (ascending)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>sort<span class="token operator">=</span>asc
-</code></pre><h4>Parameters for <code>face</code></h4>
+</code></pre><h4 id="parameters-for-face">Parameters for <code>face</code> </h4>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code>gender       <span class="token comment"># Gender designation (either male or female)</span>
 age          <span class="token comment"># Age classification (one of young, adult, middle, senior)</span>
 hat          <span class="token comment"># Wearing a hat (either true or false)</span>
 glasses      <span class="token comment"># Wearing glasses (either true or false)</span>
 mask         <span class="token comment"># Wearing a mask (either true or false)</span>
 
-<span class="token comment"># Man only request {#man-only-request }</span>
+<span class="token comment"># Man only request</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token operator">&amp;</span>gender<span class="token operator">=</span>male
 
-<span class="token comment"># Adults only {#adults-only }</span>
+<span class="token comment"># Adults only</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token operator">&amp;</span>age<span class="token operator">=</span>adult
 
-<span class="token comment"># Middle-aged woman only {#middle-aged-woman-only }</span>
+<span class="token comment"># Middle-aged woman only</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token operator">&amp;</span>gender<span class="token operator">=</span>female<span class="token operator">&amp;</span>age<span class="token operator">=</span>middle
 
-<span class="token comment"># Request only for people with glasses {#request-only-for-people-with-glasses }</span>
+<span class="token comment"># Request only for people with glasses</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token operator">&amp;</span>glasses<span class="token operator">=</span><span class="token boolean">true</span>
 
-<span class="token comment"># Request only for people wearing glasses and hats {#request-only-for-people-wearing-glasses-and-hats }</span>
+<span class="token comment"># Request only for people wearing glasses and hats</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token operator">&amp;</span>glasses<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>hat<span class="token operator">=</span><span class="token number">1</span>
 
-<span class="token comment"># Request only for people not wearing a mask {#request-only-for-people-not-wearing-a-mask }</span>
+<span class="token comment"># Request only for people not wearing a mask</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token operator">&amp;</span>mask<span class="token operator">=</span><span class="token boolean">false</span>
 
-<span class="token comment"># Request only for people wearing glasses but mask {#request-only-for-people-wearing-glasses-but-mask }</span>
+<span class="token comment"># Request only for people wearing glasses but mask</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token operator">&amp;</span>glasses<span class="token operator">=</span><span class="token boolean">true</span><span class="token operator">&amp;</span>mask<span class="token operator">=</span><span class="token boolean">false</span>
-</code></pre><h4>Parameters for <code>human</code></h4>
+</code></pre><h4 id="parameters-for-human">Parameters for <code>human</code> </h4>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code>gender        <span class="token comment"># Gender designation (either male or female)</span>
 hat           <span class="token comment"># Wearing a hat (either true or false, or either 1 or 0)</span>
 bag           <span class="token comment"># Beloing a bag (either true or false, or either 1 or 0)</span>
@@ -2130,43 +2132,43 @@ topClothes    <span class="token comment"># Top length and colors (Separate mult
               <span class="token comment"># colors (multiple choices among brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, and other)</span>
 bottomClothes <span class="token comment"># Bottom length and colors (The expressions are the same as topColors)</span>
 
-<span class="token comment"># Woman only requests {#woman-only-requests }</span>
+<span class="token comment"># Woman only requests</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>gender<span class="token operator">=</span>female
 
-<span class="token comment"># Request only for people with bags {#request-only-for-people-with-bags }</span>
+<span class="token comment"># Request only for people with bags</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>bag<span class="token operator">=</span><span class="token boolean">true</span>
 
-<span class="token comment"># Request only for people with hats and bags {#request-only-for-people-with-hats-and-bags }</span>
+<span class="token comment"># Request only for people with hats and bags</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>hat<span class="token operator">=</span><span class="token boolean">true</span><span class="token operator">&amp;</span>bag<span class="token operator">=</span><span class="token boolean">true</span>
 
-<span class="token comment"># people in short-sleeved {#people-in-short-sleeved }</span>
+<span class="token comment"># people in short-sleeved</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>topClothes<span class="token operator">=</span>short
 
-<span class="token comment"># people in yellow top {#people-in-yellow-top }</span>
+<span class="token comment"># people in yellow top</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>topClothes<span class="token operator">=</span>yellow
 
-<span class="token comment"># People in red and blue top {#people-in-red-and-blue-top }</span>
+<span class="token comment"># People in red and blue top</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>topClothes<span class="token operator">=</span>red<span class="token punctuation">,</span>blue
 
-<span class="token comment"># People in shorts {#people-in-shorts }</span>
+<span class="token comment"># People in shorts</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>bottomClothes<span class="token operator">=</span>short
 
-<span class="token comment"># People in black both upper and lower {#people-in-black-both-upper-and-lower }</span>
+<span class="token comment"># People in black both upper and lower</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>topClothes<span class="token operator">=</span>black<span class="token operator">&amp;</span>bottomClothes<span class="token operator">=</span>black
 
-<span class="token comment"># Men in a white top wearing a hat and holding a bag {#men-in-a-white-top-wearing-a-hat-and-holding-a-bag }</span>
+<span class="token comment"># Men in a white top wearing a hat and holding a bag</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>human<span class="token operator">&amp;</span>hat<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>bag<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>topClothes<span class="token operator">=</span>white<span class="token operator">&amp;</span>gender<span class="token operator">=</span>male
-</code></pre><h4>Parameters for <code>vehicle</code></h4>
+</code></pre><h4 id="parameters-for-vehicle">Parameters for <code>vehicle</code> </h4>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code>vehicleType  <span class="token comment"># Vehicle type and colors, Separated by comma (,)</span>
              <span class="token comment"># Vehicle type (car, truck, bus, bicycle, motorcycle, train 중 하나) </span>
              <span class="token comment"># Vehicle colors (multiple choices among brown, black, red, orange, yellow, green, cyan, blue, purple, magenta, gray, pink, beige, white, and other)</span>
 
-<span class="token comment"># Bus only request {#bus-only-request }</span>
+<span class="token comment"># Bus only request</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>vehicle<span class="token operator">&amp;</span>vehicleType<span class="token operator">=</span>bus
 
-<span class="token comment"># Yellow car only request {#yellow-car-only-request }</span>
+<span class="token comment"># Yellow car only request</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>find<span class="token operator">?</span>what<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>vehicle<span class="token operator">&amp;</span>vehicleType<span class="token operator">=</span>car<span class="token punctuation">,</span>yellow
-</code></pre><h3>Face Search <code>@0.9.6</code></h3>
+</code></pre><h3 id="face-search-096">Face Search <code>@0.9.6</code> </h3>
 <p>You can find faces that resemble using photo of faces.</p>
 <p>In order to send a photo image, it is requested using the <code>HTTP POST</code> method.<br>
 Set search condition with CGI parameter and send only image as POST data.<br>
@@ -2177,19 +2179,19 @@ timeEnd     <span class="token comment"># Faces recorded before a specific date 
 ch          <span class="token comment"># The channel number, multiple numbers can be used using commas(,)</span>
 threshold   <span class="token comment"># Similarity (specified by 1 ~ 100 percentage)</span>
 
-<span class="token comment"># Search faces recorded during January 2020 {#search-faces-recorded-during-january-2020 }</span>
-<span class="token comment"># (2020-01-01T00:00:00-05:00 ~ 2020-01-31T23:59:59.999-059:00) {#2020-01-01t000000-0500--2020-01-31t235959999-05900 }</span>
+<span class="token comment"># Search faces recorded during January 2020</span>
+<span class="token comment"># (2020-01-01T00:00:00-05:00 ~ 2020-01-31T23:59:59.999-059:00)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>searchFace<span class="token operator">?</span>timeBegin<span class="token operator">=</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">01</span>T00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2020</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">31</span>T23<span class="token operator">%</span><span class="token number">3</span>A59<span class="token operator">%</span><span class="token number">3</span>A59<span class="token punctuation">.</span><span class="token number">999</span><span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># Search faces of channels 1 and 2 {#search-faces-of-channels-1-and-2 }</span>
+<span class="token comment"># Search faces of channels 1 and 2</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>searchFace<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span>
 
-<span class="token comment"># 95% similar face search {#95-similar-face-search }</span>
+<span class="token comment"># 95% similar face search</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>searchFace<span class="token operator">?</span>threshold<span class="token operator">=</span><span class="token number">95</span>
-</code></pre><h2>Search for video sources</h2>
+</code></pre><h2 id="search-for-video-sources">Search for video sources </h2>
 <p>You can use this method if your application uses the video address directly instead of the video display feature using the API you used in <a href="#inserting-video-into-web-page">Inserting video into web page</a>.</p>
 <p>This way you can get video address instead of displaying video.</p>
-<h3>Real-time video source</h3>
+<h3 id="real-time-video-source">Real-time video source </h3>
 <p>You can request a list of real-time video addresses that the server is streaming by requesting the following without any parameters:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod
 </code></pre><p>The server returns JSON data in the following format with an HTTP response code of 200:</p>
@@ -2292,21 +2294,21 @@ protocol    <span class="token comment"># Specify a streaming protocol (rtmp, hl
 stream      <span class="token comment"># Specify the resolution of the video (main: High definition video, sbu: Low-resolution video)</span>
 nameonly    <span class="token comment"># If true, only the channel name is requested without the video stream data part. </span>
 
-<span class="token comment"># Examples {#examples-5 }</span>
-<span class="token comment"># Request channel 1 only {#request-channel-1-only }</span>
+<span class="token comment"># Examples</span>
+<span class="token comment"># Request channel 1 only</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span>
 
-<span class="token comment"># Request only hls protocol streams {#request-only-hls-protocol-streams }</span>
+<span class="token comment"># Request only hls protocol streams</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>protocol<span class="token operator">=</span>hls
 
-<span class="token comment"># Request only low-resolution streams {#request-only-low-resolution-streams }</span>
+<span class="token comment"># Request only low-resolution streams</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>stream<span class="token operator">=</span>sub
 
-<span class="token comment"># Only request channel name {#only-request-channel-name }</span>
+<span class="token comment"># Only request channel name</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>nameonly<span class="token operator">=</span><span class="token boolean">true</span>
-<span class="token comment"># Or simply {#or-simply }</span>
+<span class="token comment"># Or simply</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>nameonly
-</code></pre><h3>Recorded video source</h3>
+</code></pre><h3 id="recorded-video-source">Recorded video source </h3>
 <p>In general, you will use the <a href="#search-date-with-recorded-video">Search date with recorded video</a> function to access the recorded video, but here are some ways to get a video source recorded at a lower level.</p>
 <p>Use <code>/api/vod</code>, which is used when requesting a real-time video sources, and specify different parameters as follows.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token keyword keyword-when">when</span>        <span class="token comment"># Specify the timestamp of recorded video</span>
@@ -2320,53 +2322,53 @@ otherwise   <span class="token comment"># If there is no search result,</span>
             <span class="token comment"># If requested with 'nearAfter', near recorded video after the search time period will be returned.</span>
 nolive      <span class="token comment"># Prevents search results from including real-time videos even timestamp is less than 1 minute from the current time (TS-API@0.9.9)</span>
 
-<span class="token comment"># Examples {#examples-6 }</span>
-<span class="token comment"># The channel 1 video source on channel 1 ecorded on January 8, 2018 at 9:30 PM EST {#the-channel-1-video-source-on-channel-1-ecorded-on-january-8-2018-at-930-pm-est }</span>
-<span class="token comment"># [Important!] {#important }</span>
-<span class="token comment"># 1. For recorded video, HTTP response code 400 (invalid request) occurs if 'ch=' is not specified. {#1-for-recorded-video-http-response-code-400-invalid-request-occurs-if-ch-is-not-specified }</span>
-<span class="token comment"># 2. Only data within 1 second is retrieved from the time specified by 'when='. {#2-only-data-within-1-second-is-retrieved-from-the-time-specified-by-when }</span>
+<span class="token comment"># Examples</span>
+<span class="token comment"># The channel 1 video source on channel 1 ecorded on January 8, 2018 at 9:30 PM EST</span>
+<span class="token comment"># [Important!]</span>
+<span class="token comment">#   1. For recorded video, HTTP response code 400 (invalid request) occurs if 'ch=' is not specified.</span>
+<span class="token comment">#   2. Only data within 1 second is retrieved from the time specified by 'when='.</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword keyword-when">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">08</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00
 
-<span class="token comment"># Search the channel 1 video source for data within 1 hour from 9:30 PM 00:00 on January 8, 2018 {#search-the-channel-1-video-source-for-data-within-1-hour-from-930-pm-0000-on-january-8-2018 }</span>
-<span class="token comment"># [Time unit notation used by duration] {#time-unit-notation-used-by-duration }</span>
-<span class="token comment"># w: week   (eg: 1w = one week) {#w-week---eg-1w--one-week }</span>
-<span class="token comment"># d: day    (eg: 5d = 5 days) {#d-day----eg-5d--5-days }</span>
-<span class="token comment"># h: hour   (eg: 3h = 3 hours) {#h-hour---eg-3h--3-hours }</span>
-<span class="token comment"># m: minute (eg: 10m = 10 minutes) {#m-minute-eg-10m--10-minutes }</span>
-<span class="token comment"># s: second (eg: 30s = 30 seconds) {#s-second-eg-30s--30-seconds }</span>
-<span class="token comment"># ms: millisecond (1/1000 sec.) (eg: 5000ms = 5000 milliseconds = 5 seconds) {#ms-millisecond-11000-sec-eg-5000ms--5000-milliseconds--5-seconds }</span>
-<span class="token comment"># * If units are not specified, seconds is used by the default. {#-if-units-are-not-specified-seconds-is-used-by-the-default }</span>
-<span class="token comment"># * Notation combining multiple units (eg: 1h30m) is not supported and must be {#-notation-combining-multiple-units-eg-1h30m-is-not-supported-and-must-be }</span>
-<span class="token comment"># calculated (eg: 90m) in the smallest unit if necessary {#calculated-eg-90m-in-the-smallest-unit-if-necessary }</span>
+<span class="token comment"># Search the channel 1 video source for data within 1 hour from 9:30 PM 00:00 on January 8, 2018</span>
+<span class="token comment"># [Time unit notation used by duration]</span>
+<span class="token comment">#   w: week   (eg: 1w = one week)</span>
+<span class="token comment">#   d: day    (eg: 5d = 5 days)</span>
+<span class="token comment">#   h: hour   (eg: 3h = 3 hours)</span>
+<span class="token comment">#   m: minute (eg: 10m = 10 minutes)</span>
+<span class="token comment">#   s: second (eg: 30s = 30 seconds)</span>
+<span class="token comment">#   ms: millisecond (1/1000 sec.) (eg: 5000ms = 5000 milliseconds = 5 seconds)</span>
+<span class="token comment">#   * If units are not specified, seconds is used by the default.</span>
+<span class="token comment">#   * Notation combining multiple units (eg: 1h30m) is not supported and must be</span>
+<span class="token comment">#     calculated (eg: 90m) in the smallest unit if necessary</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword keyword-when">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">08</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span><span class="token number">1</span>h
 
-<span class="token comment"># Direct request using recording file ID {#direct-request-using-recording-file-id }</span>
-<span class="token comment"># If there is a video, it returns 10 consecutive (by default) video sources {#if-there-is-a-video-it-returns-10-consecutive-by-default-video-sources }</span>
-<span class="token comment"># from that video. {#from-that-video }</span>
-<span class="token comment"># [Tips] {#tips }</span>
-<span class="token comment"># Each video file recorded on the server is assigned a unique serial number {#each-video-file-recorded-on-the-server-is-assigned-a-unique-serial-number }</span>
-<span class="token comment"># that is represented by an integer. {#that-is-represented-by-an-integer }</span>
+<span class="token comment"># Direct request using recording file ID</span>
+<span class="token comment"># If there is a video, it returns 10 consecutive (by default) video sources </span>
+<span class="token comment"># from that video.</span>
+<span class="token comment"># [Tips]</span>
+<span class="token comment">#   Each video file recorded on the server is assigned a unique serial number </span>
+<span class="token comment">#   that is represented by an integer.</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>id<span class="token operator">=</span><span class="token number">1304</span>
 
-<span class="token comment"># If the current file ID of channel 1 is 1034, it requests the next file {#if-the-current-file-id-of-channel-1-is-1034-it-requests-the-next-file }</span>
-<span class="token comment"># of the same channel (useful for continuous playback) {#of-the-same-channel-useful-for-continuous-playback }</span>
+<span class="token comment"># If the current file ID of channel 1 is 1034, it requests the next file</span>
+<span class="token comment"># of the same channel (useful for continuous playback)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>id<span class="token operator">=</span><span class="token number">1304</span><span class="token operator">&amp;</span><span class="token keyword keyword-next">next</span><span class="token operator">=</span><span class="token boolean">true</span>
-<span class="token comment"># Or simply {#or-simply-1 }</span>
+<span class="token comment"># Or simply</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>id<span class="token operator">=</span><span class="token number">1304</span><span class="token operator">&amp;</span><span class="token keyword keyword-next">next</span>
 
-<span class="token comment"># If the current file ID of channel 1 is 1034, it requests the previous file {#if-the-current-file-id-of-channel-1-is-1034-it-requests-the-previous-file }</span>
-<span class="token comment"># of the same channel (useful for continuous backward playback) {#of-the-same-channel-useful-for-continuous-backward-playback }</span>
+<span class="token comment"># If the current file ID of channel 1 is 1034, it requests the previous file</span>
+<span class="token comment"># of the same channel (useful for continuous backward playback)</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>id<span class="token operator">=</span><span class="token number">1304</span><span class="token operator">&amp;</span>prev<span class="token operator">=</span><span class="token boolean">true</span>
-<span class="token comment"># Or simply {#or-simply-2 }</span>
+<span class="token comment"># Or simply</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>id<span class="token operator">=</span><span class="token number">1304</span><span class="token operator">&amp;</span>prev
 
-<span class="token comment"># Receive 30 searched video sources {#receive-30-searched-video-sources }</span>
+<span class="token comment"># Receive 30 searched video sources</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword keyword-when">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">08</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">-</span><span class="token number">05</span><span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span><span class="token number">1</span>h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span>
 
-<span class="token comment"># If there is no search result, {#if-there-is-no-search-result }</span>
-<span class="token comment"># request near recorded video before the search time period {#request-near-recorded-video-before-the-search-time-period }</span>
+<span class="token comment"># If there is no search result,</span>
+<span class="token comment"># request near recorded video before the search time period</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword keyword-when">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">08</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">2</span>B09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span><span class="token number">1</span>h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span><span class="token operator">&amp;</span>otherwise<span class="token operator">=</span>nearBefore
-<span class="token comment"># request near recorded video after the search time period {#request-near-recorded-video-after-the-search-time-period }</span>
+<span class="token comment"># request near recorded video after the search time period</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>vod<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span><span class="token keyword keyword-when">when</span><span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">01</span><span class="token operator">-</span><span class="token number">08</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">2</span>B09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">&amp;</span>duration<span class="token operator">=</span><span class="token number">1</span>h<span class="token operator">&amp;</span>limit<span class="token operator">=</span><span class="token number">30</span><span class="token operator">&amp;</span>otherwise<span class="token operator">=</span>nearAfter
 </code></pre><p>When this request is made, the server returns JSON data in the following format with the HTTP response code 200:</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">[</span> <span class="token comment">// Consists of an array of recorded video file units</span>
@@ -2412,19 +2414,19 @@ nolive      <span class="token comment"># Prevents search results from including
     <span class="token punctuation">]</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">]</span>
-</code></pre><h2>Requesting video using video source <code>@0.3.0</code></h2>
+</code></pre><h2 id="requesting-video-using-video-source-030">Requesting video using video source <code>@0.3.0</code> </h2>
 <p>For video request using video source without using <code>/watch</code> provided by API, authentication is supported by each protocol as follows.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># RTMP (auth= parameter supported) {#rtmp-auth-parameter-supported }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># RTMP (auth= parameter supported)</span>
 <span class="token symbol">rtmp</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">&amp;</span><span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># HTTP (Only basic authentication is supported for file-based resources such as m3u8, JPG, and MP4) {#http-only-basic-authentication-is-supported-for-file-based-resources-such-as-m3u8-jpg-and-mp4 }</span>
+<span class="token comment"># HTTP (Only basic authentication is supported for file-based resources such as m3u8, JPG, and MP4)</span>
 <span class="token symbol">http</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>userid<span class="token symbol">:password</span><span class="token variable">@host</span><span class="token operator">/</span>path<span class="token operator">/</span>to
 
-<span class="token comment"># HTTP (The resources of sub path /api/ are supported in both ways) {#http-the-resources-of-sub-path-api-are-supported-in-both-ways }</span>
+<span class="token comment"># HTTP (The resources of sub path /api/ are supported in both ways)</span>
 <span class="token symbol">http</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>userid<span class="token symbol">:passwordn</span><span class="token variable">@host</span><span class="token operator">/</span>api<span class="token operator">/</span>path<span class="token operator">/</span>to
 <span class="token symbol">http</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>api<span class="token operator">/</span>path<span class="token operator">/</span>to<span class="token operator">&amp;</span><span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
-</code></pre><h2>Real-time event monitoring <code>@0.3.0</code></h2>
-<h3>Web Sockets (RFC6455)</h3>
+</code></pre><h2 id="real-time-event-monitoring-030">Real-time event monitoring <code>@0.3.0</code> </h2>
+<h3 id="web-sockets-rfc6455">Web Sockets (RFC6455) </h3>
 <p>Supports the ability to receive real-time event messsage using HTML5 Web sockets (RFC6455) method.<br>
 Once connection established the server and the client maintain the connection state, and when an event occurs, the server sends a message to the client.</p>
 <p>The step-by-step communication procedure is as follows:</p>
@@ -2462,51 +2464,51 @@ object          <span class="token comment"># Object detection event (added @0.9
 </code></pre><p>The web socket connection path and parameters are as follows.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents
 
-<span class="token comment"># Required parameters {#required-parameters }</span>
+<span class="token comment"># Required parameters</span>
 auth    <span class="token comment"># Authentication Information (Requires authentication per individual web socket, independent of session authentication)</span>
 topics  <span class="token comment"># Specify topics to receive (You can specify multiple topics at the same time, which are separated by a comma (,).)</span>
 
-<span class="token comment"># Optional argument {#optional-argument }</span>
+<span class="token comment"># Optional argument</span>
 verbose <span class="token comment"># For emergencyCall, request List the live video stream sources of the linked video channels</span>
         <span class="token comment"># For channelStatus, request status messages (Include "title" in initial message immediately after issuing subscriber id</span>
 session <span class="token comment"># Can pass authentication credentials by passing session cookie already connected</span>
 
-<span class="token comment"># channelStatus-specific parameters (optional) {#channelstatus-specific-parameters-optional }</span>
+<span class="token comment"># channelStatus-specific parameters (optional)</span>
 ch      <span class="token comment"># Used when specifying specific channels (separated by a comma (,) if multiple channels are specified at the same time)</span>
 lang    <span class="token comment"># Specify language for status messages</span>
 
-<span class="token comment"># Example {#example-1 }</span>
-<span class="token comment"># Request car number recognition event {#request-car-number-recognition-event }</span>
+<span class="token comment"># Example</span>
+<span class="token comment"># Request car number recognition event</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span><span class="token constant">LPR</span><span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># Request emergency call event {#request-emergency-call-event }</span>
+<span class="token comment"># Request emergency call event</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>emergencyCall<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># Request both events {#request-both-events }</span>
+<span class="token comment"># Request both events</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span><span class="token constant">LPR</span><span class="token punctuation">,</span>emergencyCall<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># request List the live video stream sources of the linked video channels {#request-list-the-live-video-stream-sources-of-the-linked-video-channels }</span>
+<span class="token comment"># request List the live video stream sources of the linked video channels</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span><span class="token constant">LPR</span><span class="token punctuation">,</span>emergencyCall<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>verbose<span class="token operator">=</span><span class="token boolean">true</span>
 
-<span class="token comment"># Request status change events for all channels {#request-status-change-events-for-all-channels }</span>
+<span class="token comment"># Request status change events for all channels</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>channelStatus<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># Requests status change events for all channels including messages {#requests-status-change-events-for-all-channels-including-messages }</span>
+<span class="token comment"># Requests status change events for all channels including messages</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>channelStatus<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>verbose<span class="token operator">=</span><span class="token boolean">true</span>
 
-<span class="token comment"># Requests status change events of channels 1 and 2 including Spanish messages {#requests-status-change-events-of-channels-1-and-2-including-spanish-messages }</span>
+<span class="token comment"># Requests status change events of channels 1 and 2 including Spanish messages</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>channelStatus<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token operator">&amp;</span>verbose<span class="token operator">=</span><span class="token boolean">true</span><span class="token operator">&amp;</span>lang<span class="token operator">=</span>es<span class="token operator">-</span><span class="token constant">ES</span>
 
-<span class="token comment"># Requests motion detection status change events for all channels {#requests-motion-detection-status-change-events-for-all-channels }</span>
+<span class="token comment"># Requests motion detection status change events for all channels</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>motionChanges<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># Requests motion detection status change events of channels 1 and 2 {#requests-motion-detection-status-change-events-of-channels-1-and-2 }</span>
+<span class="token comment"># Requests motion detection status change events of channels 1 and 2</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>motionChanges<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span>
 
-<span class="token comment"># Requests parking count for all the parking lots {#requests-parking-count-for-all-the-parking-lots }</span>
+<span class="token comment"># Requests parking count for all the parking lots</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>parkingCount<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># Requests parking count for the parking lot id 1 and 2 (in this case the `ch` used as parking lot id) {#requests-parking-count-for-the-parking-lot-id-1-and-2-in-this-case-the-ch-used-as-parking-lot-id }</span>
+<span class="token comment"># Requests parking count for the parking lot id 1 and 2 (in this case the `ch` used as parking lot id)</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>parkingCount<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span>
 </code></pre><p>The server issues the recipient ID in JSON format as shown below if the requested authentication information and topic are correct.<br>
 If the authentication information is incorrect or is not a supported topic, it will be disconnected immediately.</p>
@@ -2517,7 +2519,7 @@ If the authentication information is incorrect or is not a supported topic, it w
     <span class="token string">"emergencyCall"</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Channel status change events</h3>
+</code></pre><h3 id="channel-status-change-events">Channel status change events </h3>
 <p>You can receive channel status change events in real time by requesting <code>topics=channelStatus</code>.<br>
 Unlike other topics, in case of the channel status topic, for status change management, the current channel status is sent once, immediately after issuing the subscriber id.<br>
 The rest events are then sent only when there is a change from the initial state.<br>
@@ -2797,7 +2799,7 @@ Channel status change event messages are received in JSON format as shown below.
   <span class="token string-property property">"chid"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
 </code></pre><p>The list of channel status codes is the same as the status code list in <a href="#request-channel-status-030">Request channel status <code>@0.3.0</code></a>.</p>
-<h3>Car number recognition events</h3>
+<h3 id="car-number-recognition-events">Car number recognition events </h3>
 <p>If you request <code>topics=LPR</code>, you can receive the car number recognition event in real time.<br>
 The car number event message is received in JSON format as shown below.</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">{</span>
@@ -2830,9 +2832,10 @@ The car number event message is received in JSON format as shown below.</p>
   <span class="token string-property property">"parkingLot"</span><span class="token operator">:</span> <span class="token punctuation">{</span>                               <span class="token comment">// Connected parking lot id (TS-API@0.9.8)</span>
     <span class="token string-property property">"entrance"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>                              <span class="token comment">// Parking lot entrance id</span>
     <span class="token string-property property">"exit"</span><span class="token operator">:</span> <span class="token number">2</span>                                   <span class="token comment">// Parking lot exit id</span>
-  <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token string-property property">"direction"</span><span class="token operator">:</span> <span class="token string">"entry"</span>                          <span class="token comment">// Vehicle movement direction ("entry" or "exit"), this item can be omitted when there is no movement direction data.</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Emergency call events</h3>
+</code></pre><h3 id="emergency-call-events">Emergency call events </h3>
 <p>If you request <code>topics=emergencyCall</code>, you can receive the event messages at the start and end of the emergency call in real time.<br>
 Emergency call event messages are received in JSON format as shown below.</p>
 <p><strong>Call start message</strong></p>
@@ -2949,7 +2952,7 @@ If you request the video stream source of the channels as shown below, the video
   <span class="token string-property property">"topic"</span><span class="token operator">:</span><span class="token string">"emergencyCall"</span>                      <span class="token comment">// Topic name</span>
 <span class="token punctuation">}</span>
 </code></pre><p>Emergency call event messages are used for real-time communication, so the video address of the linked channel is linked to the real-time video unlike the case of car number recognition.</p>
-<h3>System event <code>@0.7.0</code></h3>
+<h3 id="system-event-070">System event <code>@0.7.0</code> </h3>
 <p>If you request <code>topics = systemEvent</code>, you can receive system events in real time.<br>
 System event is received in JSON format as below when "System log" data is generated from <a href="#event-log-type-list">Event log type list</a>.<br>
 Each data type is the same as those used in <a href="#search-event-log">Search event log</a>.</p>
@@ -2980,7 +2983,7 @@ Each data type is the same as those used in <a href="#search-event-log">Search e
     <span class="token string">"2018-12-26T15:29:20.013-05:00"</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Motion Detection Status Change Event <code>@0.8.0</code></h3>
+</code></pre><h3 id="motion-detection-status-change-event-080">Motion Detection Status Change Event <code>@0.8.0</code> </h3>
 <p>If you request <code>topics=motionChanges</code>, you can receive the event when changing the motion detection status for each channel in real time.<br>
 Immediately after the request, the current motion detection status of all specified channels is received<br>
 After this, the status of channels whose motion detection is changed in 1 second cycle is received in JSON format as below.<br>
@@ -3002,7 +3005,7 @@ No events occur for channels with the same motion detection status.</p>
     <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Parking Count Event <code>@0.9.0</code></h3>
+</code></pre><h3 id="parking-count-event-090">Parking Count Event <code>@0.9.0</code> </h3>
 <p>If you ask for <code>topics=parkingCount</code>, you can receive events in real time when the number of cars in each parking lot is changed.<br>
 Immediately after the request, the current number of vehicles in all the specified parking lots will be received once.<br>
 The number of vehicles in the parking lot will be received in JSON format as shown below.</p>
@@ -3037,7 +3040,7 @@ The number of vehicles in the parking lot will be received in JSON format as sho
     <span class="token punctuation">}</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Recording Status Event <code>@0.9.5</code></h3>
+</code></pre><h3 id="recording-status-event-095">Recording Status Event <code>@0.9.5</code> </h3>
 <p>If you request <code>topics = recordingStatus</code>, you can receive real-time events for each channel's recording status.<br>
 Immediately after the request, the current status of all channels is received.<br>
 After this, whenever a change occurs, it is received in JSON format as shown below.</p>
@@ -3083,7 +3086,7 @@ After this, whenever a change occurs, it is received in JSON format as shown bel
     <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
-</code></pre><h3>Object Detection Event <code>@0.9.11</code></h3>
+</code></pre><h3 id="object-detection-event-0911">Object Detection Event <code>@0.9.11</code> </h3>
 <p>If you request <code>topics = object</code>, you can receive real-time events at the time when the object is detected by each camera.<br>
 The supported object types are as follows.</p>
 <ul>
@@ -3093,15 +3096,15 @@ The supported object types are as follows.</p>
 </ul>
 <p>You can receive only the object you want by specifying the object type <code>objectType</code> as shown below.<br>
 If not specified, all supported object types are sent.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># requests only face {#requests-only-face }</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># requests only face</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># requests only vehicle {#requests-only-vehicle }</span>
+<span class="token comment"># requests only vehicle</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>vehicle<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 
-<span class="token comment"># requests face and human {#requests-face-and-human }</span>
+<span class="token comment"># requests face and human</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>face<span class="token punctuation">,</span>human<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
-</code></pre><h4><code>face</code> object</h4>
+</code></pre><h4 id="face-object"><code>face</code> object </h4>
 <ol>
 <li>Example data</li>
 </ol>
@@ -3161,7 +3164,7 @@ If not specified, all supported object types are sent.</p>
 </table>
 </li>
 </ol>
-<h4><code>human</code> object</h4>
+<h4 id="human-object"><code>human</code> object </h4>
 <ol>
 <li>Example data</li>
 </ol>
@@ -3261,7 +3264,7 @@ If not specified, all supported object types are sent.</p>
 </table>
 </li>
 </ol>
-<h4><code>vehicle</code> object</h4>
+<h4 id="vehicle-object"><code>vehicle</code> object </h4>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token number">1.</span> <span class="token maybe-class-name">Example</span> data
 <span class="token punctuation">{</span>
   <span class="token string-property property">"timestamp"</span><span class="token operator">:</span> <span class="token string">"2020-05-25T14:23:58.768-05:00"</span><span class="token punctuation">,</span>
@@ -3302,7 +3305,7 @@ If not specified, all supported object types are sent.</p>
 </table>
 </li>
 </ol>
-<h3>Body Temperature Event <code>@0.9.14</code></h3>
+<h3 id="body-temperature-event-0914">Body Temperature Event <code>@0.9.14</code> </h3>
 <p>If you request <code>topics=bodyTemperature</code>, you can receive real-time events when high temperatures are detected by each thermal imaging camera for body temperature detection.</p>
 <p>To receive body temperature detection events, make a request as follows:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>subscribeEvents<span class="token operator">?</span>topics<span class="token operator">=</span>object<span class="token operator">&amp;</span>objectType<span class="token operator">=</span>bodyTemperature<span class="token operator">&amp;</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
@@ -3517,7 +3520,7 @@ If not specified, all supported object types are sent.</p>
   <span class="token punctuation">}</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">&gt;</span></span>
 </code></pre><p><a href="./examples/ex3.html">Run</a></p>
-<h2>Exporting recorded video <code>@0.3.0</code></h2>
+<h2 id="exporting-recorded-video-030">Exporting recorded video <code>@0.3.0</code> </h2>
 <p>You can use the web socket to receive recorded video from the server.<br>
 The server creates the files one by one and deletes them when the client finishes downloading, and then creates the next file.<br>
 All progress is made while the server and the client remain connected,<br>
@@ -3545,12 +3548,12 @@ If the connection is lost, the server immediately stops the operation and delete
 <p>The web socket connection path and parameters are as follows.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport
 
-<span class="token comment"># Required parameters {#required-parameters-1 }</span>
+<span class="token comment"># Required parameters</span>
 auth            <span class="token comment"># Authentication Information (Requires authentication per individual web socket, independent of session authentication)</span>
 timeBegin       <span class="token comment"># Start time of data range to export (ISO8601 format)</span>
 timeEnd         <span class="token comment"># End time of data range to export (ISO8601 format)</span>
 
-<span class="token comment"># Optional parameters {#optional-parameters }</span>
+<span class="token comment"># Optional parameters</span>
 ch              <span class="token comment"># Used when specifying specific channels (separated by a comma (,) if multiple channels are specified at the same time)</span>
                 <span class="token comment"># If you do not specify a channel, it means all channels</span>
 subtitleFormat  <span class="token comment"># Specify the type of subtitle file to be used for the date time display of video</span>
@@ -3561,41 +3564,43 @@ statusInterval  <span class="token comment"># Displays the interval of receiving
                 <span class="token comment"># If statusInterval is not specified, no progress is sent</span>
 lang            <span class="token comment"># Specify the language to be used for backup progress status and subtitle file</span>
 
-<span class="token comment"># Parameters used for server-side logging for privacy (multiple lines of text can be used) {#parameters-used-for-server-side-logging-for-privacy-multiple-lines-of-text-can-be-used }</span>
+<span class="token comment"># Parameters used for server-side logging for privacy (multiple lines of text can be used)</span>
 submitter       <span class="token comment"># Specify video submitter</span>
 recipient       <span class="token comment"># Specify video recipient</span>
 purpose         <span class="token comment"># Specify the purpose of the video to submit</span>
 
-<span class="token comment"># including md5 {#including-md5 }</span>
+<span class="token comment"># including md5</span>
 md5             <span class="token comment"># added at v0.9.2</span>
 
+<span class="token comment"># data encryption</span>
+password        <span class="token comment"># added at v0.9.20. (password should be encoded using base64)</span>
 
-<span class="token comment"># Examples {#examples-7 }</span>
-<span class="token comment"># July 27, 2018 to receive all recorded videos from 9:00 am to 9:30 am {#july-27-2018-to-receive-all-recorded-videos-from-900-am-to-930-am }</span>
+<span class="token comment"># Examples</span>
+<span class="token comment"># July 27, 2018 to receive all recorded videos from 9:00 am to 9:30 am</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A
 
-<span class="token comment"># Exporting video recorded on channel 1 {#exporting-video-recorded-on-channel-1 }</span>
+<span class="token comment"># Exporting video recorded on channel 1</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span>
 
-<span class="token comment"># Exporting video recorded on channel 1 with md5 {#exporting-video-recorded-on-channel-1-with-md5 }</span>
+<span class="token comment"># Exporting video recorded on channel 1 with md5</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>md5<span class="token operator">=</span><span class="token boolean">true</span>
 
-<span class="token comment"># Exporting video recorded on channel 1,2 and 3 {#exporting-video-recorded-on-channel-12-and-3 }</span>
+<span class="token comment"># Exporting video recorded on channel 1,2 and 3</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span>
 
-<span class="token comment"># Save the file as 500MB {#save-the-file-as-500mb }</span>
+<span class="token comment"># Save the file as 500MB</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>mediaSize<span class="token operator">=</span><span class="token number">500</span>MB
 
-<span class="token comment"># Create VTT subtitle file {#create-vtt-subtitle-file }</span>
+<span class="token comment"># Create VTT subtitle file</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>mediaSize<span class="token operator">=</span><span class="token number">500</span>MB<span class="token operator">&amp;</span>subtitleFormat<span class="token operator">=</span><span class="token constant">VTT</span>
 
-<span class="token comment"># Receiving progress in 1 second interval {#receiving-progress-in-1-second-interval }</span>
+<span class="token comment"># Receiving progress in 1 second interval</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>mediaSize<span class="token operator">=</span><span class="token number">500</span>MB<span class="token operator">&amp;</span>subtitleFormat<span class="token operator">=</span><span class="token constant">VTT</span><span class="token operator">&amp;</span>statusInterval<span class="token operator">=</span><span class="token number">1</span>s
 
-<span class="token comment"># Specify language to Spanish {#specify-language-to-spanish }</span>
+<span class="token comment"># Specify language to Spanish</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>mediaSize<span class="token operator">=</span><span class="token number">500</span>MB<span class="token operator">&amp;</span>subtitleFormat<span class="token operator">=</span><span class="token constant">VTT</span><span class="token operator">&amp;</span>statusInterval<span class="token operator">=</span><span class="token number">1</span>s<span class="token operator">&amp;</span>lang<span class="token operator">=</span>es<span class="token operator">-</span><span class="token constant">ES</span>
 
-<span class="token comment"># Specify Video submitter(Begger), recipient(Prince), purpose(cold\nand hungry) {#specify-video-submitterbegger-recipientprince-purposecoldnand-hungry }</span>
+<span class="token comment"># Specify Video submitter(Begger), recipient(Prince), purpose(cold\nand hungry)</span>
 <span class="token symbol">ws</span><span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>host<span class="token operator">/</span>wsapi<span class="token operator">/</span>dataExport<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D<span class="token operator">&amp;</span>timeBegin<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>timeEnd<span class="token operator">=</span><span class="token number">2018</span><span class="token operator">-</span><span class="token number">07</span><span class="token operator">-</span><span class="token number">27</span>T09<span class="token operator">%</span><span class="token number">3</span>A30<span class="token operator">%</span><span class="token number">3</span>A00<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>A<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>mediaSize<span class="token operator">=</span><span class="token number">500</span>MB<span class="token operator">&amp;</span>subtitleFormat<span class="token operator">=</span><span class="token constant">VTT</span><span class="token operator">&amp;</span>statusInterval<span class="token operator">=</span><span class="token number">1</span>s<span class="token operator">&amp;</span>submitter<span class="token operator">=</span>Begger<span class="token operator">&amp;</span>recipient<span class="token operator">=</span>Prince<span class="token operator">&amp;</span>purpose<span class="token operator">=</span>cold<span class="token operator">%</span><span class="token number">0</span>D<span class="token operator">%</span><span class="token number">0</span>Aand<span class="token operator">%</span><span class="token number">20</span>hungry
 </code></pre><p>The message format sent by the server for each stage is as follows.<br>
 <strong>stage:ready - Ready</strong></p>
@@ -4188,7 +4193,7 @@ emergencyCall   <span class="token comment"># Emergency call</span>
 </code></pre><p>The path and parameters for sending events to the server are:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">POST</span> <span class="token operator">/</span>api<span class="token operator">/</span>push
 
-<span class="token comment"># Parameter</span>
+<span class="token comment"># Parameter {#parameter }</span>
 auth    <span class="token comment"># authentication information</span>
 </code></pre><p>Specify event data in JSON format in contents data.</p>
 <p><strong>Car number recognition data</strong></p>
@@ -4247,22 +4252,22 @@ auth    <span class="token comment"># authentication information</span>
 <p>The connected device information requests:</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>info
 
-<span class="token comment"># Parameters</span>
+<span class="token comment"># Parameters {#parameters }</span>
 caps    <span class="token comment"># Only requested "caps" item, If not specified, includes all information</span>
 ch      <span class="token comment"># specify channels, If not specified, all channels in use</span>
 reload  <span class="token comment"># Request updated information with the latest information from your channel's camera (@0.9.1)</span>
 
-<span class="token comment"># Examples</span>
-<span class="token comment"># Only requests device capabilities for each channel in use</span>
+<span class="token comment"># Examples {#examples }</span>
+<span class="token comment"># Only requests device capabilities for each channel in use {#only-requests-device-capabilities-for-each-channel-in-use }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>info<span class="token operator">?</span>caps
 
-<span class="token comment"># Only requests device capabilities connected to channels 1</span>
+<span class="token comment"># Only requests device capabilities connected to channels 1 {#only-requests-device-capabilities-connected-to-channels-1 }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>info<span class="token operator">?</span>caps<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span>
 
-<span class="token comment"># Only requests devices capabilities connected to channels 1, 2 and 3</span>
+<span class="token comment"># Only requests devices capabilities connected to channels 1, 2 and 3 {#only-requests-devices-capabilities-connected-to-channels-1-2-and-3 }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>info<span class="token operator">?</span>caps<span class="token operator">&amp;</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span>
 
-<span class="token comment"># Request renewal of camera information of all channels to latest information</span>
+<span class="token comment"># Request renewal of camera information of all channels to latest information {#request-renewal-of-camera-information-of-all-channels-to-latest-information }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>info<span class="token operator">?</span>caps<span class="token operator">&amp;</span>reload
 </code></pre><p>For the request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">[</span>
@@ -4331,11 +4336,11 @@ You can specify the language for the parameter as shown below.</p>
 </code></pre><p>For <a href="#list-of-languages-supported">a list of supported languages</a>, see the appendix.</p>
 <h3>Pan tilt control</h3>
 <p>If your device supports the pan tilt function, you can control it with the following commands.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Commands without parameters</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Commands without parameters {#commands-without-parameters }</span>
 home    <span class="token comment"># Return to home position</span>
 stop    <span class="token comment"># Stop (Common to all move commands)</span>
 
-<span class="token comment"># Commands used with parameters (Commands to move continuously)</span>
+<span class="token comment"># Commands used with parameters (Commands to move continuously) {#commands-used-with-parameters-commands-to-move-continuously }</span>
 move    <span class="token comment"># Move horizontally and vertically</span>
 zoom    <span class="token comment"># Zoom in / out    </span>
 focus   <span class="token comment"># Focus near / far</span>
@@ -4366,13 +4371,13 @@ Likewise, you can express both the direction and velocity of movement from the c
 <p>Available when the device supports the pan tilt preset function.</p>
 <p><strong>Request a preset list</strong><br>
 This command requests a list of presets that the server has already obtained (cached).</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Request a list of presets from channel 1</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Request a list of presets from channel 1 {#request-a-list-of-presets-from-channel-1 }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>list
 
-<span class="token comment"># Request a list of presets from multiple channels</span>
+<span class="token comment"># Request a list of presets from multiple channels {#request-a-list-of-presets-from-multiple-channels }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token operator">&amp;</span>list
 
-<span class="token comment"># Request a preset list of all channels</span>
+<span class="token comment"># Request a preset list of all channels {#request-a-preset-list-of-all-channels }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>list
 </code></pre><p>While the response time is fast because you do not reload from the device each time, if the preset list modified by the other software (for example, the embedded web page of the device), the server responds with the list of past.</p>
 <p>If the request is successful, the server responds with JSON data in the following format:</p>
@@ -4397,13 +4402,13 @@ This command requests a list of presets that the server has already obtained (ca
 <span class="token punctuation">]</span>
 </code></pre><p><strong>Preset list reload request</strong><br>
 This command reloads the preset list from the device and sends it back.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Request to reload the preset list of channel 1</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Request to reload the preset list of channel 1 {#request-to-reload-the-preset-list-of-channel-1 }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>reload
 
-<span class="token comment">#  Request to reload the preset list of multiple channels</span>
+<span class="token comment"># Request to reload the preset list of multiple channels {#request-to-reload-the-preset-list-of-multiple-channels }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token operator">&amp;</span>reload
 
-<span class="token comment">#  Request to reload the preset list of all channels</span>
+<span class="token comment"># Request to reload the preset list of all channels {#request-to-reload-the-preset-list-of-all-channels }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>reload
 </code></pre><p>Contrary to the <code>list</code> command, while the response time is slow, you can always receive the same data as the preset list that the device has.</p>
 <p><strong>Adding a preset</strong><br>
@@ -4412,10 +4417,10 @@ Adds the current position of the camera as a preset.</p>
 You can specify <code>name</code> as an option. Since the camera does not support various characters, it is recommended to use English letters and numbers whenever possible.<br>
 If <code>name</code> is not specified, it will be saved with the same name as the preset token generated by the camera.</p>
 <p>The maximum number of presets supported by the camera can be found at <a href="#request-device-information-and-support-function-list">Request Device Information and Support Function List</a>.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># adding a new preset</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># adding a new preset {#adding-a-new-preset }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>add<span class="token operator">&amp;</span>name<span class="token operator">=</span>door
 
-<span class="token comment"># adding a new preset (If name is omitted)</span>
+<span class="token comment"># adding a new preset (If name is omitted) {#adding-a-new-preset-if-name-is-omitted }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>add
 </code></pre><p><strong>Setting preset</strong><br>
 Sets the camera's current position as a preset.</p>
@@ -4427,10 +4432,10 @@ If the presets of the same <code>Preset Token</code> already exist, it will be o
 <p>Since the camera does not support various character sets, it is recommended to use numeric charactors for the <code>preset token</code>.<br>
 However, since the preset name is stored in the server instead of the camera, you can use the <code>preset name</code> without any character restrictions.<br>
 Don't forget to URL-encode to send the text string normally.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># When changing the existing preset position</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># When changing the existing preset position {#when-changing-the-existing-preset-position }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>set<span class="token operator">=</span>preset1 
 
-<span class="token comment"># When changing the position and name of an existing preset</span>
+<span class="token comment"># When changing the position and name of an existing preset {#when-changing-the-position-and-name-of-an-existing-preset }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>set<span class="token operator">=</span>preset1<span class="token operator">&amp;</span>name<span class="token operator">=</span>Sweet<span class="token operator">%</span><span class="token number">20</span>home<span class="token operator">%</span><span class="token number">20</span><span class="token operator">%</span><span class="token number">5</span>E<span class="token operator">%</span><span class="token number">5</span>E
 </code></pre><p>For a preset assignment request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">{</span>
@@ -4444,10 +4449,10 @@ Don't forget to URL-encode to send the text string normally.</p>
 </code></pre><p><strong>Remove presets</strong><br>
 Removes the preset of the specified preset tokens.</p>
 <p>To remove presets, you must specify the <code>preset token</code> as a parameter.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Remove presets token 1</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Remove presets token 1 {#remove-presets-token-1 }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>rm<span class="token operator">=</span><span class="token number">1</span>
 
-<span class="token comment"># Remove multiple presets</span>
+<span class="token comment"># Remove multiple presets {#remove-multiple-presets }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>preset<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>rm<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span>
 </code></pre><p>For a preset removing request, the server returns JSON data in the following format with an HTTP response code of 200:</p>
 <pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token punctuation">{</span>
@@ -4487,37 +4492,37 @@ To get a list of relay outputs, you must specify one channel to which the device
   <span class="token punctuation">]</span>
 <span class="token punctuation">}</span>
 </code></pre><p>Relay output command is specified using the <code>on</code> or<code> off</code> command and one or more relay output tokens.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Turn on the relay output of 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Turn on the relay output of 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf {#turn-on-the-relay-output-of-7657b9aa-61d6-4b4f-a70a-c91e8657dfcf }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>relay<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>on<span class="token operator">=</span><span class="token number">7657</span>b9aa<span class="token operator">-</span><span class="token number">61</span>d6<span class="token operator">-</span><span class="token number">4</span>b4f<span class="token operator">-</span>a70a<span class="token operator">-</span>c91e8657dfcf
 
-<span class="token comment"># Turn off the relay output of 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf</span>
+<span class="token comment"># Turn off the relay output of 7657b9aa-61d6-4b4f-a70a-c91e8657dfcf {#turn-off-the-relay-output-of-7657b9aa-61d6-4b4f-a70a-c91e8657dfcf }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>relay<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>off<span class="token operator">=</span><span class="token number">7657</span>b9aa<span class="token operator">-</span><span class="token number">61</span>d6<span class="token operator">-</span><span class="token number">4</span>b4f<span class="token operator">-</span>a70a<span class="token operator">-</span>c91e8657dfcf
 
-<span class="token comment"># Simultaneously turn on two relay outputs</span>
+<span class="token comment"># Simultaneously turn on two relay outputs {#simultaneously-turn-on-two-relay-outputs }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>relay<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>off<span class="token operator">=</span><span class="token number">7657</span>b9aa<span class="token operator">-</span><span class="token number">61</span>d6<span class="token operator">-</span><span class="token number">4</span>b4f<span class="token operator">-</span>a70a<span class="token operator">-</span>c91e8657dfcf<span class="token punctuation">,</span>cffd1289<span class="token operator">-</span>cb2c<span class="token operator">-</span><span class="token number">4</span>d82<span class="token operator">-</span><span class="token number">8</span>c6f<span class="token operator">-</span>c7634b432f57
 
-<span class="token comment"># If both on and off are specified at the same time, the off command is ignored.</span>
+<span class="token comment"># If both on and off are specified at the same time, the off command is ignored. {#if-both-on-and-off-are-specified-at-the-same-time-the-off-command-is-ignored }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>relay<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>on<span class="token operator">=</span><span class="token number">7657</span>b9aa<span class="token operator">-</span><span class="token number">61</span>d6<span class="token operator">-</span><span class="token number">4</span>b4f<span class="token operator">-</span>a70a<span class="token operator">-</span>c91e8657dfcf<span class="token operator">&amp;</span>off<span class="token operator">=</span>cffd1289<span class="token operator">-</span>cb2c<span class="token operator">-</span><span class="token number">4</span>d82<span class="token operator">-</span><span class="token number">8</span>c6f<span class="token operator">-</span>c7634b432f57
 
-<span class="token comment"># If one is turned on and the other is turned off, each must be sent separately for each command.</span>
+<span class="token comment"># If one is turned on and the other is turned off, each must be sent separately for each command. {#if-one-is-turned-on-and-the-other-is-turned-off-each-must-be-sent-separately-for-each-command }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>relay<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>on<span class="token operator">=</span><span class="token number">7657</span>b9aa<span class="token operator">-</span><span class="token number">61</span>d6<span class="token operator">-</span><span class="token number">4</span>b4f<span class="token operator">-</span>a70a<span class="token operator">-</span>c91e8657dfcf
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>relay<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>off<span class="token operator">=</span>cffd1289<span class="token operator">-</span>cb2c<span class="token operator">-</span><span class="token number">4</span>d82<span class="token operator">-</span><span class="token number">8</span>c6f<span class="token operator">-</span>c7634b432f57
 </code></pre><h3>AUX output</h3>
 <p>If your device supports AUX output, use the <code>on</code> or<code> off</code> command as <code>relay output</code>.<br>
 The AUX outputs are specified using a zero-based number instead of a token.</p>
-<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Turn on AUX 1 output</span>
+<pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token comment"># Turn on AUX 1 output {#turn-on-aux-1-output }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>aux<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>on<span class="token operator">=</span><span class="token number">0</span>
 
-<span class="token comment"># Turn off AUX 1 output</span>
+<span class="token comment"># Turn off AUX 1 output {#turn-off-aux-1-output }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>aux<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>off<span class="token operator">=</span><span class="token number">1</span>
 
-<span class="token comment"># Simultaneously turn on two AUX outputs</span>
+<span class="token comment"># Simultaneously turn on two AUX outputs {#simultaneously-turn-on-two-aux-outputs }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>aux<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>on<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span>
 
-<span class="token comment"># If both on and off are specified at the same time, the off command is ignored.</span>
+<span class="token comment"># If both on and off are specified at the same time, the off command is ignored. {#if-both-on-and-off-are-specified-at-the-same-time-the-off-command-is-ignored-1 }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>aux<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>on<span class="token operator">=</span><span class="token number">0</span><span class="token operator">&amp;</span>off<span class="token operator">=</span><span class="token number">1</span>
 
-<span class="token comment"># If one is turned on and the other is turned off, each must be sent separately for each command.</span>
+<span class="token comment"># If one is turned on and the other is turned off, each must be sent separately for each command. {#if-one-is-turned-on-and-the-other-is-turned-off-each-must-be-sent-separately-for-each-command-1 }</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>aux<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>on<span class="token operator">=</span><span class="token number">0</span>
 <span class="token constant">GET</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>aux<span class="token operator">?</span>ch<span class="token operator">=</span><span class="token number">1</span><span class="token operator">&amp;</span>off<span class="token operator">=</span><span class="token number">1</span>
 </code></pre><h3>Reboot the device</h3>
@@ -4535,11 +4540,11 @@ Typically, the reboot takes approximately one minute to complete, which may vary
 <p>You can add channels as shown below.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">POST</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel
 
-<span class="token comment"># Available parameters</span>
+<span class="token comment"># Available parameters {#available-parameters }</span>
 auth  <span class="token comment"># If you are not already logged in, log in when calling the API</span>
 lang  <span class="token comment"># Specify the language to be used for error code messages</span>
 
-<span class="token comment"># Usage example</span>
+<span class="token comment"># Usage example {#usage-example }</span>
 <span class="token constant">POST</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 <span class="token constant">POST</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">?</span>lang<span class="token operator">=</span>vi<span class="token operator">-</span><span class="token constant">VN</span>   <span class="token comment"># Set in Vietnamese</span>
 </code></pre><h3>Request data</h3>
@@ -4792,19 +4797,19 @@ The <code>code</code> entry in <code>status</code> returns one of the following 
 Specifies the channel to delete with only parameters, without using request data.</p>
 <pre data-role="codeBlock" data-info="ruby" class="language-ruby ruby"><code><span class="token constant">DELETE</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span><span class="token punctuation">{</span>id<span class="token punctuation">}</span>
 
-<span class="token comment"># In the {id} section, specify the channel numbers to be deleted.</span>
-<span class="token comment"># Multiple channels can be specified using the comma (,) character.</span>
-<span class="token comment"># Or 'all' can be used to specify the entire channel.</span>
+<span class="token comment"># In the {id} section, specify the channel numbers to be deleted. {#in-the-id-section-specify-the-channel-numbers-to-be-deleted }</span>
+<span class="token comment"># Multiple channels can be specified using the comma (,) character. {#multiple-channels-can-be-specified-using-the-comma--character }</span>
+<span class="token comment"># Or 'all' can be used to specify the entire channel. {#or-all-can-be-used-to-specify-the-entire-channel }</span>
 <span class="token constant">DELETE</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span><span class="token number">1</span>          <span class="token comment"># Delete channel 1</span>
 <span class="token constant">DELETE</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span>      <span class="token comment"># Delete channels 1,2,3</span>
 <span class="token constant">DELETE</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>all        <span class="token comment"># Delete all channels</span>
 
 
-<span class="token comment"># Available parameters</span>
+<span class="token comment"># Available parameters {#available-parameters-1 }</span>
 auth  <span class="token comment"># If you are not already logged in, log in when calling the API</span>
 lang  <span class="token comment"># Specify the language to be used for error code messages</span>
 
-<span class="token comment"># Usage example</span>
+<span class="token comment"># Usage example {#usage-example-1 }</span>
 <span class="token constant">DELETE</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token operator">?</span>auth<span class="token operator">=</span>ZGVtbzohMTIzNHF3ZXI<span class="token operator">%</span><span class="token number">3</span>D
 <span class="token constant">DELETE</span> <span class="token operator">/</span>api<span class="token operator">/</span>channel<span class="token operator">/</span>all<span class="token operator">?</span>lang<span class="token operator">=</span>vi<span class="token operator">-</span><span class="token constant">VN</span>   <span class="token comment"># Set in Vietnamese</span>
 </code></pre><h4>Rsponse data</h4>
