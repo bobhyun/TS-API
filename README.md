@@ -241,12 +241,12 @@ Some API features require a corresponding license. Returns 404 if the license is
 
 WebSocket API for real-time event subscription and data export.
 
-| Version | Endpoint | Description |
-|---------|----------|-------------|
-| v1 | `ws://{host}:{port}/wsapi/v1/events` | Real-time event subscription |
-| v1 | `ws://{host}:{port}/wsapi/v1/export` | Data export |
+| Endpoint | Description |
+|----------|-------------|
+| `ws://{host}:{port}/wsapi/v1/events` | Real-time event subscription |
+| `ws://{host}:{port}/wsapi/v1/export` | Data export |
 
-### 8.1. WebSocket Authentication (v1)
+### 8.1. WebSocket Authentication
 
 ```javascript
 // JWT (query param)

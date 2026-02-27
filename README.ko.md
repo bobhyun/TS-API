@@ -241,12 +241,12 @@ curl "http://localhost/api/v1/channel" \
 
 실시간 이벤트 구독 및 데이터 내보내기를 위한 WebSocket API입니다.
 
-| 버전 | 엔드포인트 | 설명 |
-|---------|----------|-------------|
-| v1 | `ws://{host}:{port}/wsapi/v1/events` | 실시간 이벤트 구독 |
-| v1 | `ws://{host}:{port}/wsapi/v1/export` | 데이터 내보내기 |
+| 엔드포인트 | 설명 |
+|----------|-------------|
+| `ws://{host}:{port}/wsapi/v1/events` | 실시간 이벤트 구독 |
+| `ws://{host}:{port}/wsapi/v1/export` | 데이터 내보내기 |
 
-### 8.1. WebSocket 인증 (v1)
+### 8.1. WebSocket 인증
 
 ```javascript
 // JWT (query param)
