@@ -2,7 +2,7 @@
 
 [English](tsapi-v1.md) | **한국어**
 
-> **관련 문서:** [마이그레이션 가이드](MIGRATION.ko.md)
+> **관련 문서:** [마이그레이션 가이드](MIGRATION.ko.md) · [변경이력](CHANGELOG.ko.md)
 
 ## 목차
 
@@ -463,7 +463,7 @@ Authorization: Bearer {admin_token}
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.0.0") |
+| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.0.1") |
 | `GET /api/v1/info?siteName` | - | 사이트 이름 조회 |
 | `GET /api/v1/info?timezone` | - | 서버 타임존 조회 (name, bias) |
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
@@ -498,7 +498,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **응답**:
 ```json
 {
-  "apiVersion": "TS-API@1.0.0",
+  "apiVersion": "TS-API@1.0.1",
   "siteName": "Main Office",
   "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
   "product": {"name": "TS-NVR", "version": "2.14.1"},
@@ -2114,7 +2114,7 @@ sequenceDiagram
 
     Note over Client,Server: 2. 실시간 이벤트 수신
     loop 이벤트 발생 시
-        Server-->>Client: {"topic":"LPR","plateNo":"12가3456",...}
+        Server-->>Client: {"topic":"LPR","channel":1,"plates":[{"plateNo":"12가3456",...}]}
     end
 
     Note over Client,Server: 3. 토픽 추가 구독
@@ -2294,7 +2294,8 @@ ws.onmessage = (event) => {
 
   switch(data.topic) {
     case 'LPR':
-      console.log('Plate:', data.plateNo, 'Score:', data.score);
+      // v1.0.1: data.plates (배열), v1.0.0: data (단일 객체) — 양쪽 모두 호환
+      (data.plates || [data]).forEach(p => console.log('Plate:', p.plateNo, 'Score:', p.score));
       break;
     case 'channelStatus':
       console.log('Channel', data.chid, 'Status:', data.status);

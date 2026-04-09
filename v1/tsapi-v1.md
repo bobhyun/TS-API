@@ -2,7 +2,7 @@
 
 **English** | [한국어](tsapi-v1.ko.md)
 
-> **See also:** [Migration Guide](MIGRATION.md)
+> **See also:** [Migration Guide](MIGRATION.md) · [Changelog](CHANGELOG.md)
 
 ## Table of Contents
 
@@ -463,7 +463,7 @@ Retrieves server and product information.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.0.0") |
+| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.0.1") |
 | `GET /api/v1/info?siteName` | - | Site name query |
 | `GET /api/v1/info?timezone` | - | Server timezone query (name, bias) |
 | `GET /api/v1/info?product` | - | Product info query (name, version) |
@@ -498,7 +498,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **Response**:
 ```json
 {
-  "apiVersion": "TS-API@1.0.0",
+  "apiVersion": "TS-API@1.0.1",
   "siteName": "Main Office",
   "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
   "product": {"name": "TS-NVR", "version": "2.14.1"},
@@ -2106,7 +2106,7 @@ sequenceDiagram
 
     Note over Client,Server: 2. Receiving Real-time Events
     loop On event
-        Server-->>Client: {"topic":"LPR","plateNo":"12가3456",...}
+        Server-->>Client: {"topic":"LPR","channel":1,"plates":[{"plateNo":"12가3456",...}]}
     end
 
     Note over Client,Server: 3. Subscribe to Additional Topic
@@ -2286,7 +2286,8 @@ ws.onmessage = (event) => {
 
   switch(data.topic) {
     case 'LPR':
-      console.log('Plate:', data.plateNo, 'Score:', data.score);
+      // v1.0.1: data.plates (array), v1.0.0: data (single object) — handle both
+      (data.plates || [data]).forEach(p => console.log('Plate:', p.plateNo, 'Score:', p.score));
       break;
     case 'channelStatus':
       console.log('Channel', data.chid, 'Status:', data.status);
@@ -2455,7 +2456,8 @@ ws.onmessage = (event) => {
   // Handle event data
   switch (data.topic) {
     case 'LPR':
-      console.log('Plate:', data.plateNo);
+      // v1.0.1: data.plates (array), v1.0.0: data (single object) — handle both
+      (data.plates || [data]).forEach(p => console.log('Plate:', p.plateNo));
       break;
     case 'channelStatus':
       console.log('Channel', data.chid, 'Status:', data.status);
