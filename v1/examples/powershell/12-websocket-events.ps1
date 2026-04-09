@@ -165,3 +165,23 @@ try {
 } finally {
     if ($ws) { $ws.Dispose() }
 }
+
+# ─────────────────────────────────────────────────
+# LPR Event Compatibility
+# ─────────────────────────────────────────────────
+#
+# LPR events may arrive in two formats:
+#
+#   v1.0.0 (single plate):  { "topic": "LPR", "plateNo": "12가3456", ... }
+#   v1.0.1 (batch/array):   { "topic": "LPR", "plates": [ { "plateNo": "12가3456", ... }, ... ] }
+#
+# To handle both formats transparently:
+#
+#   $msg = $raw | ConvertFrom-Json
+#   if ($msg.topic -eq 'LPR') {
+#       $plates = if ($msg.plates) { $msg.plates } else { @($msg) }
+#       foreach ($p in $plates) {
+#           Write-Host "Plate: $($p.plateNo)  Score: $($p.score)"
+#       }
+#   }
+#

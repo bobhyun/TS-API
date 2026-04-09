@@ -98,3 +98,25 @@ websocat -k -E \
 # } | websocat -k \
 #   --header="X-API-Key: ${API_KEY}" \
 #   "${WS_BASE}/wsapi/v1/events"
+
+# ─────────────────────────────────────────────────
+# LPR Event Compatibility
+# ─────────────────────────────────────────────────
+#
+# LPR events may arrive in two formats:
+#
+#   v1.0.0 (single plate):  { "topic": "LPR", "plateNo": "12가3456", ... }
+#   v1.0.1 (batch/array):   { "topic": "LPR", "plates": [ { "plateNo": "12가3456", ... }, ... ] }
+#
+# To handle both formats with jq:
+#
+#   websocat ... | while read -r line; do
+#     topic=$(echo "$line" | jq -r '.topic // empty')
+#     if [ "$topic" = "LPR" ]; then
+#       echo "$line" | jq -r '
+#         (.plates // [.])[] |
+#         "Plate: \(.plateNo)  Score: \(.score)"
+#       '
+#     fi
+#   done
+#

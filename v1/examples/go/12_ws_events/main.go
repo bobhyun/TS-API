@@ -179,3 +179,32 @@ func sendJSON(conn *websocket.Conn, v interface{}) {
 	}
 	conn.WriteMessage(websocket.TextMessage, data)
 }
+
+// ─────────────────────────────────────────────────
+// LPR Event Compatibility
+// ─────────────────────────────────────────────────
+//
+// LPR events may arrive in two formats:
+//
+//   v1.0.0 (single plate):  { "topic": "LPR", "plateNo": "12가3456", ... }
+//   v1.0.1 (batch/array):   { "topic": "LPR", "plates": [ { "plateNo": "12가3456", ... }, ... ] }
+//
+// To handle both formats transparently:
+//
+//   var msg map[string]interface{}
+//   json.Unmarshal(data, &msg)
+//   if msg["topic"] == "LPR" {
+//       var plates []map[string]interface{}
+//       if arr, ok := msg["plates"].([]interface{}); ok {
+//           for _, p := range arr {                          // v1.0.1 batch format
+//               if m, ok := p.(map[string]interface{}); ok {
+//                   plates = append(plates, m)
+//               }
+//           }
+//       } else {
+//           plates = []map[string]interface{}{msg}           // v1.0.0 single-plate format
+//       }
+//       for _, p := range plates {
+//           fmt.Printf("Plate: %s  Score: %v\n", p["plateNo"], p["score"])
+//       }
+//   }

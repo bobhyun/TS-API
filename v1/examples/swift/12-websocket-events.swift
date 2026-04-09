@@ -218,3 +218,31 @@ struct App {
     try await Task.sleep(nanoseconds: 500_000_000)
   }
 }
+
+/*
+ * ─────────────────────────────────────────────────
+ * LPR Event Compatibility
+ * ─────────────────────────────────────────────────
+ *
+ * LPR events may arrive in two formats:
+ *
+ *   v1.0.0 (single plate):  { "topic": "LPR", "plateNo": "12가3456", ... }
+ *   v1.0.1 (batch/array):   { "topic": "LPR", "plates": [ { "plateNo": "12가3456", ... }, ... ] }
+ *
+ * To handle both formats transparently:
+ *
+ *   if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+ *      json["topic"] as? String == "LPR" {
+ *       let plates: [[String: Any]]
+ *       if let arr = json["plates"] as? [[String: Any]] {
+ *           plates = arr           // v1.0.1 batch format
+ *       } else {
+ *           plates = [json]        // v1.0.0 single-plate format
+ *       }
+ *       for p in plates {
+ *           let plateNo = p["plateNo"] as? String ?? ""
+ *           let score = p["score"] as? Double ?? 0
+ *           print("Plate: \(plateNo)  Score: \(score)")
+ *       }
+ *   }
+ */

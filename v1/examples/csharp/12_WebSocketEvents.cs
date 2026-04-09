@@ -210,3 +210,34 @@ namespace TsApiExamples.V1
         }
     }
 }
+
+/*
+ * ─────────────────────────────────────────────────
+ * LPR Event Compatibility
+ * ─────────────────────────────────────────────────
+ *
+ * LPR events may arrive in two formats:
+ *
+ *   v1.0.0 (single plate):  { "topic": "LPR", "plateNo": "12가3456", ... }
+ *   v1.0.1 (batch/array):   { "topic": "LPR", "plates": [ { "plateNo": "12가3456", ... }, ... ] }
+ *
+ * To handle both formats transparently:
+ *
+ *   using var doc = JsonDocument.Parse(data);
+ *   var root = doc.RootElement;
+ *   if (root.TryGetProperty("topic", out var t) && t.GetString() == "LPR")
+ *   {
+ *       JsonElement[] plates;
+ *       if (root.TryGetProperty("plates", out var arr))
+ *           plates = arr.EnumerateArray().ToArray();    // v1.0.1 batch format
+ *       else
+ *           plates = new[] { root };                    // v1.0.0 single-plate format
+ *
+ *       foreach (var p in plates)
+ *       {
+ *           var plateNo = p.TryGetProperty("plateNo", out var pn) ? pn.GetString() : "";
+ *           var score = p.TryGetProperty("score", out var sc) ? sc.GetDouble() : 0;
+ *           Console.WriteLine($"Plate: {plateNo}  Score: {score}");
+ *       }
+ *   }
+ */

@@ -197,3 +197,32 @@ public class V1_12_WebSocketEvents {
         return end > start ? json.substring(start, end) : "";
     }
 }
+
+/*
+ * ─────────────────────────────────────────────────
+ * LPR Event Compatibility
+ * ─────────────────────────────────────────────────
+ *
+ * LPR events may arrive in two formats:
+ *
+ *   v1.0.0 (single plate):  { "topic": "LPR", "plateNo": "12가3456", ... }
+ *   v1.0.1 (batch/array):   { "topic": "LPR", "plates": [ { "plateNo": "12가3456", ... }, ... ] }
+ *
+ * To handle both formats with org.json or Gson:
+ *
+ *   JSONObject msg = new JSONObject(text);
+ *   if ("LPR".equals(msg.optString("topic"))) {
+ *       JSONArray plates;
+ *       if (msg.has("plates")) {
+ *           plates = msg.getJSONArray("plates");       // v1.0.1 batch format
+ *       } else {
+ *           plates = new JSONArray();
+ *           plates.put(msg);                           // v1.0.0 single-plate format
+ *       }
+ *       for (int i = 0; i < plates.length(); i++) {
+ *           JSONObject p = plates.getJSONObject(i);
+ *           System.out.println("Plate: " + p.optString("plateNo")
+ *               + "  Score: " + p.optDouble("score"));
+ *       }
+ *   }
+ */

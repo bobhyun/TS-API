@@ -197,3 +197,29 @@ private fun extractField(json: String, field: String): String {
     val end = json.indexOf("\"", valueStart)
     return if (end > valueStart) json.substring(valueStart, end) else ""
 }
+
+/*
+ * ─────────────────────────────────────────────────
+ * LPR Event Compatibility
+ * ─────────────────────────────────────────────────
+ *
+ * LPR events may arrive in two formats:
+ *
+ *   v1.0.0 (single plate):  { "topic": "LPR", "plateNo": "12가3456", ... }
+ *   v1.0.1 (batch/array):   { "topic": "LPR", "plates": [ { "plateNo": "12가3456", ... }, ... ] }
+ *
+ * To handle both formats with org.json or kotlinx.serialization:
+ *
+ *   val msg = JSONObject(text)
+ *   if (msg.optString("topic") == "LPR") {
+ *       val plates = if (msg.has("plates"))
+ *           msg.getJSONArray("plates")            // v1.0.1 batch format
+ *       else
+ *           JSONArray().apply { put(msg) }        // v1.0.0 single-plate format
+ *
+ *       for (i in 0 until plates.length()) {
+ *           val p = plates.getJSONObject(i)
+ *           println("Plate: ${p.optString("plateNo")}  Score: ${p.optDouble("score")}")
+ *       }
+ *   }
+ */

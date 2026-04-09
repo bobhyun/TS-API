@@ -163,7 +163,7 @@ main().catch(console.error);
  *
  *   // Handle events
  *   switch (data.topic) {
- *     case 'LPR':           showPlate(data.plateNo, data.score);       break;
+ *     case 'LPR':           (data.plates || [data]).forEach(p => showPlate(p.plateNo, p.score)); break;  // v1.0.0/v1.0.1 compatible
  *     case 'channelStatus': updateStatus(data.chid, data.status.code); break;
  *     case 'object':        showObject(data);                          break;
  *   }

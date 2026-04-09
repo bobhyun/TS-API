@@ -157,3 +157,21 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
+
+# ─────────────────────────────────────────────────
+# LPR Event Compatibility
+# ─────────────────────────────────────────────────
+#
+# LPR events may arrive in two formats:
+#
+#   v1.0.0 (single plate):  { "topic": "LPR", "plateNo": "12가3456", ... }
+#   v1.0.1 (batch/array):   { "topic": "LPR", "plates": [ { "plateNo": "12가3456", ... }, ... ] }
+#
+# To handle both formats transparently:
+#
+#   msg = json.loads(data)
+#   if msg.get('topic') == 'LPR':
+#       plates = msg.get('plates') or [msg]
+#       for p in plates:
+#           print(f"Plate: {p.get('plateNo')}  Score: {p.get('score')}")
+#
