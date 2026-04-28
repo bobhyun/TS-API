@@ -492,6 +492,7 @@ GET /api/info?license
     "nChFaceRecognition": 10,  // 얼굴 인식 채널 수 (TS-API@0.9.12)
     "nChTrafficCount": 10,     // 차량 통행량 집계 채널 수 (TS-API@0.9.12)
     "nChSpeedometer": 10,      // 차량 속도 측정 채널 (TS-API@0.9.12)
+    "fisheyeCamSupports": true, // 어안 카메라 펼쳐보기(디워핑) 라이선스 활성 여부 (라이선스 없으면 필드 미포함)
     "mediaType": "USB dongle", // 라이센스 미디어 종류 ("USB dongle" 또는 "Software") (TS-API@0.9.12)
     "extension": [             // 부가 기능
       "lprExt",                // 차량 번호 인식 장치 연동

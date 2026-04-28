@@ -495,33 +495,85 @@ curl "http://localhost/api/v1/info?apiVersion&product&license"
 curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 ```
 
-**Response**:
+**Response** (genuine license with ANPR / object detection / parking guidance enabled):
 ```json
 {
   "apiVersion": "TS-API@1.0.1",
   "siteName": "Main Office",
   "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
   "product": {"name": "TS-NVR", "version": "2.14.1"},
-  "license": {"type": "genuine", "maxChannels": 64}
+  "license": {
+    "type": "genuine",
+    "maxChannels": 64,
+    "nLprZone": 36,
+    "nChObjDetection": 36,
+    "nChFaceRecognition": 10,
+    "nChTrafficCount": 10,
+    "nChSpeedometer": 10,
+    "nChPeopleCount": 10,
+    "fisheyeCamSupports": true,
+    "mediaType": "USB dongle",
+    "extension": ["lprExt", "objectDetection", "parkingGuide"]
+  }
+}
+```
+
+**Response** (trial example):
+```json
+{
+  "license": {
+    "type": "trial",
+    "maxChannels": 16,
+    "trialDays": 30,
+    "leftDays": 15,
+    "mediaType": "Software"
+  }
 }
 ```
 
 **Response Fields**:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `apiVersion` | String | API version |
-| `siteName` | String | NVR site name |
-| `timezone.name` | String | Timezone name |
-| `timezone.bias` | String | Timezone offset |
-| `product.name` | String | Product name |
-| `product.version` | String | Product version |
-| `license.type` | String | `freeware`, `genuine`, `limited`, `trial` |
-| `license.maxChannels` | Int | Maximum channel count |
-| `license.extension` | Array | Extension features list |
-| `whoAmI.uid` | String | User ID |
-| `whoAmI.name` | String | User name |
-| `whoAmI.accessRights` | Object | Access rights |
+| Field | Type | When | Description |
+|-------|------|------|-------------|
+| `apiVersion` | String | Always | API version |
+| `siteName` | String | Always | NVR site name |
+| `timezone.name` | String | Always | Timezone name |
+| `timezone.bias` | String | Always | Timezone offset |
+| `product.name` | String | Always | Product name |
+| `product.version` | String | Always | Product version |
+| `license.type` | String | Always | `freeware`, `genuine`, `limited`, `trial` |
+| `license.maxChannels` | Int | Always | Maximum channel count |
+| `license.expire` | String | `type=limited` | Expiration timestamp (ISO 8601) |
+| `license.trialDays` | Int | `type=trial` | Trial total days |
+| `license.leftDays` | Int | `type=trial` | Trial days remaining |
+| `license.nLprZone` | Int | LPR-capable build | Number of LPR recognition zones |
+| `license.nDevEmCall` | Int | Emergency-call build | Emergency call devices (backward-compat — always returns `0`) |
+| `license.nChObjDetection` | Int | Object detection license active | Object detection channels |
+| `license.nChFaceRecognition` | Int | Face recognition license active | Face recognition channels |
+| `license.nChTrafficCount` | Int | Traffic count license active | Traffic count channels |
+| `license.nChSpeedometer` | Int | Vehicle speed license active | Vehicle speedometer channels |
+| `license.nChPeopleCount` | Int | People count license active | People count channels |
+| `license.fisheyeCamSupports` | Boolean | Fisheye dewarping license active | `true` is emitted only when active; the field is omitted otherwise |
+| `license.maxVehicles` | Int | ANPR + non-default value | Concurrent LPR vehicle tracking count |
+| `license.mediaType` | String | Always | `"USB dongle"` or `"Software"` |
+| `license.extension` | Array | At least one extension active | Extension feature tokens (see table below) |
+| `whoAmI.uid` | String | whoAmI requested | User ID |
+| `whoAmI.name` | String | whoAmI requested | User name |
+| `whoAmI.accessRights` | Object | whoAmI requested | Access rights |
+
+**`license.extension` tokens**:
+
+| Token | Description |
+|-------|-------------|
+| `lprExt` | License plate recognition (ANPR/LPR support) |
+| `emergencyCall` | Emergency call device integration |
+| `packing` | Packing (SEMES Lot Search, etc.) |
+| `objectDetection` | Object detection |
+| `faceRecognition` | Face recognition (external FR server integration) |
+| `sharedFrameBuffer` | Shared frame buffer |
+| `vehicleTracking` | Vehicle tracking |
+| `parkingGuide` | Parking guidance |
+| `parkingSpot` | Parking spot occupancy detection |
 
 ---
 

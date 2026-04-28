@@ -498,6 +498,7 @@ For the request, the server returns JSON data in the following format with an HT
     "nChFaceRecognition": 10,  // Maximum channels available for face recognition (TS-API@0.9.12)
     "nChTrafficCount": 10,     // Maximum channels available for vehicle traffic count (TS-API@0.9.12)
     "nChSpeedometer": 10,      // Maximum channels available for vehicle speedometer (TS-API@0.9.12)
+    "fisheyeCamSupports": true, // Whether the fisheye camera dewarping license is active (field omitted when inactive)
     "mediaType": "USB dongle", // License media type ("USB dongle" or "Software") (TS-API@0.9.12)
     "extension": [             // Add-ons
       "lprExt",                // Interworking the vehicle number recognition

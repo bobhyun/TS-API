@@ -495,33 +495,85 @@ curl "http://localhost/api/v1/info?apiVersion&product&license"
 curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 ```
 
-**응답**:
+**응답** (정품 라이선스 + ANPR/객체감지/주차안내 활성 예시):
 ```json
 {
   "apiVersion": "TS-API@1.0.1",
   "siteName": "Main Office",
   "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
   "product": {"name": "TS-NVR", "version": "2.14.1"},
-  "license": {"type": "genuine", "maxChannels": 64}
+  "license": {
+    "type": "genuine",
+    "maxChannels": 64,
+    "nLprZone": 36,
+    "nChObjDetection": 36,
+    "nChFaceRecognition": 10,
+    "nChTrafficCount": 10,
+    "nChSpeedometer": 10,
+    "nChPeopleCount": 10,
+    "fisheyeCamSupports": true,
+    "mediaType": "USB dongle",
+    "extension": ["lprExt", "objectDetection", "parkingGuide"]
+  }
+}
+```
+
+**응답** (시험판 예시):
+```json
+{
+  "license": {
+    "type": "trial",
+    "maxChannels": 16,
+    "trialDays": 30,
+    "leftDays": 15,
+    "mediaType": "Software"
+  }
 }
 ```
 
 **응답 필드**:
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| `apiVersion` | String | API 버전 |
-| `siteName` | String | NVR 사이트 이름 |
-| `timezone.name` | String | 타임존 이름 |
-| `timezone.bias` | String | 타임존 오프셋 |
-| `product.name` | String | 제품 이름 |
-| `product.version` | String | 제품 버전 |
-| `license.type` | String | `freeware`, `genuine`, `limited`, `trial` |
-| `license.maxChannels` | Int | 최대 채널 수 |
-| `license.extension` | Array | 확장 기능 목록 |
-| `whoAmI.uid` | String | 사용자 ID |
-| `whoAmI.name` | String | 사용자 이름 |
-| `whoAmI.accessRights` | Object | 접근 권한 |
+| 필드 | 타입 | 조건 | 설명 |
+|------|------|------|------|
+| `apiVersion` | String | 항상 | API 버전 |
+| `siteName` | String | 항상 | NVR 사이트 이름 |
+| `timezone.name` | String | 항상 | 타임존 이름 |
+| `timezone.bias` | String | 항상 | 타임존 오프셋 |
+| `product.name` | String | 항상 | 제품 이름 |
+| `product.version` | String | 항상 | 제품 버전 |
+| `license.type` | String | 항상 | `freeware`, `genuine`, `limited`, `trial` |
+| `license.maxChannels` | Int | 항상 | 최대 채널 수 |
+| `license.expire` | String | `type=limited` | 만료 일시 (ISO 8601) |
+| `license.trialDays` | Int | `type=trial` | 시험판 총 일수 |
+| `license.leftDays` | Int | `type=trial` | 시험판 남은 일수 |
+| `license.nLprZone` | Int | LPR 지원 빌드 | LPR 인식 영역 수 |
+| `license.nDevEmCall` | Int | 비상 호출 빌드 | 비상 호출 장치 수 (backward-compat 용 — 항상 `0` 반환) |
+| `license.nChObjDetection` | Int | 객체 감지 라이선스 활성 | 객체 감지 채널 수 |
+| `license.nChFaceRecognition` | Int | 얼굴 인식 라이선스 활성 | 얼굴 인식 채널 수 |
+| `license.nChTrafficCount` | Int | 교통량 집계 라이선스 활성 | 교통량 집계 채널 수 |
+| `license.nChSpeedometer` | Int | 속도 측정 라이선스 활성 | 차량 속도 측정 채널 수 |
+| `license.nChPeopleCount` | Int | 인원수 집계 라이선스 활성 | 인원수 집계 채널 수 |
+| `license.fisheyeCamSupports` | Boolean | 어안 디워핑 라이선스 활성 | `true` 만 emit (라이선스 없으면 필드 생략) |
+| `license.maxVehicles` | Int | ANPR + 기본값 아닐 때 | LPR 동시 추적 차량 수 |
+| `license.mediaType` | String | 항상 | `"USB dongle"` 또는 `"Software"` |
+| `license.extension` | Array | 확장 기능 1개 이상 | 확장 기능 토큰 목록 (아래 표 참조) |
+| `whoAmI.uid` | String | whoAmI 요청 시 | 사용자 ID |
+| `whoAmI.name` | String | whoAmI 요청 시 | 사용자 이름 |
+| `whoAmI.accessRights` | Object | whoAmI 요청 시 | 접근 권한 |
+
+**`license.extension` 토큰**:
+
+| 토큰 | 설명 |
+|------|------|
+| `lprExt` | 차량번호 인식 (ANPR/LPR 지원) |
+| `emergencyCall` | 비상 호출 장치 연동 |
+| `packing` | 포장 (SEMES Lot Search 등) |
+| `objectDetection` | 객체 감지 |
+| `faceRecognition` | 얼굴 인식 (외부 FR 서버 연동) |
+| `sharedFrameBuffer` | 공유 프레임 버퍼 |
+| `vehicleTracking` | 차량 추적 |
+| `parkingGuide` | 주차 안내 |
+| `parkingSpot` | 주차면 점유 인식 |
 
 ---
 
