@@ -30,7 +30,7 @@ import sys
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import NVR_API_KEY, WS_URL
+from config import BASE_URL, NVR_API_KEY, WS_URL
 from http_client import NvrClient
 
 if not NVR_API_KEY:
@@ -86,9 +86,12 @@ async def main():
 
                 elif stage == 'fileEnd':
                     # download: [{fileName, src}, ...]
+                    # Server v1.0.2+ returns relative paths (e.g. "/download/...");
+                    # prepend BASE_URL for non-browser clients to fetch.
                     dl_arr = msg.get('channel', {}).get('file', {}).get('download', [])
                     src = dl_arr[0].get('src', 'N/A') if dl_arr else 'N/A'
-                    print(f'  File ready: {src}')
+                    full_url = src if src.startswith('http') else f'{BASE_URL}{src}'
+                    print(f'  File ready: {full_url}')
                     if task_id:
                         await ws.send(json.dumps({'task': str(task_id), 'cmd': 'next'}))
 

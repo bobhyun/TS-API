@@ -95,6 +95,8 @@ namespace TsApiExamples.V1
 
                         case "fileEnd":
                             // download: [{fileName, src}, ...]
+                            // Server v1.0.2+ returns relative paths (e.g. "/download/...");
+                            // prepend client.BaseUrl for non-browser clients to fetch.
                             var download = "N/A";
                             if (root.TryGetProperty("channel", out var fch)
                                 && fch.TryGetProperty("file", out var file)
@@ -102,7 +104,8 @@ namespace TsApiExamples.V1
                                 && dlArr.GetArrayLength() > 0
                                 && dlArr[0].TryGetProperty("src", out var dlSrc))
                                 download = dlSrc.GetString();
-                            Console.WriteLine($"  File ready: {download}");
+                            var fullUrl = download.StartsWith("http") ? download : $"{client.BaseUrl}{download}";
+                            Console.WriteLine($"  File ready: {fullUrl}");
                             if (taskId != null)
                             {
                                 var cmd = JsonSerializer.Serialize(new { task = taskId, cmd = "next" });

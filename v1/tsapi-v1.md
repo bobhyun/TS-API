@@ -463,7 +463,7 @@ Retrieves server and product information.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.0.1") |
+| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.0.2") |
 | `GET /api/v1/info?siteName` | - | Site name query |
 | `GET /api/v1/info?timezone` | - | Server timezone query (name, bias) |
 | `GET /api/v1/info?product` | - | Product info query (name, version) |
@@ -498,7 +498,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **Response** (genuine license with ANPR / object detection / parking guidance enabled):
 ```json
 {
-  "apiVersion": "TS-API@1.0.1",
+  "apiVersion": "TS-API@1.0.2",
   "siteName": "Main Office",
   "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
   "product": {"name": "TS-NVR", "version": "2.14.1"},
@@ -1458,8 +1458,8 @@ Searches license plate recognition logs.
       "srcCode": "GATE-IN",
       "srcName": "Entrance Gate",
       "direction": "entry",
-      "image": ["http://host/lpr/image1.jpg"],
-      "vod": [{"chid": 1, "videoSrc": "http://host/watch?ch=1&when=..."}]
+      "image": ["/lpr/image1.jpg"],
+      "vod": [{"chid": 1, "videoSrc": "/watch?ch=1&when=..."}]
     }
   ]
 }
@@ -2631,12 +2631,12 @@ sequenceDiagram
       "download": [
         {
           "fileName": "CH01_20240101_120000.mp4",
-          "src": "http://host/download/task-uuid/CH01_20240101_120000.mp4",
+          "src": "/download/task-uuid/CH01_20240101_120000.mp4",
           "md5": "abc123..."
         },
         {
           "fileName": "CH01_20240101_120000.srt",
-          "src": "http://host/download/task-uuid/CH01_20240101_120000.srt",
+          "src": "/download/task-uuid/CH01_20240101_120000.srt",
           "md5": "def456..."
         }
       ]

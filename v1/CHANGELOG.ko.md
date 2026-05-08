@@ -2,6 +2,47 @@
 
 [English](CHANGELOG.md) | **한국어**
 
+## v1.0.2
+
+### 응답 URL 상대 경로화
+
+API 응답의 URL 필드를 절대 URL (`http://host/...`) 에서 **상대 경로** (`/...`) 로 변경했습니다.
+
+REST·WebSocket 양쪽에 적용되는 영향 받은 필드:
+- `src` — `/wsapi/v1/export` (및 v0 `/wsapi/dataExport`) 의 다운로드 링크
+- `videoSrc` — LPR / 검색 / 차량 추적 결과의 watch URL
+- `image`, `images[]` — 이벤트 알림, LPR / VA 검색 이미지 참조
+- `faceImg`, `orgImg` — 얼굴 검색 결과
+
+```json
+{
+  "download": [
+    {"src": "/download/task-uuid/CH01.mp4", "fileName": "CH01.mp4"}
+  ]
+}
+```
+
+**클라이언트 호환성**:
+- **브라우저 클라이언트**: 변경 불필요 — 상대 URL이 페이지 origin 에 자동 결합됩니다.
+- **비-브라우저 클라이언트** (curl, Python `requests`, 모바일 앱, 서버 간 통신): fetch 전 base URL 을 결합해야 합니다:
+  ```javascript
+  const fullUrl = baseUrl + response.download[0].src;
+  ```
+
+### 변경 배경
+
+이전의 절대 URL 은 서버가 받은 `Host:` 헤더를 그대로 포함했습니다. 요청이 `Host:` 를 다시 쓰는 리버스 프록시를 통과하면 잘못된 호스트가 URL 에 박혀, 클라이언트가 다운로드에 실패하는 경우가 발생했습니다 (호스트 인젝션 패턴). 상대 경로로 전환해 이 문제를 차단하고, 향후 다중 NVR 그룹 라우팅 아키텍처와 정렬했습니다.
+
+### 라이브 스트림 URL 유지
+
+`/api/v1/vod` (라이브 스트림) 응답 `src` 배열의 RTMP / HLS / DASH / WebSocket-FLV 스트림 URL 은 **절대 URL 유지** — 이 프로토콜들은 완전히 정규화된 URL 이 필요합니다.
+
+### Breaking Changes
+
+브라우저 클라이언트는 영향 없음. `response.src` 를 base URL 결합 없이 직접 사용하던 비-브라우저 클라이언트는 위 "클라이언트 호환성" 항목 참고하여 코드 수정 필요.
+
+---
+
 ## v1.0.1
 
 ### LPR 이벤트: 번호판 배열 형식 (WebSocket)

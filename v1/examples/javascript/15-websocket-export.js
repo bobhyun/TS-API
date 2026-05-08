@@ -25,7 +25,7 @@
  */
 
 const WebSocket = require('ws');
-const { WS_URL, NVR_API_KEY } = require('./config');
+const { BASE_URL, WS_URL, NVR_API_KEY } = require('./config');
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
@@ -75,9 +75,12 @@ async function main() {
 
         case 'fileEnd': {
           // download: [{fileName, src}, ...]
+          // Server v1.0.2+ returns relative paths (e.g. "/download/...");
+          // prepend BASE_URL for non-browser clients to fetch.
           const downloads = msg.channel?.file?.download || [];
           const src = downloads[0]?.src || 'N/A';
-          console.log(`  File ready: ${src}`);
+          const fullUrl = src.startsWith('http') ? src : `${BASE_URL}${src}`;
+          console.log(`  File ready: ${fullUrl}`);
           if (taskId) {
             ws.send(JSON.stringify({ task: taskId, cmd: 'next' }));
           }

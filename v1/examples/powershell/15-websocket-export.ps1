@@ -111,9 +111,11 @@ try {
             }
             'fileEnd' {
                 # download: [{fileName, src}, ...]
+                # Server v1.0.2+ returns relative paths; prepend $BASE_URL for non-browser fetch.
                 $dlArr = $msg.channel.file.download
                 $src = if ($dlArr -and $dlArr.Count -gt 0) { $dlArr[0].src } else { 'N/A' }
-                Write-Host "  File ready: $src"
+                $fullUrl = if ($src.StartsWith('http')) { $src } else { "$BASE_URL$src" }
+                Write-Host "  File ready: $fullUrl"
                 if ($taskId) {
                     $cmd = @{ task = [string]$taskId; cmd = 'next' } | ConvertTo-Json -Compress
                     Send-WsMessage $ws $cmd

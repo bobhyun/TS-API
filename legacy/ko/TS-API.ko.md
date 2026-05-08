@@ -1961,10 +1961,10 @@ GET /api/find?what=carNo
         "size": [132,31]                  // 번호판 이미지 크기
       },
       "image": [                          // 동일 번호판이 연속으로 저장된 경우를 위해 배열로 표현함 (항목 없을 수 있음)
-        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
-        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386146439.plate.jpg",
-        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386199445.plate.jpg",
-        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386510078.plate.jpg"
+        "/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
+        "/storage/e/0/0/0/39/39589.161142.1576732386146439.plate.jpg",
+        "/storage/e/0/0/0/39/39589.161142.1576732386199445.plate.jpg",
+        "/storage/e/0/0/0/39/39589.161142.1576732386510078.plate.jpg"
       ],
       "timeRange": [                      // 차량 번호 인식 날짜, 시각
         "2018-02-21T09:07:29.000+09:00",  // 시작 시점
@@ -1976,19 +1976,19 @@ GET /api/find?what=carNo
       "vod": [  // 인식된 시점의 영상 (연동 채널이 설정된 경우 여러 개가 될 수 있음)
         {
           "chid": 1,
-          "videoSrc": "http://192.168.0.100/watch?ch=1&when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"
+          "videoSrc": "/watch?ch=1&when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"
         },
         {
           "chid": 2,
-          "videoSrc": "http://192.168.0.100/watch?ch=2&when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"
+          "videoSrc": "/watch?ch=2&when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"
         },
         {
           "chid": 3,
-          "videoSrc": "http://192.168.0.100/watch?ch=3&when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"
+          "videoSrc": "/watch?ch=3&when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"
         },
         {
           "chid": 4,
-          "videoSrc": "http://192.168.0.100/watch?ch=4&when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"
+          "videoSrc": "/watch?ch=4&when=2018%2D02%2D21T09%3A07%3A29%2E000%2B09%3A00"
         }
       ]
     },
@@ -2001,7 +2001,7 @@ GET /api/find?what=carNo
         "size": [150,38]
       },
       "image": [
-        "http://192.168.0.100/storage/e/0/0/0/39/39588.161141.1576732012342440.plate.jpg"
+        "/storage/e/0/0/0/39/39588.161141.1576732012342440.plate.jpg"
       ],
       "timeRange": [
         "2018-02-21T08:00:00.915+09:00",
@@ -2013,19 +2013,19 @@ GET /api/find?what=carNo
       "vod": [
         {
           "chid": 1,
-          "videoSrc": "http://192.168.0.100/watch?ch=1&when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"
+          "videoSrc": "/watch?ch=1&when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"
         },
         {
           "chid": 2,
-          "videoSrc": "http://192.168.0.100/watch?ch=2&when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"
+          "videoSrc": "/watch?ch=2&when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"
         },
         {
           "chid": 3,
-          "videoSrc": "http://192.168.0.100/watch?ch=3&when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"
+          "videoSrc": "/watch?ch=3&when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"
         },
         {
           "chid": 4,
-          "videoSrc": "http://192.168.0.100/watch?ch=4&when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"
+          "videoSrc": "/watch?ch=4&when=2018%2D02%2D21T08%3A00%3A00%2E915%2B09%3A00"
         }
       ]
     },
@@ -2046,7 +2046,7 @@ GET /api/find?what=carNo
       "vod": [
         {
           "chid": 1,
-          "videoSrc": "http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00"
+          "videoSrc": "/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00"
         }
       ]
     }
@@ -2110,7 +2110,7 @@ GET /api/find?what=carNo&src=1,2
     "vod": [
       {
         "chid": 1,
-        "videoSrc": "http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00"
+        "videoSrc": "/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828%2B09%3A00"
       }
     ]
   }
@@ -2136,8 +2136,8 @@ GET /api/find?what=carNo&timeBegin=2018-01-01T00%3A00%3A00%2B09%3A00&timeEnd=201
 
 ```jsx
 [
-  "http://host/download/2018-01-01T00.00.00.xls",   // 엑셀 파일 다운로드 주소
-  "http://host/download/2018-01-01T00.00.00(2).xls",
+  "/download/2018-01-01T00.00.00.xls",   // 엑셀 파일 다운로드 주소
+  "/download/2018-01-01T00.00.00(2).xls",
     // ... 중략
 ]
 ```
@@ -2192,7 +2192,7 @@ GET /api/find?what=object
         "glasses": true,       # 안경 (착용)
         "mask": false          # 마스크 (미착용)
       },
-      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412659.1590386295819221.object._c1_t2_s392x504.jpg" # 이미지 주소
+      "image": "/storage/e/0/0/7/7673/object/7673911/7673911.4412659.1590386295819221.object._c1_t2_s392x504.jpg" # 이미지 주소
     },
     {
       "timestamp": "2020-05-25T14:58:14.449+09:00",
@@ -2204,7 +2204,7 @@ GET /api/find?what=object
         "gender": "male",      # 성별 (남자)
         "hat": true            # 모자 (착용)
       },
-      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412660.1590386294449281.object._c1_t2_s744x624.jpg" # 이미지 주소
+      "image": "/storage/e/0/0/7/7673/object/7673911/7673911.4412660.1590386294449281.object._c1_t2_s744x624.jpg" # 이미지 주소
     },
     {
       "timestamp": "2020-05-25T14:58:14.185+09:00",
@@ -2231,7 +2231,7 @@ GET /api/find?what=object
           }
         ]
       },
-      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412658.1590386294185653.object._c1_t1_s296x464.jpg" # 이미지 주소
+      "image": "/storage/e/0/0/7/7673/object/7673911/7673911.4412658.1590386294185653.object._c1_t1_s296x464.jpg" # 이미지 주소
     },
     {
       "timestamp": "2020-05-25T14:55:21.557+09:00",
@@ -2245,7 +2245,7 @@ GET /api/find?what=object
           "gray"
         ]
       },
-      "image": "http://host/storage/e/0/0/7/7673/object/7673909/7673909.4412630.1590386121557955.object._c1_t3_s440x312.jpg" # 이미지 주소
+      "image": "/storage/e/0/0/7/7673/object/7673909/7673909.4412630.1590386121557955.object._c1_t3_s440x312.jpg" # 이미지 주소
     },
     // ... 중략
   ]
@@ -2603,7 +2603,7 @@ GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&ot
     "fileId": 100,                    // 파일 아이디
     "src": [  //동영상 소스 
       {
-        "src": "http://192.168.0.100/storage/e/0/0/0/0/100.mp4",  // 동영상 주소
+        "src": "/storage/e/0/0/0/0/100.mp4",  // 동영상 주소
         "type": "video/mp4",    // MIME 형식 (mp4 파일)
         "label": "1080p FHD",   // 해상도 이름
         "size": [               // 해상도
@@ -2624,7 +2624,7 @@ GET /api/vod?ch=1&when=2018-01-08T09%3A30%3A00%2B09%3A00&duration=1h&limit=30&ot
     "fileId": 104,
     "src": [
       {
-        "src": "http://192.168.0.100/storage/e/0/0/0/0/104.mp4",
+        "src": "/storage/e/0/0/0/0/104.mp4",
         "type": "video/mp4",
         "label": "1080p FHD",
         "size": [
@@ -3055,7 +3055,7 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
     "chid":1,
     "title":"카메라1",
     "displayName":"CH1. 카메라1",                // TS-API@0.9.4 이후 추가됨
-    "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"  // 차량 번호 인식 시점의 영상
+    "src":"/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00"  // 차량 번호 인식 시점의 영상
   },
   "srcCode":"1-1-7",                            // 차량 번호 인식 장치(영역) 코드
   "srcName":"B1주차장",                          // 차량 번호 인식 장치(영역) 이름
@@ -3064,10 +3064,10 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
       "chid":2,
       "title":"카메라2",
       "displayName":"CH2. 카메라2",              // TS-API@0.9.4 이후 추가됨
-      "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00" // 차량 번호 인식 시점의 영상
+      "src":"/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575%2B09%3A00" // 차량 번호 인식 시점의 영상
     }
   ],
-  "image":"http://host/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // 캡쳐된 낱장 이미지
+  "image":"/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // 캡쳐된 낱장 이미지
   "plateNo":"11가1432",                          // 차량 번호
   "score":98,                                    // 인식 점수 (100점 만점): 차번인식 엔진에 따라 지원하지 않을 수 있음 (항목 없을 수 있음)
   "roi": {                                       // 번호판 이미지 영역
@@ -3101,13 +3101,13 @@ ws://host/wsapi/subscribeEvents?topics=parkingCount&auth=ZGVtbzohMTIzNHF3ZXI%3D&
       "chid":1,
       "title":"카메라1",
       "displayName":"CH1. 카메라1",               // TS-API@0.9.4 이후 추가됨
-      "src":"http://host/watch?ch=1"
+      "src":"/watch?ch=1"
     },
     {
       "chid":2,
       "title":"카메라2",
       "displayName":"CH2. 카메라2",               // TS-API@0.9.4 이후 추가됨
-      "src":"http://host/watch?ch=2"
+      "src":"/watch?ch=2"
     }
   ],
   "name":"지하1층 계단",                         // 비상 호출 장치 위치 이름
@@ -3131,7 +3131,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
       "chid":1,
       "title":"카메라1",
       "displayName":"CH1. 카메라1",               // TS-API@0.9.4 이후 추가됨
-      "src":"http://host/watch?ch=1",
+      "src":"/watch?ch=1",
       "streams": [  // 동영상 소스 목록
                 // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨)
         { // 1080p RTMP 스트림
@@ -3176,7 +3176,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
       "chid":2,
       "title":"카메라2",
       "displayName":"CH2. 카메라2",               // TS-API@0.9.4 이후 추가됨
-      "src":"http://host/watch?ch=2",
+      "src":"/watch?ch=2",
       "streams":[
         // ... 중략
       ]
@@ -3199,13 +3199,13 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
       "chid":1,
       "title":"카메라1",
       "displayName":"CH1. 카메라1",               // TS-API@0.9.4 이후 추가됨
-      "src":"http://host/watch?ch=1"
+      "src":"/watch?ch=1"
     },
     {
       "chid":2,
       "title":"카메라2",
       "displayName":"CH2. 카메라2",               // TS-API@0.9.4 이후 추가됨
-      "src":"http://host/watch?ch=2"
+      "src":"/watch?ch=2"
     }
   ],
   "name":"비상벨2",                             // 비상 호출 장치 위치 이름
@@ -3406,7 +3406,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
     "glasses": false,     # 안경 (미착용)
     "mask": false         # 마스크 (미착용)
   },
-  "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411971.1590382562558672.object._c1_t2_s552x400.jpg" # 이미지 주소
+  "image": "/storage/e/0/0/7/7673/object/7673854/7673854.4411971.1590382562558672.object._c1_t2_s552x400.jpg" # 이미지 주소
 }
 ```
 2. `face` 객체 속성
@@ -3449,7 +3449,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
       }
     ]
   },
-  "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411974.1590382578461739.object._c1_t1_s376x600.jpg" # 이미지 주소
+  "image": "/storage/e/0/0/7/7673/object/7673854/7673854.4411974.1590382578461739.object._c1_t1_s376x600.jpg" # 이미지 주소
 }
 ```
 2. `human` 객체 속성
@@ -3483,7 +3483,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
       "white"
     ]
   },
-  "image": "http://host/storage/e/0/0/7/7673/object/7673880/7673880.4412174.1590384238768802.object._c1_t3_s944x520.jpg" # 이미지 주소
+  "image": "/storage/e/0/0/7/7673/object/7673880/7673880.4412174.1590384238768802.object._c1_t3_s944x520.jpg" # 이미지 주소
 }
 ```
 2. `vehicle` 객체 속성
@@ -3512,7 +3512,7 @@ GET /api/subscribeEvents?topics=object&objectType=bodyTemperature&auth=ZGVtbzohM
       "chid":1,
       "title":"카메라1",
       "displayName":"CH1. 카메라1",             // TS-API@0.9.4
-      "src":"http://host/watch?ch=1",
+      "src":"/watch?ch=1",
       "streams": [  // 동영상 스트림 정보
                 // (프로토콜 및 해상도에 따라 하나의 채널에 여러 개의 소스가 배열로 구성됨)
         { // 1080p RTMP 스트림
@@ -3913,13 +3913,13 @@ ttl 이내에 클라이언트는 서버에로 명령을 보내어 흐름을 제�
         # 생성된 동영상 파일
         {
           "fileName": "CH1.2018-07-27T09.11.19.mp4",
-          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
+          "src": "/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
           "md5": "1125ee2c3d20f30b31166c821204603d" # md5=true로 요청시 포함됨
         },
         # 생성된 자막 파일
         {
           "fileName": "CH1.2018-07-27T09.11.19.vtt",
-          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt",
+          "src": "/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt",
           "md5": "9176eec58f3be777ae7bd188a1f14165" # md5=true로 요청시 포함됨
         }
       ]

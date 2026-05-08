@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -117,6 +118,7 @@ func main() {
 			if ch, ok := msg["channel"].(map[string]interface{}); ok {
 				if file, ok := ch["file"].(map[string]interface{}); ok {
 					// download: [{fileName, src}, ...]
+					// Server v1.0.2+ returns relative paths; prepend BaseURL for non-browser fetch.
 					if dlArr, ok := file["download"].([]interface{}); ok && len(dlArr) > 0 {
 						if dlObj, ok := dlArr[0].(map[string]interface{}); ok {
 							if src, ok := dlObj["src"].(string); ok {
@@ -126,7 +128,11 @@ func main() {
 					}
 				}
 			}
-			fmt.Printf("  File ready: %s\n", download)
+			fullURL := download
+			if !strings.HasPrefix(download, "http") {
+				fullURL = cfg.BaseURL + download
+			}
+			fmt.Printf("  File ready: %s\n", fullURL)
 			if taskId != "" {
 				conn.WriteJSON(map[string]string{"task": taskId, "cmd": "next"})
 			}

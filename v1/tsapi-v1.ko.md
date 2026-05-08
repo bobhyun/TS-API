@@ -463,7 +463,7 @@ Authorization: Bearer {admin_token}
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.0.1") |
+| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.0.2") |
 | `GET /api/v1/info?siteName` | - | 사이트 이름 조회 |
 | `GET /api/v1/info?timezone` | - | 서버 타임존 조회 (name, bias) |
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
@@ -498,7 +498,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **응답** (정품 라이선스 + ANPR/객체감지/주차안내 활성 예시):
 ```json
 {
-  "apiVersion": "TS-API@1.0.1",
+  "apiVersion": "TS-API@1.0.2",
   "siteName": "Main Office",
   "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
   "product": {"name": "TS-NVR", "version": "2.14.1"},
@@ -1460,8 +1460,8 @@ LPR 소스(인식 지점/영역) 목록을 조회합니다.
       "srcCode": "GATE-IN",
       "srcName": "Entrance Gate",
       "direction": "entry",
-      "image": ["http://host/lpr/image1.jpg"],
-      "vod": [{"chid": 1, "videoSrc": "http://host/watch?ch=1&when=..."}]
+      "image": ["/lpr/image1.jpg"],
+      "vod": [{"chid": 1, "videoSrc": "/watch?ch=1&when=..."}]
     }
   ]
 }
@@ -2489,12 +2489,12 @@ sequenceDiagram
       "download": [
         {
           "fileName": "CH01_20240101_120000.mp4",
-          "src": "http://host/download/task-uuid/CH01_20240101_120000.mp4",
+          "src": "/download/task-uuid/CH01_20240101_120000.mp4",
           "md5": "abc123..."
         },
         {
           "fileName": "CH01_20240101_120000.srt",
-          "src": "http://host/download/task-uuid/CH01_20240101_120000.srt",
+          "src": "/download/task-uuid/CH01_20240101_120000.srt",
           "md5": "def456..."
         }
       ]

@@ -91,8 +91,14 @@ fun main() {
                     }
                     "fileEnd" -> {
                         // download: [{fileName, src}, ...]
+                        // Server v1.0.2+ returns relative paths; prepend client.baseUrl for non-browser fetch.
                         val src = extractField(json, "src")
-                        println("  File ready: ${if (src.isEmpty()) "N/A" else src}")
+                        val fullUrl = when {
+                            src.isEmpty() -> "N/A"
+                            src.startsWith("http") -> src
+                            else -> "${client.baseUrl}$src"
+                        }
+                        println("  File ready: $fullUrl")
                         taskId?.let {
                             webSocket.sendText("""{"task":"$it","cmd":"next"}""", true)
                         }

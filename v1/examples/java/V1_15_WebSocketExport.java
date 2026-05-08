@@ -99,8 +99,11 @@ public class V1_15_WebSocketExport {
 
                             case "fileEnd":
                                 // download: [{fileName, src}, ...]
+                                // Server v1.0.2+ returns relative paths; prepend client.baseUrl for non-browser fetch.
                                 String src = extractField(json, "src");
-                                System.out.println("  File ready: " + (src.isEmpty() ? "N/A" : src));
+                                String fullUrl = src.isEmpty() ? "N/A"
+                                        : (src.startsWith("http") ? src : client.baseUrl + src);
+                                System.out.println("  File ready: " + fullUrl);
                                 if (taskIdHolder[0] != null) {
                                     webSocket.sendText("{\"task\":\"" + taskIdHolder[0] + "\",\"cmd\":\"next\"}", true);
                                 }

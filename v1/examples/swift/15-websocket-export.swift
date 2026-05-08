@@ -111,11 +111,13 @@ struct App {
                     print("  Ready - Task ID: \(taskId ?? "N/A")")
 
                 case "fileEnd":
+                    // Server v1.0.2+ returns relative paths; prepend client.baseURL for non-browser fetch.
                     let channel = msg["channel"] as? [String: Any]
                     let file = channel?["file"] as? [String: Any]
                     let downloads = file?["download"] as? [[String: Any]]
                     let src = downloads?.first?["src"] as? String ?? "N/A"
-                    print("  File ready: \(src)")
+                    let fullUrl = src.hasPrefix("http") ? src : "\(client.baseURL)\(src)"
+                    print("  File ready: \(fullUrl)")
                     // Request next file
                     if let tid = taskId {
                         let cmd = try JSONSerialization.data(withJSONObject: ["task": tid, "cmd": "next"])

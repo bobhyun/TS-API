@@ -1969,10 +1969,10 @@ For the request, the server returns JSON data in the following format with an HT
         "size":[173,43]                     // License plate image size
       },
       "image": [                              // an array for the same plates captured consecutively
-        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
-        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386146439.plate.jpg",
-        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386199445.plate.jpg",
-        "http://192.168.0.100/storage/e/0/0/0/39/39589.161142.1576732386510078.plate.jpg"
+        "/storage/e/0/0/0/39/39589.161142.1576732385942440.plate.jpg",
+        "/storage/e/0/0/0/39/39589.161142.1576732386146439.plate.jpg",
+        "/storage/e/0/0/0/39/39589.161142.1576732386199445.plate.jpg",
+        "/storage/e/0/0/0/39/39589.161142.1576732386510078.plate.jpg"
       ],
       "timeRange": [                      // Date and time the vehicle number was recognized
         "2018-02-21T09:07:29.000-05:00",  // Starting timestamp
@@ -1984,19 +1984,19 @@ For the request, the server returns JSON data in the following format with an HT
       "vod": [  // The Video at the recognized point (may be several if linked channels are set)
         {
           "chid": 1,
-          "videoSrc": "http://192.168.0.100/watch?ch=1&when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"
+          "videoSrc": "/watch?ch=1&when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"
         },
         {
           "chid": 2,
-          "videoSrc": "http://192.168.0.100/watch?ch=2&when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"
+          "videoSrc": "/watch?ch=2&when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"
         },
         {
           "chid": 3,
-          "videoSrc": "http://192.168.0.100/watch?ch=3&when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"
+          "videoSrc": "/watch?ch=3&when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"
         },
         {
           "chid": 4,
-          "videoSrc": "http://192.168.0.100/watch?ch=4&when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"
+          "videoSrc": "/watch?ch=4&when=2018%2D02%2D21T09%3A07%3A29%2E000-05%3A00"
         }
       ]
     },
@@ -2009,7 +2009,7 @@ For the request, the server returns JSON data in the following format with an HT
         "size": [150,38]
       },
       "image": [
-        "http://192.168.0.100/storage/e/0/0/0/39/39588.161141.1576732012342440.plate.jpg"
+        "/storage/e/0/0/0/39/39588.161141.1576732012342440.plate.jpg"
       ],
       "timeRange": [
         "2018-02-21T08:00:00.915-05:00",
@@ -2021,19 +2021,19 @@ For the request, the server returns JSON data in the following format with an HT
       "vod": [
         {
           "chid": 1,
-          "videoSrc": "http://192.168.0.100/watch?ch=1&when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"
+          "videoSrc": "/watch?ch=1&when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"
         },
         {
           "chid": 2,
-          "videoSrc": "http://192.168.0.100/watch?ch=2&when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"
+          "videoSrc": "/watch?ch=2&when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"
         },
         {
           "chid": 3,
-          "videoSrc": "http://192.168.0.100/watch?ch=3&when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"
+          "videoSrc": "/watch?ch=3&when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"
         },
         {
           "chid": 4,
-          "videoSrc": "http://192.168.0.100/watch?ch=4&when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"
+          "videoSrc": "/watch?ch=4&when=2018%2D02%2D21T08%3A00%3A00%2E915-05%3A00"
         }
       ]
     },
@@ -2054,7 +2054,7 @@ For the request, the server returns JSON data in the following format with an HT
       "vod": [
         {
           "chid": 1,
-          "videoSrc": "http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00"
+          "videoSrc": "/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00"
         }
       ]
     }
@@ -2116,7 +2116,7 @@ For example, if you want to display a video of the following search results
     "vod": [
       {
         "chid": 1,
-        "videoSrc": "http://192.168.0.100/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00"
+        "videoSrc": "/watch?ch=1&when=2018%2D02%2D20T18%3A12%3A05%2E828-05%3A00"
       }
     ]
   }
@@ -2141,8 +2141,8 @@ If you request by adding `export=true` parameter to vehicle number log search
 The server returns JSON data in the format shown below with an HTTP response code of 200 as follows:
 ```jsx
 [
-  "http://host/download/2018-01-01T00.00.00.xls",   // Excel file download URL
-  "http://host/download/2018-01-01T00.00.00(2).xls",
+  "/download/2018-01-01T00.00.00.xls",   // Excel file download URL
+  "/download/2018-01-01T00.00.00(2).xls",
     // ... omitted
 ]
 ```
@@ -2195,7 +2195,7 @@ For the request, the server returns JSON data in the following format with an HT
         "glasses": true,       # glasses (wearing)
         "mask": false          # mask (not wearing)
       },  
-      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412659.1590386295819221.object._c1_t2_s392x504.jpg" # image address
+      "image": "/storage/e/0/0/7/7673/object/7673911/7673911.4412659.1590386295819221.object._c1_t2_s392x504.jpg" # image address
     },
     {
       "timestamp": "2020-05-25T14:58:14.449-05:00",
@@ -2206,7 +2206,7 @@ For the request, the server returns JSON data in the following format with an HT
       "attributes": {          # object attributes (list only detected attributes)
         "gender": "male"       # gender
       },
-      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412660.1590386294449281.object._c1_t2_s744x624.jpg" # image address
+      "image": "/storage/e/0/0/7/7673/object/7673911/7673911.4412660.1590386294449281.object._c1_t2_s744x624.jpg" # image address
     },
     {
       "timestamp": "2020-05-25T14:58:14.185-05:00",
@@ -2233,7 +2233,7 @@ For the request, the server returns JSON data in the following format with an HT
           }
         ]
       },
-      "image": "http://host/storage/e/0/0/7/7673/object/7673911/7673911.4412658.1590386294185653.object._c1_t1_s296x464.jpg" # image address
+      "image": "/storage/e/0/0/7/7673/object/7673911/7673911.4412658.1590386294185653.object._c1_t1_s296x464.jpg" # image address
     },
     {
       "timestamp": "2020-05-25T14:55:21.557-05:00",
@@ -2247,7 +2247,7 @@ For the request, the server returns JSON data in the following format with an HT
           "gray"
         ]
       },
-      "image": "http://host/storage/e/0/0/7/7673/object/7673909/7673909.4412630.1590386121557955.object._c1_t3_s440x312.jpg" # image address
+      "image": "/storage/e/0/0/7/7673/object/7673909/7673909.4412630.1590386121557955.object._c1_t3_s440x312.jpg" # image address
     },
     // ... omitted
   ]
@@ -2609,7 +2609,7 @@ When this request is made, the server returns JSON data in the following format 
     "fileId": 100,                    // File ID
     "src": [  // Video source
       {
-        "src": "http://192.168.0.100/storage/e/0/0/0/0/100.mp4",  // Video address
+        "src": "/storage/e/0/0/0/0/100.mp4",  // Video address
         "type": "video/mp4",    // MIME type (mp4 file)
         "label": "1080p FHD",   // Resolution name
         "size": [               // Resolution
@@ -2630,7 +2630,7 @@ When this request is made, the server returns JSON data in the following format 
     "fileId": 104,
     "src": [
       {
-        "src": "http://192.168.0.100/storage/e/0/0/0/0/104.mp4",
+        "src": "/storage/e/0/0/0/0/104.mp4",
         "type": "video/mp4",
         "label": "1080p FHD",
         "size": [
@@ -3056,7 +3056,7 @@ The car number event message is received in JSON format as shown below.
     "chid":1,
     "title":"Camera1",
     "displayName":"CH1. Camera1", // Added since TS-API@0.9.4
-    "src":"http://host/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00"  // The video at vehicle identification time
+    "src":"/watch?ch=1&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00"  // The video at vehicle identification time
   },
   "deviceCode":"1-1-7",                         // Car number identification device (zone) code
   "deviceName":"B1 Parking Lot",                // Car number identification device (zone) name
@@ -3065,10 +3065,10 @@ The car number event message is received in JSON format as shown below.
       "chid":2,
       "title":"Camera2",
       "displayName":"CH2. Camera2",             // Added since TS-API@0.9.4
-      "src":"http://host/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" // The video at vehicle identification time
+      "src":"/watch?ch=2&when=2018%2D06%2D27T10%3A42%3A06%2E575-05%3A00" // The video at vehicle identification time
     }
   ],
-  "image":"http://host/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // captured still cut image
+  "image":"/storage/e/0/0/0/39/39612.161192.1576732638241699.plate.jpg", // captured still cut image
   "plateNo":"DSP963",                           // License plate number
   "score":98,                                   // recognition score (Based on 100 points): May not be supported depending on vehicle identification engine (optional item)
   "roi": {                                      // License plate area
@@ -3102,13 +3102,13 @@ Emergency call event messages are received in JSON format as shown below.
       "chid":1,
       "title":"Camera1",
       "displayName":"CH1. Camera1",             // Added since TS-API@0.9.4
-      "src":"http://host/watch?ch=1"
+      "src":"/watch?ch=1"
     },
     {
       "chid":2,
       "title":"Camera2",
       "displayName":"CH2. Camera2",             // Added since TS-API@0.9.4
-      "src":"http://host/watch?ch=2"
+      "src":"/watch?ch=2"
     }
   ],
   "name":"B1 Stairs",                           // Emergency call device location name
@@ -3132,7 +3132,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
       "chid":1,
       "title":"Camera1",
       "displayName":"CH1. Camera1",             // Added since TS-API@0.9.4
-      "src":"http://host/watch?ch=1",
+      "src":"/watch?ch=1",
       "streams": [  // vidio stream sources
                 // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
         { // 1080p RTMP stream
@@ -3177,7 +3177,7 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
       "chid":2,
       "title":"Camera2",
       "displayName":"CH2. Camera2",             // Added since TS-API@0.9.4
-      "src":"http://host/watch?ch=2",
+      "src":"/watch?ch=2",
       "streams":[
         // ... omitted
       ]
@@ -3200,13 +3200,13 @@ GET /api/subscribeEvents?topics=emergencyCall&auth=ZGVtbzohMTIzNHF3ZXI%3D&verbos
       "chid":1,
       "title":"Camera1",
       "displayName":"CH1. Camera1",             // Added since TS-API@0.9.4
-      "src":"http://host/watch?ch=1"
+      "src":"/watch?ch=1"
     },
     {
       "chid":2,
       "title":"Camera2",
       "displayName":"CH2. Camera2",             // Added since TS-API@0.9.4
-      "src":"http://host/watch?ch=2"
+      "src":"/watch?ch=2"
     }
   ],
   "name":"B1 Stairs",                          // Emergency call device location name
@@ -3406,7 +3406,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
     "glasses": false,     # glasses (not wearing)
     "mask": false         # mask (not wearing)
   },
-  "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411971.1590382562558672.object._c1_t2_s552x400.jpg" # image address
+  "image": "/storage/e/0/0/7/7673/object/7673854/7673854.4411971.1590382562558672.object._c1_t2_s552x400.jpg" # image address
 }
 ```
 2. `face` attributes
@@ -3448,7 +3448,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
       }
     ]
   },
-  "image": "http://host/storage/e/0/0/7/7673/object/7673854/7673854.4411974.1590382578461739.object._c1_t1_s376x600.jpg" # image address
+  "image": "/storage/e/0/0/7/7673/object/7673854/7673854.4411974.1590382578461739.object._c1_t1_s376x600.jpg" # image address
 }
 ```
 2. `human` attributes
@@ -3482,7 +3482,7 @@ GET /api/subscribeEvents?topics=object&objectType=face,human&auth=ZGVtbzohMTIzNH
       "white"
     ]
   },
-  "image": "http://host/storage/e/0/0/7/7673/object/7673880/7673880.4412174.1590384238768802.object._c1_t3_s944x520.jpg" # image address
+  "image": "/storage/e/0/0/7/7673/object/7673880/7673880.4412174.1590384238768802.object._c1_t3_s944x520.jpg" # image address
 }
 ```
 2. `vehicle` attributes
@@ -3511,7 +3511,7 @@ Example data
       "chid":1,
       "title":"Camera1",
       "displayName":"CH1. Camera1",             // Added since TS-API@0.9.4
-      "src":"http://host/watch?ch=1",
+      "src":"/watch?ch=1",
       "streams": [  // vidio stream sources
                 // (Multiple sources are organized into an array in one channel, depending on protocol and resolution)
         { // 1080p RTMP stream
@@ -3912,13 +3912,13 @@ Within ttl, The client must send a command to the server to control the flow, ot
         # Created video file
         {
           "fileName": "CH1.2018-07-27T09.11.19.mp4",
-          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
+          "src": "/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.mp4",
           "md5": "1125ee2c3d20f30b31166c821204603d" # md5=true
         },
         # Created subtitle file
         {
           "fileName": "CH1.2018-07-27T09.11.19.vtt",
-          "src": "http://host/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt",
+          "src": "/download/7963635e-1bff-40e1-bbf3-3f17525aef40/CH1.2018-07-27T09.11.19.vtt",
           "md5": "9176eec58f3be777ae7bd188a1f14165" # md5=true
         }
       ]
