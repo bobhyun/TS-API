@@ -4,25 +4,35 @@
 
 ## v1.0.2
 
-### 응답 URL 상대 경로화
+### v1 응답 URL 상대 경로화
 
-API 응답의 URL 필드를 절대 URL (`http://host/...`) 에서 **상대 경로** (`/...`) 로 변경했습니다.
+**v1** API 응답의 URL 필드를 **상대 경로** (`/...`) 로 변경했습니다. **v0 (레거시) 엔드포인트는 기존과 동일하게 절대 URL** (`http://{host}/...`) 을 반환합니다 — 기존 연동 시스템의 하위 호환성을 위해 유지됩니다.
 
-REST·WebSocket 양쪽에 적용되는 영향 받은 필드:
-- `src` — `/wsapi/v1/export` (및 v0 `/wsapi/dataExport`) 의 다운로드 링크
+영향 받는 v1 응답 필드 (REST·WebSocket):
+- `src` — `/wsapi/v1/export` 의 다운로드 링크
 - `videoSrc` — LPR / 검색 / 차량 추적 결과의 watch URL
 - `image`, `images[]` — 이벤트 알림, LPR / VA 검색 이미지 참조
 - `faceImg`, `orgImg` — 얼굴 검색 결과
 
 ```json
+// v1 응답
 {
   "download": [
     {"src": "/download/task-uuid/CH01.mp4", "fileName": "CH01.mp4"}
   ]
 }
+
+// v0 응답 (레거시 — 변경 없음)
+{
+  "download": [
+    {"src": "http://nvr.example.com/download/task-uuid/CH01.mp4", "fileName": "CH01.mp4"}
+  ]
+}
 ```
 
-**클라이언트 호환성**:
+v0 절대 URL의 host는 **Canonical Host** 서버 설정(웹 관리자 → 서버 설정 → API)이 지정되어 있으면 그 값을 사용하고, 없으면 요청의 `X-Host` 헤더로 fallback 합니다.
+
+**클라이언트 호환성 (v1)**:
 - **브라우저 클라이언트**: 변경 불필요 — 상대 URL이 페이지 origin 에 자동 결합됩니다.
 - **비-브라우저 클라이언트** (curl, Python `requests`, 모바일 앱, 서버 간 통신): fetch 전 base URL 을 결합해야 합니다:
   ```javascript
@@ -31,15 +41,15 @@ REST·WebSocket 양쪽에 적용되는 영향 받은 필드:
 
 ### 변경 배경
 
-이전의 절대 URL 은 서버가 받은 `Host:` 헤더를 그대로 포함했습니다. 요청이 `Host:` 를 다시 쓰는 리버스 프록시를 통과하면 잘못된 호스트가 URL 에 박혀, 클라이언트가 다운로드에 실패하는 경우가 발생했습니다 (호스트 인젝션 패턴). 상대 경로로 전환해 이 문제를 차단하고, 향후 다중 NVR 그룹 라우팅 아키텍처와 정렬했습니다.
+이전의 절대 URL 은 서버가 받은 `Host:` 헤더를 그대로 포함했습니다. 요청이 `Host:` 를 다시 쓰는 리버스 프록시를 통과하면 잘못된 호스트가 URL 에 박혀, 클라이언트가 다운로드에 실패하는 경우가 발생했습니다 (호스트 인젝션 패턴). v1 에서 상대 경로로 전환해 이 문제를 차단하고, 향후 다중 NVR 그룹 라우팅 아키텍처와 정렬했습니다. v0 는 기존 레거시 연동 시스템이 코드 수정 없이 동작하도록 절대 URL 을 유지합니다.
 
 ### 라이브 스트림 URL 유지
 
-`/api/v1/vod` (라이브 스트림) 응답 `src` 배열의 RTMP / HLS / DASH / WebSocket-FLV 스트림 URL 은 **절대 URL 유지** — 이 프로토콜들은 완전히 정규화된 URL 이 필요합니다.
+`/api/v1/vod` (라이브 스트림) 응답 `src` 배열의 RTMP / WebSocket-FLV 스트림 URL 은 **절대 URL 유지** — 이 프로토콜들은 완전히 정규화된 URL 이 필요합니다.
 
 ### Breaking Changes
 
-브라우저 클라이언트는 영향 없음. `response.src` 를 base URL 결합 없이 직접 사용하던 비-브라우저 클라이언트는 위 "클라이언트 호환성" 항목 참고하여 코드 수정 필요.
+없음. v0 클라이언트는 기존과 동일하게 절대 URL 을 받습니다. 신규 v1 클라이언트는 상대 URL 을 받으므로 위 "클라이언트 호환성 (v1)" 항목 참고.
 
 ---
 

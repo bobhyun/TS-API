@@ -79,9 +79,11 @@ struct App {
                 print("  \(time) | \(plateNo) (score: \(score)) [\(srcName)]")
 
                 // VOD links for playback
+                // v1 returns relative paths (e.g. "/watch?ch=1&when=..."); prepend baseURL for non-browser clients.
                 if let vod = entry["vod"] as? [[String: Any]], let first = vod.first {
                     let videoSrc = first["videoSrc"] as? String ?? ""
-                    print("    VOD: \(videoSrc)")
+                    let fullUrl = videoSrc.hasPrefix("http") ? videoSrc : "\(client.baseURL)\(videoSrc)"
+                    print("    VOD: \(fullUrl)")
                 }
             }
         }

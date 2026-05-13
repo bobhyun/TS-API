@@ -14,7 +14,7 @@
  *   (at/maxCount) to keep each request under a manageable size.
  */
 
-const { NVR_API_KEY } = require('./config');
+const { BASE_URL, NVR_API_KEY } = require('./config');
 const { setApiKey, get } = require('./http');
 
 async function main() {
@@ -62,8 +62,11 @@ async function main() {
         console.log(`  ${time} | ${entry.plateNo} (score: ${entry.score}) [${entry.srcName || entry.srcCode}]`);
 
         // VOD links for playback
+        // v1 returns relative paths (e.g. "/watch?ch=1&when=..."); prepend BASE_URL for non-browser clients.
         if (Array.isArray(entry.vod) && entry.vod.length > 0) {
-          console.log(`    VOD: ${entry.vod[0].videoSrc}`);
+          const videoSrc = entry.vod[0].videoSrc || '';
+          const fullUrl = videoSrc.startsWith('http') ? videoSrc : `${BASE_URL}${videoSrc}`;
+          console.log(`    VOD: ${fullUrl}`);
         }
       }
     }

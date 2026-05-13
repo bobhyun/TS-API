@@ -40,6 +40,7 @@ Setting location: **Web Admin** → **Server Settings** → **API** tab
 | Auth: Session Cookie | ✅ | ✅ |
 | Auth: JWT Bearer Token | ❌ | ✅ |
 | Auth: API Key | ❌ | ✅ |
+| Response URL format | Absolute (`http://{host}/...`) | Relative (`/...`) |
 | Channel list | `GET /api/enum?what=channel` | `GET /api/v1/channel` |
 | System info | `GET /api/system?info` | `GET /api/v1/system/info` |
 | PTZ control | `GET /api/channel/ptz?ch=1&home` | `GET /api/v1/channel/1/ptz?home` |
@@ -249,7 +250,13 @@ requests.post(f'{base}/api/v1/system/restart')
    - v0: `info=os`, `health=cpu`
    - v1: `item=os`, `item=cpu`
 
-5. **Response field name notes** (same for v0/v1):
+5. **Response URL format**: Absolute URLs in v0, relative URLs in v1
+   - v0 (legacy): `"image": "http://nvr.example.com/storage/..."`, `"videoSrc": "http://nvr.example.com/watch?ch=1&when=..."`
+   - v1: `"image": "/storage/..."`, `"videoSrc": "/watch?ch=1&when=..."`
+   - The host for v0 absolute URLs comes from the **Canonical Host** setting (Web Admin → Server Settings → API) when configured, otherwise falls back to the request's `X-Host` header.
+   - v1 returns relative URLs so clients can prepend their own base URL — useful behind reverse proxies or in cross-origin scenarios.
+
+6. **Response field name notes** (same for v0/v1):
    - Channel list: `title` (channel name), `displayName` (display name, `"CH{N}. {title}"` format)
    - VOD response: stream URLs are in the `src` field (e.g., `src.rtmp`, `src.flv`)
    - Event types: `id` (type ID), `code` (sub-code array)
@@ -291,6 +298,6 @@ Returns 404 error when v0 API is called:
 
 | Type | Endpoints |
 |------|-----------|
-| REST API | `/api/auth`, `/api/info`, `/api/system`, `/api/enum`, `/api/find`, `/api/vod`, `/api/status`, `/api/channel/*`, `/api/push`, `/api/subscribeEvents`, `/api/searchFace` |
+| REST API | `/api/auth`, `/api/info`, `/api/system`, `/api/enum`, `/api/find`, `/api/vod`, `/api/status`, `/api/channel/*`, `/api/push`, `/api/searchFace` |
 | WebSocket API | `/wsapi/subscribeEvents`, `/wsapi/dataExport` |
 

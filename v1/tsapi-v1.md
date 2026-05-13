@@ -376,6 +376,8 @@ GET /download/export_20240101.mp4?token=eyJhbGc...
 | `/event-storage/{path}` | Event-related media (LPR images, etc.) |
 | `/download/{file}` | Exported files |
 
+> **URL format**: v1 returns **relative URLs** (paths starting with `/`) in response fields such as `image`, `videoSrc`, `src`. Clients should prepend their own base URL (`http://{host}:{port}`) when constructing absolute requests. This is the opposite of v0 (legacy) which returns absolute URLs — see [Migration Guide](MIGRATION.md#5-key-changes) for details.
+
 ---
 
 ### 3.5. API Key Authentication

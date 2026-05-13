@@ -376,6 +376,8 @@ GET /download/export_20240101.mp4?token=eyJhbGc...
 | `/event-storage/{path}` | 이벤트 관련 미디어 (LPR 이미지 등) |
 | `/download/{file}` | 내보내기 파일 |
 
+> **URL 형식**: v1은 응답의 `image`, `videoSrc`, `src` 등의 필드에 **상대 URL** (`/`로 시작하는 경로)을 반환합니다. 클라이언트는 절대 요청을 만들 때 자신의 base URL(`http://{host}:{port}`)을 prepend 해야 합니다. v0 (레거시)는 반대로 절대 URL을 반환합니다 — 자세한 내용은 [마이그레이션 가이드](MIGRATION.ko.md#5-주요-변경사항) 참고.
+
 ---
 
 ### 3.5. API Key 인증

@@ -40,6 +40,7 @@ v0 API의 사용 여부는 서버 설정에서 제어합니다:
 | 인증: 세션 쿠키 | ✅ | ✅ |
 | 인증: JWT Bearer Token | ❌ | ✅ |
 | 인증: API Key | ❌ | ✅ |
+| 응답 URL 형식 | 절대 URL (`http://{host}/...`) | 상대 URL (`/...`) |
 | 채널 목록 | `GET /api/enum?what=channel` | `GET /api/v1/channel` |
 | 시스템 정보 | `GET /api/system?info` | `GET /api/v1/system/info` |
 | PTZ 제어 | `GET /api/channel/ptz?ch=1&home` | `GET /api/v1/channel/1/ptz?home` |
@@ -249,7 +250,13 @@ requests.post(f'{base}/api/v1/system/restart')
    - v0: `info=os`, `health=cpu`
    - v1: `item=os`, `item=cpu`
 
-5. **응답 필드명 참고사항** (v0/v1 동일):
+5. **응답 URL 형식**: v0는 절대 URL, v1은 상대 URL
+   - v0 (레거시): `"image": "http://nvr.example.com/storage/..."`, `"videoSrc": "http://nvr.example.com/watch?ch=1&when=..."`
+   - v1: `"image": "/storage/..."`, `"videoSrc": "/watch?ch=1&when=..."`
+   - v0 절대 URL의 host는 **Canonical Host** 설정(웹 관리자 → 서버 설정 → API)이 지정되어 있으면 그 값을 사용하고, 없으면 요청의 `X-Host` 헤더로 fallback 합니다.
+   - v1은 상대 URL을 반환하므로 클라이언트가 자신의 base URL을 prepend 합니다 — 리버스 프록시나 cross-origin 환경에서 유용합니다.
+
+6. **응답 필드명 참고사항** (v0/v1 동일):
    - 채널 목록: `title` (채널명), `displayName` (표시명, `"CH{N}. {title}"` 형식)
    - VOD 응답: 스트림 URL은 `src` 필드 (예: `src.rtmp`, `src.flv`)
    - 이벤트 유형: `id` (유형 ID), `code` (하위 코드 배열)
@@ -291,6 +298,6 @@ v0 API 호출 시 404 에러가 반환됩니다:
 
 | 구분 | 엔드포인트 |
 |------|-----------|
-| REST API | `/api/auth`, `/api/info`, `/api/system`, `/api/enum`, `/api/find`, `/api/vod`, `/api/status`, `/api/channel/*`, `/api/push`, `/api/subscribeEvents`, `/api/searchFace` |
+| REST API | `/api/auth`, `/api/info`, `/api/system`, `/api/enum`, `/api/find`, `/api/vod`, `/api/status`, `/api/channel/*`, `/api/push`, `/api/searchFace` |
 | WebSocket API | `/wsapi/subscribeEvents`, `/wsapi/dataExport` |
 
