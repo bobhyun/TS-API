@@ -14,6 +14,8 @@
 #   src: [
 #     { protocol: "rtmp", profile: "main", src: "rtmp://...", label: "1080p", size: [1920, 1080] },
 #     { protocol: "flv", profile: "main", src: "http://.../.flv", label: "1080p", size: [1920, 1080] }
+#     { protocol: "websocket-flv", profile: "main", src: "ws://.../.flv", label: "1080p", size: [1920, 1080] }
+#     { protocol: "rtsp", profile: "main", src: "rtsp://.../live/ch1main", label: "1080p", size: [1920, 1080] }
 #   ]
 #
 # Usage:
@@ -54,6 +56,8 @@ echo "=== Channel 1 Live Stream ==="
 # 3. Filter by Protocol
 #    protocol=rtmp - RTMP only
 #    protocol=flv  - FLV only (HTTP-FLV)
+#    protocol=websocket-flv - WebSocket-FLV only (same stream, WS transport)
+#    protocol=rtsp - RTSP re-stream only (TCP transport only, H.264 only)
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== RTMP Only ==="

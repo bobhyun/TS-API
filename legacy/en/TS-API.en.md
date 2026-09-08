@@ -1262,6 +1262,13 @@ For the request, the server returns JSON data in the following format with an HT
 #### Adding stream list `@0.9.4`
 You can add the `staticSrc` parameter to get the list of streams together.
 These streams may not be available depending on the camera connection.
+
+> **Server 1.1.0+**: the list may also contain a `websocket-flv` entry (`ws://`/`wss://`) —
+> the same stream as `flv`, delivered over a WebSocket connection instead of HTTP chunked
+> transfer — and, on servers built with RTSP re-streaming, an `rtsp` entry
+> (`rtsp://host/live/ch<N>{main|sub}`). RTSP is **TCP interleaved only** (a UDP `SETUP`
+> gets `461 Unsupported Transport`), **H.264 only**, and requires Basic authentication in
+> the URL. Treat the list as open-ended and ignore protocols you do not handle.
 ```ruby
 GET /api/enum?what=channel&staticSrc
 ```
@@ -1287,7 +1294,7 @@ For the request, the server returns JSON data in the following format with an HT
       {
         "protocol": "flv",
         "profile": "main",
-        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1main",
+        "src": "http://192.168.0.100/live?app=live&stream=ch1main",
         "type": "application/x-mpegurl",
         "label": "1080p",
         "size": [
@@ -1320,7 +1327,7 @@ For the request, the server returns JSON data in the following format with an HT
       {
         "protocol": "flv",
         "profile": "main",
-        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1sub",
+        "src": "http://192.168.0.100/live?app=live&stream=ch1sub",
         "type": "application/x-mpegurl",
         "label": "360p",
         "size": [
@@ -2432,7 +2439,7 @@ The server returns JSON data in the following format with an HTTP response code 
       { // 1080p HTTP-FLV stream
         "protocol": "flv",
         "profile": "main",
-        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1main", // Video address
+        "src": "http://192.168.0.100/live?app=live&stream=ch1main", // Video address
         "type": "video/x-flv",  // MIME type: FLV (HTTP protocol)
         "label": "1080p",       // Resolution name
         "size": [               // Resolution
@@ -2465,7 +2472,7 @@ The server returns JSON data in the following format with an HTTP response code 
       { // VGA HTTP-FLV stream
         "protocol": "flv",
         "profile": "sub",
-        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1sub", // Video address
+        "src": "http://192.168.0.100/live?app=live&stream=ch1sub", // Video address
         "type": "video/x-flv",  // MIME type: FLV
         "label": "VGA",       // Resolution name
         "size": [             // Resolution

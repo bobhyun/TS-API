@@ -465,7 +465,7 @@ Authorization: Bearer {admin_token}
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.0.2") |
+| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.1.0") |
 | `GET /api/v1/info?siteName` | - | 사이트 이름 조회 |
 | `GET /api/v1/info?timezone` | - | 서버 타임존 조회 (name, bias) |
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
@@ -500,7 +500,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **응답** (정품 라이선스 + ANPR/객체감지/주차안내 활성 예시):
 ```json
 {
-  "apiVersion": "TS-API@1.0.2",
+  "apiVersion": "TS-API@1.1.0",
   "siteName": "Main Office",
   "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
   "product": {"name": "TS-NVR", "version": "2.14.1"},
@@ -1290,8 +1290,128 @@ curl "http://localhost/api/v1/channel/1/preset/preset1/go"
 | `data[].typeName` | String | 이벤트 유형 이름 |
 | `data[].code` | Int | 이벤트 코드 |
 | `data[].codeName` | String | 이벤트 코드 이름 |
-| `data[].chid` | Int | 관련 채널 ID |
+| `data[].chid` | Int | 관련 채널 ID. 이벤트가 특정 채널 하나에 매인 것이 아니면 `null` 입니다 — 여러 채널에 걸친 사건은 채널 목록을 `param` 에 싣습니다(아래 참조) |
 | `data[].timeRange` | Array | 이벤트 발생 시간 범위 |
+| `data[].param` | Object | 이벤트별 상세(저장된 원본). 형태는 `code` 에 따라 다르므로 열린 집합으로 보고, 처리하지 않는 키는 무시하십시오. `typeName` / `codeName` 과 달리 **번역되지 않습니다**. |
+
+#### 스토리지 장애 상세
+
+`codeName` 이 `"저장 장치 오류"` / `"저장 장치 준비 완료"` 인 녹화 이벤트는 `param.statusCode` 를 함께 보냅니다.
+
+| `statusCode` | 의미 |
+|-----:|---------|
+| `0` | 정상 |
+| `-1` | 존재하지 않음 |
+| `-2` | 쓰기 전용 |
+| `-4` | 읽기 전용 |
+| `-6` | 읽기/쓰기 거부됨 |
+| `-8` | 스토리지 정리 중단 — 정리 스레드가 멈췄습니다. 녹화는 계속되지만 지연삭제와 고아 정리가 돌지 않습니다 |
+| `-9` | 스토리지 쓰기 정지 — 쓸 데이터가 밀려 있는데 스토리지가 한 바이트도 받지 않았습니다 |
+| `-100` | 알 수 없는 오류 |
+
+`-9` 는 두 곳에서 발화하며, 서로 다른 질문에 답합니다.
+
+| 발화 조건 | payload |
+|---|---|
+| 디스크 I/O 호출이 반복적으로 10초를 넘음 — 1시간 관측 창 안에 3건 이상 | `stallCount`, `stalledSec`, `chid` |
+| 쓸 데이터가 밀려 있는데 스토리지가 한 바이트도 받지 않음 | `stalledSec` |
+
+앞의 것은 **사건 행** 입니다. 장애가 지나간 뒤가 아니라 조건을 만족하는 즉시 열리고, 지속되는 동안 1분에 한 번쯤 갱신되며(`ongoing: true`), 관측 창의 건수가 문턱 아래로 내려가면 확정됩니다. `data[].timeRange` 도 함께 늘어나므로 같은 `data[].id` 를 나중에 다시 조회하면 더 넓은 구간이 옵니다. 뒤의 것은 정지가 끝난 뒤 한 번만 나옵니다.
+
+정지가 실제로 영상 손실을 낸 경우 두 경로 모두 **손실 요약** 을 함께 싣습니다 — `lostSec`, `channels`, `channelList`, `droppedFrames` 이며 사건이 열린 시점부터 집계합니다. "얼마나 나빴나" 에 대한 답이고, 프레임 수가 아니라 **영상 길이(초)와 채널 수** 로 적습니다.
+
+**손실이 없으면 이 네 키가 모두 없습니다.** 그것이 정상적인 결과입니다 — 쓰기 큐가 정지 시간을 흡수한 경우입니다. 키가 없는 것을 "손실 없음" 으로 다루십시오. 값이 빠진 것으로 보고 0 으로 채워 "손실 0" 을 보고하면 안 됩니다.
+
+| 필드 | 타입 | 설명 |
+|-------|------|-------------|
+| `storagePath` | String | 정지가 발생한 녹화 스토리지 |
+| `stalledSec` | Int | 사건 중 가장 길었던 단일 무응답 시간(초) |
+| `stallCount` | Int | 사건 동안 10초를 넘긴 디스크 I/O 호출 건수 |
+| `chid` | Int | 그중 가장 오래 걸린 호출이 난 채널. `data[].chid` 와 달리 **0부터 시작** |
+| `lostSec` | Int | 사건 동안 실제로 잃은 영상 길이(초, 전 채널 합계). 손실이 없으면 실리지 않음 |
+| `channels` | Int | 영상을 잃은 채널 수. 손실이 없으면 실리지 않음 |
+| `channelList` | Array | 그 채널 ID 목록. **0부터 시작**. 손실이 없으면 실리지 않음 |
+| `droppedFrames` | Int | 잃은 프레임 수(전 채널 합계). `lostSec` 의 진단용 상세. 손실이 없으면 실리지 않음 |
+| `ongoing` | Bool | 사건이 아직 진행 중이면 `true` 로 실려 옵니다 |
+
+손실이 없는 정지 — 흔한 경우:
+
+```json
+{
+  "storagePath": "G:\\recData",
+  "statusCode": -9,
+  "stalledSec": 20
+}
+```
+
+영상 손실이 있었던 정지:
+
+```json
+{
+  "storagePath": "G:\\recData",
+  "statusCode": -9,
+  "stalledSec": 67,
+  "stallCount": 19,
+  "chid": 3,
+  "lostSec": 200,
+  "channels": 9,
+  "channelList": [0, 1, 2, 4, 7, 8, 11, 12, 15],
+  "droppedFrames": 74213,
+  "ongoing": true
+}
+```
+
+`lostSec` 은 **실제로 빈 영상의 합** 이지 그 일이 걸쳐 있던 시간대가 아닙니다. 두 시간짜리 `-9` 사건에서 손실은 3분뿐일 수 있습니다 — 구간은 `"녹화 프레임 누락"` 의 `period` 가, 피해 규모는 `lostSec` 이 말합니다.
+
+#### 녹화 프레임 누락 상세
+
+`"녹화 프레임 누락"` 은 복구할 수 없이 잃어버린 영상을 보고합니다.
+
+**한 이벤트는 채널 하나가 아니라 사건 하나를 담습니다.** 같은 구간에 여러 채널에서 발생한 드롭을 한 행으로 모으므로 `data[].chid` 는 `null` 이고, 영향받은 채널은 `param` 에 실립니다. 드롭이 60초간 없으면 사건이 끝납니다. 위의 `-9` 와 마찬가지로 행은 즉시 열리고 사건이 지속되는 동안 갱신됩니다 — `data[].timeRange` 와 `param.period` 가 함께 늘어납니다.
+
+같은 시각의 `-9` 가 보통 그 **원인** 입니다. 스토리지가 따라오지 못해 쓰기 큐가 프레임을 거절한 것입니다. 반대로 한두 채널에만 국한된 드롭은 다른 원인을 봐야 합니다 — 디스크 지연은 채널을 골라 가지 않습니다.
+
+| 필드 | 타입 | 설명 |
+|-------|------|-------------|
+| `period` | Array | 누락 구간 — 시작과 끝, ISO 8601 두 개 |
+| `channels` | Int | 영향받은 채널 수 |
+| `channelList` | Array | 영향받은 채널 ID 목록. `data[].chid` 와 달리 **0부터 시작** |
+| `droppedFrames` | Int | 사건 동안 잃은 프레임 수(전 채널 합계) |
+| `ongoing` | Bool | 사건이 아직 진행 중이면 `true` 로 실려 옵니다 |
+
+```json
+{
+  "period": ["2026-08-31T19:36:41", "2026-08-31T20:22:30"],
+  "channels": 9,
+  "channelList": [0, 1, 2, 4, 7, 8, 11, 12, 15],
+  "droppedFrames": 74213,
+  "ongoing": true
+}
+```
+
+#### 녹화 누락 상세
+
+`"녹화 누락"` 은 채널 단위이므로 `data[].chid` 가 해당 채널을 가리킵니다. 녹화 워치독이 그 채널에서 기록되는 것이 없음을 확인하고 스트림을 재시작한 것입니다. 나머지 필드는 그 시점의 상태를 담고 있어, 스토리지 문제와 스트림 문제를 가르는 근거가 됩니다.
+
+| 필드 | 타입 | 설명 |
+|-------|------|-------------|
+| `secs` | Int | 재시작 전까지 녹화가 실패하고 있던 시간(초) |
+| `streamFps` | Int | 그 시점의 스트림 프레임 레이트. `0` 이면 스토리지가 아니라 카메라/네트워크 쪽입니다 |
+| `storage` | Int | 사용 중인 녹화 스토리지 ID |
+| `freeMB` | Int | 그 스토리지의 남은 용량(MB). 조회에 실패하면 `-1` |
+| `anchorAge` | Int | 남은 용량을 마지막으로 실측한 뒤 지난 시간(초). 값이 크면 볼륨이 응답을 멈춘 것입니다. 한 번도 실측하지 못했으면 `-1` |
+| `queuePct` | Int | 쓰기 큐 사용률(%). 낮은데도 녹화가 실패하고 있으면 큐 적체는 원인이 아닙니다. 조회 불가면 `-1` |
+
+```json
+{
+  "secs": 30,
+  "streamFps": 15,
+  "storage": 2,
+  "freeMB": 10240,
+  "anchorAge": -1,
+  "queuePct": 0
+}
+```
 
 ### 9.4. 이벤트 트리거 (이벤트 백업)
 
@@ -1692,6 +1812,8 @@ ch: 1,2,3
 | `GET /api/v1/vod?ch=1,2,3` | 여러 채널 스트림 |
 | `GET /api/v1/vod?protocol=rtmp` | RTMP 스트림만 조회 |
 | `GET /api/v1/vod?protocol=flv` | HTTP-FLV 스트림만 조회 |
+| `GET /api/v1/vod?protocol=websocket-flv` | WebSocket-FLV 스트림만 조회 |
+| `GET /api/v1/vod?protocol=rtsp` | RTSP 스트림만 조회 |
 | `GET /api/v1/vod?stream=sub` | 서브스트림 (저해상도) |
 | `GET /api/v1/vod?stream=main` | 메인스트림 (고해상도) |
 
@@ -1724,8 +1846,24 @@ ch: 1,2,3
       {
         "protocol": "flv",
         "profile": "main",
-        "src": "https://host/live?port=1935&app=live&stream=ch1main",
+        "src": "https://host/live?app=live&stream=ch1main",
         "type": "video/x-flv",
+        "label": "1080p",
+        "size": [1920, 1080]
+      },
+      {
+        "protocol": "websocket-flv",
+        "profile": "main",
+        "src": "wss://host/live?app=live&stream=ch1main",
+        "type": "video/x-flv",
+        "label": "1080p",
+        "size": [1920, 1080]
+      },
+      {
+        "protocol": "rtsp",
+        "profile": "main",
+        "src": "rtsp://host/live/ch1main",
+        "type": "application/x-rtsp",
         "label": "1080p",
         "size": [1920, 1080]
       },
@@ -1740,8 +1878,24 @@ ch: 1,2,3
       {
         "protocol": "flv",
         "profile": "sub",
-        "src": "https://host/live?port=1935&app=live&stream=ch1sub",
+        "src": "https://host/live?app=live&stream=ch1sub",
         "type": "video/x-flv",
+        "label": "VGA",
+        "size": [640, 480]
+      },
+      {
+        "protocol": "websocket-flv",
+        "profile": "sub",
+        "src": "wss://host/live?app=live&stream=ch1sub",
+        "type": "video/x-flv",
+        "label": "VGA",
+        "size": [640, 480]
+      },
+      {
+        "protocol": "rtsp",
+        "profile": "sub",
+        "src": "rtsp://host/live/ch1sub",
+        "type": "application/x-rtsp",
         "label": "VGA",
         "size": [640, 480]
       }
@@ -1778,7 +1932,17 @@ ch: 1,2,3
 | 프로토콜 | 설명 | 조건 |
 |----------|-------------|-----------|
 | `rtmp` | RTMP 스트림 | 항상 |
-| `flv` | HTTP-FLV 스트림 | HTTP-FLV 활성화 시 |
+| `flv` | HTTP-FLV 스트림 (`http`/`https`) | HTTP-FLV 활성화 시 |
+| `websocket-flv` | WebSocket-FLV 스트림 (`ws`/`wss`) | HTTP-FLV 활성화 시 |
+| `rtsp` | RTSP 재송출 (`rtsp`), TCP 전용 | RTSP 재송출 활성화 시 |
+
+> **`flv` 와 `websocket-flv` 의 차이**: 같은 스트림, 같은 엔드포인트이고 전송 프레이밍만 다릅니다. `flv` 는 HTTP chunked 전송을 쓰고, `websocket-flv` 는 연결을 업그레이드해 FLV 태그 하나를 WebSocket 바이너리 프레임 하나로 보냅니다. 스킴은 요청 스킴을 따릅니다(`http`→`ws`, `https`→`wss`). flv.js / mpegts.js 같은 플레이어에서 둘 다 동작합니다.
+
+> **여러 채널을 동시에 볼 때는 `websocket-flv` 를 쓰십시오.** 실시간 스트림은 재생하는 동안 연결이 계속 유지되므로, 채널 수만큼 연결이 동시에 열려 있게 됩니다. 브라우저는 **출처(origin)당 HTTP/1.1 연결을 약 6개로 제한**하는데, 이 엔드포인트는 HTTP/2 와 HTTP/3 을 받지 않으므로 `flv` 스트림은 그 6개 중 하나를 반드시 차지합니다. 그 수를 넘으면 나머지 채널은 대기하고, 같은 출처로 가는 다른 요청(REST 호출, 썸네일)도 그 뒤에 줄을 섭니다. WebSocket 연결은 그 한도에서 빠지고 훨씬 많은 수가 허용되므로, `websocket-flv` 는 비디오월에서 사실상 동시접속 제한이 없습니다. 채널이 하나뿐이면 어느 쪽이든 무방합니다.
+
+> **`rtsp`**: 같은 RTMP publish 를 서버가 RTP 로 다시 내보내는 것입니다. **TCP interleaved 전용**입니다 — UDP `SETUP` 에는 `461 Unsupported Transport` 로 답하므로, 기본값이 UDP 인 클라이언트에는 TCP 를 지정해야 합니다(`vlc --rtsp-tcp`, `ffplay -rtsp_transport tcp`). Basic 인증이 필수이고 끌 수 없습니다 — 자격증명을 URL 에 넣고(`rtsp://user:pass@host/live/ch1main`) 예약 문자는 퍼센트 인코딩하십시오(`@` 는 `%40`). 영상은 **H.264 전용**입니다. 브라우저는 RTSP 를 재생할 수 없습니다 — 웹 페이지용이 아니라 외부 플레이어·VMS 연동·FFmpeg 기반 파이프라인용입니다.
+
+> **웹 페이지에 영상을 넣으시려면** 위 URL 들이 대개 필요 없습니다 — 서버가 [`GET /watch`](#133-watch-페이지-임베드-플레이어) 로 완성된 플레이어를 제공합니다. `<iframe>` 에 넣으면 프로토콜 선택·인증(`token` / `apikey`)·녹화 재생까지 알아서 처리합니다. Watch 페이지가 주지 않는 제어가 필요할 때만 `flv` / `websocket-flv` 로 직접 만드십시오.
 
 > **참고**: `X-Host` 헤더가 필요합니다. 일반적인 웹 브라우저 접속 시 자동으로 설정됩니다. 직접 호출 시 `X-Host: {host}:{port}` 헤더를 포함하세요.
 
@@ -2471,7 +2635,7 @@ sequenceDiagram
 | `0` | 성공 |
 | `-1` | 지정된 시간 범위에 녹화 데이터 없음 |
 | `-2` | 잘못된 파라미터 |
-| `-3` | 녹화 저장소에 저장 불가 |
+| `-3` | 녹화 스토리지에 저장 불가 |
 | `-4` | 폴더 생성/쓰기 불가 |
 | `-5` | 디스크 여유 공간 부족 |
 

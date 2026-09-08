@@ -465,7 +465,7 @@ Retrieves server and product information.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.0.2") |
+| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.1.0") |
 | `GET /api/v1/info?siteName` | - | Site name query |
 | `GET /api/v1/info?timezone` | - | Server timezone query (name, bias) |
 | `GET /api/v1/info?product` | - | Product info query (name, version) |
@@ -500,7 +500,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **Response** (genuine license with ANPR / object detection / parking guidance enabled):
 ```json
 {
-  "apiVersion": "TS-API@1.0.2",
+  "apiVersion": "TS-API@1.1.0",
   "siteName": "Main Office",
   "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
   "product": {"name": "TS-NVR", "version": "2.14.1"},
@@ -1290,8 +1290,128 @@ Searches stored event logs.
 | `data[].typeName` | String | Event type name |
 | `data[].code` | Int | Event code |
 | `data[].codeName` | String | Event code name |
-| `data[].chid` | Int | Related channel ID |
+| `data[].chid` | Int | Related channel ID. `null` when the event is not tied to a single channel — an incident spanning several channels lists them in `param` instead (see below) |
 | `data[].timeRange` | Array | Event time range |
+| `data[].param` | Object | Event-specific detail, as stored. Its shape depends on `code` — treat it as open-ended and ignore keys you do not handle. Unlike `typeName` / `codeName` it is **not** localized. |
+
+#### Storage failure detail
+
+Recording events with `codeName` `"Storage error"` / `"Storage ready"` carry `param.statusCode`:
+
+| `statusCode` | Meaning |
+|-----:|---------|
+| `0` | Normal |
+| `-1` | Not exist |
+| `-2` | Write only |
+| `-4` | Read only |
+| `-6` | Read write denied |
+| `-8` | Storage cleanup stopped — the housekeeping thread stalled. Recording continues, but deferred deletion and orphan cleanup are not running |
+| `-9` | Storage write stalled — the storage accepted no writes while data was queued |
+| `-100` | Unknown error |
+
+`-9` has two emitters, and they answer different questions:
+
+| Emitted when | Payload |
+|---|---|
+| Disk I/O calls repeatedly took over 10 seconds — three or more within a rolling 1-hour window | `stallCount`, `stalledSec`, `chid` |
+| The storage accepted no writes at all while data was queued | `stalledSec` |
+
+The first is an **incident row**. It opens as soon as the condition is met rather than after the trouble passes, is refreshed about once a minute while it lasts (`ongoing: true`), and is finalized when the window falls back under the threshold. `data[].timeRange` grows with it, so the same `data[].id` returns a wider range on a later poll. The second is emitted once, after the stall ends.
+
+Both carry a **loss summary** when the stall actually cost video — `lostSec`, `channels`, `channelList` and `droppedFrames`, measured from the moment the incident opened. This is the answer to "how bad was it", and it is deliberately expressed in seconds of video and channel count rather than a frame count.
+
+**When no video was lost, none of those four keys are present.** That is the normal outcome: the write queue absorbed the stall. Treat their absence as "no loss", not as missing data — do not default them to zero and report a loss of 0.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `storagePath` | String | Recording storage that stalled |
+| `stalledSec` | Int | Longest single unresponsive stretch in the incident, in seconds |
+| `stallCount` | Int | How many disk I/O calls took over 10 seconds during the incident |
+| `chid` | Int | Channel that saw the longest of those calls. **0-based**, unlike `data[].chid` |
+| `lostSec` | Int | Video actually lost during the incident, in seconds, all channels combined. Absent when nothing was lost |
+| `channels` | Int | Number of channels that lost video. Absent when nothing was lost |
+| `channelList` | Array | Those channel IDs. **0-based**. Absent when nothing was lost |
+| `droppedFrames` | Int | Frames lost, all channels combined. Diagnostic detail behind `lostSec`. Absent when nothing was lost |
+| `ongoing` | Bool | Present and `true` while the incident is still open |
+
+Stall with no loss — the common case:
+
+```json
+{
+  "storagePath": "G:\\recData",
+  "statusCode": -9,
+  "stalledSec": 20
+}
+```
+
+Stall that cost video:
+
+```json
+{
+  "storagePath": "G:\\recData",
+  "statusCode": -9,
+  "stalledSec": 67,
+  "stallCount": 19,
+  "chid": 3,
+  "lostSec": 200,
+  "channels": 9,
+  "channelList": [0, 1, 2, 4, 7, 8, 11, 12, 15],
+  "droppedFrames": 74213,
+  "ongoing": true
+}
+```
+
+`lostSec` is the **total missing video**, not the span it happened over. A `-9` incident lasting two hours may have lost only three minutes; the `"Recording frame drop"` event's `period` gives the span, and `lostSec` gives the damage.
+
+#### Recording frame drop detail
+
+`"Recording frame drop"` reports video that was lost and cannot be recovered.
+
+**One event covers one incident, not one channel.** Frames dropped across many channels within the same stretch are collected into a single row, so `data[].chid` is `null` and the affected channels are listed in `param`. An incident ends after 60 seconds with no further drops. Like `-9` above, the row opens immediately and is refreshed while the incident lasts — both `data[].timeRange` and `param.period` grow with it.
+
+`-9` at the same timestamp is the usual **cause**: the storage stopped keeping up and the write queue had to reject frames. A drop confined to one or two channels points elsewhere, since disk latency does not single out channels.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `period` | Array | Missing period — two ISO 8601 timestamps, start and end |
+| `channels` | Int | Number of affected channels |
+| `channelList` | Array | Affected channel IDs. **0-based**, unlike `data[].chid` |
+| `droppedFrames` | Int | Frames lost in the incident, all channels combined |
+| `ongoing` | Bool | Present and `true` while the incident is still open |
+
+```json
+{
+  "period": ["2026-08-31T19:36:41", "2026-08-31T20:22:30"],
+  "channels": 9,
+  "channelList": [0, 1, 2, 4, 7, 8, 11, 12, 15],
+  "droppedFrames": 74213,
+  "ongoing": true
+}
+```
+
+#### Missing recording detail
+
+`"Missing recording"` is per-channel, so `data[].chid` names the channel: the recording watchdog saw nothing written for it and restarted its stream. The remaining fields describe the state at that moment, which is what separates a storage problem from a stream problem.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `secs` | Int | How long recording had been failing before the restart, in seconds |
+| `streamFps` | Int | Stream frame rate at that moment. `0` points at the camera or network rather than the storage |
+| `storage` | Int | ID of the recording storage in use |
+| `freeMB` | Int | Free space on it, in MB. `-1` if it could not be read |
+| `anchorAge` | Int | Seconds since the last successful free-space reading. A large value means the volume stopped answering; `-1` if it was never read |
+| `queuePct` | Int | Write queue occupancy, in percent. A low value with recording still failing rules out back-pressure. `-1` if unavailable |
+
+```json
+{
+  "secs": 30,
+  "streamFps": 15,
+  "storage": 2,
+  "freeMB": 10240,
+  "anchorAge": -1,
+  "queuePct": 0
+}
+```
 
 ### 9.4. Event Trigger (Event Backup)
 
@@ -1688,6 +1808,8 @@ Retrieves live stream and recording playback URLs.
 | `GET /api/v1/vod?ch=1,2,3` | Multiple channel streams |
 | `GET /api/v1/vod?protocol=rtmp` | RTMP streams only |
 | `GET /api/v1/vod?protocol=flv` | HTTP-FLV streams only |
+| `GET /api/v1/vod?protocol=websocket-flv` | WebSocket-FLV streams only |
+| `GET /api/v1/vod?protocol=rtsp` | RTSP streams only |
 | `GET /api/v1/vod?stream=sub` | Substream (low resolution) |
 | `GET /api/v1/vod?stream=main` | Main stream (high resolution) |
 
@@ -1720,8 +1842,24 @@ Retrieves recording playback URLs.
       {
         "protocol": "flv",
         "profile": "main",
-        "src": "https://host/live?port=1935&app=live&stream=ch1main",
+        "src": "https://host/live?app=live&stream=ch1main",
         "type": "video/x-flv",
+        "label": "1080p",
+        "size": [1920, 1080]
+      },
+      {
+        "protocol": "websocket-flv",
+        "profile": "main",
+        "src": "wss://host/live?app=live&stream=ch1main",
+        "type": "video/x-flv",
+        "label": "1080p",
+        "size": [1920, 1080]
+      },
+      {
+        "protocol": "rtsp",
+        "profile": "main",
+        "src": "rtsp://host/live/ch1main",
+        "type": "application/x-rtsp",
         "label": "1080p",
         "size": [1920, 1080]
       },
@@ -1736,8 +1874,24 @@ Retrieves recording playback URLs.
       {
         "protocol": "flv",
         "profile": "sub",
-        "src": "https://host/live?port=1935&app=live&stream=ch1sub",
+        "src": "https://host/live?app=live&stream=ch1sub",
         "type": "video/x-flv",
+        "label": "VGA",
+        "size": [640, 480]
+      },
+      {
+        "protocol": "websocket-flv",
+        "profile": "sub",
+        "src": "wss://host/live?app=live&stream=ch1sub",
+        "type": "video/x-flv",
+        "label": "VGA",
+        "size": [640, 480]
+      },
+      {
+        "protocol": "rtsp",
+        "profile": "sub",
+        "src": "rtsp://host/live/ch1sub",
+        "type": "application/x-rtsp",
         "label": "VGA",
         "size": [640, 480]
       }
@@ -1774,7 +1928,17 @@ Retrieves recording playback URLs.
 | Protocol | Description | Condition |
 |----------|-------------|-----------|
 | `rtmp` | RTMP stream | Always |
-| `flv` | HTTP-FLV stream | HTTP-FLV enabled |
+| `flv` | HTTP-FLV stream (`http`/`https`) | HTTP-FLV enabled |
+| `websocket-flv` | WebSocket-FLV stream (`ws`/`wss`) | HTTP-FLV enabled |
+| `rtsp` | RTSP re-stream (`rtsp`), TCP only | RTSP re-streaming enabled |
+
+> **`flv` vs `websocket-flv`**: same stream, same endpoint — only the transport framing differs. `flv` uses HTTP chunked transfer, `websocket-flv` upgrades the connection and sends each FLV tag as one WebSocket binary frame. The scheme follows the request scheme (`http`→`ws`, `https`→`wss`). Both work with players such as flv.js / mpegts.js.
+
+> **Prefer `websocket-flv` when watching several channels at once.** A live stream keeps its connection open while it plays, so the number of simultaneous connections equals the number of channels on screen. Browsers cap **HTTP/1.1 connections per origin at about 6**, and HTTP-FLV cannot escape that cap — this endpoint refuses HTTP/2 and HTTP/3, so every `flv` stream consumes one of those 6 slots. Past that point additional channels simply wait, and other requests to the same origin (REST calls, thumbnails) queue behind them. WebSocket connections are not taken from that pool and are allowed in far greater numbers, so `websocket-flv` has no practical concurrency limit for a video wall. For a single channel either choice is fine.
+
+> **`rtsp`**: the same RTMP publish, re-sent by the server as RTP. **TCP interleaved only** — a UDP `SETUP` is answered with `461 Unsupported Transport`, so clients that default to UDP must be told to use TCP (`vlc --rtsp-tcp`, `ffplay -rtsp_transport tcp`). Basic authentication is required and cannot be turned off: put the credentials in the URL (`rtsp://user:pass@host/live/ch1main`) and percent-encode reserved characters (`@` becomes `%40`). Video is **H.264 only**. Browsers cannot play RTSP — use it for external players, VMS integrations and FFmpeg-based pipelines, not for a web page.
+
+> **Embedding video in a web page?** You usually need none of these URLs — the server ships a ready-made player at [`GET /watch`](#133-watch-page-embeddable-player). Put it in an `<iframe>` and it handles the protocol choice, authentication (`token` / `apikey`) and recorded playback for you. Build your own player on `flv` / `websocket-flv` only when you need control the Watch Page does not offer.
 
 > **Note**: The `X-Host` header is required. Set automatically on standard web browser requests. When calling directly, include the `X-Host: {host}:{port}` header.
 

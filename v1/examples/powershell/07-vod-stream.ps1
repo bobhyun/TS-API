@@ -10,7 +10,7 @@
         - Note: 'src' is an array of objects with 'protocol' and 'src' fields
 
     GET /api/v1/vod?protocol=rtmp
-        - Filter by protocol (rtmp, flv)
+        - Filter by protocol (rtmp, flv, websocket-flv, rtsp)
 
     GET /api/v1/vod?stream=sub
         - Filter by stream type (main, sub)
@@ -38,8 +38,13 @@ if ($vods) {
         Write-Host "  chid=$($v.chid)  title=$($v.title)"
         $rtmpUrl = ($v.src | Where-Object { $_.protocol -eq 'rtmp' } | Select-Object -First 1).src
         $flvUrl  = ($v.src | Where-Object { $_.protocol -eq 'flv' }  | Select-Object -First 1).src
+        $wsFlvUrl = ($v.src | Where-Object { $_.protocol -eq 'websocket-flv' } | Select-Object -First 1).src
+        # rtsp appears only on servers built with RTSP re-streaming. TCP transport only.
+        $rtspUrl = ($v.src | Where-Object { $_.protocol -eq 'rtsp' } | Select-Object -First 1).src
         if ($rtmpUrl) { Write-Host "    RTMP: $rtmpUrl" }
         if ($flvUrl)  { Write-Host "    FLV:  $flvUrl" }
+        if ($wsFlvUrl) { Write-Host "    WS-FLV: $wsFlvUrl" }
+        if ($rtspUrl) { Write-Host "    RTSP: $rtspUrl   (TCP only)" }
     }
 }
 

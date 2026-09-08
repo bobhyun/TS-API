@@ -14,6 +14,8 @@
  *   src: [
  *     { protocol: "rtmp", profile: "main", src: "rtmp://...", type: "...", label: "1080p", size: [1920, 1080] },
  *     { protocol: "flv", profile: "main", src: "http://.../.flv", type: "...", label: "1080p", size: [1920, 1080] }
+ *     { protocol: "websocket-flv", profile: "main", src: "ws://.../.flv", type: "...", label: "1080p", size: [1920, 1080] }
+ *     { protocol: "rtsp", profile: "main", src: "rtsp://.../live/ch1main", type: "...", label: "1080p", size: [1920, 1080] }
  *   ]
  */
 
@@ -46,8 +48,15 @@ async function main() {
       console.log(`  CH${ch.chid}: ${ch.title}`);
       const rtmp = findStream(ch.src, 'rtmp');
       const flv = findStream(ch.src, 'flv');
+      const wsFlv = findStream(ch.src, 'websocket-flv');
+      // rtsp is present only on servers built with RTSP re-streaming.
+      // Not playable in a browser — hand it to VLC/ffplay, and force TCP
+      // (the server rejects UDP with 461 Unsupported Transport).
+      const rtsp = findStream(ch.src, 'rtsp');
       if (rtmp) console.log(`    RTMP: ${rtmp}`);
       if (flv) console.log(`    FLV:  ${flv}`);
+      if (wsFlv) console.log(`    WS-FLV: ${wsFlv}`);
+      if (rtsp) console.log(`    RTSP: ${rtsp}   (TCP only: ffplay -rtsp_transport tcp)`);
     }
     console.log(`  Total: ${liveRes.body.length} streams\n`);
   }
@@ -66,6 +75,8 @@ async function main() {
   // 3. Filter by Protocol
   //    protocol=rtmp - RTMP only
   //    protocol=flv  - FLV only (HTTP-FLV)
+  //    protocol=websocket-flv - WebSocket-FLV only (same stream, WS transport)
+  //    protocol=rtsp - RTSP re-stream only (TCP transport only, H.264 only)
   // ─────────────────────────────────────────────────
   console.log('\n=== RTMP Only ===');
   const rtmpRes = await get('/api/v1/vod?ch=1&protocol=rtmp');

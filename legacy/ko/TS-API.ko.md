@@ -1254,6 +1254,14 @@ GET /api/enum?what=channel
 ```
 
 #### 스트림 목록 추가하기 `@0.9.4`
+
+> **서버 1.1.0+**: 목록에 `websocket-flv` 항목(`ws://`/`wss://`)이 함께 나올 수 있습니다 —
+> `flv` 와 같은 스트림을 HTTP chunked 전송 대신 WebSocket 연결로 받는 것입니다. RTSP
+> 재송출이 포함된 서버에서는 `rtsp` 항목(`rtsp://host/live/ch<N>{main|sub}`)도 함께
+> 나옵니다. RTSP 는 **TCP interleaved 전용**이고(UDP `SETUP` 은 `461 Unsupported
+> Transport`), **H.264 전용**이며, URL 에 Basic 인증 자격증명이 필요합니다. 목록은
+> 열린 집합으로 보고, 처리하지 않는 프로토콜은 무시하십시오.
+
 스트림 목록을 함께 얻으려면 `staticSrc` 매개변수를 추가합니니다.
 이 스트림들은 카메라 접속 상태에 따라 가용하지 않을 수도 있습니다.
 ```ruby
@@ -1281,7 +1289,7 @@ GET /api/enum?what=channel&staticSrc
       {
         "protocol": "flv",
         "profile": "main",
-        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1main",
+        "src": "http://192.168.0.100/live?app=live&stream=ch1main",
         "type": "application/x-mpegurl",
         "label": "1080p",
         "size": [
@@ -1314,7 +1322,7 @@ GET /api/enum?what=channel&staticSrc
       {
         "protocol": "flv",
         "profile": "main",
-        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1sub",
+        "src": "http://192.168.0.100/live?app=live&stream=ch1sub",
         "type": "application/x-mpegurl",
         "label": "360p",
         "size": [
@@ -2431,7 +2439,7 @@ GET /api/vod
       { // 1080p HTTP-FLV 스트림
         "protocol": "flv",
         "profile": "main",
-        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1main", // 동영상 주소
+        "src": "http://192.168.0.100/live?app=live&stream=ch1main", // 동영상 주소
         "type": "video/x-flv",  // MIME 형식: FLV (HTTP 프로토콜)
         "label": "1080p",       // 해상도 이름
         "size": [               // 해상도
@@ -2464,7 +2472,7 @@ GET /api/vod
       { // VGA HTTP-FLV 스트림
         "protocol": "flv",
         "profile": "sub",
-        "src": "http://192.168.0.100/live?port=1935&app=live&stream=ch1sub", // 동영상 주소
+        "src": "http://192.168.0.100/live?app=live&stream=ch1sub", // 동영상 주소
         "type": "video/x-flv",  // MIME 형식: FLV
         "label": "VGA",   // 해상도 이름
         "size": [               // 해상도

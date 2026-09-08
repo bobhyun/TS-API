@@ -50,8 +50,13 @@ namespace TsApiExamples.V1
 
             // ── Usage examples ──
             Console.WriteLine("\n=== How to Use Streams ===");
-            Console.WriteLine("  RTMP: Play in web browser (flv.js) or VLC");
-            Console.WriteLine("  FLV: Play in VLC, ffplay, or other media players");
+            Console.WriteLine("  In a web page: you usually do not need these URLs -");
+            Console.WriteLine("        the server ships a player at GET /watch");
+            Console.WriteLine("        <iframe src=\"http://<host>/watch?ch=1&apikey=...\">");
+            Console.WriteLine("  RTMP / FLV: VLC, ffplay, or any media player");
+            Console.WriteLine("  WS-FLV: browser players (flv.js / mpegts.js) when you build your own");
+            Console.WriteLine("  RTSP: VLC or ffplay - TCP transport only");
+            Console.WriteLine("        vlc --rtsp-tcp <url> / ffplay -rtsp_transport tcp <url>");
         }
     }
 }

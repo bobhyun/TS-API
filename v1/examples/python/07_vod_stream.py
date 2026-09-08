@@ -8,7 +8,7 @@ Endpoints:
       - Note: 'src' is an array of objects with 'protocol' and 'src' fields
 
   GET /api/v1/vod?protocol=rtmp
-      - Filter by protocol (rtmp, flv)
+      - Filter by protocol (rtmp, flv, websocket-flv, rtsp)
 
   GET /api/v1/vod?stream=sub
       - Filter by stream type (main, sub)
@@ -43,10 +43,18 @@ def main():
             src = v.get('src', [])
             rtmp_url = next((s['src'] for s in src if s.get('protocol') == 'rtmp'), None)
             flv_url = next((s['src'] for s in src if s.get('protocol') == 'flv'), None)
+            ws_flv_url = next((s['src'] for s in src if s.get('protocol') == 'websocket-flv'), None)
+            # rtsp appears only on servers built with RTSP re-streaming.
+            # TCP transport only: ffplay -rtsp_transport tcp / vlc --rtsp-tcp
+            rtsp_url = next((s['src'] for s in src if s.get('protocol') == 'rtsp'), None)
             if rtmp_url:
                 print(f"    RTMP: {rtmp_url}")
             if flv_url:
                 print(f"    FLV:  {flv_url}")
+            if ws_flv_url:
+                print(f"    WS-FLV: {ws_flv_url}")
+            if rtsp_url:
+                print(f"    RTSP: {rtsp_url}   (TCP only)")
     else:
         print(f"  Status: {r.status_code}")
 
