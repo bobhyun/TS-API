@@ -63,7 +63,10 @@ namespace TsApiExamples.V1
             }
 
             using var ldoc = await NvrClient.ReadJsonAsync(lr);
-            foreach (var evt in ldoc.RootElement.EnumerateArray())
+            // 로그는 목록 봉투다: { totalCount, at, data: [...] }. 루트는 배열이 아니다.
+            var levents = ldoc.RootElement.TryGetProperty("data", out var ldata)
+                ? ldata : ldoc.RootElement;
+            foreach (var evt in levents.EnumerateArray())
             {
                 Console.WriteLine($"  {evt}");
             }
@@ -83,9 +86,11 @@ namespace TsApiExamples.V1
             }
 
             using var ddoc = await NvrClient.ReadJsonAsync(dr);
-            var cnt = ddoc.RootElement.GetArrayLength();
-            Console.WriteLine($"  Event count: {cnt}");
-            foreach (var evt in ddoc.RootElement.EnumerateArray())
+            // 위와 같은 목록 봉투다: { totalCount, at, data: [...] }.
+            var devents = ddoc.RootElement.TryGetProperty("data", out var ddata)
+                ? ddata : ddoc.RootElement;
+            Console.WriteLine($"  Event count: {devents.GetArrayLength()}");
+            foreach (var evt in devents.EnumerateArray())
             {
                 Console.WriteLine($"  {evt}");
             }

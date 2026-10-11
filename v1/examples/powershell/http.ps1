@@ -111,7 +111,9 @@ function Invoke-NvrGetRaw([string]$Path, [hashtable]$Headers = @{}) {
     $h = Get-NvrHeaders
     foreach ($k in $Headers.Keys) { $h[$k] = $Headers[$k] }
     try {
-        Invoke-WebRequest -Uri "${BASE_URL}${Path}" -Method Get -Headers $h @SkipCertFlag
+        # -UseBasicParsing 필수. 빠뜨리면 Windows PowerShell 5.1 이 IE 파싱 엔진을 타고,
+        # 본문을 읽다 멈추거나 NullReferenceException 을 낸다. 여기는 원본 바이트만 쓴다.
+        Invoke-WebRequest -UseBasicParsing -Uri "${BASE_URL}${Path}" -Method Get -Headers $h @SkipCertFlag
     } catch {
         return $_.Exception.Response
     }

@@ -1,3 +1,5 @@
 *.exe
 *.exp
 *.lib
+out/
+.build/

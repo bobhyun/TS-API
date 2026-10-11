@@ -60,7 +60,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	fmt.Println("  Connected! Waiting for spot events...\n")
+	fmt.Print("  Connected! Waiting for spot events...\n\n")
 
 	msgCount := 0
 	go func() {

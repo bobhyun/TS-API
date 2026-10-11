@@ -50,7 +50,7 @@ echo "=== Recent Events (latest 10) ==="
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Events from Today ==="
-TODAY=$(date -u +%Y-%m-%d)
+TODAY=$(date +%Y-%m-%d)
 "${CURL[@]}" "${AUTH[@]}" \
   "${BASE}/api/v1/event/log?timeBegin=${TODAY}T00:00:00&timeEnd=${TODAY}T23:59:59&maxCount=5" | jqf
 

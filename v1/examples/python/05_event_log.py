@@ -45,8 +45,8 @@ def main():
     # --- Event Log (last 24 hours, paginated) ---
     print("\n=== Event Log (last 24h) ===")
     now = datetime.now()
-    time_end = now.strftime('%Y-%m-%d %H:%M:%S')
-    time_begin = (now - timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S')
+    time_end = now.strftime('%Y-%m-%dT%H:%M:%S')
+    time_begin = (now - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%S')
 
     at = 0
     max_count = 20  # Page size

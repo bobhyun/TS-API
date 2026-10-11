@@ -7,6 +7,8 @@
 ## 목차
 
 1. [개요](#1-개요)
+   - [1.1. 시각 표기](#11-시각-표기)
+   - [1.2. 박스 좌표 표기](#12-박스-좌표-표기)
 2. [API 호출 흐름](#2-api-호출-흐름)
    - [2.1. 기본 흐름 (JWT 인증)](#21-기본-흐름-jwt-인증)
    - [2.2. 녹화 검색 및 재생 흐름](#22-녹화-검색-및-재생-흐름)
@@ -68,6 +70,10 @@
     - [16.2. 주차장 상태](#162-주차장-상태)
     - [16.3. 주차면 목록](#163-주차면-목록)
     - [16.4. 주차면 상태](#164-주차면-상태)
+    - [16.5. 주차 내역 조회](#165-주차-내역-조회)
+    - [16.6. 주차 내역 상세](#166-주차-내역-상세)
+    - [16.7. 정산 상태 변경](#167-정산-상태-변경)
+    - [16.8. 미출차 정리](#168-미출차-정리)
 17. [실시간 이벤트 구독 (WebSocket API)](#17-실시간-이벤트-구독-websocket-api)
     - [17.1. 연결 흐름](#171-websocket-연결-흐름)
     - [17.2. 엔드포인트](#172-엔드포인트)
@@ -102,6 +108,67 @@ TS-API v1은 RESTful 경로 기반의 API입니다.
 **Content-Type**: `application/json`
 
 > **참고**: API 전체에서 채널 번호(`ch`, `chid`)는 1부터 시작합니다 (1-based).
+
+### 1.1. 시각 표기
+
+**요청의 표기가 응답의 표기를 정합니다.**
+
+| 요청에 준 시각 | 해석 | 그 요청의 응답 표기 |
+|---------------|------|-------------------|
+| `2026-10-07T09:30:00Z` | UTC | `...Z` (UTC) |
+| `2026-10-07T09:30:00+09:00` | 그 오프셋 | `...+09:00` (서버 로컬) |
+| `2026-10-07T09:30:00` (오프셋 없음) | **서버의 로컬 타임존** | `...+09:00` (서버 로컬) |
+| `today` · `yesterday` | 서버 로컬 자정 | `...+09:00` (서버 로컬) |
+| (시각 파라미터 없음) | — | `...+09:00` (서버 로컬) |
+
+**응답에는 오프셋(또는 `Z`)이 항상 붙습니다.** 생략되는 경우가 없으므로, 오프셋 없이
+보냈더라도 서버가 **무엇으로 해석했는지 응답에서 바로 확인**할 수 있습니다 — 보낸 숫자는
+그대로 돌아오고 그 뒤에 서버가 가정한 오프셋이 붙습니다. 호출하는 쪽과 서버의 타임존이
+다르면 그 오프셋이 다르게 보이므로 그것으로 알 수 있습니다.
+
+오프셋을 함께 보내는 편이 분명합니다. 다만 보내지 않아도 응답이 해석 결과를 알려 주므로
+타임존을 다루지 않는 클라이언트도 그대로 쓸 수 있습니다.
+
+서버 내부 저장은 UTC(마이크로초)입니다. 응답은 밀리초까지 냅니다.
+
+**정산 앱이 보내는 시각**([16.7](#167-정산-상태-변경)·[16.8](#168-미출차-정리)의 `time`)은
+그 앱의 시계 값으로 **별도 보존**되고, NVR 의 기록 시각은 **항상 서버 시계**입니다.
+두 시스템의 시간 동기가 깨져 있어도 주차 시간·영상 위치가 흔들리지 않게 하기 위한 분리입니다.
+
+### 1.2. 박스 좌표 표기
+
+박스(바운딩 박스)는 **YOLO 좌표계**로 냅니다 — 중심 기준, 네 값 모두 `0~1` 정규화입니다.
+
+```json
+{ "cx": 0.394, "cy": 0.556, "w": 0.164, "h": 0.201 }
+```
+
+| 값 | 뜻 |
+|----|----|
+| `cx` · `cy` | 박스 **중심**의 가로·세로 위치 (0 = 왼쪽/위, 1 = 오른쪽/아래) |
+| `w` · `h` | 박스의 가로·세로 **크기** |
+
+그릴 때는 대상 이미지·영상의 크기에 곱하면 됩니다. 내부 좌표 공간을 알 필요가 없습니다.
+
+```
+left = (cx - w/2) * 화면폭      top = (cy - h/2) * 화면높이
+```
+
+| 규칙 | 내용 |
+|------|------|
+| 범위 | `cx ± w/2` 와 `cy ± h/2` 가 `0~1` 을 **넘지 않습니다** — 서버가 잘라서 보냅니다 |
+| 없을 때 | `null` 입니다. 키를 빼지 않습니다 — "박스가 없다" 와 "이 버전은 박스를 주지 않는다" 를 구분할 수 있어야 합니다 |
+| 기준 | 그 박스가 실린 **이미지/영상** 전체입니다. 크롭 이미지에 실린 박스는 그 크롭 기준입니다 |
+
+> **주차 내역의 박스는 세션을 열 때의 관측 한 장입니다.** 그 순간에만 맞으므로
+> **스틸컷에만 얹고, 영상 재생을 시작하면 지우십시오** — 추적하지 않습니다. 출입구 세션은
+> 차량 박스를 남기지 않아(번호 인식 한 건입니다) `null` 입니다.
+
+**예외 — [16.4](#164-주차면-상태) 의 `vehicle.plate`.** 이 필드는 **절대 픽셀**
+(`left`, `top`, `right`, `bottom`)을 유지합니다. 이미 배포돼 협력사 응용이 그 값을 읽고
+있어, 형태를 바꾸면 그쪽이 조용히 깨집니다. 같은 응답의 `imageSize` 로 나눠 쓰십시오.
+**새로 추가되는 박스 필드는 YOLO 를 씁니다.**
+
 
 ---
 
@@ -311,7 +378,10 @@ Content-Type: application/json
   "refreshToken": "eyJhbGc...",
   "expiresIn": 3600,
   "tokenType": "Bearer",
-  "user": {"username": "admin", "role": "admin"}
+  "user": {
+    "username": "admin",
+    "role": "admin"
+  }
 }
 ```
 
@@ -502,8 +572,14 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 {
   "apiVersion": "TS-API@1.1.0",
   "siteName": "Main Office",
-  "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
-  "product": {"name": "TS-NVR", "version": "2.14.1"},
+  "timezone": {
+    "name": "Asia/Seoul",
+    "bias": "+09:00"
+  },
+  "product": {
+    "name": "TS-NVR",
+    "version": "2.14.1"
+  },
   "license": {
     "type": "genuine",
     "maxChannels": 64,
@@ -576,6 +652,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `vehicleTracking` | 차량 추적 |
 | `parkingGuide` | 주차 안내 |
 | `parkingSpot` | 주차면 점유 인식 |
+| `parkingHistory` | 주차 내역 — [16.5~16.8](#165-주차-내역-조회) 엔드포인트는 이 토큰이 있을 때만 응답합니다 |
 
 ---
 
@@ -690,15 +767,20 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 |----------|------|------|------|
 | `disk` | Int | N | 디스크 번호 (생략 시 전체) |
 
-**응답**: 배열 형태로 각 디스크의 S.M.A.R.T 정보를 반환합니다.
+**응답**: 고정 디스크마다 항목 하나씩을 배열로 반환합니다.
+
+배열이 비어 있으면 고정 디스크를 찾지 못한 것입니다. 아직 속성을 읽지 않은 디스크도
+목록에는 나오며 `code` 가 `-1` 입니다. S.M.A.R.T 는 백그라운드에서 읽어 한 시간 동안
+캐시하므로, 기동 직후 짧은 동안은 `-1` 로 보일 수 있습니다.
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `[].name` | String | 디스크 이름 (예: `"PhysicalDrive0"`) |
 | `[].model` | String | 디스크 모델명 |
-| `[].code` | Int | S.M.A.R.T 지원 상태 코드 (0: 미검사, 1: 미지원, 2: 지원) |
-| `[].message` | String | 상태 메시지 (`"Not tested yet"`, `"Not supported"`, `"Supported"`) |
-| `[].smart` | Array | S.M.A.R.T 속성 목록 (지원 시에만 포함) |
+| `[].code` | Int | S.M.A.R.T 상태 (아래 표 참고) |
+| `[].message` | String | `code` 에 해당하는 상태 메시지. 요청한 언어로 반환됩니다 |
+| `[].protocol` | String | 속성을 읽은 방식: `"ATA"` 또는 `"NVMe"`. 둘은 속성 ID 체계가 다릅니다 |
+| `[].smart` | Array | S.M.A.R.T 속성 목록 (속성을 읽은 경우에만 포함) |
 | `[].smart[].id` | Int | 속성 ID |
 | `[].smart[].attribute` | String | 속성 이름 |
 | `[].smart[].critical` | Boolean | 치명적 속성 여부 |
@@ -707,6 +789,17 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `[].smart[].threshold` | Int | 임계 값 |
 | `[].smart[].raw` | Int | Raw 값 |
 | `[].smart[].rawHex` | String | Raw 값 (16진수 문자열) |
+
+`[].code` 값:
+
+| 코드 | 의미 |
+|------|------|
+| `-1` | 아직 조회하지 않음 |
+| `0` | 드라이브가 S.M.A.R.T 를 지원하지 않음 |
+| `1` | 지원 - 속성은 `[].smart` 에 들어 있습니다 |
+| `2` | 드라이브를 열 수 없음. 관리자 권한이 필요합니다 |
+| `3` | 스토리지 컨트롤러가 S.M.A.R.T 를 통과시키지 않음 (RAID 컨트롤러 뒤의 디스크) |
+| `4` | 드라이브는 지원하지만 속성 읽기에 실패 |
 
 ### 5.4. 시스템 제어
 
@@ -749,7 +842,10 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
     "chid": 1,
     "displayName": "CH1. Front Door",
     "title": "Front Door",
-    "caps": {"pantilt": true, "zoom": true}
+    "caps": {
+      "pantilt": true,
+      "zoom": true
+    }
   },
   {
     "chid": 2,
@@ -816,12 +912,18 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 [
   {
     "chid": 1,
-    "status": {"code": 0, "message": "Connected"},
+    "status": {
+      "code": 0,
+      "message": "Connected"
+    },
     "recording": true
   },
   {
     "chid": 2,
-    "status": {"code": -1, "message": "Disconnected"},
+    "status": {
+      "code": -1,
+      "message": "Disconnected"
+    },
     "recording": false
   }
 ]
@@ -1086,7 +1188,11 @@ curl "http://localhost/api/v1/channel/1/preset/preset1/go"
   "timeBegin": "2024-01-01T00:00:00",
   "timeEnd": "2024-01-31T23:59:59",
   "data": [
-    {"year": 2024, "month": 1, "days": [1, 2, 3, 5, 8, 10]}
+    {
+      "year": 2024,
+      "month": 1,
+      "days": [1, 2, 3, 5, 8, 10]
+    }
   ]
 }
 ```
@@ -1124,7 +1230,10 @@ curl "http://localhost/api/v1/channel/1/preset/preset1/go"
   "timeBegin": "2024-01-01T00:00:00",
   "timeEnd": "2024-01-01T23:59:59",
   "data": [
-    {"chid": 1, "minutes": "111111110000..."}
+    {
+      "chid": 1,
+      "minutes": "111111110000..."
+    }
   ]
 }
 ```
@@ -1187,16 +1296,28 @@ curl "http://localhost/api/v1/channel/1/preset/preset1/go"
     "id": 0,
     "name": "시스템 로그",
     "code": [
-      {"id": 1, "name": "시스템 시작"},
-      {"id": 2, "name": "시스템 종료"}
+      {
+        "id": 1,
+        "name": "시스템 시작"
+      },
+      {
+        "id": 2,
+        "name": "시스템 종료"
+      }
     ]
   },
   {
     "id": 1,
     "name": "카메라",
     "code": [
-      {"id": 100, "name": "연결됨"},
-      {"id": 101, "name": "연결 끊김"}
+      {
+        "id": 100,
+        "name": "연결됨"
+      },
+      {
+        "id": 101,
+        "name": "연결 끊김"
+      }
     ]
   }
 ]
@@ -1552,12 +1673,14 @@ LPR 소스(인식 지점/영역) 목록을 조회합니다.
 | `GET /api/v1/lpr/log?at=0&maxCount=50` | 페이지네이션 |
 | `GET /api/v1/lpr/log?sort=asc` | 오래된 순 정렬 |
 | `GET /api/v1/lpr/log?export=true` | CSV 내보내기 형식 |
+| `GET /api/v1/lpr/log?unrecognized=true` | 번호를 읽지 못한 건만 |
 
 **파라미터**:
 
 | 파라미터 | 타입 | 필수 | 기본값 | 설명 |
 |---------|------|------|--------|------|
 | `keyword` | String | N | - | 번호판 검색어 (부분 일치) |
+| `unrecognized` | Boolean | N | false | 번호를 **읽지 못한** 건만. 키워드로는 찾을 수 없어 별도 조건입니다 |
 | `timeBegin` | DateTime | Y | - | 검색 시작 시간 (ISO 8601) |
 | `timeEnd` | DateTime | Y | - | 검색 종료 시간 (ISO 8601) |
 | `src` | String | N | - | LPR 소스 필터 (쉼표 구분) |
@@ -1565,6 +1688,10 @@ LPR 소스(인식 지점/영역) 목록을 조회합니다.
 | `maxCount` | Int | N | 50 | 최대 결과 수 |
 | `sort` | String | N | `"desc"` | 정렬 순서 (`"asc"` 또는 `"desc"`) |
 | `export` | Boolean | N | false | true 시 CSV 내보내기 형식으로 반환 |
+
+> **번호를 읽지 못한 건.** `plateNo` 가 `null` 입니다. 예전에는 자리표시 문자열(`xxxx`)이
+> 들어가 번호처럼 보였는데, 지금은 "번호 없음" 과 같은 표현(`null`)으로 통일했습니다.
+> 그래서 키워드로는 찾을 수 없고 `unrecognized=true` 를 쓰십시오.
 
 > **참고**: `timeBegin`과 `timeEnd`는 필수입니다. `export=true` 요청은 큰 데이터셋에서 시간이 오래 걸릴 수 있으므로 적절한 타임아웃을 설정하세요.
 
@@ -1583,7 +1710,12 @@ LPR 소스(인식 지점/영역) 목록을 조회합니다.
       "srcName": "Entrance Gate",
       "direction": "entry",
       "image": ["/lpr/image1.jpg"],
-      "vod": [{"chid": 1, "videoSrc": "/watch?ch=1&when=..."}]
+      "vod": [
+        {
+          "chid": 1,
+          "videoSrc": "/watch?ch=1&when=..."
+        }
+      ]
     }
   ]
 }
@@ -1650,11 +1782,7 @@ LPR 소스(인식 지점/영역) 목록을 조회합니다.
 
 **응답**:
 ```json
-[
-  "face",
-  "human",
-  "vehicle"
-]
+["face", "human", "vehicle"]
 ```
 
 ### 11.2. 객체 속성
@@ -1826,6 +1954,21 @@ ch: 1,2,3
 | `GET /api/v1/vod?ch=1&when=2024-01-08T09:30:00` | 특정 시간 녹화 재생 |
 | `GET /api/v1/vod?id=1304&next` | 다음 녹화 세그먼트 |
 | `GET /api/v1/vod?id=1304&prev` | 이전 녹화 세그먼트 |
+| `GET /api/v1/vod?ch=1&when=...&otherwise=nearBefore` | 그 시각 녹화, 없으면 **가장 가까운 과거** 녹화 |
+
+**`otherwise` — 그 시각에 녹화가 없을 때 무엇을 줄 것인가**
+
+| 값 | 동작 |
+|----|------|
+| (생략) | 그 채널은 아무것도 반환하지 않습니다 |
+| `nearBefore` | 요청 시각보다 **앞선** 가장 가까운 녹화 |
+| `nearAfter` | 요청 시각보다 **뒤인** 가장 가까운 녹화 |
+
+`nearBefore` 는 주차 내역을 위해 있습니다. 주차된 차는 움직이지 않아 움직임 조건 녹화가
+끊겼을 수 있지만, 차는 그 자리에 그대로이므로 직전 영상이 그 순간의 상황을 보여 줍니다.
+주차 내역(16.5 이하)에서 온 요청에만 쓰십시오. 이벤트·차번·객체 검색에는 쓰지 마십시오 —
+그쪽은 그 순간에 일어난 일을 묻는 것이고, 이전 영상을 대신 띄우면 다른 순간을 그 순간이라고
+보여 주는 것이 됩니다.
 
 **응답**:
 ```json
@@ -1915,6 +2058,10 @@ ch: 1,2,3
 | `id` | Int | N | - | VOD 세그먼트 ID (녹화 탐색용) |
 | `next` | Flag | N | - | 다음 녹화 세그먼트 (`id`와 함께 사용) |
 | `prev` | Flag | N | - | 이전 녹화 세그먼트 (`id`와 함께 사용) |
+| `otherwise` | String | N | - | 그 시각에 녹화가 없을 때의 대체 (`nearBefore` / `nearAfter`, 위 표 참조) |
+| `duration` | String | N | `"1m"` | `when` 부터 찾을 구간. 숫자만 쓰면 초, 접미사로 `m`·`h`·`d`·`w` |
+| `limit` | Int | N | `10` | 채널당 최대 세그먼트 수 |
+| `nolive` | Boolean | N | false | 라이브 대체를 끈다 (아래 주의 참조) |
 
 | 응답 필드 | 타입 | 설명 |
 |----------|------|------|
@@ -1927,6 +2074,41 @@ ch: 1,2,3
 | `src[].type` | String | MIME 타입 |
 | `src[].label` | String | 해상도 라벨 (예: `"1080p"`) |
 | `src[].size` | number[] | 해상도 `[width, height]` |
+
+**녹화 재생 응답** (`when` 에 시각을 준 경우)은 모양이 다릅니다. `protocol`·`profile` 은 실시간
+전용이고, 대신 세그먼트를 가리키는 `fileId` 와 그 구간의 `timeRange` 가 실립니다.
+
+```json
+[
+  {
+    "chid": 1,
+    "title": "Front Door",
+    "fileId": 1304,
+    "src": [
+      {
+        "src": "https://host/storage/f/00/13/1304.mp4",
+        "type": "video/mp4",
+        "label": "1080p",
+        "size": [1920, 1080],
+        "timeRange": ["2024-01-08T09:28:11+09:00", "2024-01-08T09:33:04+09:00"]
+      }
+    ]
+  }
+]
+```
+
+| 응답 필드 (녹화) | 타입 | 설명 |
+|----------------|------|------|
+| `fileId` | Int | 세그먼트 ID. `?id=<fileId>&next`/`&prev` 로 앞뒤 세그먼트를 탐색합니다 |
+| `src[].timeRange` | String[] | 그 세그먼트의 `[시작, 끝]` ([1.1](#11-시각-표기)) |
+
+> **라이브 대체.** 조회 결과가 없고 **요청 시각이 지금 이후**이면 그 채널의 실시간 스트림으로
+> 대체해 응답합니다(응답이 위의 실시간 모양이 됩니다). 미래 시각을 넣어도 응답이 비지 않는
+> 이유입니다. 녹화만 받으려면 `nolive=true` 를 주십시오.
+
+> **지워진 파일은 빠집니다.** 보존 기간이 지나 삭제된 세그먼트는 기록이 남아 있어도 응답에
+> 담기지 않습니다. 그래서 `otherwise` 로 찾은 결과가 **빈 배열**일 수 있습니다 — 특히
+> `nearAfter` 는 가장 오래된 쪽을 집어 오므로 그렇게 되기 쉽습니다. 빈 배열은 오류가 아닙니다.
 
 **사용 가능한 프로토콜**:
 | 프로토콜 | 설명 | 조건 |
@@ -2308,8 +2490,408 @@ Content-Type: application/json
 | `vehicle.bike` | Boolean | 이륜차 여부 |
 | `vehicle.since` | DateTime\|null | 주차 시작 시간 |
 | `vehicle.image` | String | (`image=true` 시) 차량 이미지 경로 |
-| `vehicle.plate` | Object | (`image=true` 시) 번호판 좌표 (`left`, `top`, `right`, `bottom`) |
+| `vehicle.plate` | Object | (`image=true` 시) 번호판 좌표 (`left`, `top`, `right`, `bottom`). **절대 픽셀**이며 `vehicle.image` 크롭 기준입니다 — [1.2](#12-박스-좌표-표기) 의 예외입니다 |
 | `vehicle.imageSize` | Object | (`image=true` 시) 이미지 크기 (`width`, `height`) |
+
+### 16.5. 주차 내역 조회
+
+**주차 세션**은 한 대의 차가 한 자리에 머문 한 건입니다. 차가 있다고 확정되면 열리고 사라지면
+닫힙니다. "이 차가 지금 얼마나 서 있나" 를 묻거나 정산 근거를 만들 때 사용합니다.
+
+세션이 생기는 자리는 세 가지입니다(`kind`) — 주차면, 출입구, 주차 금지(체류) 구역.
+
+> 주차 내역 조회 라이선스가 필요합니다. 없으면 16.5~16.8 이 모두 `403` 입니다.
+> 미리 확인하려면 `GET /api/v1/info?license` 를 보십시오 — `license.extension` 에
+> `parkingHistory` 가 있으면 라이선스가 활성입니다([서버 정보](#4-서버-정보) 참조).
+> 조회는 **재생(Playback)** 권한, 이력을 바꾸는 16.7·16.8 은 **제어(Control)** 권한이 필요합니다.
+
+| 엔드포인트 | 설명 |
+|-----------|------|
+| `GET /api/v1/parking/session` | 세션 목록 |
+| `GET /api/v1/parking/session?open=true` | 아직 주차 중인 차량 |
+| `GET /api/v1/parking/session?plateNo=12가3456&open=true` | 이 번호가 주차 중인지, 얼마나 됐는지 |
+| `GET /api/v1/parking/session?timeField=out&timeBegin=...&timeEnd=...` | 그 기간에 출차한 차량 |
+
+**파라미터**:
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|---------|------|------|------|
+| `timeBegin` | DateTime | N | 기간 시작 |
+| `timeEnd` | DateTime | N | 기간 끝 |
+| `timeField` | String | N | 기간을 무엇에 거는지 — `in`(입차), `out`(출차), `overlap`(기간과 겹치면) |
+| `plateNo` | String | N | 번호 정확히 일치 |
+| `keyword` | String | N | 번호 부분 일치 |
+| `scope` | String | N | 조회 대상 — `all`(기본), `spot`, `gate`, `noparking`, `channel`, `lot`. 아래 설명 참고 |
+| `lot` | String | N | 주차장 ID 목록, 콤마 구분 (세션에 기록된 소속으로 찾습니다) |
+| `src` | String | N | 영역 ID 목록, 콤마 구분 (주차면·출입구·체류 구역) |
+| `ch` | String | N | 채널 번호 목록, 콤마 구분 (1부터) |
+| `kind` | String | N | `spot`, `gate`, `dwell` — 콤마 구분, 생략하면 전부 |
+| `outKind` | String | N | 출차 근거, 콤마 구분 (아래 표 참고) |
+| `inKind` | String | N | 입차 근거, 콤마 구분 (아래 표 참고). 열린 세션에도 걸립니다 |
+| `open` | Boolean | N | `true` = 주차 중, `false` = 출차 완료 |
+| `paid` | Boolean | N | `true` = **유효한** 정산 기록이 있는 건 (되돌린 것은 제외) |
+| `exempt` | Boolean | N | `true` = 정산 대상에서 제외된 건만. 제외를 **되돌리려면 먼저 찾아야** 하므로 이 조건이 필요합니다 ([16.7](#167-정산-상태-변경)) |
+| `hasPlate` | Boolean | N | `true` = 번호를 인식한 건 |
+| `durationMin` | Int | N | 최소 주차 시간(초) |
+| `durationMax` | Int | N | 최대 주차 시간(초) |
+| `unpaidDurationMin` | Int | N | 최소 미정산 시간(초) — 마지막 정산 이후 경과 |
+| `at` | Int | N | 페이지 오프셋 (기본 `0`) |
+| `maxCount` | Int | N | 페이지 크기 (서버 상한이 적용됩니다) |
+
+**`scope` — 조회 대상**
+
+`scope` 는 2차 항목을 **무엇의 목록에서** 고르는지 정합니다. 대상마다 항목 파라미터가 다릅니다.
+
+| `scope` | 항목 파라미터 | 항목을 생략하면 |
+|---------|--------------|----------------|
+| `all` (기본) | — | 조건 없음. 각 파라미터가 독립으로 걸립니다(기존 동작) |
+| `spot` | `src` | 주차면 이력 전부 |
+| `gate` | `src` | 출입구 이력 전부 |
+| `noparking` | `src` | 주차 금지 영역 이력 전부 |
+| `channel` | `ch` | 모든 채널 (= 조건 없음) |
+| `lot` | `lot` | **주차장에 속한 세션만** |
+
+항목을 생략하면 '그 대상 전체' 이고, 이는 **조건 없음과 다릅니다**. `scope=lot` 에 `lot` 을
+주지 않으면 주차장에 소속된 세션만 반환합니다 — 주차 금지 영역 이력은 주차장에 속하지 않아
+빠집니다. 같은 이유로 `scope=spot` 은 주차면 이력만 반환합니다.
+
+`scope` 가 `spot`·`gate`·`noparking` 이면 세션 종류가 함께 정해지므로 `kind` 를 덮습니다.
+`scope` 를 보내지 않으면 지금까지와 똑같이 동작합니다.
+
+| `sort` | String | N | `desc`(기본) 또는 `asc` |
+| `sortBy` | String | N | `time`(입차 시각, 기본) 또는 `duration` |
+| `includePayments` | Boolean | N | 각 세션에 `payments` 배열을 포함합니다 |
+
+**응답**:
+```json
+{
+  "totalCount": 128,
+  "at": 0,
+  "asOf": "2026-10-07T09:30:00",
+  "summary": {
+    "count": 128,
+    "totalDurationMs": 442800000,
+    "firstTimeIn": "2026-10-07T07:05:11",
+    "lastTimeOut": "2026-10-07T09:22:40"
+  },
+  "data": [
+    {
+      "id": 4821,
+      "kind": "spot",
+      "src": {
+        "id": 101,
+        "name": "A-13"
+      },
+      "lots": [1],
+      "usageFlags": 1,
+      "chid": 3,
+      "plateNo": "12가3456",
+      "plateTime": "2026-10-07T08:01:12",
+      "score": 95.0,
+      "timeRange": ["2026-10-07T08:01:04", "2026-10-07T09:22:40"],
+      "open": false,
+      "outKind": "observed",
+      "outTimeMeans": "exitedAt",
+      "inKind": "observed",
+      "inTimeMeans": "enteredAt",
+      "durationMs": 4896000,
+      "box": { "cx": 0.394, "cy": 0.556, "w": 0.164, "h": 0.201 },
+      "paidCount": 1,
+      "lastPaidTime": "2026-10-07T09:20:03",
+      "unpaidDurationMs": 157000,
+      "snapshots": [
+        {
+          "time": "2026-10-07T08:01:04",
+          "chid": 3,
+          "tags": ["in", "bestshot", "plate"],
+          "plateNo": "12가3456",
+          "image": "https://nvr.example.com/storage/f/parking/20261007/4821-in.jpg",
+          "video": "https://nvr.example.com/api/v1/vod?ch=3&when=2026-10-07T08%3A01%3A04&otherwise=nearBefore"
+        },
+        {
+          "time": "2026-10-07T08:04:22",
+          "chid": 3,
+          "tags": ["bestshot"],
+          "plateNo": null,
+          "image": "https://nvr.example.com/storage/f/lpr/20261007/99213.jpg",
+          "video": "https://nvr.example.com/api/v1/vod?ch=3&when=2026-10-07T08%3A04%3A22&otherwise=nearBefore"
+        },
+        {
+          "time": "2026-10-07T09:22:40",
+          "chid": 3,
+          "tags": ["out"],
+          "plateNo": null,
+          "image": null,
+          "video": "https://nvr.example.com/api/v1/vod?ch=3&when=2026-10-07T09%3A22%3A40&otherwise=nearBefore"
+        }
+      ]
+    }
+  ]
+}
+```
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `totalCount` | Int | 전체 건수 (시간 조건이 없어 세기를 건너뛰면 `-1`) |
+| `at` | Int | 이 페이지의 오프셋 |
+| `asOf` | DateTime | 응답을 만든 서버 시각. **주차 중인 세션은 이 시각까지로 셉니다** |
+| `summary.count` | Int | 결과 전체의 세션 수 |
+| `summary.totalDurationMs` | Int | 주차 시간 합계(밀리초) |
+| `summary.firstTimeIn` | DateTime\|null | 결과 중 가장 이른 입차 |
+| `summary.lastTimeOut` | DateTime\|null | 결과 중 가장 늦은 출차 |
+| `data[].id` | Int | 세션 ID |
+| `data[].kind` | String | `spot`, `gate`, `dwell` |
+| `data[].src` | Object | 그 자리 — 주차면·출입구·구역의 `id` 와 `name` |
+| `data[].srcOut` | Int | (출입구) 나간 지점의 영역 ID |
+| `data[].lots` | Int[] | **그때** 그 영역이 속했던 주차장입니다. 지금 설정이 아닙니다 |
+| `data[].usageFlags` | Int | 세션에 기록된 영역 용도 플래그 |
+| `data[].chid` | Int | 채널 번호 (1부터) |
+| `data[].plateNo` | String\|null | 번호. 끝내 인식하지 못했으면 `null` |
+| `data[].plateTime` | DateTime\|null | 번호를 읽은 시각 |
+| `data[].score` | Float | 인식 신뢰도 (`plateNo` 와 함께 옵니다) |
+| `data[].timeRange` | DateTime[] | 주차 중이면 `[입차]`, 닫혔으면 `[입차, 출차]` |
+| `data[].open` | Boolean | `true` = 주차 중 |
+| `data[].outKind` | String | 출차 시각을 무엇으로 정했는지 (닫힌 세션만) |
+| `data[].outTimeMeans` | String | 그 시각이 **무엇인지** (닫힌 세션만) |
+| `data[].inKind` | String | 입차 시각을 무엇으로 정했는지 (**열린 세션에도** 옵니다) |
+| `data[].inTimeMeans` | String | 그 시각이 **무엇인지** |
+| `data[].durationMs` | Int | 주차 시간(밀리초). 주차 중이면 `asOf` 까지 |
+| `data[].paidCount` | Int | **유효한** 정산 건수 (되돌린 것은 빠집니다) |
+| `data[].lastPaidTime` | DateTime\|null | 마지막 정산 시각 |
+| `data[].unpaidDurationMs` | Int | 정산으로 덮이지 않은 시간. **`exempt` 가 `true` 면 청구 근거로 쓰지 마십시오** |
+| `data[].exempt` | Boolean | 정산 대상에서 제외됨 ([16.7](#167-정산-상태-변경)) |
+| `data[].box` | Object\|null | 그 차량의 박스 ([1.2](#12-박스-좌표-표기)). 스냅샷에서 **어느 차인지** 가리는 용도입니다 |
+| `data[].snapshots` | Object[] | 세션의 순간들을 **시각 오름차순**으로 담은 배열(아래) |
+| `data[].payments` | Object[] | (`includePayments=true`) `{ id, time, kind, target?, ref? }`. `kind` 는 `commit`·`exempt`·`undo`, `target` 은 `undo` 가 되돌린 행의 `id` 입니다 |
+
+**스냅샷** — 항목은 `{ time, chid, tags, plateNo, image, video }` 이고 **시각 오름차순**입니다.
+한 장이 여러 뜻을 가질 수 있어(입차 프레임이 곧 번호를 읽어낸 샷인 경우) 뜻은 키가 아니라
+**태그 배열**로 답니다. 같은 뜻이 여러 장일 수도 있습니다 — AI 카메라는 한 대의 차에
+베스트샷을 여러 번 보냅니다.
+
+| 필드 | 내용 |
+|------|------|
+| `time` | 그 순간의 시각. `current` 는 "지금"이라 `null` 입니다 |
+| `chid` | 채널 번호 (1부터) |
+| `tags` | 아래 표의 태그들 |
+| `plateNo` | 그 샷이 읽어낸 번호. **읽지 못했으면 `null`** 입니다 |
+| `image` | 사진 URL. 보존 기간이 지나 정리됐거나 애초에 사진이 없는 순간이면 `null` |
+| `video` | 그 시각의 VOD 링크 ([13.2](#132-재생-url), `otherwise=nearBefore` 포함) |
+
+| 태그 | 뜻 |
+|------|-----|
+| `in` | 입차 |
+| `out` | 출차 |
+| `current` | 주차 중인 세션의 "지금" (사진 없음, 라이브 링크) |
+| `bestshot` | 번호 인식을 **시도한** 샷 |
+| `plate` | 그 샷이 번호를 **읽어냈다** |
+
+> **`bestshot` 과 `plate` 는 다릅니다.** 인식에 실패한 샷도 `bestshot` 으로 남습니다 —
+> `plate` 가 없고 `plateNo` 가 `null` 입니다. 사진은 그대로 있으므로 나중에 사람이 확인할 수
+> 있습니다. 번호가 있는 항목만 쓰려면 `tags` 에 `plate` 가 있는지 보십시오.
+
+> **장수 상한은 세션당 20장**입니다. 넘으면 **번호를 읽어낸 샷을 먼저, 그다음 큰 이미지
+> 순**으로 남깁니다. 사진이 없는 순간(`in`·`out`·`current`)은 영상 링크라 상한과 무관하게
+> 항상 들어갑니다.
+
+**출차 근거** — 측정값은 `observed` 하나뿐입니다. 나머지는 추정이고 오차 방향이 서로 달라서,
+정산 앱은 시각만 읽지 말고 근거에 따라 다르게 다루셔야 합니다.
+
+| `outKind` | `outTimeMeans` | 그 시각이 무엇인가 |
+|-----------|----------------|-------------------|
+| `observed` | `exitedAt` | 출차를 관측했습니다. 유일한 측정값입니다 |
+| `paid` | `paidAt` | 마지막 정산 시각입니다. 보통 정산 직후 나가므로 영상 근거보다 가깝고 영수증과도 맞습니다 |
+| `covered` | `discoveredAt` | 가려져 있다가 **사라진 것을 발견한** 시점입니다. 실제로는 그 전에 나갔습니다 |
+| `lastSeen` | `lastSeenAt` | **관측이 끊겼습니다**(카메라 접속 종료·프로그램 종료). 그 채널을 마지막으로 판정한 때이므로 **하한**입니다. 원인은 기록하지 않으므로 이름도 사실만 가리킵니다 |
+| `manual` | `closedByOperator` | 운영자가 닫았습니다(야간 개방·장시간 가림). 출차 시각이 아니라 운영 조치 시각입니다 |
+| `unknown` | `unknown` | 이 규칙 이전 데이터입니다. 소급 근사만 있습니다 |
+
+**입차 근거** — 출차와 대칭이고 **오차 방향이 반대**입니다. `lastSeenAt` 은 실제 출차의
+하한인데 `firstSeenAt` 은 실제 입차의 **상한**입니다(그 이전부터 서 있었습니다). 둘 다 머문
+시간을 적게 잡는 쪽으로 틀립니다.
+
+출차 근거와 달리 **열린 세션에도 들어갑니다** — 시작은 이미 지난 일이라, 주차 중인 건도
+관측 시작으로 열렸을 수 있습니다.
+
+| `inKind` | `inTimeMeans` | 그 시각이 무엇인가 |
+|----------|---------------|-------------------|
+| `observed` | `enteredAt` | 빈 자리 → 점유 전이를 관측했습니다. 유일한 측정값입니다 |
+| `firstSeen` | `firstSeenAt` | 관측을 시작했을 때 **이미 차가 있었습니다**. 언제부터인지는 모릅니다 |
+| `unknown` | `unknown` | 이 규칙 이전 데이터입니다. 시작이 관측이었는지 알 수 없습니다 |
+
+> **같은 차가 여러 건으로 나뉠 수 있습니다.** 관측이 길게 끊기면 그 건을 `lastSeen` 으로 닫고
+> 재개 후 `firstSeen` 으로 새로 엽니다 — 보지 않은 구간을 머문 시간에 넣지 않기 위해서입니다.
+> 같은 주차면에서 `lastSeen` 으로 닫힌 건과 `firstSeen` 으로 열린 건이 시각상 맞붙어 있으면
+> 같은 체류일 가능성이 높습니다. 합산 여부는 정산 정책이라 API 가 판단하지 않습니다.
+>
+> 짧게 끊긴 경우(진출입 확정 시간의 두 배 미만)는 나누지 않습니다. 그 안에서는 출차·입차가
+> 확정될 수 없어, 관측이 이어졌더라도 한 건이었을 구간입니다.
+
+| 질의 | 설명 |
+|------|------|
+| `GET /api/v1/parking/session?inKind=firstSeen` | 입차를 관측하지 못한 건만 |
+| `GET /api/v1/parking/session?outKind=lastSeen` | 출차를 관측하지 못하고 관측이 끊긴 건만 |
+
+### 16.6. 주차 내역 상세
+
+한 건을 정산 이력과 함께 반환합니다. 분쟁 때 근거를 한 번에 보여 주는 용도입니다.
+
+| 엔드포인트 | 설명 |
+|-----------|------|
+| `GET /api/v1/parking/session/{id}` | 세션 상세 |
+
+**응답**: 16.5 의 `data[]` 와 같은 모양의 객체 하나입니다. `payments` 가 **항상** 포함됩니다.
+
+```json
+{
+  "id": 4821,
+  "kind": "spot",
+  "src": {
+    "id": 101,
+    "name": "A-13"
+  },
+  "chid": 3,
+  "plateNo": "12가3456",
+  "timeRange": ["2026-10-07T08:01:04", "2026-10-07T09:22:40"],
+  "open": false,
+  "outKind": "paid",
+  "outTimeMeans": "paidAt",
+  "durationMs": 4739000,
+  "paidCount": 1,
+  "lastPaidTime": "2026-10-07T09:20:03",
+  "unpaidDurationMs": 0,
+  "snapshots": [
+    {
+      "time": "2026-10-07T08:01:04",
+      "chid": 3,
+      "tags": ["in"],
+      "plateNo": null,
+      "image": null,
+      "video": "..."
+    }
+  ],
+  "payments": [
+    {
+      "id": 77,
+      "time": "2026-10-07T09:20:03",
+      "ref": "POS-20261007-0042"
+    }
+  ]
+}
+```
+
+| 상태 | 의미 |
+|------|-----|
+| `404` | 그 ID 의 세션이 없습니다 |
+
+### 16.7. 정산 상태 변경
+
+이 세션의 정산 상태를 바꿉니다. NVR 은 **시각**과 호출자의 참조만 저장합니다 —
+금액·요금표·할인 규칙은 정산 앱 쪽에 남습니다.
+
+| 엔드포인트 | 하는 일 | `409` |
+|-----------|--------|-------|
+| `POST /api/v1/parking/session/{id}/payment/commit` | 정산 완료 (한 세션에 여러 번 가능) | — |
+| `POST /api/v1/parking/session/{id}/payment/exempt` | 정산 대상에서 제외 | 이미 제외됨 |
+| `POST /api/v1/parking/session/{id}/payment/undo` | 가장 최근 유효 변경을 되돌림 | 되돌릴 변경 없음 |
+
+**동작이 바꾸는 값** (16.5 응답 필드)
+
+| 동작 | `paidCount` | `lastPaidTime` | `unpaidDurationMs` | `exempt` |
+|------|------------|----------------|--------------------|----------|
+| `commit` | +1 | 이번 시각 | 이번 시각부터 다시 셈 | 그대로 |
+| `exempt` | 그대로 | 그대로 | 그대로 | `true` |
+| `undo` | −1 (완료를 되돌린 경우) | 이전 유효 정산 시각 | 그에 맞춰 되돌아감 | 제외를 되돌리면 `false` |
+
+**규칙**
+
+| 항목 | 규칙 |
+|---|---|
+| 기록 | 지우지 않고 쌓습니다. `undo` 도 한 줄 남습니다 |
+| `undo` 대상 | 생략하면 가장 최근 유효 변경(완료·제외 둘 다). `ref` 를 주면 그 참조의 **완료** 건 |
+| `undo` 응답 | `undone` 이 무엇을 되돌렸는지 알려 줍니다 (`commit` 또는 `exempt`) |
+| 반복 `undo` | 로그를 거슬러 그 앞의 변경을 되돌립니다 |
+| `exempt` 의 뜻 | 금액을 지우는 것이 아니라 **받지 않기로 결정했다**는 기록입니다 |
+| 제외와 조회 | 제외된 세션은 `unpaidDurationMin` 조회에서 빠집니다 (받을 것이 남은 건을 찾는 조회입니다) |
+| 되돌린 정산 | `outKind:"paid"` 의 출차 시각 근거가 되지 않습니다 |
+| 기록 시각 | **항상 서버 시계**입니다. `time` 으로 준 값은 `clientTime` 으로 따로 보존됩니다 ([1.1](#11-시각-표기)) |
+
+**파라미터**:
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|---------|------|------|------|
+| `time` | DateTime | N | **호출자 시계의** 시각. 별도로 보존되며 NVR 의 기록 시각은 항상 서버 시계입니다 ([1.1](#11-시각-표기)) |
+| `ref` | String | N | 정산 앱의 거래 식별자. `undo` 에서는 되돌릴 완료 건을 지목합니다 |
+
+**응답**:
+```json
+{
+  "session": 4821,
+  "time": "2026-10-07T09:20:03",
+  "action": "commit",
+  "ref": "POS-20261007-0042"
+}
+```
+```json
+{
+  "session": 4821,
+  "time": "2026-10-07T18:40:11",
+  "action": "undo",
+  "undone": "exempt"
+}
+```
+
+| 상태 | 의미 |
+|------|-----|
+| `400` | 세션 ID 또는 시각이 올바르지 않습니다 |
+| `403` | **제어(Control)** 권한이 필요합니다 |
+| `404` | 그 ID 의 세션이 없습니다 |
+| `409` | `exempt` 인데 이미 제외됨, 또는 `undo` 인데 되돌릴 변경이 없습니다 |
+
+> 주차 중인 세션에 남긴 정산 기록은, 끝내 출차를 관측하지 못했을 때 출차 시각을 `paid` 로
+> 대체하는 근거가 되기도 합니다 — 16.5 의 출차 근거 표를 참고하십시오. **되돌린 정산은 그
+> 근거가 되지 않습니다**(되면 출차 시각 자체가 틀어집니다).
+
+### 16.8. 미출차 정리
+
+출차를 관측하지 못해 '주차중' 으로 남은 세션을 운영자가 정리합니다(세션을 닫습니다).
+
+| 항목 | 내용 |
+|---|---|
+| 용도 | 차는 나갔는데 출차가 인식되지 않아 남은 건을 걷어냅니다 |
+| 왜 생기나 | 야간 차단기 개방(출입구 미인식) · 큰 차에 장시간 가림(주차면) |
+| 그대로 두면 | '주차중' 이 쌓여 현황·이력을 믿을 수 없게 됩니다 |
+| 기록되는 값 | `outKind: "manual"` · `outTimeMeans: "closedByOperator"` |
+| 정산 앱은 | 출차가 관측된 건과 **같이 취급하지 말고** 가려내십시오 |
+| [16.7](#167-정산-상태-변경) `exempt` 와 차이 | 이쪽은 **주차 상태**를 닫습니다. `exempt` 는 **정산 대상**에서 빼는 것이고 세션은 열려 있을 수 있습니다 |
+
+| 엔드포인트 | 설명 |
+|-----------|------|
+| `POST /api/v1/parking/session/{id}/close` | 지금 시각으로 종료 |
+| `POST /api/v1/parking/session/{id}/close?time=...` | 지정한 시각으로 종료 |
+
+**파라미터**:
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|---------|------|------|------|
+| `time` | DateTime | N | **호출자 시계의** 출차 시각. 별도로 보존되며 주차 시간 계산에는 서버 시계만 씁니다 ([1.1](#11-시각-표기)) |
+
+**응답**:
+```json
+{
+  "session": 4821,
+  "time": "2026-10-07T09:30:00",
+  "outKind": "manual",
+  "outTimeMeans": "closedByOperator"
+}
+```
+
+| 상태 | 의미 |
+|------|-----|
+| `400` | 세션 ID 가 잘못됐거나, 입차 시각과 같거나 그보다 이른 시각입니다 |
+| `403` | **제어(Control)** 권한이 필요합니다 |
+| `404` | 그 ID 의 세션이 없습니다 |
+| `409` | 이미 닫힌 세션입니다 — 기존 출차 기록을 덮어쓰지 않습니다 |
 
 > **예제:** [JavaScript](examples/javascript/10-parking.js) · [Python](examples/python/10_parking.py) · [C#](examples/csharp/10_Parking.cs) · [Go](examples/go/10_parking/) · [Java](examples/java/V1_10_Parking.java) · [Kotlin](examples/kotlin/V1_10_Parking.kt) · [Swift](examples/swift/10-parking.swift) · [PowerShell](examples/powershell/10-parking.ps1) · [curl](examples/curl/10-parking.sh)
 
@@ -2423,12 +3005,17 @@ ws://{host}:{port}/wsapi/v1/events?topics={topics}&apikey={apiKey}
 
 구독 추가:
 ```json
-{"subscribe": "channelStatus", "ch": [1, 2]}
+{
+  "subscribe": "channelStatus",
+  "ch": [1, 2]
+}
 ```
 
 구독 해제:
 ```json
-{"unsubscribe": "channelStatus"}
+{
+  "unsubscribe": "channelStatus"
+}
 ```
 
 **응답:**
@@ -2700,7 +3287,10 @@ sequenceDiagram
 `fileEnd` 메시지를 수신한 후, `ttl` 시간 내에 다음 명령 중 하나를 전송해야 합니다:
 
 ```json
-{"task": "{taskId}", "cmd": "next"}
+{
+  "task": "{taskId}",
+  "cmd": "next"
+}
 ```
 
 | cmd | 설명 |

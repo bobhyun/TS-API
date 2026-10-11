@@ -36,7 +36,7 @@ $payload = @{
     topic   = 'LPR'
     plateNo = '12AB3456'
     src     = 'booth-01'             # Source booth code (string)
-    when    = '2026-01-15 10:30:00'
+    when    = '2026-01-15T10:30:00'
 }
 $r = Invoke-NvrPost '/api/v1/push' -Body $payload
 if ($r) {

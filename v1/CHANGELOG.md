@@ -2,6 +2,55 @@
 
 **English** | [한국어](CHANGELOG.ko.md)
 
+## v1.2.0
+
+### Parking session history
+
+Four endpoints under `/api/v1/parking/session` expose the history of vehicles parking and
+leaving. A *session* opens when a vehicle is confirmed present and closes when it is gone,
+on a parking spot, an entrance/exit gate, or a no-parking (dwell) zone.
+
+- `GET /api/v1/parking/session` — list, with paging, a summary block and filters for time,
+  plate, lot, source, channel, kind, exit basis, stay duration and unpaid time
+- `GET /api/v1/parking/session/{id}` — one session with its payment history
+- `POST /api/v1/parking/session/{id}/payment` — record that a payment was settled
+- `POST /api/v1/parking/session/{id}/close` — close a session observation cannot end
+
+The NVR provides the history; amounts, tariffs and discount rules stay in the billing app.
+Only the payment **time** and the caller's reference are stored.
+
+Requires the parking history license (`403` without it). Reading needs **Playback**
+permission, the two `POST`s need **Control**.
+
+`GET /api/v1/info?license` reports that license as the `parkingHistory` token in
+`license.extension`, so a client can show or hide its history UI without probing for `403`.
+
+### Exit time carries its basis
+
+A closed session reports **how** its exit time was decided, not just the number. Only
+`observed` is a measurement; the rest are estimates whose error leans in different
+directions, so a billing app can treat them accordingly.
+
+| `outKind` | `outTimeMeans` | What the exit time is |
+|-----------|----------------|-----------------------|
+| `observed` | `exitedAt` | The exit was seen |
+| `paid` | `paidAt` | Last payment time — vehicles usually leave right after paying |
+| `covered` | `discoveredAt` | The view was blocked; this is when the vehicle was found gone |
+| `lastSeen` | `lastSeenAt` | Observation ended (camera disconnected, program exited); a lower bound |
+| `manual` | `closedByOperator` | An operator closed it — an action, not an observed exit |
+| `unknown` | `unknown` | Pre-dates this rule |
+
+The entry time carries the same kind of basis as `inKind` · `inTimeMeans`. If the vehicle
+was already there when observation started it is `firstSeen`, and that timestamp is an
+**upper bound** on the real entry — the error leans the opposite way from the exit basis.
+Unlike the exit basis, it is present on **open sessions too**.
+
+### Existing parking endpoints unchanged
+
+`/api/v1/parking/lot`, `/lot/status`, `/spot` and `/spot/status` are untouched. Session
+objects use the same leaf names as the spot API (`id`, `name`, `chid`), nested under `src`
+because a session's source is not always a spot — `kind` tells which.
+
 ## v1.1.0
 
 ### New live protocol: `websocket-flv`

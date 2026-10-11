@@ -31,10 +31,10 @@ CURL=(curl -sk)
 jqf() { jq . 2>/dev/null || cat; }
 
 # Time range: last 7 days
-TIME_END=$(date -u +%Y-%m-%dT%H:%M:%S)
-TIME_BEGIN=$(date -u -d "7 days ago" +%Y-%m-%dT%H:%M:%S 2>/dev/null \
-  || date -u -v-7d +%Y-%m-%dT%H:%M:%S 2>/dev/null \
-  || echo "2025-01-01T00:00:00")
+TIME_END=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+TIME_BEGIN=$(date -u -d "7 days ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+  || date -u -v-7d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+  || echo "2025-01-01T00:00:00Z")
 
 # ─────────────────────────────────────────────────
 # 1. LPR Source List

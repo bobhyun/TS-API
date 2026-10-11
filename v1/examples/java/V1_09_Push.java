@@ -42,7 +42,7 @@ public class V1_09_Push {
                 + "\"type\":\"LPR\","
                 + "\"plate\":\"12AB3456\","
                 + "\"chid\":1,"
-                + "\"time\":\"2026-01-15 10:30:00\""
+                + "\"time\":\"2026-01-15T10:30:00\""
                 + "}";
 
         NvrClient.Response r = client.post("/api/v1/push", payload);

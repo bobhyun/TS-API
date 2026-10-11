@@ -45,8 +45,8 @@ if ! command -v websocat &>/dev/null; then
 fi
 
 # Time range: yesterday 00:00 ~ 00:10
-YESTERDAY=$(date -u -d "yesterday" +%Y-%m-%d 2>/dev/null \
-  || date -u -v-1d +%Y-%m-%d 2>/dev/null \
+YESTERDAY=$(date -d "yesterday" +%Y-%m-%d 2>/dev/null \
+  || date -v-1d +%Y-%m-%d 2>/dev/null \
   || echo "2025-01-01")
 TIME_BEGIN="${YESTERDAY}T00:00:00"
 TIME_END="${YESTERDAY}T00:10:00"

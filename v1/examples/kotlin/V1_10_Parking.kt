@@ -6,6 +6,7 @@
  *   GET /api/v1/parking/lot/status    - Lot occupancy status
  *   GET /api/v1/parking/spot          - List parking spots
  *   GET /api/v1/parking/spot/status   - Individual spot status
+ *   GET /api/v1/info?license          - License check (parkingHistory extension token)
  *
  * Compile: kotlinc TsApiClient.kt V1_10_Parking.kt -include-runtime -d V1_10_Parking.jar
  * Run:     java -jar V1_10_Parking.jar
@@ -54,4 +55,88 @@ fun main() {
     if (r.status == 200) {
         println(r.body)
     }
+
+    // -- Parking Session History --
+    // GET /api/v1/parking/session
+    // A session opens when a vehicle is confirmed present and closes when it is
+    // gone. Needs the parking history license - 403 without it. Ask /api/v1/info
+    // first: the "parkingHistory" extension token says whether the session
+    // endpoints will answer. No JSON parser here, so test for the quoted token.
+    r = client.get("/api/v1/info?license")
+    if (r.status != 200 || "\"parkingHistory\"" !in r.body) {
+        println("\nparking history license not found (no 'parkingHistory' in license.extension) - skipping session examples")
+        return
+    }
+    println("\n=== Currently Parked ===")
+    r = client.get("/api/v1/parking/session?open=true&maxCount=10")
+    println("  status=${r.status}")
+    if (r.status == 200) {
+        println(r.body)
+    }
+
+    // -- Session Detail --
+    // GET /api/v1/parking/session/{id}
+    // outKind / outTimeMeans say HOW the exit time was decided. Only "observed"
+    // is a measurement; the others are estimates whose error leans in different
+    // directions, so bill from the basis, not from the number alone.
+    //
+    // inKind / inTimeMeans do the same for the entry, and the error leans the OTHER
+    // way: firstSeen is an UPPER bound on the real entry (already there when
+    // observation started). It is present on OPEN sessions too — the body below
+    // shows both fields.
+    println("\n=== Session Detail ===")
+    r = client.get("/api/v1/parking/session?maxCount=1")
+    if (r.status == 200) {
+        println(r.body)
+    }
+
+    // -- Scope: what the query is scoped to --
+    // Items omitted means "the whole scope", which is NOT the same as no filter:
+    // scope=lot with no lot returns only sessions that belong to a parking lot,
+    // so no-parking-zone history is excluded (it belongs to no lot).
+    println("\n=== Scope ===")
+    for (qs in listOf("scope=channel&ch=1,2", "scope=lot", "scope=noparking")) {
+        r = client.get("/api/v1/parking/session?$qs&maxCount=5")
+        println("  $qs => ${r.status}")
+    }
+
+    // -- Video for a session: otherwise=nearBefore --
+    // A parked car does not move, so motion-triggered recording may have stopped
+    // while it was still there. The car is in the same place, so the preceding
+    // footage still shows the situation. Use this for parking history only.
+    // An empty result means there is no usable recording at all (never recorded,
+    // or already recycled) -- the session snapshots remain available either way.
+    println("\n=== Video at entry time (nearest earlier if none) ===")
+    r = client.get("/api/v1/vod?ch=1&when=2024-01-08T09:30:00&otherwise=nearBefore")
+    println("  => ${r.status}")
+
+    // -- Which car is it? the bounding box --
+    // A snapshot can hold several cars. `box` points at the one this session is
+    // about. YOLO style: center based, all four values 0..1 (see 1.2) --
+    // multiply by the size of whatever you draw on:
+    //   left = (cx - w/2) * width,  top = (cy - h/2) * height
+    // Entrance/exit sessions carry no vehicle box (a single plate read) and the
+    // value is null; the key is always present.
+    println("\n=== Bounding box of the session vehicle ===")
+    r = client.get("/api/v1/parking/session?maxCount=1")
+    println("  => ${r.status}")
+    if (r.status == 200) {
+        println(if (r.body.contains("\"box\":null")) "  (no box for this session)"
+                else "  box present - see 1.2 for the conversion")
+    }
+
+    // -- Writing history (Control permission) --
+    // Both change stored history, so they are not executed here.
+    // Payment state (16.7): commit settles it, exempt records a decision not to
+    // collect, undo reverts the most recent change (the response says which one).
+    // Records are appended, never deleted.
+    //
+    // close (16.8) is a different axis: it clears the lingering "parked" state left
+    // when an exit was never observed. Exempt takes a session out of billing and may
+    // leave it parked; close ends the session. Do not conflate the two.
+    //
+    //   client.post("/api/v1/parking/session/$id/payment/commit?ref=POS-0042")
+    //   client.post("/api/v1/parking/session/$id/payment/exempt")
+    //   client.post("/api/v1/parking/session/$id/payment/undo")
+    //   client.post("/api/v1/parking/session/$id/close")
 }

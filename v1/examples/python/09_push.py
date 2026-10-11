@@ -37,7 +37,7 @@ def push_lpr_event(client):
         'topic': 'LPR',
         'plateNo': '12AB3456',
         'src': 'booth-01',          # Source booth code (string)
-        'when': '2026-01-15 10:30:00',
+        'when': '2026-01-15T10:30:00',
     }
     r = client.post('/api/v1/push', json=payload)
     print(f"  Status: {r.status_code}")

@@ -49,8 +49,8 @@ def main():
     # --- LPR Log (last 24 hours) ---
     # timeBegin and timeEnd are REQUIRED parameters
     now = datetime.now()
-    time_end = now.strftime('%Y-%m-%d %H:%M:%S')
-    time_begin = (now - timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S')
+    time_end = now.strftime('%Y-%m-%dT%H:%M:%S')
+    time_begin = (now - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%S')
 
     print(f"\n=== LPR Log ({time_begin} ~ {time_end}) ===")
     r = client.get('/api/v1/lpr/log', params={

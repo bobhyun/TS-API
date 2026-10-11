@@ -39,7 +39,7 @@ namespace TsApiExamples
         public string RefreshToken => _refreshToken;
 
         private readonly HttpClient _http;
-        private string _apiKey;
+        private string _apiKey = "";
         private string _accessToken = "";
         private string _refreshToken = "";
 

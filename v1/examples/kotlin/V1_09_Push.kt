@@ -39,7 +39,7 @@ fun main() {
 private fun pushLprEvent(client: TsApiClient) {
     println("=== Push LPR Event ===")
 
-    val payload = """{"type":"LPR","plate":"12AB3456","chid":1,"time":"2026-01-15 10:30:00"}"""
+    val payload = """{"type":"LPR","plate":"12AB3456","chid":1,"time":"2026-01-15T10:30:00"}"""
 
     val r = client.post("/api/v1/push", payload)
     println("  status=${r.status}")

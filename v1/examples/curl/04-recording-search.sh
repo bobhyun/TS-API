@@ -51,7 +51,7 @@ echo ""
 echo "=== Recording Minutes (Timeline) ==="
 
 # Query today's recordings
-TODAY=$(date -u +%Y-%m-%d)
+TODAY=$(date +%Y-%m-%d)
 TIME_BEGIN="${TODAY}T00:00:00"
 TIME_END="${TODAY}T23:59:59"
 

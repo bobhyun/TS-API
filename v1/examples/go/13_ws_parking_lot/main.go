@@ -56,7 +56,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	fmt.Println("  Connected! Waiting for parking count events...\n")
+	fmt.Print("  Connected! Waiting for parking count events...\n\n")
 
 	msgCount := 0
 	go func() {

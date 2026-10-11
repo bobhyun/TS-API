@@ -7,6 +7,8 @@
 ## Table of Contents
 
 1. [Overview](#1-overview)
+   - [1.1. Time Notation](#11-time-notation)
+   - [1.2. Box Coordinates](#12-box-coordinates)
 2. [API Call Flow](#2-api-call-flow)
    - [2.1. Basic Flow (JWT Authentication)](#21-basic-flow-jwt-authentication)
    - [2.2. Recording Search and Playback Flow](#22-recording-search-and-playback-flow)
@@ -68,6 +70,10 @@
     - [16.2. Parking Lot Status](#162-parking-lot-status)
     - [16.3. Parking Spot (LPR Zone)](#163-parking-spot-lpr-zone)
     - [16.4. Parking Spot Status](#164-parking-spot-status)
+    - [16.5. Parking Session History](#165-parking-session-history)
+    - [16.6. Parking Session Detail](#166-parking-session-detail)
+    - [16.7. Change Payment State](#167-change-payment-state)
+    - [16.8. No-exit Cleanup](#168-no-exit-cleanup)
 17. [Realtime Event Subscription (WebSocket API)](#17-realtime-event-subscription-websocket-api)
     - [17.1. Connection Flow](#171-connection-flow)
     - [17.2. Endpoints](#172-endpoints)
@@ -102,6 +108,72 @@ TS-API v1 is a RESTful path-based API.
 **Content-Type**: `application/json`
 
 > **Note**: Channel numbers (`ch`, `chid`) are 1-based throughout the API.
+
+### 1.1. Time Notation
+
+**The notation you send decides the notation you get back.**
+
+| Time sent in the request | Interpreted as | Response notation for that request |
+|--------------------------|----------------|------------------------------------|
+| `2026-10-07T09:30:00Z` | UTC | `...Z` (UTC) |
+| `2026-10-07T09:30:00+09:00` | that offset | `...+09:00` (server local) |
+| `2026-10-07T09:30:00` (no offset) | **the server's local time zone** | `...+09:00` (server local) |
+| `today` · `yesterday` | midnight, server local | `...+09:00` (server local) |
+| (no time parameter) | — | `...+09:00` (server local) |
+
+**Responses always carry an offset (or `Z`)** — it is never omitted. So even if you send a
+time without one, the response shows **how the server read it**: the digits you sent come
+back unchanged, followed by the offset the server assumed. If your zone differs from the
+server's, that offset is what reveals it.
+
+Sending an explicit offset is clearer. But you do not have to: the response states the
+interpretation, so a client that does not deal with time zones still works.
+
+Storage is UTC (microseconds) internally. Responses carry milliseconds.
+
+**Times sent by a billing app** (the `time` parameter in
+[16.7](#167-change-payment-state) and [16.8](#168-no-exit-cleanup)) are **kept separately**
+as that app's clock reading; the NVR's own recorded time is **always the server clock**.
+That separation keeps parking durations and video positions stable even when the two
+systems' clocks drift apart.
+
+### 1.2. Box Coordinates
+
+Bounding boxes use the **YOLO coordinate system** — center-based, all four values
+normalized to `0..1`.
+
+```json
+{ "cx": 0.394, "cy": 0.556, "w": 0.164, "h": 0.201 }
+```
+
+| Value | Meaning |
+|-------|---------|
+| `cx` · `cy` | **Center** of the box (0 = left/top, 1 = right/bottom) |
+| `w` · `h` | **Size** of the box |
+
+To draw it, multiply by the size of the target image or video. You never need to know the
+internal coordinate space.
+
+```
+left = (cx - w/2) * displayWidth      top = (cy - h/2) * displayHeight
+```
+
+| Rule | Detail |
+|------|--------|
+| Range | `cx ± w/2` and `cy ± h/2` never leave `0..1` — the server clamps before sending |
+| When absent | `null`. The key is not omitted — "no box" and "this version sends no boxes" must stay distinguishable |
+| Reference frame | The **image or video** the box came with. A box on a cropped image is relative to that crop |
+
+> **A parking-history box is a single observation taken when the session opened.** It is
+> only correct for that instant, so **draw it on the stillcut and clear it once video
+> playback starts** — it is not tracked. Entrance/exit sessions carry no vehicle box (they
+> are a single plate read), so the value is `null`.
+
+**Exception — `vehicle.plate` in [16.4](#164-parking-spot-status).** That field keeps
+**absolute pixels** (`left`, `top`, `right`, `bottom`). It is already deployed and partner
+applications read those values; changing its shape would break them silently. Divide by
+`imageSize` from the same response. **New box fields use YOLO.**
+
 
 ---
 
@@ -311,7 +383,10 @@ Content-Type: application/json
   "refreshToken": "eyJhbGc...",
   "expiresIn": 3600,
   "tokenType": "Bearer",
-  "user": {"username": "admin", "role": "admin"}
+  "user": {
+    "username": "admin",
+    "role": "admin"
+  }
 }
 ```
 
@@ -502,8 +577,14 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 {
   "apiVersion": "TS-API@1.1.0",
   "siteName": "Main Office",
-  "timezone": {"name": "Asia/Seoul", "bias": "+09:00"},
-  "product": {"name": "TS-NVR", "version": "2.14.1"},
+  "timezone": {
+    "name": "Asia/Seoul",
+    "bias": "+09:00"
+  },
+  "product": {
+    "name": "TS-NVR",
+    "version": "2.14.1"
+  },
   "license": {
     "type": "genuine",
     "maxChannels": 64,
@@ -576,6 +657,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `vehicleTracking` | Vehicle tracking |
 | `parkingGuide` | Parking guidance |
 | `parkingSpot` | Parking spot occupancy detection |
+| `parkingHistory` | Parking session history — the endpoints in [16.5–16.8](#165-parking-session-history) answer only when this is present |
 
 ---
 
@@ -690,15 +772,20 @@ Retrieves disk health status.
 |-----------|------|----------|-------------|
 | `disk` | Int | N | Disk number (all disks if omitted) |
 
-**Response**: Returns an array of S.M.A.R.T information for each disk.
+**Response**: Returns an array with one entry per fixed disk.
+
+An empty array means the server found no fixed disks. A disk whose attributes have not
+been read yet is still listed, with `code` = `-1`; S.M.A.R.T. is read in the background
+and cached for an hour, so an entry can report `-1` for a short while after startup.
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `[].name` | String | Disk name (e.g., `"PhysicalDrive0"`) |
 | `[].model` | String | Disk model name |
-| `[].code` | Int | S.M.A.R.T support status code (0: Not tested, 1: Not supported, 2: Supported) |
-| `[].message` | String | Status message (`"Not tested yet"`, `"Not supported"`, `"Supported"`) |
-| `[].smart` | Array | S.M.A.R.T attribute list (only included when supported) |
+| `[].code` | Int | S.M.A.R.T status (see the table below) |
+| `[].message` | String | Status message for `code`, in the requested language |
+| `[].protocol` | String | How the attributes were read: `"ATA"` or `"NVMe"`. The attribute ID scheme differs between the two |
+| `[].smart` | Array | S.M.A.R.T attribute list (only included when attributes were read) |
 | `[].smart[].id` | Int | Attribute ID |
 | `[].smart[].attribute` | String | Attribute name |
 | `[].smart[].critical` | Boolean | Whether this is a critical attribute |
@@ -707,6 +794,17 @@ Retrieves disk health status.
 | `[].smart[].threshold` | Int | Threshold value |
 | `[].smart[].raw` | Int | Raw value |
 | `[].smart[].rawHex` | String | Raw value (hexadecimal string) |
+
+`[].code` values:
+
+| Code | Meaning |
+|------|---------|
+| `-1` | Not read yet |
+| `0` | The drive does not support S.M.A.R.T. |
+| `1` | Supported - attributes are in `[].smart` |
+| `2` | Could not open the drive; administrator rights are required |
+| `3` | The storage controller does not pass S.M.A.R.T. through (disks behind a RAID controller) |
+| `4` | The drive supports S.M.A.R.T. but reading the attributes failed |
 
 ### 5.4. System Control
 
@@ -749,7 +847,10 @@ Retrieves registered channel list.
     "chid": 1,
     "displayName": "CH1. Front Door",
     "title": "Front Door",
-    "caps": {"pantilt": true, "zoom": true}
+    "caps": {
+      "pantilt": true,
+      "zoom": true
+    }
   },
   {
     "chid": 2,
@@ -816,12 +917,18 @@ Retrieves channel connection status.
 [
   {
     "chid": 1,
-    "status": {"code": 0, "message": "Connected"},
+    "status": {
+      "code": 0,
+      "message": "Connected"
+    },
     "recording": true
   },
   {
     "chid": 2,
-    "status": {"code": -1, "message": "Disconnected"},
+    "status": {
+      "code": -1,
+      "message": "Disconnected"
+    },
     "recording": false
   }
 ]
@@ -1086,7 +1193,11 @@ Retrieves dates with recording data.
   "timeBegin": "2024-01-01T00:00:00",
   "timeEnd": "2024-01-31T23:59:59",
   "data": [
-    {"year": 2024, "month": 1, "days": [1, 2, 3, 5, 8, 10]}
+    {
+      "year": 2024,
+      "month": 1,
+      "days": [1, 2, 3, 5, 8, 10]
+    }
   ]
 }
 ```
@@ -1124,7 +1235,10 @@ Retrieves minute-level recording data. Used for timeline UI.
   "timeBegin": "2024-01-01T00:00:00",
   "timeEnd": "2024-01-01T23:59:59",
   "data": [
-    {"chid": 1, "minutes": "111111110000..."}
+    {
+      "chid": 1,
+      "minutes": "111111110000..."
+    }
   ]
 }
 ```
@@ -1187,16 +1301,28 @@ Retrieves event types supported by the system.
     "id": 0,
     "name": "시스템 로그",
     "code": [
-      {"id": 1, "name": "시스템 시작"},
-      {"id": 2, "name": "시스템 종료"}
+      {
+        "id": 1,
+        "name": "시스템 시작"
+      },
+      {
+        "id": 2,
+        "name": "시스템 종료"
+      }
     ]
   },
   {
     "id": 1,
     "name": "카메라",
     "code": [
-      {"id": 100, "name": "연결됨"},
-      {"id": 101, "name": "연결 끊김"}
+      {
+        "id": 100,
+        "name": "연결됨"
+      },
+      {
+        "id": 101,
+        "name": "연결 끊김"
+      }
     ]
   }
 ]
@@ -1550,12 +1676,14 @@ Searches license plate recognition logs.
 | `GET /api/v1/lpr/log?at=0&maxCount=50` | Pagination |
 | `GET /api/v1/lpr/log?sort=asc` | Sort ascending |
 | `GET /api/v1/lpr/log?export=true` | CSV export format |
+| `GET /api/v1/lpr/log?unrecognized=true` | Only records where no plate was read |
 
 **Parameters**:
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `keyword` | String | N | - | Plate keyword (partial match) |
+| `unrecognized` | Boolean | N | false | Only records where **no plate was read**. A keyword cannot express this, so it is a separate condition |
 | `timeBegin` | DateTime | Y | - | Search start time (ISO 8601) |
 | `timeEnd` | DateTime | Y | - | Search end time (ISO 8601) |
 | `src` | String | N | - | LPR source filter (comma-separated) |
@@ -1563,6 +1691,10 @@ Searches license plate recognition logs.
 | `maxCount` | Int | N | 50 | Maximum results |
 | `sort` | String | N | `"desc"` | Sort order (`"asc"` or `"desc"`) |
 | `export` | Boolean | N | false | When true, returns CSV format |
+
+> **Records with no plate.** `plateNo` is `null`. A placeholder string (`xxxx`) used to be
+> stored there and looked like a real plate; it now uses the same representation as
+> "no plate" (`null`). A keyword cannot match it, so use `unrecognized=true`.
 
 > **Note**: `timeBegin` and `timeEnd` are required. `export=true` requests may take a long time on large datasets, so set an appropriate timeout.
 
@@ -1581,7 +1713,12 @@ Searches license plate recognition logs.
       "srcName": "Entrance Gate",
       "direction": "entry",
       "image": ["/lpr/image1.jpg"],
-      "vod": [{"chid": 1, "videoSrc": "/watch?ch=1&when=..."}]
+      "vod": [
+        {
+          "chid": 1,
+          "videoSrc": "/watch?ch=1&when=..."
+        }
+      ]
     }
   ]
 }
@@ -1646,11 +1783,7 @@ Retrieves detectable object types.
 
 **Response**:
 ```json
-[
-  "face",
-  "human",
-  "vehicle"
-]
+["face", "human", "vehicle"]
 ```
 
 ### 11.2. Object Attributes
@@ -1822,6 +1955,22 @@ Retrieves recording playback URLs.
 | `GET /api/v1/vod?ch=1&when=2024-01-08T09:30:00` | Playback at specific time |
 | `GET /api/v1/vod?id=1304&next` | Next recording segment |
 | `GET /api/v1/vod?id=1304&prev` | Previous recording segment |
+| `GET /api/v1/vod?ch=1&when=...&otherwise=nearBefore` | Playback at that time, or the nearest **earlier** recording if there is none |
+
+**`otherwise` — what to return when nothing was recorded at that time**
+
+| Value | Behavior |
+|-------|----------|
+| (omitted) | Nothing is returned for that channel |
+| `nearBefore` | The nearest recording **before** the requested time |
+| `nearAfter` | The nearest recording **after** the requested time |
+
+`nearBefore` exists for parking history. A parked vehicle does not move, so motion-triggered
+recording may have stopped while it was still there — but the car is in the same place, so the
+preceding footage still shows the situation at that moment. Use it when the request comes from
+parking history (section 16.5+). Do not use it for event, LPR or object searches: those ask what
+happened *at* that instant, and showing earlier footage would present a different moment as if it
+were that one.
 
 **Response**:
 ```json
@@ -1911,6 +2060,10 @@ Retrieves recording playback URLs.
 | `id` | Int | N | - | VOD segment ID (for recording navigation) |
 | `next` | Flag | N | - | Next recording segment (used with `id`) |
 | `prev` | Flag | N | - | Previous recording segment (used with `id`) |
+| `otherwise` | String | N | - | Fallback when nothing was recorded at that time (`nearBefore` / `nearAfter`, see table above) |
+| `duration` | String | N | `"1m"` | Window to search from `when`. A bare number means seconds; suffixes `m`, `h`, `d`, `w` |
+| `limit` | Int | N | `10` | Maximum segments per channel |
+| `nolive` | Boolean | N | false | Disable the live fallback (see note below) |
 
 | Response Field | Type | Description |
 |----------------|------|-------------|
@@ -1923,6 +2076,44 @@ Retrieves recording playback URLs.
 | `src[].type` | String | MIME type |
 | `src[].label` | String | Resolution label (e.g., `"1080p"`) |
 | `src[].size` | number[] | Resolution `[width, height]` |
+
+**The recording-playback response** (when `when` carries a time) has a different shape.
+`protocol` and `profile` are live-only; instead the segment is identified by `fileId` and
+carries the `timeRange` it covers.
+
+```json
+[
+  {
+    "chid": 1,
+    "title": "Front Door",
+    "fileId": 1304,
+    "src": [
+      {
+        "src": "https://host/storage/f/00/13/1304.mp4",
+        "type": "video/mp4",
+        "label": "1080p",
+        "size": [1920, 1080],
+        "timeRange": ["2024-01-08T09:28:11+09:00", "2024-01-08T09:33:04+09:00"]
+      }
+    ]
+  }
+]
+```
+
+| Response Field (recording) | Type | Description |
+|----------------------------|------|-------------|
+| `fileId` | Int | Segment ID. Use `?id=<fileId>&next` / `&prev` to walk adjacent segments |
+| `src[].timeRange` | String[] | `[start, end]` of that segment (see [1.1](#11-time-notation)) |
+
+> **Live fallback.** When the query finds nothing **and the requested time is at or after now**,
+> the server answers with that channel's live stream instead (the response takes the live shape
+> above). That is why a future timestamp does not come back empty. Pass `nolive=true` to get
+> recordings only.
+
+> **Deleted files are omitted.** Segments already removed by the retention policy are left out
+> even though the record still exists. An `otherwise` lookup can therefore return an **empty
+> array** — `nearAfter` especially, because it reaches for the oldest end. An empty array is not
+> an error.
 
 **Available Protocols**:
 | Protocol | Description | Condition |
@@ -2300,8 +2491,420 @@ Retrieves real-time spot occupancy. Returns only parking spots (`type:"spot"`).
 | `vehicle.bike` | Boolean | Two-wheeler |
 | `vehicle.since` | DateTime\|null | Parked since |
 | `vehicle.image` | String | (with `image=true`) Vehicle image path |
-| `vehicle.plate` | Object | (with `image=true`) Plate coordinates (`left`, `top`, `right`, `bottom`) |
+| `vehicle.plate` | Object | (with `image=true`) Plate coordinates (`left`, `top`, `right`, `bottom`) in **absolute pixels**, relative to the `vehicle.image` crop — an exception to [1.2](#12-box-coordinates) |
 | `vehicle.imageSize` | Object | (with `image=true`) Image dimensions (`width`, `height`) |
+
+### 16.5. Parking Session History
+
+A *parking session* is one vehicle's stay in one place: it opens when the vehicle is
+confirmed present and closes when it is gone. Use it to answer "how long has this car
+been here" and to build billing records.
+
+Sessions come from three kinds of place (`kind`): a parking spot, an entrance/exit gate,
+and a no-parking (dwell) zone.
+
+> Requires the parking history license. Without it every endpoint in 16.5–16.8 returns
+> `403`. Check beforehand with `GET /api/v1/info?license`: the license is active when
+> `license.extension` contains `parkingHistory` (see [Server Info](#4-server-info)).
+> Reading needs **Playback** permission; 16.7 and 16.8 write history and need
+> **Control**.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/v1/parking/session` | Session list |
+| `GET /api/v1/parking/session?open=true` | Vehicles still parked |
+| `GET /api/v1/parking/session?plateNo=12가3456&open=true` | Is this plate parked, and for how long |
+| `GET /api/v1/parking/session?timeField=out&timeBegin=...&timeEnd=...` | Vehicles that left in a period |
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `timeBegin` | DateTime | N | Period start |
+| `timeEnd` | DateTime | N | Period end |
+| `timeField` | String | N | What the period applies to: `in` (entry, default for most queries), `out` (exit), `overlap` (any overlap with the period) |
+| `plateNo` | String | N | Exact plate match |
+| `keyword` | String | N | Partial plate match |
+| `scope` | String | N | What the query is scoped to: `all` (default), `spot`, `gate`, `noparking`, `channel`, `lot`. See the note below |
+| `lot` | String | N | Parking lot IDs, comma-separated (matched against the lots recorded with the session) |
+| `src` | String | N | Source IDs, comma-separated (spot / gate / dwell zone) |
+| `ch` | String | N | Channel numbers, comma-separated (1-based) |
+| `kind` | String | N | `spot`, `gate`, `dwell` — comma-separated, all if omitted |
+| `outKind` | String | N | Exit basis, comma-separated (see table below) |
+| `inKind` | String | N | Entry basis, comma-separated (see table below). Also matches open sessions |
+| `open` | Boolean | N | `true` = still parked, `false` = already left |
+| `paid` | Boolean | N | `true` = has an **effective** payment record (undone ones excluded) |
+| `exempt` | Boolean | N | `true` = only sessions exempt from billing. Needed because an exemption has to be **found before it can be reverted** (see [16.7](#167-change-payment-state)) |
+| `hasPlate` | Boolean | N | `true` = plate was recognized |
+| `durationMin` | Int | N | Minimum stay, seconds |
+| `durationMax` | Int | N | Maximum stay, seconds |
+| `unpaidDurationMin` | Int | N | Minimum unpaid time, seconds (time since the last payment) |
+| `at` | Int | N | Offset for paging (default `0`) |
+| `maxCount` | Int | N | Page size (server cap applies) |
+
+**`scope` — what the query is scoped to**
+
+`scope` decides *which list* the secondary items come from. Each scope reads a different item
+parameter.
+
+| `scope` | Item parameter | When items are omitted |
+|---------|---------------|------------------------|
+| `all` (default) | — | No scope condition; each parameter applies independently (previous behavior) |
+| `spot` | `src` | All parking-space history |
+| `gate` | `src` | All entrance/exit history |
+| `noparking` | `src` | All no-parking-zone history |
+| `channel` | `ch` | All channels (no condition) |
+| `lot` | `lot` | **Only sessions that belong to a parking lot** |
+
+Omitting the items means "the whole scope", which is **not the same as no condition**. With
+`scope=lot` and no `lot`, only sessions that belong to a parking lot are returned — no-parking-zone
+history does not belong to a lot and is therefore excluded. For the same reason `scope=spot`
+returns parking-space history only.
+
+When `scope` is `spot`, `gate` or `noparking` it also fixes the session kind, so it overrides
+`kind`. Omitting `scope` keeps the previous behavior exactly.
+
+| `sort` | String | N | `desc` (default) or `asc` |
+| `sortBy` | String | N | `time` (entry time, default) or `duration` |
+| `includePayments` | Boolean | N | Include the `payments` array in each session |
+
+**Response**:
+```json
+{
+  "totalCount": 128,
+  "at": 0,
+  "asOf": "2026-10-07T09:30:00",
+  "summary": {
+    "count": 128,
+    "totalDurationMs": 442800000,
+    "firstTimeIn": "2026-10-07T07:05:11",
+    "lastTimeOut": "2026-10-07T09:22:40"
+  },
+  "data": [
+    {
+      "id": 4821,
+      "kind": "spot",
+      "src": {
+        "id": 101,
+        "name": "A-13"
+      },
+      "lots": [1],
+      "usageFlags": 1,
+      "chid": 3,
+      "plateNo": "12가3456",
+      "plateTime": "2026-10-07T08:01:12",
+      "score": 95.0,
+      "timeRange": ["2026-10-07T08:01:04", "2026-10-07T09:22:40"],
+      "open": false,
+      "outKind": "observed",
+      "outTimeMeans": "exitedAt",
+      "inKind": "observed",
+      "inTimeMeans": "enteredAt",
+      "durationMs": 4896000,
+      "box": { "cx": 0.394, "cy": 0.556, "w": 0.164, "h": 0.201 },
+      "paidCount": 1,
+      "lastPaidTime": "2026-10-07T09:20:03",
+      "unpaidDurationMs": 157000,
+      "snapshots": [
+        {
+          "time": "2026-10-07T08:01:04",
+          "chid": 3,
+          "tags": ["in", "bestshot", "plate"],
+          "plateNo": "12가3456",
+          "image": "https://nvr.example.com/storage/f/parking/20261007/4821-in.jpg",
+          "video": "https://nvr.example.com/api/v1/vod?ch=3&when=2026-10-07T08%3A01%3A04&otherwise=nearBefore"
+        },
+        {
+          "time": "2026-10-07T08:04:22",
+          "chid": 3,
+          "tags": ["bestshot"],
+          "plateNo": null,
+          "image": "https://nvr.example.com/storage/f/lpr/20261007/99213.jpg",
+          "video": "https://nvr.example.com/api/v1/vod?ch=3&when=2026-10-07T08%3A04%3A22&otherwise=nearBefore"
+        },
+        {
+          "time": "2026-10-07T09:22:40",
+          "chid": 3,
+          "tags": ["out"],
+          "plateNo": null,
+          "image": null,
+          "video": "https://nvr.example.com/api/v1/vod?ch=3&when=2026-10-07T09%3A22%3A40&otherwise=nearBefore"
+        }
+      ]
+    }
+  ]
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `totalCount` | Int | Total matches (`-1` when no time filter was given, so the count was skipped) |
+| `at` | Int | Offset of this page |
+| `asOf` | DateTime | Server time the response was built. Open sessions are measured up to this instant |
+| `summary.count` | Int | Session count in the whole result |
+| `summary.totalDurationMs` | Int | Sum of stay time, milliseconds |
+| `summary.firstTimeIn` | DateTime\|null | Earliest entry in the result |
+| `summary.lastTimeOut` | DateTime\|null | Latest exit in the result |
+| `data[].id` | Int | Session ID |
+| `data[].kind` | String | `spot`, `gate` or `dwell` |
+| `data[].src` | Object | Where it happened — `id` and `name` of the spot / gate / zone |
+| `data[].srcOut` | Int | (gate only) Source ID the vehicle left through |
+| `data[].lots` | Int[] | Parking lots the source belonged to **at the time**, not now |
+| `data[].usageFlags` | Int | Source usage flags recorded with the session |
+| `data[].chid` | Int | Channel number (1-based) |
+| `data[].plateNo` | String\|null | Plate number, `null` if never recognized |
+| `data[].plateTime` | DateTime\|null | When the plate was read |
+| `data[].score` | Float | Recognition confidence (present with `plateNo`) |
+| `data[].timeRange` | DateTime[] | `[entry]` while open, `[entry, exit]` once closed |
+| `data[].open` | Boolean | `true` = still parked |
+| `data[].outKind` | String | How the exit time was decided (closed sessions only) |
+| `data[].outTimeMeans` | String | What the exit time *is* (closed sessions only) |
+| `data[].inKind` | String | How the entry time was decided (present on **open sessions too**) |
+| `data[].inTimeMeans` | String | What the entry time *is* |
+| `data[].durationMs` | Int | Stay in milliseconds — up to `asOf` while open |
+| `data[].paidCount` | Int | Number of **effective** payments (undone ones are excluded) |
+| `data[].lastPaidTime` | DateTime\|null | Last payment time |
+| `data[].unpaidDurationMs` | Int | Time not covered by a payment. **Do not bill from this when `exempt` is `true`** |
+| `data[].exempt` | Boolean | Exempt from billing (see [16.7](#167-change-payment-state)) |
+| `data[].box` | Object\|null | Box for that vehicle (see [1.2](#12-box-coordinates)) — points out **which** car in the snapshot |
+| `data[].snapshots` | Object[] | Moments of the session, **oldest first** (below) |
+| `data[].payments` | Object[] | (with `includePayments=true`) `{ id, time, kind, target?, ref? }`. `kind` is `commit`, `exempt` or `undo`; `target` is the `id` the `undo` reverted |
+
+**Snapshots** — each entry is `{ time, chid, tags, plateNo, image, video }`, **oldest first**.
+A single picture can mean several things (the entry frame is often the very shot that read the
+plate), so meaning is carried by a **tag array**, not by a key. The same meaning can also occur
+several times — an AI camera sends several bestshots for one car.
+
+| Field | Content |
+|-------|---------|
+| `time` | Time of that moment. `null` for `current`, which means "now" |
+| `chid` | Channel number (1-based) |
+| `tags` | Tags from the table below |
+| `plateNo` | Plate this shot read. **`null` when it read none** |
+| `image` | Picture URL, or `null` when reclaimed by retention or when the moment has no picture |
+| `video` | VOD link for that moment (see [13.2](#132-playback-urls), includes `otherwise=nearBefore`) |
+
+| Tag | Meaning |
+|-----|---------|
+| `in` | Entry |
+| `out` | Exit |
+| `current` | "Now" for a session still parked (no picture, live link) |
+| `bestshot` | A shot plate recognition was **attempted** on |
+| `plate` | That shot **did** read a plate |
+
+> **`bestshot` and `plate` are not the same.** A shot that failed recognition still appears as
+> `bestshot`, without `plate` and with `plateNo: null`. The picture is kept, so a person can
+> check it later. To use only entries that carry a number, look for `plate` in `tags`.
+
+> **At most 20 pictures per session.** Beyond that, shots that read a plate are kept first, then
+> the larger images. Moments with no picture (`in`, `out`, `current`) are video links and are
+> always included, regardless of the cap.
+
+**Exit basis** — only `observed` is a measured value. The others are estimates, and the
+error leans in different directions, so a billing app should treat them differently
+rather than reading the timestamp alone.
+
+| `outKind` | `outTimeMeans` | What the exit time is |
+|-----------|----------------|-----------------------|
+| `observed` | `exitedAt` | The exit was seen. The only measurement |
+| `paid` | `paidAt` | Last payment time. Vehicles usually leave right after paying, so this is closer than video evidence and matches the receipt |
+| `covered` | `discoveredAt` | The spot was blocked from view; this is when the vehicle was found gone. It left **some time earlier** |
+| `lastSeen` | `lastSeenAt` | **Observation ended** (camera disconnected, program exited). This is the last time that channel was evaluated — a **lower bound**. The cause is not recorded, so the name states only the fact |
+| `manual` | `closedByOperator` | An operator closed it (night opening, long occlusion). An operational action, not an observed exit |
+| `unknown` | `unknown` | Pre-dates this rule; only a retrospective approximation exists |
+
+**Entry basis** — the mirror of the exit basis, and the error leans the **other way**.
+`lastSeenAt` is a lower bound on the real exit, while `firstSeenAt` is an **upper bound**
+on the real entry (the vehicle was already there). Both understate the time parked.
+
+Unlike the exit basis, this is present on **open sessions too** — the start has already
+happened, so a vehicle still parked may have been recorded from `firstSeen`.
+
+| `inKind` | `inTimeMeans` | What the entry time is |
+|----------|---------------|------------------------|
+| `observed` | `enteredAt` | An empty → occupied transition was seen. The only measurement |
+| `firstSeen` | `firstSeenAt` | The vehicle was **already there** when observation started. How long it had been is unknown |
+| `unknown` | `unknown` | Pre-dates this rule; whether the start was observed is unknown |
+
+> **One stay may appear as several sessions.** When observation is lost for a while, the
+> session is closed as `lastSeen` and a new one opens as `firstSeen` once observation
+> resumes — the unobserved gap is deliberately excluded from the time parked. A session
+> closed as `lastSeen` and one opened as `firstSeen` on the same space, adjacent in time,
+> are likely the same stay. Whether to add them up is billing policy, not something the
+> API decides.
+>
+> A short loss (under twice the entry/exit confirmation time) does not split the record.
+> No exit or entry can be confirmed within it, so it would have been one session even if
+> observation had continued.
+
+| Query | Description |
+|-------|-------------|
+| `GET /api/v1/parking/session?inKind=firstSeen` | Only sessions whose entry was not observed |
+| `GET /api/v1/parking/session?outKind=lastSeen` | Only sessions closed because observation ended |
+
+### 16.6. Parking Session Detail
+
+Returns one session with its payment history always included. Use it as the evidence
+view for a dispute.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/v1/parking/session/{id}` | Session detail |
+
+**Response**: a single session object, same shape as `data[]` in 16.5, always carrying
+`payments`.
+
+```json
+{
+  "id": 4821,
+  "kind": "spot",
+  "src": {
+    "id": 101,
+    "name": "A-13"
+  },
+  "chid": 3,
+  "plateNo": "12가3456",
+  "timeRange": ["2026-10-07T08:01:04", "2026-10-07T09:22:40"],
+  "open": false,
+  "outKind": "paid",
+  "outTimeMeans": "paidAt",
+  "durationMs": 4739000,
+  "paidCount": 1,
+  "lastPaidTime": "2026-10-07T09:20:03",
+  "unpaidDurationMs": 0,
+  "snapshots": [
+    {
+      "time": "2026-10-07T08:01:04",
+      "chid": 3,
+      "tags": ["in"],
+      "plateNo": null,
+      "image": null,
+      "video": "..."
+    }
+  ],
+  "payments": [
+    {
+      "id": 77,
+      "time": "2026-10-07T09:20:03",
+      "ref": "POS-20261007-0042"
+    }
+  ]
+}
+```
+
+| Status | Meaning |
+|--------|---------|
+| `404` | No session with that ID |
+
+### 16.7. Change Payment State
+
+Changes the payment state of this session. The NVR stores the **time** and the caller's
+reference only — amounts, tariffs and discount rules stay in the billing app.
+
+| Endpoint | What it does | `409` |
+|----------|--------------|-------|
+| `POST /api/v1/parking/session/{id}/payment/commit` | Settle the payment (repeatable) | — |
+| `POST /api/v1/parking/session/{id}/payment/exempt` | Exempt the session from billing | Already exempt |
+| `POST /api/v1/parking/session/{id}/payment/undo` | Revert the latest effective change | Nothing to revert |
+
+**What each action changes** (response fields in 16.5)
+
+| Action | `paidCount` | `lastPaidTime` | `unpaidDurationMs` | `exempt` |
+|--------|-------------|----------------|--------------------|----------|
+| `commit` | +1 | this time | recounted from this time | unchanged |
+| `exempt` | unchanged | unchanged | unchanged | `true` |
+| `undo` | −1 (when a payment is reverted) | previous effective payment | follows that | `false` when an exemption is reverted |
+
+**Rules**
+
+| Item | Rule |
+|---|---|
+| Records | Appended, never deleted. An `undo` adds a row of its own |
+| `undo` target | Omitted: the latest effective change (payment or exemption). With `ref`: the **payment** carrying that reference |
+| `undo` response | `undone` says which kind was reverted (`commit` or `exempt`) |
+| Repeated `undo` | Walks further back through the log |
+| What `exempt` means | Not erasing an amount — recording a **decision not to collect** |
+| Exempt and queries | Exempt sessions are left out of `unpaidDurationMin` queries (that query looks for what is still owed) |
+| Reverted payments | Are not a basis for the `outKind:"paid"` exit time |
+| Recorded time | **Always the server clock.** A `time` you pass is kept separately as `clientTime` (see [1.1](#11-time-notation)) |
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `time` | DateTime | N | The **caller's clock** reading. Kept separately; the NVR always records its own server time (see [1.1](#11-time-notation)) |
+| `ref` | String | N | Transaction identifier in the billing app. For `undo`, singles out the payment to revert |
+
+**Response**:
+```json
+{
+  "session": 4821,
+  "time": "2026-10-07T09:20:03",
+  "action": "commit",
+  "ref": "POS-20261007-0042"
+}
+```
+```json
+{
+  "session": 4821,
+  "time": "2026-10-07T18:40:11",
+  "action": "undo",
+  "undone": "exempt"
+}
+```
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Invalid session ID or time |
+| `403` | Needs **Control** permission |
+| `404` | No session with that ID |
+| `409` | `exempt` on an already exempt session, or `undo` with nothing left to revert |
+
+> A payment on an open session is also what lets the exit time fall back to `paid` if the
+> vehicle is never observed leaving — see the exit basis table in 16.5. **An undone payment
+> is not such a basis** (if it were, the exit time itself would be wrong).
+
+### 16.8. No-exit Cleanup
+
+Lets an operator clear a session left "parked" because its exit was never observed
+(it closes the session).
+
+| Item | Detail |
+|---|---|
+| Purpose | Clear entries where the vehicle left but no exit was recognized |
+| Why they occur | Gate left open during free night hours (no exit at a gate) · a spot hidden behind a large vehicle for a long time |
+| If left alone | "Parked" entries pile up and make the live status and the history untrustworthy |
+| Recorded as | `outKind: "manual"` · `outTimeMeans: "closedByOperator"` |
+| A billing app should | **Not** treat it like an observed exit — single it out |
+| vs. `exempt` in [16.7](#167-change-payment-state) | This closes the **parking state**; `exempt` takes the session out of **billing** and may leave it parked |
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/v1/parking/session/{id}/close` | Close at the current time |
+| `POST /api/v1/parking/session/{id}/close?time=...` | Close at a given time |
+
+**Parameters**:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `time` | DateTime | N | The **caller's clock** reading of the exit. Kept separately; parking duration is computed from the server clock only (see [1.1](#11-time-notation)) |
+
+**Response**:
+```json
+{
+  "session": 4821,
+  "time": "2026-10-07T09:30:00",
+  "outKind": "manual",
+  "outTimeMeans": "closedByOperator"
+}
+```
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Invalid session ID, or a time at or before the entry time |
+| `403` | Needs **Control** permission |
+| `404` | No session with that ID |
+| `409` | The session is already closed — an existing exit record is never overwritten |
 
 > **Examples:** [JavaScript](examples/javascript/10-parking.js) · [Python](examples/python/10_parking.py) · [C#](examples/csharp/10_Parking.cs) · [Go](examples/go/10_parking/) · [Java](examples/java/V1_10_Parking.java) · [Kotlin](examples/kotlin/V1_10_Parking.kt) · [Swift](examples/swift/10-parking.swift) · [PowerShell](examples/powershell/10-parking.ps1) · [curl](examples/curl/10-parking.sh)
 
@@ -2415,12 +3018,17 @@ You can add or remove topic subscriptions at any time after connection by sendin
 
 Subscribe:
 ```json
-{"subscribe": "channelStatus", "ch": [1, 2]}
+{
+  "subscribe": "channelStatus",
+  "ch": [1, 2]
+}
 ```
 
 Unsubscribe:
 ```json
-{"unsubscribe": "channelStatus"}
+{
+  "unsubscribe": "channelStatus"
+}
 ```
 
 **Responses:**
@@ -2608,7 +3216,9 @@ ws://{host}:{port}/wsapi/v1/events?apikey={apiKey}
 **Unsubscribe:**
 
 ```json
-{"unsubscribe": "channelStatus"}
+{
+  "unsubscribe": "channelStatus"
+}
 ```
 
 | Field | Type | Description |
@@ -2842,7 +3452,10 @@ sequenceDiagram
 After receiving a `fileEnd` message, send one of the following commands within the `ttl` time:
 
 ```json
-{"task": "{taskId}", "cmd": "next"}
+{
+  "task": "{taskId}",
+  "cmd": "next"
+}
 ```
 
 | cmd | Description |

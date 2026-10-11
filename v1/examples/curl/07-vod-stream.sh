@@ -80,9 +80,9 @@ echo "=== Sub Stream (Low Resolution) ==="
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Playback URL ==="
-YESTERDAY=$(date -u -d "yesterday" +%Y-%m-%dT%H:%M:%S 2>/dev/null \
-  || date -u -v-1d +%Y-%m-%dT%H:%M:%S 2>/dev/null \
-  || echo "2025-01-01T12:00:00")
+YESTERDAY=$(date -u -d "yesterday" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+  || date -u -v-1d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+  || echo "2025-01-01T12:00:00Z")
 
 PLAY_RESPONSE=$("${CURL[@]}" "${AUTH[@]}" -H "X-Host: ${HOST}:${PORT}" \
   "${BASE}/api/v1/vod?ch=1&when=${YESTERDAY}")
