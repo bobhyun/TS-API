@@ -63,7 +63,7 @@
     - [13.3. Watch Page (Embeddable Player)](#133-watch-page-embeddable-player)
 14. [Emergency](#14-emergency)
     - [14.1. Emergency Call List](#141-emergency-call-list)
-15. [Push](#15-push)
+15. [Push](#15-push-lpr-camera-emergency-bell-integration)
     - [15.1. Send Push Event](#151-send-push-event)
 16. [Parking](#16-parking)
     - [16.1. Parking Lot](#161-parking-lot)
@@ -171,8 +171,22 @@ left = (cx - w/2) * displayWidth      top = (cy - h/2) * displayHeight
 
 **Exception — `vehicle.plate` in [16.4](#164-parking-spot-status).** That field keeps
 **absolute pixels** (`left`, `top`, `right`, `bottom`). It is already deployed and partner
-applications read those values; changing its shape would break them silently. Divide by
-`imageSize` from the same response. **New box fields use YOLO.**
+applications read those values; changing its shape would break them silently —
+compatibility comes before a uniform notation.
+
+Those pixels are **not** relative to the whole frame. They are relative to the
+`vehicle.image` crop in the same response, whose dimensions are `vehicle.imageSize`
+(all three fields come only with `image=true`). To normalize, divide by
+`imageSize.width` / `imageSize.height`.
+
+```
+cx = (left + right) / 2 / imageSize.width
+cy = (top + bottom) / 2 / imageSize.height
+w  = (right - left)     / imageSize.width
+h  = (bottom - top)     / imageSize.height
+```
+
+**New box fields use YOLO.**
 
 
 ---
@@ -2733,9 +2747,14 @@ happened, so a vehicle still parked may have been recorded from `firstSeen`.
 > are likely the same stay. Whether to add them up is billing policy, not something the
 > API decides.
 >
-> A short loss (under twice the entry/exit confirmation time) does not split the record.
-> No exit or entry can be confirmed within it, so it would have been one session even if
-> observation had continued.
+> A short loss does not split the record. No exit or entry can be confirmed within it, so
+> it would have been one session even if observation had continued. The threshold is
+> whichever of these is **longer**:
+>
+> - **twice the entry/exit confirmation time**
+> - **twice the plate recognition interval** — a floor that keeps a normal cycle from
+>   being read as a loss. On a unit configured with a long recognition interval this is
+>   what applies, so the same gap does not split the record.
 
 | Query | Description |
 |-------|-------------|
