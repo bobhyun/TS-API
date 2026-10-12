@@ -2842,7 +2842,7 @@ reference only — amounts, tariffs and discount rules stay in the billing app.
 | `undo` target | Omitted: the latest effective change (payment or exemption). With `ref`: the **payment** carrying that reference |
 | `undo` response | `undone` says which kind was reverted (`commit` or `exempt`) |
 | Repeated `undo` | Walks further back through the log |
-| What `exempt` means | Not erasing an amount — recording a **decision not to collect** |
+| What `exempt` means | Records a **decision not to collect**. The time values do not change, so when `exempt` is `true`, do not bill from `unpaidDurationMs` |
 | Exempt and queries | Exempt sessions are left out of `unpaidDurationMin` queries (that query looks for what is still owed) |
 | Reverted payments | Are not a basis for the `outKind:"paid"` exit time |
 | Recorded time | **Always the server clock.** A `time` you pass is kept separately as `clientTime` (see [1.1](#11-time-notation)) |
