@@ -3068,8 +3068,65 @@ Unsubscribe:
 | `{"type":"subscribed","topic":"..."}` | Subscription successful. Depending on the topic, initial state data may also be sent. |
 | `{"type":"unsubscribed","topic":"..."}` | Unsubscription successful. |
 | `{"type":"error","topic":"...","message":"..."}` | Unknown topic or invalid request. |
+| `{"type":"error","message":"unknown command"}` | A message that is neither `subscribe` nor `unsubscribe`. |
+| `{"type":"error","message":"invalid JSON"}` | A message that cannot be parsed as JSON. |
 
 > **Note**: Re-subscribing to the same topic automatically replaces the existing subscription (useful for changing filters).
+
+**Connecting without topics:**
+
+v1 lets you connect without `topics`. Pick topics afterwards with `subscribe` messages, so a
+client whose subscription list changes at runtime can change topics without reconnecting.
+
+```
+ws://{host}:{port}/wsapi/v1/events?apikey={apiKey}
+```
+
+**Filters in a subscribe message:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `subscribe` | string | Topic name to subscribe |
+| `ch` | number[] | Channel filter (optional) |
+| `objectTypes` | string[] | Object type filter — `human`, `face`, `vehicle` (optional) |
+| `lot` | number[] | Parking lot ID filter (optional) |
+| `spot` | number[] | Parking spot ID filter (optional) |
+
+```json
+{"subscribe": "channelStatus"}
+{"subscribe": "channelStatus", "ch": [1, 2, 3]}
+{"subscribe": "object", "objectTypes": ["human", "vehicle"]}
+{"subscribe": "parkingSpot", "lot": [1, 2], "spot": [100, 200]}
+{"subscribe": "LPR", "ch": [1]}
+```
+
+**Dynamic subscription example:**
+
+```javascript
+const ws = new WebSocket('ws://localhost/wsapi/v1/events?apikey=tsapi_key_...');
+
+ws.onopen = () => {
+  // Pick topics after connecting
+  ws.send(JSON.stringify({ subscribe: 'channelStatus' }));
+  ws.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 2] }));
+};
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  // Handle control messages first
+  if (data.type === 'subscribed') { console.log('Subscribed:', data.topic); return; }
+  if (data.type === 'unsubscribed') { console.log('Unsubscribed:', data.topic); return; }
+  if (data.type === 'error') { console.error('Error:', data.message); return; }
+
+  // Event data
+  if (data.topic === 'LPR') (data.plates || [data]).forEach(p => console.log('Plate:', p.plateNo));
+};
+
+// Add or drop topics at runtime
+ws.send(JSON.stringify({ unsubscribe: 'channelStatus' }));
+ws.send(JSON.stringify({ subscribe: 'object', objectTypes: ['human'] }));
+```
 
 **Parking Spot Event Filters:**
 
@@ -3206,138 +3263,6 @@ ws1.onmessage = (event) => {
   }
 };
 ```
-
-### 17.5. Dynamic Subscribe / Unsubscribe (v1 only)
-
-v1 WebSocket connections support dynamic topic management via `send()` messages after connection.
-This allows:
-- Connecting **without initial topics** and subscribing later
-- Adding/removing topics at runtime without reconnecting
-- Changing per-topic filters (channel, objectTypes, lot, spot) by re-subscribing
-
-#### Connection without topics
-
-v1 allows connecting without `topics` parameter. Subscribe to topics later via `send()`:
-
-```
-ws://{host}:{port}/wsapi/v1/events?apikey={apiKey}
-```
-
-#### Client → Server Messages
-
-**Subscribe:**
-
-```json
-{"subscribe": "channelStatus"}
-{"subscribe": "channelStatus", "ch": [1, 2, 3]}
-{"subscribe": "object", "objectTypes": ["human", "vehicle"]}
-{"subscribe": "parkingSpot", "lot": [1, 2], "spot": [100, 200]}
-{"subscribe": "LPR", "ch": [1]}
-```
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `subscribe` | string | Topic name to subscribe |
-| `ch` | number[] | Channel filter (optional) |
-| `objectTypes` | string[] | Object type filter: `"human"`, `"face"`, `"vehicle"` (optional) |
-| `lot` | number[] | Parking lot ID filter (optional) |
-| `spot` | number[] | Parking spot ID filter (optional) |
-
-**Unsubscribe:**
-
-```json
-{
-  "unsubscribe": "channelStatus"
-}
-```
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `unsubscribe` | string | Topic name to unsubscribe |
-
-#### Server → Client Responses
-
-```json
-{"type": "subscribed", "topic": "channelStatus"}
-{"type": "unsubscribed", "topic": "channelStatus"}
-{"type": "error", "topic": "unknownTopic", "message": "unknown topic"}
-{"type": "error", "message": "unknown command"}
-{"type": "error", "message": "invalid JSON"}
-```
-
-| type | Description |
-|------|-------------|
-| `subscribed` | Topic successfully subscribed. Initial data (if any) follows immediately. |
-| `unsubscribed` | Topic successfully unsubscribed |
-| `error` | Error with optional `topic` and `message` fields |
-
-#### Re-subscribe to update filters
-
-Sending `subscribe` for an already-subscribed topic replaces the existing subscription with new filter parameters:
-
-```javascript
-// Initial: subscribe ch 1 only
-ws.send(JSON.stringify({ subscribe: 'channelStatus', ch: [1] }));
-
-// Later: update to ch 1, 2, 3
-ws.send(JSON.stringify({ subscribe: 'channelStatus', ch: [1, 2, 3] }));
-```
-
-#### Example
-
-```javascript
-const ws = new WebSocket('ws://localhost/wsapi/v1/events?apikey=tsapi_key_...');
-
-ws.onopen = () => {
-  // Subscribe to topics dynamically after connection
-  ws.send(JSON.stringify({ subscribe: 'channelStatus' }));
-  ws.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 2] }));
-};
-
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-
-  // Handle control messages
-  if (data.type === 'subscribed') {
-    console.log(`Subscribed to ${data.topic}`);
-    return;
-  }
-  if (data.type === 'unsubscribed') {
-    console.log(`Unsubscribed from ${data.topic}`);
-    return;
-  }
-  if (data.type === 'error') {
-    console.error(`Error: ${data.message}`);
-    return;
-  }
-
-  // Handle event data
-  switch (data.topic) {
-    case 'LPR':
-      // v1.0.1: data.plates (array), v1.0.0: data (single object) — handle both
-      (data.plates || [data]).forEach(p => console.log('Plate:', p.plateNo));
-      break;
-    case 'channelStatus':
-      console.log('Channel', data.chid, 'Status:', data.status);
-      break;
-  }
-};
-
-// Later: unsubscribe from a topic
-ws.send(JSON.stringify({ unsubscribe: 'channelStatus' }));
-
-// Later: add new topic
-ws.send(JSON.stringify({ subscribe: 'object', objectTypes: ['human'] }));
-```
-
-> **Note**: v0 WebSocket (`/wsapi/subscribeEvents`) does NOT support dynamic subscribe/unsubscribe. Messages sent on v0 connections are ignored.
-
-> **Examples:**
-> - Events: [JavaScript](examples/javascript/12-websocket-events.js) · [Python](examples/python/12_websocket_events.py) · [C#](examples/csharp/12_WebSocketEvents.cs) · [Go](examples/go/12_ws_events/) · [Java](examples/java/V1_12_WebSocketEvents.java) · [Kotlin](examples/kotlin/V1_12_WebSocketEvents.kt) · [Swift](examples/swift/12-websocket-events.swift) · [PowerShell](examples/powershell/12-websocket-events.ps1) · [curl](examples/curl/12-websocket-events.sh)
-> - Parking Lot: [JavaScript](examples/javascript/13-websocket-parking-lot.js) · [Python](examples/python/13_websocket_parking_lot.py) · [C#](examples/csharp/13_WebSocketParkingLot.cs) · [Go](examples/go/13_ws_parking_lot/) · [Java](examples/java/V1_13_WebSocketParkingLot.java) · [Kotlin](examples/kotlin/V1_13_WebSocketParkingLot.kt) · [Swift](examples/swift/13-websocket-parking-lot.swift) · [PowerShell](examples/powershell/13-websocket-parking-lot.ps1) · [curl](examples/curl/13-websocket-parking-lot.sh)
-> - Parking Spot: [JavaScript](examples/javascript/14-websocket-parking-spot.js) · [Python](examples/python/14_websocket_parking_spot.py) · [C#](examples/csharp/14_WebSocketParkingSpot.cs) · [Go](examples/go/14_ws_parking_spot/) · [Java](examples/java/V1_14_WebSocketParkingSpot.java) · [Kotlin](examples/kotlin/V1_14_WebSocketParkingSpot.kt) · [Swift](examples/swift/14-websocket-parking-spot.swift) · [PowerShell](examples/powershell/14-websocket-parking-spot.ps1) · [curl](examples/curl/14-websocket-parking-spot.sh)
-
----
 
 ## 18. Data Export — Recording Backup (WebSocket API)
 

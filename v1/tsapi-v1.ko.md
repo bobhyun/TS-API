@@ -3050,8 +3050,65 @@ ws://{host}:{port}/wsapi/v1/events?topics={topics}&apikey={apiKey}
 | `{"type":"subscribed","topic":"..."}` | 구독 성공. 토픽에 따라 초기 상태 데이터가 함께 전송될 수 있습니다. |
 | `{"type":"unsubscribed","topic":"..."}` | 구독 해제 성공. |
 | `{"type":"error","topic":"...","message":"..."}` | 알 수 없는 토픽이거나 잘못된 요청. |
+| `{"type":"error","message":"unknown command"}` | `subscribe`·`unsubscribe` 가 아닌 메시지. |
+| `{"type":"error","message":"invalid JSON"}` | JSON 으로 해석할 수 없는 메시지. |
 
 > **참고**: 동일 토픽을 다시 subscribe하면 기존 구독이 자동으로 교체됩니다 (필터 변경 시 유용).
+
+**토픽 없이 연결하기:**
+
+v1 은 `topics` 없이 연결할 수 있습니다. 연결한 뒤 `subscribe` 메시지로 토픽을 고르면 되므로,
+구독 목록이 실행 중에 바뀌는 클라이언트는 재연결 없이 토픽을 바꿀 수 있습니다.
+
+```
+ws://{host}:{port}/wsapi/v1/events?apikey={apiKey}
+```
+
+**subscribe 메시지의 필터:**
+
+| 필드 | 형식 | 설명 |
+|------|------|------|
+| `subscribe` | string | 구독할 토픽 이름 |
+| `ch` | number[] | 채널 필터 (선택) |
+| `objectTypes` | string[] | 객체 유형 필터 — `human`·`face`·`vehicle` (선택) |
+| `lot` | number[] | 주차장 ID 필터 (선택) |
+| `spot` | number[] | 주차면 ID 필터 (선택) |
+
+```json
+{"subscribe": "channelStatus"}
+{"subscribe": "channelStatus", "ch": [1, 2, 3]}
+{"subscribe": "object", "objectTypes": ["human", "vehicle"]}
+{"subscribe": "parkingSpot", "lot": [1, 2], "spot": [100, 200]}
+{"subscribe": "LPR", "ch": [1]}
+```
+
+**동적 구독 예제:**
+
+```javascript
+const ws = new WebSocket('ws://localhost/wsapi/v1/events?apikey=tsapi_key_...');
+
+ws.onopen = () => {
+  // 연결한 뒤에 토픽을 고른다
+  ws.send(JSON.stringify({ subscribe: 'channelStatus' }));
+  ws.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 2] }));
+};
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  // 제어 메시지 먼저 가린다
+  if (data.type === 'subscribed') { console.log('Subscribed:', data.topic); return; }
+  if (data.type === 'unsubscribed') { console.log('Unsubscribed:', data.topic); return; }
+  if (data.type === 'error') { console.error('Error:', data.message); return; }
+
+  // 이벤트 데이터
+  if (data.topic === 'LPR') (data.plates || [data]).forEach(p => console.log('Plate:', p.plateNo));
+};
+
+// 실행 중에 토픽을 빼거나 더한다
+ws.send(JSON.stringify({ unsubscribe: 'channelStatus' }));
+ws.send(JSON.stringify({ subscribe: 'object', objectTypes: ['human'] }));
+```
 
 **주차면 이벤트 필터:**
 
