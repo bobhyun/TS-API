@@ -171,8 +171,8 @@ left = (cx - w/2) * displayWidth      top = (cy - h/2) * displayHeight
 
 **Exception — `vehicle.plate` in [16.4](#164-parking-spot-status).** That field keeps
 **absolute pixels** (`left`, `top`, `right`, `bottom`). It is already deployed and partner
-applications read those values; changing its shape would break them silently —
-compatibility comes before a uniform notation.
+applications read those values, so it is not changed. Compatibility takes precedence
+over a uniform notation.
 
 Those pixels are **not** relative to the whole frame. They are relative to the
 `vehicle.image` crop in the same response, whose dimensions are `vehicle.imageSize`
