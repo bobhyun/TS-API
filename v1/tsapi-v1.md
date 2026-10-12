@@ -2879,9 +2879,15 @@ reference only — amounts, tariffs and discount rules stay in the billing app.
 | `404` | No session with that ID |
 | `409` | `exempt` on an already exempt session, or `undo` with nothing left to revert |
 
-> A payment on an open session is also what lets the exit time fall back to `paid` if the
-> vehicle is never observed leaving — see the exit basis table in 16.5. **An undone payment
-> is not such a basis** (if it were, the exit time itself would be wrong).
+> A payment on an open session can also become the basis for the exit time. **When the
+> program restarts**, parking space and dwell sessions still left open are closed, and if
+> the last payment is later than the video-based estimate, that time is used as the exit
+> time with `paid` as the basis (see the exit basis table in
+> [16.5](#165-parking-session-history)). It does not apply to entrance/exit sessions.
+>
+> **Undone payments and exemptions are not used as a basis** (if they were, the exit time
+> itself would be wrong). A session closed during operation after observation was lost
+> stays `lastSeen`; a payment arriving later does not change it to `paid`.
 
 ### 16.8. No-exit Cleanup
 
