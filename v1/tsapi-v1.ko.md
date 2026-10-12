@@ -2828,7 +2828,7 @@ Content-Type: application/json
 | `undo` 응답 | `undone` 이 무엇을 되돌렸는지 알려 줍니다 (`commit` 또는 `exempt`) |
 | 반복 `undo` | 로그를 거슬러 그 앞의 변경을 되돌립니다 |
 | `exempt` 의 뜻 | **정산하지 않기로 한 결정**을 기록합니다. 시간 값은 바뀌지 않으므로, `exempt` 가 `true` 면 `unpaidDurationMs` 를 청구 근거로 쓰지 않습니다 |
-| 제외와 조회 | 제외된 세션은 `unpaidDurationMin` 조회에서 빠집니다 (받을 것이 남은 건을 찾는 조회입니다) |
+| 제외와 조회 | 제외된 세션은 `unpaidDurationMin` 조회 결과에서 빠집니다. 이 조건은 정산되지 않은 시간이 남은 세션을 추리는 용도이고, 제외된 세션은 정산 대상이 아닙니다 |
 | 되돌린 정산 | `outKind:"paid"` 의 출차 시각 근거가 되지 않습니다 |
 | 기록 시각 | **항상 서버 시계**입니다. `time` 으로 준 값은 `clientTime` 으로 따로 보존됩니다 ([1.1](#11-시각-표기)) |
 
