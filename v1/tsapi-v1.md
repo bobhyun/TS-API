@@ -137,6 +137,12 @@ as that app's clock reading; the NVR's own recorded time is **always the server 
 That separation keeps parking durations and video positions stable even when the two
 systems' clocks drift apart.
 
+To align the clocks themselves, **the NVR can be used as an NTP server.** It serves its
+own clock over standard NTP (UDP 123), so pointing the integrating system's time
+synchronization at the NVR address makes both clocks agree and removes the discrepancy
+the separation above accounts for. Some products do not provide this, so check first
+that time synchronization against the NVR address works.
+
 ### 1.2. Box Coordinates
 
 Bounding boxes use the **YOLO coordinate system** — center-based, all four values
