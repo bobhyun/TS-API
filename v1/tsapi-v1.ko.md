@@ -26,6 +26,7 @@
    - [5.2. 시스템 상태](#52-시스템-상태)
    - [5.3. HDD S.M.A.R.T](#53-hdd-smart)
    - [5.4. 시스템 제어](#54-시스템-제어)
+   - [5.5. 시스템 알림](#55-시스템-알림)
 6. [채널](#6-채널)
    - [6.1. 채널 목록](#61-채널-목록)
    - [6.2. 채널 상태](#62-채널-상태)
@@ -50,6 +51,7 @@
     - [10.1. LPR 소스 (인식 지점/영역)](#101-lpr-소스-인식-지점영역)
     - [10.2. LPR 로그](#102-lpr-로그)
     - [10.3. 유사 번호판 검색](#103-유사-번호판-검색)
+    - [10.4. 차량 번호 수정](#104-차량-번호-수정)
 11. [객체 감지](#11-객체-감지)
     - [11.1. 객체 유형](#111-객체-유형)
     - [11.2. 객체 속성](#112-객체-속성)
@@ -74,6 +76,7 @@
     - [16.6. 주차 내역 상세](#166-주차-내역-상세)
     - [16.7. 정산 상태 변경](#167-정산-상태-변경)
     - [16.8. 미출차 정리](#168-미출차-정리)
+    - [16.9. 차량 번호 수정](#169-차량-번호-수정)
 17. [실시간 이벤트 구독 (WebSocket API)](#17-실시간-이벤트-구독-websocket-api)
     - [17.1. 연결 흐름](#171-websocket-연결-흐름)
     - [17.2. 엔드포인트](#172-엔드포인트)
@@ -551,7 +554,7 @@ Authorization: Bearer {admin_token}
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.1.0") |
+| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.3.0") |
 | `GET /api/v1/info?siteName` | - | 사이트 이름 조회 |
 | `GET /api/v1/info?timezone` | - | 서버 타임존 조회 (name, bias) |
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
@@ -586,7 +589,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **응답** (정품 라이선스 + ANPR/객체감지/주차안내 활성 예시):
 ```json
 {
-  "apiVersion": "TS-API@1.1.0",
+  "apiVersion": "TS-API@1.3.0",
   "siteName": "Main Office",
   "timezone": {
     "name": "Asia/Seoul",
@@ -721,12 +724,13 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `GET /api/v1/system/health?item=memory` | 메모리 사용량 (total, used, free) |
 | `GET /api/v1/system/health?item=disk` | 디스크 사용량 (total, used, free) |
 | `GET /api/v1/system/health?item=memory,disk` | 여러 항목 동시 조회 |
+| `GET /api/v1/system/health?item=systemDisk` | 시스템 디스크(데이터베이스와 로그가 있는 디스크) 상태 |
 
 **파라미터**:
 
 | 파라미터 | 타입 | 필수 | 설명 |
 |----------|------|------|------|
-| `item` | String | N | 조회 항목 (쉼표 구분): `cpu`, `memory`, `disk`, `recording`, `network`, `all`, `supported` |
+| `item` | String | N | 조회 항목 (쉼표 구분): `cpu`, `memory`, `disk`, `systemDisk`, `recording`, `network`, `all`, `supported` |
 
 **응답 필드**:
 
@@ -767,6 +771,17 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `network[].recvBytesPerSec` | Int | 수신 속도 (bytes/sec) |
 | `network[].sendBytesPerSec` | Int | 송신 속도 (bytes/sec) |
 | `network[].curBandwidth` | Int | 현재 대역폭 (bps) |
+| `systemDisk` | Object | 시스템 디스크 상태 (`item` 에 `systemDisk` 포함 시) |
+| `systemDisk.drive` | String | 볼륨 (예: `"C:"`) |
+| `systemDisk.totalSpace` | Int | 전체 용량 (bytes), 첫 측정 전에는 `-1` |
+| `systemDisk.freeSpace` | Int | 여유 용량 (bytes), 첫 측정 전에는 `-1` |
+| `systemDisk.status` | String | `normal`, `low` (여유 1 GB 미만), `critical` (여유 200 MB 미만 또는 최근 저장 실패) |
+| `systemDisk.dataWriteFailed` | Boolean | 최근 60초 안에 공간 부족이나 I/O 오류로 기록을 저장하지 못했는지 |
+
+*시스템 디스크*는 제품이 데이터베이스와 로그를 저장하는 디스크로, 보통 Windows 가 설치된 `C:` 이며
+녹화 디스크와 별개입니다. 이 디스크가 차면 녹화 디스크에 공간이 남아 있어도 새 녹화를 색인하지 못하고
+인식 기록이 저장되지 않습니다. 그러므로 `disk[]` 만 보지 말고 `systemDisk.status` 를 함께 확인하십시오.
+바뀔 때 알림을 받으려면 알림 채널([5.5. 시스템 알림](#55-시스템-알림))을 쓰십시오.
 
 ### 5.3. HDD S.M.A.R.T
 
@@ -836,6 +851,88 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 > **예제:** [JavaScript](examples/javascript/08-system-info.js) · [Python](examples/python/08_system_info.py) · [C#](examples/csharp/08_SystemInfo.cs) · [Go](examples/go/08_system/) · [Java](examples/java/V1_08_SystemInfo.java) · [Kotlin](examples/kotlin/V1_08_SystemInfo.kt) · [Swift](examples/swift/08-system-info.swift) · [PowerShell](examples/powershell/08-system-info.ps1) · [curl](examples/curl/08-system-info.sh)
 
 ---
+
+### 5.5. 시스템 알림
+
+알림은 **지금 유효한** 주의 사항입니다. 올라오고, 갱신되고, 해제됩니다. 이벤트(§9)가 일어난 일의
+이력이라면 알림은 현재 상태입니다. 알림은 메모리에만 두므로 시스템 디스크가 가득 차도 동작합니다.
+
+| Endpoint | 설명 |
+|----------|------|
+| `GET /api/v1/system/notices` | 지금 유효한 알림 목록 |
+| `GET /api/v1/system/notices?lang=ko-KR` | 같은 목록, `message` 에 `ko-KR` 문구를 덧붙여 |
+
+로그인한 사용자는 누구나 조회할 수 있습니다. 실시간으로 받으려면 `notice` 토픽을 구독하십시오
+([17.4. 이벤트 구독](#174-이벤트-구독)). 구독 직후 현재 목록을 한 번 보내고, 이후로는 바뀐 것만 보냅니다.
+
+**언어** — `message` 는 언어 코드를 키로 하는 객체입니다. `en-US` 는 항상 있으며 정본입니다.
+요청(REST 호출 또는 웹소켓 URL 의 `lang`)이 영어가 아닌 언어를 지정하면, 그 언어 코드를 키로 문구를
+덧붙입니다. 코드는 이 API 의 `lang` 파라미터와 같은 체계입니다(예: `ko-KR`, `zh-TW`). 서버가 번역할 수 없는
+언어는 덧붙이지 않습니다. 직접 번역하는 클라이언트는 `messageKey` 와 `args` 를 쓰면 되고, 사용자가
+언어를 바꿔도 다시 접속할 필요가 없습니다.
+
+**응답** — 배열, 심각도 높은 순, 같으면 먼저 올라온 순:
+```json
+[
+  {
+    "id": "systemDisk",
+    "kind": "systemDisk",
+    "severity": "critical",
+    "message": {
+      "en-US": "Disk C: is almost full: 150MB left",
+      "ko-KR": "C: 디스크 거의 가득 참: 150MB 남음"
+    },
+    "messageKey": "Disk %1% is almost full: %2% left",
+    "args": ["C:", "150MB"],
+    "param": {"drive": "C:", "totalSpace": 119387713536, "freeSpace": 157286400, "status": "critical", "dataWriteFailed": false},
+    "timeBegin": "2026-10-23T08:40:12.000+09:00",
+    "timeUpdate": "2026-10-23T08:51:07.000+09:00"
+  }
+]
+```
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | String | 알림 하나를 가리키는 키. 같은 `id` 는 중복되지 않고 그 자리에서 갱신됩니다 |
+| `kind` | String | 알림을 올린 곳. 현재는 `systemDisk` |
+| `severity` | String | `info`, `warning`, `critical`. `critical` 은 즉시 조치가 필요하니 눈에 띄게 표시하십시오 |
+| `message` | Object | 언어 코드별 문구, 자리표시자를 채움 |
+| `message.en-US` | String | 영어 — 항상 있음 |
+| `message.{lang}` | String | 요청한 언어, 그 언어 코드를 키로(예: `ko-KR`). 지원하는 영어 외 언어를 `lang` 으로 요청했을 때만 있음 |
+| `messageKey` | String | 자리표시자(`%1%`, `%2%` …)가 든 영어 원문 — 번역 키. 직접 번역하는 클라이언트용 |
+| `args` | Array | 자리표시자 값, 순서대로 (번역하지 않음) |
+| `param` | Object | `kind` 별 상세. 없으면 생략. 열린 집합으로 다루십시오 |
+| `timeBegin` | String | 처음 올라온 시각. 갱신되어도 바뀌지 않음 |
+| `timeUpdate` | String | 마지막 변경 시각 |
+
+**`notice` 토픽 메시지:**
+
+| `action` | 본문 | 시점 |
+|----------|------|------|
+| `snapshot` | `notices`: 위와 같은 배열 | 구독 직후 한 번 |
+| `raised` | `notice`: 알림 하나 | 새 알림 |
+| `updated` | `notice`: 알림 하나 | 내용이 바뀜 (`systemDisk` 는 남은 공간 수치가 바뀔 때마다 — 지속되는 동안 약 5초마다) |
+| `cleared` | `notice`: 마지막 내용 | 더 이상 해당하지 않음 |
+
+```json
+{"topic": "notice", "action": "updated", "notice": {"id": "systemDisk", "severity": "critical", "message": {"en-US": "Disk C: is almost full: 140MB left", "ko-KR": "C: 디스크 거의 가득 참: 140MB 남음"}, "...": "..."}}
+```
+
+#### 시스템 디스크 알림 (`kind: systemDisk`)
+
+*시스템 디스크*는 제품이 데이터베이스와 로그를 저장하는 디스크로, 보통 Windows 가 설치된 `C:` 이며
+녹화 디스크와 별개입니다. 이 디스크가 차면 녹화 디스크에 공간이 남아 있어도 새 녹화를 색인하지 못하고
+인식 기록이 저장되지 않습니다.
+
+| `severity` | 조건 | `messageKey` |
+|----------|------|------|
+| `warning` | 여유 공간 1 GB 미만 | `Low disk space on %1%: %2% left` |
+| `critical` | 여유 공간 200 MB 미만 | `Disk %1% is almost full: %2% left` |
+| `critical` | 최근 60초 안에 공간 부족으로 기록을 저장하지 못함 | `Disk %1% is full. Data is not being saved.` |
+
+디스크가 정상으로 돌아오면 해제됩니다. `param` 은 [5.2. 시스템 상태](#52-시스템-상태)의 `systemDisk` 와
+같은 필드입니다. 단계가 바뀔 때마다 `systemEvent` 로도 기록합니다([시스템 디스크 경고](#시스템-디스크-경고)
+참조). 디스크가 가득 차 기록하지 못하면 알림만 남습니다.
 
 ## 6. 채널
 
@@ -1362,6 +1459,7 @@ curl "http://localhost/api/v1/channel/1/preset/preset1/go"
   "emergencyCall",
   "LPR",
   "systemEvent",
+  "notice",
   "motionChanges",
   "recordingStatus",
   "parkingCount",
@@ -1549,6 +1647,25 @@ curl "http://localhost/api/v1/channel/1/preset/preset1/go"
   "queuePct": 0
 }
 ```
+
+#### 시스템 디스크 경고
+
+시스템 로그 이벤트로 시스템 디스크의 단계 변화를 기록합니다([5.2. 시스템 상태](#52-시스템-상태)의
+`systemDisk` 참조). 현재 상태는 알림 채널([5.5. 시스템 알림](#55-시스템-알림))로 받으십시오.
+단계가 바뀔 때마다 한 번 보냅니다.
+
+| `code` | `codeName` | 시점 |
+|-----:|---------|------|
+| `51` | `"System disk space is low"` | 여유 공간이 1 GB 아래로 내려감 |
+| `52` | `"System disk is full"` | 여유 공간이 200 MB 아래로 내려가거나, 공간 부족으로 기록을 저장하지 못함 |
+| `53` | `"System disk space has been restored."` | 정상으로 돌아옴 |
+
+`codeName` 은 요청 언어로 번역되어 나갑니다. `param` 에는 상태 API 의 `systemDisk` 와 같은 필드
+(`drive`, `totalSpace`, `freeSpace`, `status`, `dataWriteFailed`)가 들어 있습니다.
+
+디스크가 가득 차 이벤트를 저장하지 못한 경우에도 `systemEvent` 구독자에게는 `id` `-1` 로
+전달되며, 이벤트 로그에는 남지 않습니다. 이 경고를 놓치면 안 되는 클라이언트는 로그를 조회하지 말고
+구독하십시오.
 
 ### 9.4. 이벤트 트리거 (이벤트 백업)
 
@@ -1745,7 +1862,9 @@ LPR 소스(인식 지점/영역) 목록을 조회합니다.
 | `at` | Int | 현재 오프셋 |
 | `data` | Array | 인식 결과 목록 |
 | `data[].id` | Int | 레코드 ID |
-| `data[].plateNo` | String | 차량 번호 |
+| `data[].plateNo` | String | 차량 번호. 언제나 **현재** 값입니다 — 수정했으면([10.4](#104-차량-번호-수정)) 수정한 번호입니다 |
+| `data[].plateEdited` | Boolean | 사람이 번호를 수정했으면 `true` |
+| `data[].originalPlateNo` | String | (`plateEdited` 일 때만) 처음 인식한 번호 (읽지 못했으면 `""`) |
 | `data[].score` | Float | 인식 신뢰도 |
 | `data[].timeRange` | Array | `[시작시간, 종료시간]` (ISO 8601) |
 | `data[].srcCode` | String | LPR 소스 코드 |
@@ -1777,6 +1896,84 @@ LPR 소스(인식 지점/영역) 목록을 조회합니다.
 ```json
 ["12가1234", "56나1234", "78다1234", ...]
 ```
+
+### 10.4. 차량 번호 수정
+
+오인식된 인식 기록 **한 건**의 번호를 수정합니다. 주차 정산에는 세션의 대표 번호를
+수정합니다([16.9](#169-차량-번호-수정)).
+
+| 엔드포인트 | 설명 |
+|-----------|------|
+| `POST /api/v1/lpr/log/{id}/plate` | 기록 `{id}` 의 번호 수정 |
+| `GET /api/v1/lpr/log/{id}/plate/history` | 기록 `{id}` 의 수정 이력 |
+
+**규칙**
+
+| 항목 | 규칙 |
+|---|---|
+| 대상 | `id` 로 지정한 기록 **한 건**뿐입니다. 일괄 수정, 번호 값으로 대상을 찾는 수정은 없습니다 |
+| `id` 를 얻는 곳 | [10.2](#102-lpr-로그) 의 `data[].id`, 또는 실시간 `LPR` 이벤트가 각 `plateNo` 옆에 싣는 `id` |
+| 이력 | 수정할 때마다 한 줄씩 쌓이고 앞선 기록은 바뀌지 않습니다. 잘못 수정한 것도 남으며, 다시 수정해 바로잡습니다 |
+| 형식 | 검사하지 않습니다(나라마다 다릅니다). 앞뒤 공백을 뺀 1~32자 |
+| 효과 | 저장된 기록만 바뀝니다. 이미 나간 이벤트(푸시, 등록 차량 대조, 전광판)는 다시 판정하지 않습니다 |
+| 권한 | **제어(Control)** |
+
+**파라미터** (쿼리, form, 또는 JSON 본문):
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|---------|------|------|------|
+| `plateNo` | String | Y | 새 번호 (1~32자) |
+| `reason` | String | N | 수정 사유 (200자 이하) |
+
+**응답**:
+```json
+{
+  "id": 91234,
+  "plateNo": "12가3456",
+  "previousPlateNo": "12가3458",
+  "originalPlateNo": "12가3458",
+  "editCount": 1,
+  "edit": {
+    "id": 57,
+    "time": "2026-10-22T14:03:11+09:00",
+    "user": "admin",
+    "reason": "야간 오인식"
+  }
+}
+```
+
+| 필드 | 설명 |
+|------|------|
+| `previousPlateNo` | 이번 수정 직전 값 (미인식 기록이었으면 `""`) |
+| `originalPlateNo` | 처음 인식한 값 |
+| `editCount` | 이번을 포함한 누적 수정 횟수 |
+| `edit.user` | 수정한 계정 (API 키면 그 키를 발급한 계정) |
+
+**이력 응답**:
+```json
+{
+  "target": "lpr",
+  "id": 91234,
+  "plateNo": "12가3456",
+  "originalPlateNo": "12가3458",
+  "edits": [
+    { "id": 41, "time": "2026-10-22T13:58:02+09:00", "user": "admin",
+      "before": "12가3458", "after": "12가3486", "reason": "" },
+    { "id": 57, "time": "2026-10-22T14:03:11+09:00", "user": "admin",
+      "before": "12가3486", "after": "12가3456", "reason": "야간 오인식" }
+  ]
+}
+```
+
+`edits` 는 기록된 순서입니다. 수정한 적이 없으면 비어 있고 `originalPlateNo` 가 없습니다.
+이력 조회는 **재생(Playback)** 권한이 필요합니다.
+
+| 상태 | 의미 |
+|------|-----|
+| `400` | ID 가 잘못됐거나, `plateNo` 가 없음·비었음·32자 초과, 또는 `reason` 이 200자 초과 |
+| `403` | **제어(Control)** 권한이 필요합니다 (이력은 **재생(Playback)**) |
+| `404` | 그 ID 의 기록이 없습니다 |
+| `409` | `plateNo` 가 지금 번호와 같습니다 |
 
 > **예제:** [JavaScript](examples/javascript/06-lpr-search.js) · [Python](examples/python/06_lpr_search.py) · [C#](examples/csharp/06_LprSearch.cs) · [Go](examples/go/06_lpr/) · [Java](examples/java/V1_06_LprSearch.java) · [Kotlin](examples/kotlin/V1_06_LprSearch.kt) · [Swift](examples/swift/06-lpr-search.swift) · [PowerShell](examples/powershell/06-lpr-search.ps1) · [curl](examples/curl/06-lpr-search.sh)
 
@@ -2516,10 +2713,10 @@ Content-Type: application/json
 
 세션이 생기는 자리는 세 가지입니다(`kind`) — 주차면, 출입구, 주차 금지(체류) 구역.
 
-> 주차 내역 조회 라이선스가 필요합니다. 없으면 16.5~16.8 이 모두 `403` 입니다.
+> 주차 내역 조회 라이선스가 필요합니다. 없으면 16.5~16.9 가 모두 `403` 입니다.
 > 미리 확인하려면 `GET /api/v1/info?license` 를 보십시오 — `license.extension` 에
 > `parkingHistory` 가 있으면 라이선스가 활성입니다([서버 정보](#4-서버-정보) 참조).
-> 조회는 **재생(Playback)** 권한, 이력을 바꾸는 16.7·16.8 은 **제어(Control)** 권한이 필요합니다.
+> 조회는 **재생(Playback)** 권한, 이력을 바꾸는 16.7·16.8·16.9 는 **제어(Control)** 권한이 필요합니다.
 
 | 엔드포인트 | 설명 |
 |-----------|------|
@@ -2662,7 +2859,9 @@ Content-Type: application/json
 | `data[].lots` | Int[] | **그때** 그 영역이 속했던 주차장입니다. 지금 설정이 아닙니다 |
 | `data[].usageFlags` | Int | 세션에 기록된 영역 용도 플래그 |
 | `data[].chid` | Int | 채널 번호 (1부터) |
-| `data[].plateNo` | String\|null | 번호. 끝내 인식하지 못했으면 `null` |
+| `data[].plateNo` | String\|null | 번호. 끝내 인식하지 못했으면 `null`. 언제나 **현재** 값입니다 — 수정했으면([16.9](#169-차량-번호-수정)) 수정한 번호입니다 |
+| `data[].plateEdited` | Boolean | 사람이 번호를 수정했으면 `true` |
+| `data[].originalPlateNo` | String | (`plateEdited` 일 때만) 처음 인식한 번호 (읽지 못했으면 `""`) |
 | `data[].plateTime` | DateTime\|null | 번호를 읽은 시각 |
 | `data[].score` | Float | 인식 신뢰도 (`plateNo` 와 함께 옵니다) |
 | `data[].timeRange` | DateTime[] | 주차 중이면 `[입차]`, 닫혔으면 `[입차, 출차]` |
@@ -2918,6 +3117,35 @@ Content-Type: application/json
 | `404` | 그 ID 의 세션이 없습니다 |
 | `409` | 이미 닫힌 세션입니다 — 기존 출차 기록을 덮어쓰지 않습니다 |
 
+> 종료는 그 세션이 **더 이상 존재하지 않는다**는 뜻입니다. NVR 은 그 주차면·구역에서
+> 추적하던 상태도 함께 버려, 같은 세션을 스스로 다시 열지 않습니다. 차가 실제로 있으면
+> 진입 확정 시간을 처음부터 다시 거쳐 **새** 세션으로 열립니다.
+
+### 16.9. 차량 번호 수정
+
+세션의 **대표 번호** — 세션이 `plateNo` 로 알려 주는 번호 하나 — 를 수정합니다. 추적
+세션은 베스트샷을 여러 장 읽을 수 있지만 수정 대상은 대표 번호뿐이며, 장별 판독
+(`snapshots[].plateNo`)은 증거이므로 그대로 둡니다.
+
+| 엔드포인트 | 설명 |
+|-----------|------|
+| `POST /api/v1/parking/session/{id}/plate` | 세션 `{id}` 의 번호 수정 |
+| `GET /api/v1/parking/session/{id}/plate/history` | 세션 `{id}` 의 수정 이력 |
+
+파라미터·응답·이력·상태 코드는 [10.4](#104-차량-번호-수정) 와 같습니다. 수정 응답은 `"id"` 대신
+`"session": {id}`, 이력은 `"target": "session"` 입니다.
+
+**규칙**
+
+| 항목 | 규칙 |
+|---|---|
+| 대상 | `id` 로 지정한 세션 **한 건**뿐입니다. 일괄 수정, 번호 값으로 대상을 찾는 수정, 세션 병합은 없습니다 |
+| 이력 | 수정할 때마다 한 줄씩 쌓이고 앞선 기록은 바뀌지 않습니다 |
+| 진행 중 세션 | 수정한 번호가 유지됩니다 — 이후 그 차의 인식 결과가 덮지 않습니다. **다른** 차가 그 자리에 들어오면 그 차의 번호로 새 세션이 열립니다 |
+| 정산 기록 | 세션에 그대로 붙어 있습니다 (번호가 아니라 세션 ID 로 묶입니다) |
+| 출입구 세션 | 출차는 번호로 열린 입차 세션과 짝을 짓습니다. 열린 입차의 번호를 고치면 출차가 고친 번호로 읽힐 때만 짝이 맞습니다. 오인식으로 이미 갈라진 두 세션은 **합치지 않습니다** — 입차 세션은 [16.8](#168-미출차-정리) 로 닫습니다 |
+| 프로그램 재시작 | 재시작을 넘어 이어지는 세션은 수정한 번호를 유지합니다. 재시작이 닫은 세션(16.7 의 안내 참조)의 수정은 그 뒤 새로 열린 세션으로 넘어가지 않습니다 |
+
 > **예제:** [JavaScript](examples/javascript/10-parking.js) · [Python](examples/python/10_parking.py) · [C#](examples/csharp/10_Parking.cs) · [Go](examples/go/10_parking/) · [Java](examples/java/V1_10_Parking.java) · [Kotlin](examples/kotlin/V1_10_Parking.kt) · [Swift](examples/swift/10-parking.swift) · [PowerShell](examples/powershell/10-parking.ps1) · [curl](examples/curl/10-parking.sh)
 
 ---
@@ -3016,6 +3244,7 @@ ws://{host}:{port}/wsapi/v1/events?topics={topics}&apikey={apiKey}
 | `emergencyCall` | 비상 호출 이벤트 | 비상 호출 라이선스 |
 | `LPR` | 차량 번호 인식 이벤트 | 항상 |
 | `systemEvent` | 시스템 이벤트 (시작, 종료, 오류 등) | 항상 |
+| `notice` | 지금 유효한 알림 — 구독 직후 목록, 이후 raised / updated / cleared ([5.5](#55-시스템-알림)) | 항상 |
 | `motionChanges` | 모션 감지 상태 변경 | 항상 |
 | `recordingStatus` | 녹화 상태 변경 | 녹화 활성화 시 |
 | `parkingCount` | 주차장 카운트 변동 | 주차 안내 라이선스 |

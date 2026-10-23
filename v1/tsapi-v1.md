@@ -26,6 +26,7 @@
    - [5.2. System Health](#52-system-health)
    - [5.3. HDD S.M.A.R.T](#53-hdd-smart)
    - [5.4. System Control](#54-system-control)
+   - [5.5. System Notices](#55-system-notices)
 6. [Channel](#6-channel)
    - [6.1. List Channels](#61-list-channels)
    - [6.2. Channel Status](#62-channel-status)
@@ -50,6 +51,7 @@
     - [10.1. LPR Source List (Recognition Point/Zone)](#101-lpr-source-list-recognition-pointzone)
     - [10.2. LPR Log](#102-lpr-log)
     - [10.3. Similar Plate Search](#103-similar-plate-search)
+    - [10.4. Vehicle Number Correction](#104-vehicle-number-correction)
 11. [Object Detection](#11-object-detection)
     - [11.1. Object Types](#111-object-types)
     - [11.2. Object Attributes](#112-object-attributes)
@@ -74,6 +76,7 @@
     - [16.6. Parking Session Detail](#166-parking-session-detail)
     - [16.7. Change Payment State](#167-change-payment-state)
     - [16.8. No-exit Cleanup](#168-no-exit-cleanup)
+    - [16.9. Vehicle Number Correction](#169-vehicle-number-correction)
 17. [Realtime Event Subscription (WebSocket API)](#17-realtime-event-subscription-websocket-api)
     - [17.1. Connection Flow](#171-connection-flow)
     - [17.2. Endpoints](#172-endpoints)
@@ -559,7 +562,7 @@ Retrieves server and product information.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.1.0") |
+| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.3.0") |
 | `GET /api/v1/info?siteName` | - | Site name query |
 | `GET /api/v1/info?timezone` | - | Server timezone query (name, bias) |
 | `GET /api/v1/info?product` | - | Product info query (name, version) |
@@ -594,7 +597,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **Response** (genuine license with ANPR / object detection / parking guidance enabled):
 ```json
 {
-  "apiVersion": "TS-API@1.1.0",
+  "apiVersion": "TS-API@1.3.0",
   "siteName": "Main Office",
   "timezone": {
     "name": "Asia/Seoul",
@@ -729,12 +732,13 @@ Retrieves real-time system status.
 | `GET /api/v1/system/health?item=memory` | Memory usage (total, used, free) |
 | `GET /api/v1/system/health?item=disk` | Disk usage (total, used, free) |
 | `GET /api/v1/system/health?item=memory,disk` | Query multiple items |
+| `GET /api/v1/system/health?item=systemDisk` | System disk status (the disk holding the database and logs) |
 
 **Parameters**:
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `item` | String | N | Items to query (comma-separated): `cpu`, `memory`, `disk`, `recording`, `network`, `all`, `supported` |
+| `item` | String | N | Items to query (comma-separated): `cpu`, `memory`, `disk`, `systemDisk`, `recording`, `network`, `all`, `supported` |
 
 **Response Fields**:
 
@@ -775,6 +779,18 @@ Retrieves real-time system status.
 | `network[].recvBytesPerSec` | Int | Receive rate (bytes/sec) |
 | `network[].sendBytesPerSec` | Int | Send rate (bytes/sec) |
 | `network[].curBandwidth` | Int | Current bandwidth (bps) |
+| `systemDisk` | Object | System disk status (when `item` includes `systemDisk`) |
+| `systemDisk.drive` | String | Volume (e.g., `"C:"`) |
+| `systemDisk.totalSpace` | Int | Total capacity (bytes), `-1` before the first measurement |
+| `systemDisk.freeSpace` | Int | Free capacity (bytes), `-1` before the first measurement |
+| `systemDisk.status` | String | `normal`, `low` (under 1 GB free) or `critical` (under 200 MB free, or a recent write failure) |
+| `systemDisk.dataWriteFailed` | Boolean | A record could not be written for lack of space or an I/O error within the last 60 seconds |
+
+The *system disk* is the disk where the product keeps its database and logs — normally the Windows
+drive `C:`, separate from the recording disks. When it fills up, new recordings cannot be indexed
+and recognition records are not saved, while the recording disks still have room — so watch
+`systemDisk.status`, not only `disk[]`. To be told when it changes, use the `notice` channel
+([5.5. System Notices](#55-system-notices)).
 
 ### 5.3. HDD S.M.A.R.T
 
@@ -844,6 +860,92 @@ System control commands. **Admin privileges required**
 > **Examples:** [JavaScript](examples/javascript/08-system-info.js) · [Python](examples/python/08_system_info.py) · [C#](examples/csharp/08_SystemInfo.cs) · [Go](examples/go/08_system/) · [Java](examples/java/V1_08_SystemInfo.java) · [Kotlin](examples/kotlin/V1_08_SystemInfo.kt) · [Swift](examples/swift/08-system-info.swift) · [PowerShell](examples/powershell/08-system-info.ps1) · [curl](examples/curl/08-system-info.sh)
 
 ---
+
+### 5.5. System Notices
+
+Notices are conditions that are **true right now** and need attention — they are raised, updated
+and cleared. Events (§9) are a history of what happened; notices are the current state. Notices are
+kept in memory only, so they keep working when the system disk is full.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/v1/system/notices` | Notices currently in effect |
+| `GET /api/v1/system/notices?lang=ko-KR` | Same, with the `ko-KR` text added to `message` |
+
+Any signed-in user can read notices. For live updates subscribe to the `notice` topic
+([17.4. Event Subscription](#174-event-subscription)) — it sends the current list on subscribe and
+every change after that.
+
+**Language** — `message` is an object keyed by language code. `en-US` is always there and is the
+canonical text. When the request (`lang` query of the REST call, or of the WebSocket URL) names a
+language other than English, that language is added under its language code — the same codes as
+the `lang` parameter everywhere in this API (e.g. `ko-KR`, `zh-TW`). A language the server cannot
+translate is not added. A client that translates on its own can use `messageKey` and `args` instead, and
+does not need to reconnect when its user switches language.
+
+**Response** — an array, most severe first, then oldest first:
+```json
+[
+  {
+    "id": "systemDisk",
+    "kind": "systemDisk",
+    "severity": "critical",
+    "message": {
+      "en-US": "Disk C: is almost full: 150MB left",
+      "ko-KR": "C: 디스크 거의 가득 참: 150MB 남음"
+    },
+    "messageKey": "Disk %1% is almost full: %2% left",
+    "args": ["C:", "150MB"],
+    "param": {"drive": "C:", "totalSpace": 119387713536, "freeSpace": 157286400, "status": "critical", "dataWriteFailed": false},
+    "timeBegin": "2026-10-23T08:40:12.000+09:00",
+    "timeUpdate": "2026-10-23T08:51:07.000+09:00"
+  }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | String | Identifies one notice. A notice with the same `id` is updated in place, never duplicated |
+| `kind` | String | What raised it. Currently `systemDisk` |
+| `severity` | String | `info`, `warning` or `critical`. Show `critical` prominently — it needs immediate action |
+| `message` | Object | Text by language code, placeholders filled |
+| `message.en-US` | String | English — always present |
+| `message.{lang}` | String | The requested language, under its language code (e.g. `ko-KR`). Only when `lang` names a supported language other than English |
+| `messageKey` | String | English text with `%1%`, `%2%` … placeholders — the translation key, for clients that translate themselves |
+| `args` | Array | Placeholder values, in order (not translated) |
+| `param` | Object | `kind`-specific detail. Omitted when there is none. Treat as open-ended |
+| `timeBegin` | String | When it was first raised. Stays the same while it is updated |
+| `timeUpdate` | String | Last change |
+
+**`notice` topic messages:**
+
+| `action` | Body | When |
+|----------|------|------|
+| `snapshot` | `notices`: array as above | Once, right after subscribing |
+| `raised` | `notice`: one notice | A new notice |
+| `updated` | `notice`: one notice | Its content changed (for `systemDisk`, every change of the free-space figure — about every 5 seconds while it lasts) |
+| `cleared` | `notice`: the last content | It no longer applies |
+
+```json
+{"topic": "notice", "action": "updated", "notice": {"id": "systemDisk", "severity": "critical", "message": {"en-US": "Disk C: is almost full: 140MB left"}, "...": "..."}}
+```
+
+#### System disk notice (`kind: systemDisk`)
+
+The *system disk* is the disk where the product keeps its database and logs — normally the
+Windows drive `C:`, separate from the recording disks. When it fills up, new recordings cannot be
+indexed and recognition records are not saved, even though the recording disks still have room.
+
+| `severity` | Condition | `messageKey` |
+|----------|------|------|
+| `warning` | Under 1 GB free | `Low disk space on %1%: %2% left` |
+| `critical` | Under 200 MB free | `Disk %1% is almost full: %2% left` |
+| `critical` | A record could not be written for lack of space within the last 60 seconds | `Disk %1% is full. Data is not being saved.` |
+
+It is cleared when the disk is back to normal. `param` carries the same fields as `systemDisk` in
+[5.2. System Health](#52-system-health). Each change of level is also recorded as a `systemEvent`
+(see [System disk warning](#system-disk-warning)) — when the disk is too full to record it, only
+the notice remains.
 
 ## 6. Channel
 
@@ -1370,6 +1472,7 @@ Retrieves available topics for real-time event subscription.
   "emergencyCall",
   "LPR",
   "systemEvent",
+  "notice",
   "motionChanges",
   "recordingStatus",
   "parkingCount",
@@ -1557,6 +1660,25 @@ Stall that cost video:
   "queuePct": 0
 }
 ```
+
+#### System disk warning
+
+System log events record each change of the system disk level (see `systemDisk` in
+[5.2. System Health](#52-system-health)). For the current state use the `notice` channel
+([5.5. System Notices](#55-system-notices)). One event is emitted per change of level:
+
+| `code` | `codeName` | When |
+|-----:|---------|------|
+| `51` | `"System disk space is low"` | Free space fell under 1 GB |
+| `52` | `"System disk is full"` | Free space fell under 200 MB, or a record could not be written for lack of space |
+| `53` | `"System disk space has been restored."` | Back to normal |
+
+`codeName` is localized to the requested language. `param` carries `drive`, `totalSpace`,
+`freeSpace`, `status` and `dataWriteFailed` — the same fields as `systemDisk` in the health response.
+
+When the disk is too full to store the event, it is still delivered to `systemEvent`
+subscribers, with `id` `-1`, and does not appear in the event log. A client that must not miss
+it should subscribe rather than poll the log.
 
 ### 9.4. Event Trigger (Event Backup)
 
@@ -1749,7 +1871,9 @@ Searches license plate recognition logs.
 | `at` | Int | Current offset |
 | `data` | Array | Recognition result list |
 | `data[].id` | Int | Record ID |
-| `data[].plateNo` | String | License plate number |
+| `data[].plateNo` | String | License plate number. Always the **current** value — after a correction ([10.4](#104-vehicle-number-correction)) it is the corrected one |
+| `data[].plateEdited` | Boolean | `true` if a person corrected the plate |
+| `data[].originalPlateNo` | String | (only when `plateEdited`) The plate as first recognized (`""` if none was read) |
 | `data[].score` | Float | Recognition confidence |
 | `data[].timeRange` | Array | `[startTime, endTime]` (ISO 8601) |
 | `data[].srcCode` | String | LPR source code |
@@ -1781,6 +1905,84 @@ For example, if you only know the four-digit number `1234`, searching with `keyw
 ```json
 ["12가1234", "56나1234", "78다1234", ...]
 ```
+
+### 10.4. Vehicle Number Correction
+
+Corrects the plate number of **one** recognition record when it was misread. For parking
+billing, correct the session's representative plate instead ([16.9](#169-vehicle-number-correction)).
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/v1/lpr/log/{id}/plate` | Correct the plate of record `{id}` |
+| `GET /api/v1/lpr/log/{id}/plate/history` | Correction history of record `{id}` |
+
+**Rules**
+
+| Item | Rule |
+|---|---|
+| Target | Exactly **one** record, by its `id`. There is no bulk correction and no correction by plate value |
+| Where the `id` comes from | `data[].id` of [10.2](#102-lpr-log), or the `id` that the realtime `LPR` event carries next to each `plateNo` |
+| History | Every correction adds a row; earlier rows are never changed. A wrong correction stays on record and is fixed by correcting again |
+| Format | Not checked (plates differ by country). 1–32 characters after trimming |
+| Effect | Changes the stored record only. Events already sent (push, registered-vehicle matching, signboard) are not re-evaluated |
+| Permission | **Control** |
+
+**Parameters** (query, form, or a JSON body):
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `plateNo` | String | Y | New plate number (1–32 characters) |
+| `reason` | String | N | Reason for the change (up to 200 characters) |
+
+**Response**:
+```json
+{
+  "id": 91234,
+  "plateNo": "12가3456",
+  "previousPlateNo": "12가3458",
+  "originalPlateNo": "12가3458",
+  "editCount": 1,
+  "edit": {
+    "id": 57,
+    "time": "2026-10-22T14:03:11+09:00",
+    "user": "admin",
+    "reason": "misread at night"
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `previousPlateNo` | Value just before this correction (`""` for an unrecognized record) |
+| `originalPlateNo` | Value as first recognized |
+| `editCount` | Number of corrections so far, including this one |
+| `edit.user` | Account that made the correction (for an API key, the account that issued it) |
+
+**History response**:
+```json
+{
+  "target": "lpr",
+  "id": 91234,
+  "plateNo": "12가3456",
+  "originalPlateNo": "12가3458",
+  "edits": [
+    { "id": 41, "time": "2026-10-22T13:58:02+09:00", "user": "admin",
+      "before": "12가3458", "after": "12가3486", "reason": "" },
+    { "id": 57, "time": "2026-10-22T14:03:11+09:00", "user": "admin",
+      "before": "12가3486", "after": "12가3456", "reason": "misread at night" }
+  ]
+}
+```
+
+`edits` is in recorded order. It is empty (and `originalPlateNo` is absent) when the record
+was never corrected. Reading the history needs **Playback** permission.
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Invalid ID, `plateNo` missing / empty / longer than 32, or `reason` longer than 200 |
+| `403` | Needs **Control** permission (history: **Playback**) |
+| `404` | No record with that ID |
+| `409` | `plateNo` equals the current plate |
 
 > **Examples:** [JavaScript](examples/javascript/06-lpr-search.js) · [Python](examples/python/06_lpr_search.py) · [C#](examples/csharp/06_LprSearch.cs) · [Go](examples/go/06_lpr/) · [Java](examples/java/V1_06_LprSearch.java) · [Kotlin](examples/kotlin/V1_06_LprSearch.kt) · [Swift](examples/swift/06-lpr-search.swift) · [PowerShell](examples/powershell/06-lpr-search.ps1) · [curl](examples/curl/06-lpr-search.sh)
 
@@ -2522,10 +2724,10 @@ been here" and to build billing records.
 Sessions come from three kinds of place (`kind`): a parking spot, an entrance/exit gate,
 and a no-parking (dwell) zone.
 
-> Requires the parking history license. Without it every endpoint in 16.5–16.8 returns
+> Requires the parking history license. Without it every endpoint in 16.5–16.9 returns
 > `403`. Check beforehand with `GET /api/v1/info?license`: the license is active when
 > `license.extension` contains `parkingHistory` (see [Server Info](#4-server-info)).
-> Reading needs **Playback** permission; 16.7 and 16.8 write history and need
+> Reading needs **Playback** permission; 16.7, 16.8 and 16.9 write history and need
 > **Control**.
 
 | Endpoint | Description |
@@ -2671,7 +2873,9 @@ When `scope` is `spot`, `gate` or `noparking` it also fixes the session kind, so
 | `data[].lots` | Int[] | Parking lots the source belonged to **at the time**, not now |
 | `data[].usageFlags` | Int | Source usage flags recorded with the session |
 | `data[].chid` | Int | Channel number (1-based) |
-| `data[].plateNo` | String\|null | Plate number, `null` if never recognized |
+| `data[].plateNo` | String\|null | Plate number, `null` if never recognized. Always the **current** value — after a correction ([16.9](#169-vehicle-number-correction)) it is the corrected one |
+| `data[].plateEdited` | Boolean | `true` if a person corrected the plate |
+| `data[].originalPlateNo` | String | (only when `plateEdited`) The plate as first recognized (`""` if none was read) |
 | `data[].plateTime` | DateTime\|null | When the plate was read |
 | `data[].score` | Float | Recognition confidence (present with `plateNo`) |
 | `data[].timeRange` | DateTime[] | `[entry]` while open, `[entry, exit]` once closed |
@@ -2936,6 +3140,38 @@ Lets an operator clear a session left "parked" because its exit was never observ
 | `404` | No session with that ID |
 | `409` | The session is already closed — an existing exit record is never overwritten |
 
+> Closing means the session **no longer exists**. The NVR also drops what it was tracking
+> for that spot or zone, so it does not reopen the same session on its own. If a vehicle
+> is really there, it is confirmed again from scratch (entry confirm time) and gets a
+> **new** session.
+
+### 16.9. Vehicle Number Correction
+
+Corrects a session's **representative plate** — the one plate the session reports in
+`plateNo`. A tracked session may have read many shots; only the representative plate is the
+correction target, the per-shot readings (`snapshots[].plateNo`) are evidence and stay as
+they were.
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/v1/parking/session/{id}/plate` | Correct the plate of session `{id}` |
+| `GET /api/v1/parking/session/{id}/plate/history` | Correction history of session `{id}` |
+
+Parameters, responses, history and status codes are the same as [10.4](#104-vehicle-number-correction),
+with `"session": {id}` in place of `"id"` in the correction response and `"target": "session"`
+in the history.
+
+**Rules**
+
+| Item | Rule |
+|---|---|
+| Target | Exactly **one** session, by its `id`. There is no bulk correction, no correction by plate value, and no merging of sessions |
+| History | Every correction adds a row; earlier rows are never changed |
+| Open sessions | The corrected plate is kept: later recognitions of the vehicle do not overwrite it. If a **different** vehicle takes the spot, that is a new session with its own plate |
+| Payments | Stay attached to the session (they are keyed by session ID, not by plate) |
+| Gate sessions | The exit is matched to the open entry by plate. Correcting an open entry helps only if the exit is read as the corrected plate. Two sessions already split by a misread are **not** merged — close the entry with [16.8](#168-no-exit-cleanup) |
+| Program restart | A session that carries on across the restart keeps its corrected plate. A session that the restart closes (see the note in 16.7) does not pass the correction to the session opened after it |
+
 > **Examples:** [JavaScript](examples/javascript/10-parking.js) · [Python](examples/python/10_parking.py) · [C#](examples/csharp/10_Parking.cs) · [Go](examples/go/10_parking/) · [Java](examples/java/V1_10_Parking.java) · [Kotlin](examples/kotlin/V1_10_Parking.kt) · [Swift](examples/swift/10-parking.swift) · [PowerShell](examples/powershell/10-parking.ps1) · [curl](examples/curl/10-parking.sh)
 
 ---
@@ -3034,6 +3270,7 @@ ws://{host}:{port}/wsapi/v1/events?topics={topics}&apikey={apiKey}
 | `emergencyCall` | Emergency call event | Emergency call license |
 | `LPR` | License plate recognition event | Always |
 | `systemEvent` | System event (start, shutdown, error, etc.) | Always |
+| `notice` | Notices currently in effect — list on subscribe, then raised / updated / cleared ([5.5](#55-system-notices)) | Always |
 | `motionChanges` | Motion detection status change | Always |
 | `recordingStatus` | Recording status change | Recording enabled |
 | `parkingCount` | Parking lot count change | Parking guide license |

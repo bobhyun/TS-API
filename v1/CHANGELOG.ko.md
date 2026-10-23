@@ -2,6 +2,50 @@
 
 [English](CHANGELOG.md) | **한국어**
 
+## v1.3.0
+
+### 차량 번호 수정
+
+오인식된 번호를 한 건씩 수정할 수 있고, 수정은 모두 이력으로 남습니다.
+
+- `POST /api/v1/lpr/log/{id}/plate` · `GET /api/v1/lpr/log/{id}/plate/history` — 인식 기록 한 건
+- `POST /api/v1/parking/session/{id}/plate` · `GET /api/v1/parking/session/{id}/plate/history` —
+  주차 세션 한 건의 대표 번호 (장별 판독은 증거로 그대로 둡니다)
+
+대상은 언제나 `id` 하나입니다. 일괄 수정, 번호 값으로 대상을 찾는 수정, 세션 병합은 없습니다.
+목록 응답(`/lpr/log`, `/parking/session`)에 `plateEdited` 와, 수정된 항목에는
+`originalPlateNo` 가 붙습니다. `plateNo` 는 언제나 현재 값입니다. 실시간 `LPR` 이벤트는 각
+`plateNo` 옆에 기록 `id` 를 싣습니다 — 받은 그 기록을 정확히 수정할 수 있습니다.
+
+수정은 **제어(Control)**, 이력 조회는 **재생(Playback)** 권한이 필요합니다.
+
+### 시스템 알림과 시스템 디스크 경고
+
+지금 유효한 주의 사항을 전하는 알림 채널을 추가했습니다. 올라오고, 갱신되고, 해제되며, 메모리에만
+두므로 디스크가 가득 차도 동작합니다.
+
+- `GET /api/v1/system/notices` — 지금 유효한 알림 목록
+- 실시간 토픽 `notice` — 구독 직후 목록, 이후 `raised` / `updated` / `cleared`
+- `message` 는 언어 코드별 객체 — `en-US` 는 항상, 영어가 아닌 `lang` 으로 요청하면 그 코드로 하나 더
+
+첫 사용처는 *시스템 디스크*(제품이 데이터베이스와 로그를 저장하는 디스크, 보통 `C:`)입니다. 이 디스크가
+차면 녹화 디스크에 공간이 남아 있어도 새 녹화를 색인하지 못하고 인식 기록이 저장되지 않는데, 지금까지는
+이를 알릴 방법이 없었습니다.
+
+- 알림 `kind: systemDisk` — 여유 1 GB 미만이면 `warning`, 200 MB 미만이거나 기록을 저장하지 못하면 `critical`.
+- `GET /api/v1/system/health?item=systemDisk` — `drive`, `totalSpace`, `freeSpace`,
+  `status` (`normal` / `low` / `critical`), `dataWriteFailed`. 기본 응답에도 포함됩니다.
+- `systemEvent` 코드 `51` *System disk space is low*, `52` *System disk is full*,
+  `53` *System disk space has been restored.* 로 단계 변화를 기록합니다. 디스크가 가득 차 이벤트를
+  저장하지 못해도 구독자에게는 `id` `-1` 로 보냅니다.
+- 기록을 저장하지 못해도 `LPR` 이벤트는 계속 나갑니다. 이때 이벤트에는 `id` 와 `image` 가 없습니다.
+
+### 미출차 정리가 추적 상태도 버립니다
+
+`POST /api/v1/parking/session/{id}/close` 가 그 주차면·구역에서 추적하던 상태도 함께 버립니다.
+전에는 닫은 세션이 같은 자리에서 곧바로 다시 열릴 수 있었습니다. 차가 실제로 있으면 다시
+확정을 거쳐 새 세션으로 열립니다.
+
 ## v1.2.0
 
 ### 주차 내역

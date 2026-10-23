@@ -2,6 +2,53 @@
 
 **English** | [한국어](CHANGELOG.ko.md)
 
+## v1.3.0
+
+### Vehicle number correction
+
+A misread plate can be corrected, one record at a time, with every correction kept as history.
+
+- `POST /api/v1/lpr/log/{id}/plate` · `GET /api/v1/lpr/log/{id}/plate/history` — one recognition record
+- `POST /api/v1/parking/session/{id}/plate` · `GET /api/v1/parking/session/{id}/plate/history` — the
+  representative plate of one parking session (per-shot readings stay as evidence)
+
+The target is always one `id`. There is no bulk correction, no correction by plate value and
+no merging of sessions. List responses (`/lpr/log`, `/parking/session`) now carry
+`plateEdited` and, for corrected items, `originalPlateNo`; `plateNo` is always the current
+value. Realtime `LPR` events now carry the record `id` next to each `plateNo`, so a client can
+correct exactly the record it received.
+
+Correcting needs **Control** permission; reading the history needs **Playback**.
+
+### System notices and the system disk warning
+
+A new notice channel carries conditions that are true right now — raised, updated and cleared,
+kept in memory so it works even when the disk is full:
+
+- `GET /api/v1/system/notices` — the notices currently in effect
+- `notice` realtime topic — the list on subscribe, then `raised` / `updated` / `cleared`
+- `message` is an object by language code — `en-US` always, plus the requested `lang` when it is not English
+
+Its first use is the *system disk* — the disk where the product keeps its database and logs
+(normally `C:`). When it fills up, recordings can no longer be indexed and recognition records are
+not saved, even though the recording disks still have room, and nothing used to say so.
+
+- Notice `kind: systemDisk` — `warning` under 1 GB free, `critical` under 200 MB or when a record
+  could not be written.
+- `GET /api/v1/system/health?item=systemDisk` — `drive`, `totalSpace`, `freeSpace`,
+  `status` (`normal` / `low` / `critical`) and `dataWriteFailed`. Included in the default response.
+- `systemEvent` codes `51` *System disk space is low*, `52` *System disk is full*,
+  `53` *System disk space has been restored.* record each change of level. When the disk is too
+  full to store the event, it is still pushed to subscribers, with `id` `-1`.
+- `LPR` events keep flowing when a record cannot be saved; such an event has no `id` and no
+  `image`.
+
+### No-exit cleanup also drops the tracking state
+
+`POST /api/v1/parking/session/{id}/close` now also makes the NVR forget what it was tracking
+for that spot or zone. Before, a closed session could be reopened right away for the same
+spot. A vehicle that is really there is confirmed again and gets a new session.
+
 ## v1.2.0
 
 ### Parking session history
