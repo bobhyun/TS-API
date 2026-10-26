@@ -7,10 +7,10 @@
  *   - Zoom control (zoom=z, range: -1.0 ~ 1.0)
  *   - Focus/Iris control
  *   - Stop movement
- *   - Preset management (list, go to)
+ *   - Presets (list, go to)
  *
- * NOTE: PTZ commands are sent via ONVIF to the camera.
- *       Returns 500 if the camera doesn't support ONVIF or is unreachable.
+ * NOTE: PTZ commands are sent to the camera via ONVIF.
+ *       Returns 500 if the camera does not support ONVIF or is unreachable.
  */
 
 const { NVR_API_KEY } = require('./config');
@@ -38,11 +38,11 @@ async function main() {
   // ─────────────────────────────────────────────────
   // 2. Pan/Tilt Movement
   //    move=x,y where x=pan(-1~1), y=tilt(-1~1)
-  //    Positive x = right, Positive y = up
+  //    Positive x = right, positive y = down
   // ─────────────────────────────────────────────────
   console.log('\n=== Pan/Tilt ===');
 
-  // Move right and up
+  // Move right and down
   let res = await get(`/api/v1/channel/${CHANNEL}/ptz?move=0.3,0.3`);
   console.log(`  Move right+up (0.3, 0.3): ${res.status}`);
   await sleep(500);
@@ -52,7 +52,7 @@ async function main() {
   console.log(`  Stop: ${res.status}`);
   await sleep(500);
 
-  // Move left and down
+  // Move left and up
   res = await get(`/api/v1/channel/${CHANNEL}/ptz?move=-0.3,-0.3`);
   console.log(`  Move left+down (-0.3, -0.3): ${res.status}`);
   await sleep(500);
@@ -107,7 +107,7 @@ async function main() {
       console.log(`    - Token: ${preset.token}, Name: ${preset.name}`);
     }
 
-    // Go to first preset if exists
+    // Go to the first preset, if any
     if (listRes.body.length > 0) {
       const token = listRes.body[0].token;
       const goRes = await get(`/api/v1/channel/${CHANNEL}/preset/${token}/go`);

@@ -17,7 +17,7 @@
 
 ## 1. 개요
 
-v1 API는 RESTful 경로 기반으로 변경되었습니다. 기존 v0 API도 계속 지원되며, 서버 설정에서 선택적으로 활성화/비활성화할 수 있습니다.
+v1 API는 RESTful 경로 기반으로 설계되었습니다. 기존 v0 API도 계속 지원하며, 서버 설정에서 활성화 여부를 선택할 수 있습니다.
 
 ### 레거시 API (v0) 지원 설정
 
@@ -58,7 +58,7 @@ v0 API의 사용 여부는 서버 설정에서 제어합니다:
 | `GET /api/auth?login=...` | `POST /api/v1/auth/login` (JSON body) |
 | `GET /api/auth?logout` | `POST /api/v1/auth/logout` (JSON body) |
 
-> **참고:** `GET /api/v1/auth?login=...`은 보안상의 이유로 v1에서 차단되었습니다. 크레덴셜을 쿼리 스트링으로 전달해서는 안 됩니다. 대신 `POST /api/v1/auth/login`을 사용하여 JSON 요청 본문으로 크레덴셜을 전송하십시오.
+> **참고:** `GET /api/v1/auth?login=...`은 보안상의 이유로 v1에서 차단되었습니다. 자격 증명을 쿼리 스트링으로 전달하지 마십시오. 대신 `POST /api/v1/auth/login`을 사용하여 JSON 요청 본문으로 자격 증명을 전송하십시오.
 
 ### 2.2. Info (변경 없음)
 | v0 | v1 |
@@ -172,7 +172,7 @@ v0 API의 사용 여부는 서버 설정에서 제어합니다:
 |----|-----|
 | `ws:///wsapi/dataExport?ch=1&timeBegin=...&timeEnd=...` | `ws:///wsapi/v1/export?ch=1&timeBegin=...&timeEnd=...` |
 
-> **인증 변경**: v0는 `auth=base64(user:pass)` 쿼리 파라미터를 사용하지만, v1은 `token={JWT}` 또는 `apikey={key}` 쿼리 파라미터를 사용합니다.
+> **인증 변경**: v0는 `auth=base64(user:pass)` 쿼리 매개변수를 사용하지만, v1은 `token={JWT}` 또는 `apikey={key}` 쿼리 매개변수를 사용합니다.
 
 ---
 
@@ -253,8 +253,8 @@ requests.post(f'{base}/api/v1/system/restart')
 5. **응답 URL 형식**: v0는 절대 URL, v1은 상대 URL
    - v0 (레거시): `"image": "http://nvr.example.com/storage/..."`, `"videoSrc": "http://nvr.example.com/watch?ch=1&when=..."`
    - v1: `"image": "/storage/..."`, `"videoSrc": "/watch?ch=1&when=..."`
-   - v0 절대 URL의 host는 **Canonical Host** 설정(웹 관리자 → 서버 설정 → API)이 지정되어 있으면 그 값을 사용하고, 없으면 요청의 `X-Host` 헤더로 fallback 합니다.
-   - v1은 상대 URL을 반환하므로 클라이언트가 자신의 base URL을 prepend 합니다 — 리버스 프록시나 cross-origin 환경에서 유용합니다.
+   - v0 절대 URL의 host는 **Canonical Host** 설정(웹 관리자 → 서버 설정 → API)이 지정되어 있으면 그 값을 사용하고, 설정이 없으면 요청의 `X-Host` 헤더 값을 사용합니다.
+   - v1은 상대 URL을 반환하므로 클라이언트가 자신의 base URL을 앞에 붙여 사용합니다. 이 방식은 리버스 프록시나 cross-origin 환경에서 유용합니다.
 
 6. **응답 필드명 참고사항** (v0/v1 동일):
    - 채널 목록: `title` (채널명), `displayName` (표시명, `"CH{N}. {title}"` 형식)
@@ -270,14 +270,14 @@ v1 API는 모든 엔드포인트에서 **JWT Bearer Token** 및 **API Key** 인�
 
 | 기존 v0 인증 | v1 권장 방식 |
 |-------------|-------------|
-| 세션 쿠키 | JWT 로그인 (`POST /api/v1/auth/login`) - 크레덴셜은 JSON body로 전송 |
+| 세션 쿠키 | JWT 로그인 (`POST /api/v1/auth/login`) - 자격 증명은 JSON 본문으로 전송 |
 | 외부 시스템 연동 | API Key (`X-API-Key` 헤더) - 로그인 불필요 |
 
 ---
 
 ## 7. v0 API 비활성화
 
-v0 API는 deprecated 되었으며, 보안 강화를 위해 설정에서 비활성화할 수 있습니다. v0 API는 쿼리 스트링을 통한 인증 정보 전달 등 보안에 취약한 방식을 사용하므로, v1 마이그레이션이 완료된 환경에서는 비활성화를 권장합니다.
+v0 API는 사용 중단(deprecated) 대상이며, 보안 강화를 위해 설정에서 비활성화할 수 있습니다. v0 API는 쿼리 스트링으로 인증 정보를 전달하는 등 보안에 취약한 방식을 사용합니다. v1 마이그레이션이 완료된 환경에서는 비활성화를 권장합니다.
 
 **비활성화 방법:**
 
@@ -285,7 +285,7 @@ v0 API는 deprecated 되었으며, 보안 강화를 위해 설정에서 비활�
 
 **비활성화 시 동작:**
 
-v0 API 호출 시 404 에러가 반환됩니다:
+v0 API를 호출하면 404 오류를 반환합니다:
 
 ```json
 {

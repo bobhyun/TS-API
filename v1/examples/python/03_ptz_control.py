@@ -2,17 +2,17 @@
 03_ptz_control.py - TS-API v1 PTZ Control
 
 Endpoints:
-  GET /api/v1/channel/{chid}/ptz?home         - Move to home position
-  GET /api/v1/channel/{chid}/ptz?move=x,y     - Continuous move (x,y: -1.0 to 1.0)
-  GET /api/v1/channel/{chid}/ptz?zoom=speed   - Zoom (positive=in, negative=out)
-  GET /api/v1/channel/{chid}/ptz?focus=speed  - Focus (positive=far, negative=near)
-  GET /api/v1/channel/{chid}/ptz?iris=speed   - Iris (positive=open, negative=close)
-  GET /api/v1/channel/{chid}/ptz?stop         - Stop all PTZ movement
-  GET /api/v1/channel/{chid}/preset           - List presets
-  GET /api/v1/channel/{chid}/preset/{token}/go - Go to preset
+  GET /api/v1/channel/{chid}/ptz?home           - Go to home position
+  GET /api/v1/channel/{chid}/ptz?move=x,y       - Continuous move (x,y: -1.0 ~ 1.0; +x=right, +y=down)
+  GET /api/v1/channel/{chid}/ptz?zoom=speed     - Zoom (positive=in, negative=out)
+  GET /api/v1/channel/{chid}/ptz?focus=speed    - Focus (positive=far, negative=near)
+  GET /api/v1/channel/{chid}/ptz?iris=speed     - Iris (positive=open, negative=close)
+  GET /api/v1/channel/{chid}/ptz?stop           - Stop all PTZ movement
+  GET /api/v1/channel/{chid}/preset             - List presets
+  GET /api/v1/channel/{chid}/preset/{token}/go  - Go to preset
 
-NOTE: PTZ may return HTTP 500 if camera does not support ONVIF PTZ
-      or if the ONVIF connection is unavailable.
+NOTE: Returns HTTP 500 if the camera does not support ONVIF PTZ or is unreachable.
+      Always call stop after move/zoom/focus/iris.
 """
 
 import os
@@ -43,9 +43,9 @@ def main():
         return
     time.sleep(2)
 
-    # --- Continuous Move (pan right, tilt up) ---
+    # --- Continuous Move (pan right, tilt down) ---
     print("\n=== PTZ Move ===")
-    # x=0.5 (pan right at half speed), y=0.3 (tilt up at 30% speed)
+    # x=0.5 (pan right at half speed), y=0.3 (tilt down at 30% speed)
     r = client.get(f'/api/v1/channel/{CHID}/ptz?move=0.5,0.3')
     print(f"  move=0.5,0.3 -> {r.status_code}")
     time.sleep(1)

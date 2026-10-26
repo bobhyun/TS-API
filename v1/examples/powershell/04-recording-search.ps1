@@ -9,10 +9,10 @@
         - Response: { "data": [{ "year": 2026, "month": 1, "days": [1, 5, 10, ...] }] }
 
     GET /api/v1/recording/minutes?ch=1&timeBegin=2026-01-15&timeEnd=2026-01-16
-        - Returns minute-level recording timeline as JSON
-        - Response: { "data": [...] }
+        - Returns one character per minute per channel ('1' = recorded, '0' = not recorded)
+        - Response: { "data": [{ "chid": 1, "minutes": "1100..." }] }
 
-  Use these endpoints to build a recording timeline calendar UI.
+  Use days for a calendar UI and minutes for a timeline UI.
 #>
 
 $ErrorActionPreference = 'Stop'

@@ -95,8 +95,7 @@ namespace TsApiExamples.V1
 
                         case "fileEnd":
                             // download: [{fileName, src}, ...]
-                            // Server v1.0.2+ returns relative paths (e.g. "/download/...");
-                            // prepend client.BaseUrl for non-browser clients to fetch.
+                            // src is a relative path (e.g. "/download/..."); prepend client.BaseUrl outside a browser.
                             var download = "N/A";
                             if (root.TryGetProperty("channel", out var fch)
                                 && fch.TryGetProperty("file", out var file)

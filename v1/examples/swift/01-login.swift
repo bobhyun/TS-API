@@ -1,14 +1,12 @@
 // Example 01: Authentication
 //
-// TS-API v1 supports three authentication methods:
-//   1. JWT Login (POST) - primary method for all v1 endpoints
-//   2. API Key - for external system integration (v1 endpoints only)
-//   3. Session Login - uses JWT internally, tokens stored by NvrClient
+// Three authentication methods:
+//   1. Client login - NvrClient logs in with JWT and sends the Bearer token automatically
+//   2. JWT          - POST /api/v1/auth/login; manage accessToken/refreshToken yourself
+//   3. API Key      - X-API-Key header, for external integrations
 //
-// NOTE: v1 data endpoints require JWT Bearer token or API Key.
-//       Session cookies are NOT supported by v1 endpoints.
-// NOTE: API Key authentication is supported on v1 endpoints only.
-//       v0 endpoints (/api/*) reject X-API-Key with 401 Unauthorized.
+// NOTE: v1 endpoints accept a JWT Bearer token or an API Key. Session cookies are not supported.
+// NOTE: v0 endpoints (/api/*) reject X-API-Key with 401.
 
 import Foundation
 
@@ -22,9 +20,9 @@ struct App {
     let client = NvrClient()
 
     // -------------------------------------------------
-    // Method 1: Simple Login (JWT stored internally by NvrClient)
-    //   POST /api/v1/auth/login with JSON body
-    //   Tokens are stored automatically; subsequent requests use Bearer header
+    // Method 1: Client login (JWT stored by NvrClient)
+    //   POST /api/v1/auth/login
+    //   Subsequent requests send the Bearer token automatically
     // -------------------------------------------------
     print("=== Simple Login ===")
 
@@ -35,7 +33,7 @@ struct App {
         print("Access Token: \(prefix)...")
     }
 
-    // Now all data API calls will use the Bearer token automatically
+    // Token is stored; data endpoints are accessible
     let channelRes = try await client.get("/api/v1/channel")
     if let channels = channelRes.body as? [[String: Any]] {
         print("Channels: \(channelRes.status) (\(channels.count) channels)")
@@ -45,7 +43,7 @@ struct App {
     print("Logged out\n")
 
     // -------------------------------------------------
-    // Method 2: JWT Login (manual token management)
+    // Method 2: JWT (manage tokens yourself)
     // -------------------------------------------------
     print("=== JWT Login ===")
 
@@ -68,8 +66,8 @@ struct App {
         let apikeyList = try await client.get("/api/v1/auth/apikey")
         print("API Key List: \(apikeyList.status)")
 
-        // 3) Refresh accessToken using refreshToken
-        //    NOTE: Server performs token rotation - old refreshToken is revoked
+        // 3) Refresh accessToken
+        //    NOTE: The server rotates refreshToken: the old one is revoked
         let refreshed = try await client.jwtRefresh(refreshToken)
         if let refreshed = refreshed {
             let newAccess = refreshed["accessToken"] as? String ?? ""
@@ -78,7 +76,7 @@ struct App {
             print("New Refresh:   \(String(newRefresh.prefix(30)))...")
 
             // 4) Logout (revoke refreshToken)
-            //    Must use the NEW refreshToken after rotation
+            //    Use the new refreshToken after rotation
             try await client.jwtLogout(newRefresh)
         } else {
             try await client.jwtLogout(refreshToken)
@@ -91,16 +89,15 @@ struct App {
     print("")
 
     // -------------------------------------------------
-    // Method 3: API Key (issue -> use -> list -> revoke)
-    //   POST /api/v1/auth/apikey   (create, requires admin JWT)
-    //   X-API-Key header           (use, v1 endpoints only)
-    //   GET /api/v1/auth/apikey    (list)
-    //   DELETE /api/v1/auth/apikey/{id}  (delete)
-    //   NOTE: v0 endpoints (/api/*) reject API Key with 401
+    // Method 3: API Key (create -> use -> list -> delete)
+    //   POST /api/v1/auth/apikey        (create, requires admin JWT)
+    //   X-API-Key header                (use, v1 endpoints only)
+    //   GET /api/v1/auth/apikey         (list)
+    //   DELETE /api/v1/auth/apikey/{id} (delete)
     // -------------------------------------------------
     print("=== API Key ===")
 
-    // 1) JWT login for admin access
+    // 1) Get an admin token via JWT login
     guard let authTokens = try await client.jwtLogin() else {
         print("JWT login failed")
         return
@@ -121,7 +118,7 @@ struct App {
         print("  WARNING: \(message)")
     }
 
-    // 3) Use API Key for data endpoint access (no login required)
+    // 3) Call a data endpoint with the API Key (no login required)
     let savedAccessToken = client.accessToken
     client.accessToken = ""
     client.setApiKey(newApiKey)

@@ -2,10 +2,10 @@
  * Example 12: WebSocket - Real-time Event Subscription
  *
  * Demonstrates subscribing to real-time events via WebSocket.
- * Topics: LPR, channelStatus, emergencyCall, object, recording
+ * Topics: LPR, channelStatus, notice, emergencyCall, object, recordingStatus, motionChanges
  *
  * Two subscription modes:
- *   1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+ *   1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
  *   2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
  *
  * Endpoint:
@@ -25,6 +25,29 @@ const { WS_URL, NVR_API_KEY } = require('./config');
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
+const LANG = 'ko-KR';
+
+// Print LPR and notice events by field; other topics as raw JSON.
+function printEvent(msg) {
+  if (msg.topic === 'LPR') {
+    // id: record id for plate correction (absent when the record could not be saved)
+    // direction: "entry" / "exit" (absent when unknown)
+    for (const p of msg.plates || [msg]) {
+      console.log(`  [LPR] id=${p.id ?? '-'} plateNo=${p.plateNo} score=${p.score} direction=${p.direction || '-'}`);
+    }
+  } else if (msg.topic === 'notice') {
+    // snapshot: current list once after subscribing; raised/updated/cleared: one notice
+    // message is keyed by language code: en-US always, plus the requested lang
+    const notices = msg.action === 'snapshot' ? (msg.notices || []) : [msg.notice];
+    if (notices.length === 0) console.log('  [notice] snapshot: (no notices)');
+    for (const n of notices) {
+      console.log(`  [notice] ${msg.action} ${n.id} ${n.severity}: ${n.message[LANG] ?? n.message['en-US']}`);
+    }
+  } else {
+    console.log(`  [${msg.topic || msg.type}] ${JSON.stringify(msg)}`);
+  }
+}
+
 async function main() {
   if (!NVR_API_KEY) {
     console.error('NVR_API_KEY environment variable is required');
@@ -38,7 +61,7 @@ async function main() {
 
   try {
     const ws1 = new WebSocket(
-      `${WS_URL}/wsapi/v1/events?topics=LPR,channelStatus`,
+      `${WS_URL}/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=${LANG}`,
       { headers: { 'X-API-Key': NVR_API_KEY }, rejectUnauthorized: false }
     );
     const messages1 = [];
@@ -47,7 +70,7 @@ async function main() {
     ws1.on('message', (data) => {
       const msg = JSON.parse(data.toString());
       messages1.push(msg);
-      console.log(`  [${msg.topic || msg.type}] ${JSON.stringify(msg)}`);
+      printEvent(msg);
     });
     ws1.on('error', (err) => console.log(`  Error: ${err.message}`));
 
@@ -104,7 +127,7 @@ async function main() {
       }
 
       // Handle event data
-      console.log(`  [${msg.topic}] ${JSON.stringify(msg)}`);
+      printEvent(msg);
     });
 
     ws2.on('error', (err) => console.log(`  Error: ${err.message}`));
@@ -113,14 +136,14 @@ async function main() {
     await sleep(3000);
     console.log('  [Phase 2] Add object topic + expand LPR to ch 1-4');
     ws2.send(JSON.stringify({ subscribe: 'object', objectTypes: ['human', 'vehicle'] }));
-    ws2.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 2, 3, 4] }));  // re-subscribe updates filter
+    ws2.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 2, 3, 4] }));  // re-subscribe replaces the filter
 
     // Phase 3 (6s): Unsubscribe topic + subscribe new topic + reduce channels
     await sleep(3000);
     console.log('  [Phase 3] Unsubscribe channelStatus + add motionChanges (ch 1) + reduce LPR to ch 1,3');
     ws2.send(JSON.stringify({ unsubscribe: 'channelStatus' }));
     ws2.send(JSON.stringify({ subscribe: 'motionChanges', ch: [1] }));
-    ws2.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 3] }));  // re-subscribe with fewer ch drops ch 2,4
+    ws2.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 3] }));  // re-subscribe replaces the filter (drops ch 2,4)
 
     await sleep(4000);
     console.log(`  Received ${messages2.length} messages`);
@@ -140,7 +163,7 @@ main().catch(console.error);
  *
  * // Method 1: Subscribe via URL
  * const ws = new WebSocket(
- *   'ws://nvr-server/wsapi/v1/events?topics=LPR,channelStatus&apikey=tsapi_key_...'
+ *   'ws://nvr-server/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=ko-KR&apikey=tsapi_key_...'
  * );
  *
  * // Method 2: Dynamic subscribe/unsubscribe (v1 only)
@@ -164,6 +187,9 @@ main().catch(console.error);
  *   // Handle events
  *   switch (data.topic) {
  *     case 'LPR':           (data.plates || [data]).forEach(p => showPlate(p.plateNo, p.score)); break;  // v1.0.0/v1.0.1 compatible
+ *                           // each plate also carries id (record id for plate correction) and direction ("entry"/"exit")
+ *     case 'notice':        // message is keyed by language code: n.message['ko-KR'] ?? n.message['en-US']
+ *                           (data.action === 'snapshot' ? data.notices : [data.notice]).forEach(n => showNotice(data.action, n)); break;
  *     case 'channelStatus': updateStatus(data.chid, data.status.code); break;
  *     case 'object':        showObject(data);                          break;
  *   }
@@ -176,5 +202,5 @@ main().catch(console.error);
  * // Phase 3: Unsubscribe topic + subscribe new topic + reduce channels
  * ws.send(JSON.stringify({ unsubscribe: 'channelStatus' }));
  * ws.send(JSON.stringify({ subscribe: 'motionChanges', ch: [1] }));
- * ws.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 3] }));  // re-subscribe with fewer ch drops ch 2,4
+ * ws.send(JSON.stringify({ subscribe: 'LPR', ch: [1, 3] }));  // re-subscribe replaces the filter (drops ch 2,4)
  */

@@ -8,9 +8,12 @@
  *   GET /api/v1/system/info?item=storage   - Storage info (response field: 'disk')
  *   GET /api/v1/system/info?item=network   - Network interfaces
  *   GET /api/v1/system/health              - System health status
+ *   GET /api/v1/system/health?item=systemDisk
+ *                                          - System disk (database and logs) status
  *   GET /api/v1/system/hddsmart            - HDD S.M.A.R.T. data
+ *   GET /api/v1/system/notices?lang=ko-KR  - Notices currently in effect
  *
- * NOTE: The 'storage' query returns data with response field named 'disk' (NOT 'storage').
+ * NOTE: item=storage returns its data in the 'disk' field (NOT 'storage').
  *
  * Compile: kotlinc TsApiClient.kt V1_08_SystemInfo.kt -include-runtime -d V1_08_SystemInfo.jar
  * Run:     java -jar V1_08_SystemInfo.jar
@@ -70,6 +73,37 @@ fun main() {
     println("  status=${r.status}")
     if (r.status == 200) println(r.body)
 
+    // -- System Disk --
+    // GET /api/v1/system/health?item=systemDisk
+    // Holds the database and logs (normally C:), separate from the recording disks.
+    // When it is full, records stop being saved even if the recording disks have room.
+    // Watch status here, not only disk[].
+    // Fields: drive, totalSpace, freeSpace, status (normal/low/critical), dataWriteFailed
+    println("\n=== System Disk ===")
+    r = client.get("/api/v1/system/health?item=systemDisk")
+    println("  status=${r.status}")
+    if (r.status == 200) println(r.body)
+
+    // -- System Notices --
+    // GET /api/v1/system/notices?lang=ko-KR
+    // Conditions in effect right now (raised, updated, cleared).
+    // message is keyed by language code: en-US is always present,
+    // plus the requested lang when it is not English.
+    val lang = "ko-KR"
+    println("\n=== System Notices ===")
+    r = client.get("/api/v1/system/notices?lang=$lang")
+    println("  status=${r.status}")
+    if (r.status == 200) {
+        // No JSON parser here - match each notice's kind, severity and message object
+        val noticeRegex = """"kind":"([^"]*)"[^{}]*?"severity":"([^"]*)"[^{}]*?"message":\{([^{}]*)\}""".toRegex()
+        val notices = noticeRegex.findAll(r.body).toList()
+        if (notices.isEmpty()) println("  (no notices)")
+        for (n in notices) {
+            val (kind, severity, message) = n.destructured
+            println("  [$severity] $kind: ${messageText(message, lang)}")
+        }
+    }
+
     // -- HDD S.M.A.R.T. Info --
     // GET /api/v1/system/hddsmart
     println("\n=== HDD S.M.A.R.T. ===")
@@ -81,3 +115,9 @@ fun main() {
         println("  S.M.A.R.T. may not be available")
     }
 }
+
+/** message[lang], or message["en-US"] when that language is absent. */
+private fun messageText(messageObject: String, lang: String): String =
+    listOf(lang, "en-US").firstNotNullOfOrNull { code ->
+        """"$code":"((?:[^"\\]|\\.)*)"""".toRegex().find(messageObject)?.groupValues?.get(1)
+    } ?: ""

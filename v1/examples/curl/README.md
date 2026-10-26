@@ -49,11 +49,11 @@ bash 02-channels.sh
 | [03-ptz-control.sh](03-ptz-control.sh) | PTZ camera control | `GET channel/{id}/ptz`, `channel/{id}/preset` |
 | [04-recording-search.sh](04-recording-search.sh) | Recording calendar & timeline | `GET recording/days`, `recording/minutes` |
 | [05-event-log.sh](05-event-log.sh) | Event search & filtering | `GET event/type`, `event/log` |
-| [06-lpr-search.sh](06-lpr-search.sh) | License plate recognition search | `GET lpr/source`, `lpr/log`, `lpr/similar` |
+| [06-lpr-search.sh](06-lpr-search.sh) | License plate recognition search | `GET lpr/source`, `lpr/log`, `lpr/similar`, `lpr/log/{id}/plate/history` |
 | [07-vod-stream.sh](07-vod-stream.sh) | Live & playback stream URLs | `GET vod` |
-| [08-system-info.sh](08-system-info.sh) | System & server information | `GET info`, `system/info`, `system/health`, `system/hddsmart` |
+| [08-system-info.sh](08-system-info.sh) | System & server information | `GET info`, `system/info`, `system/health`, `system/notices`, `system/hddsmart` |
 | [09-push.sh](09-push.sh) | External event push (LPR, emergency) | `POST push` |
-| [10-parking.sh](10-parking.sh) | Parking lot & spot management | `GET parking/lot`, `parking/spot`, `/status` |
+| [10-parking.sh](10-parking.sh) | Parking lot & spot management | `GET parking/lot`, `parking/spot`, `/status`, `parking/session` |
 | [11-emergency.sh](11-emergency.sh) | Emergency call devices | `GET emergency` |
 
 ### WebSocket (websocat)
@@ -104,6 +104,6 @@ websocat -k -H "X-API-Key: tsapi_key_..." wss://nvr-server/wsapi/v1/events?topic
 
 - All scripts use `set -euo pipefail` for safe execution
 - Self-signed certificates are accepted (`curl -k`, `websocat -k`)
-- JSON output is pretty-printed with `jq` when available, raw output otherwise
+- JSON output is pretty-printed with `jq` if it is installed; otherwise raw output is shown
 - Time parameters use ISO 8601 format (e.g., `2025-01-15T09:30:00`)
 - Channel IDs are 1-based

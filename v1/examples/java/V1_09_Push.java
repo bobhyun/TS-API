@@ -14,7 +14,6 @@
  *          The alarm persists until callEnd is sent.
  *          ALWAYS send callEnd after callStart.
  *
- *
  * Compile: javac NvrClient.java V1_09_Push.java
  * Run:     java V1_09_Push
  */
@@ -64,8 +63,6 @@ public class V1_09_Push {
         System.out.println("\n=== Push Emergency Call ===");
         System.out.println("  WARNING: This triggers a REAL alarm on the NVR!");
 
-        // Uncomment the code below to actually trigger the alarm.
-        // Make sure you always send callEnd after callStart.
         // Uncomment the code below to actually trigger the alarm.
         // Make sure you always send callEnd after callStart.
 

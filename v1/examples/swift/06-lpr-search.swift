@@ -5,13 +5,14 @@
  *   - LPR source list
  *   - License plate log search (keyword, time range, pagination)
  *   - Similar plate search
+ *   - Plate correction history (GET /api/v1/lpr/log/{id}/plate/history)
+ *   - Plate correction (POST /api/v1/lpr/log/{id}/plate, Control permission, not executed)
  *   - CSV export
  *
  * NOTE: timeBegin and timeEnd are required for LPR log searches.
  *
- * WARNING: Exporting large datasets (10,000+ records) may cause HTTP timeout
- *   errors. For bulk exports, narrow the time range or use pagination
- *   (at/maxCount) to keep each request under a manageable size.
+ * WARNING: Large exports (10,000+ records) can hit HTTP timeouts.
+ *   Narrow the time range or page with at/maxCount.
  */
 
 import Foundation
@@ -65,18 +66,28 @@ struct App {
     let timeEnd = formatter.string(from: endDate)
 
     let logRes = try await client.get("/api/v1/lpr/log?timeBegin=\(timeBegin)&timeEnd=\(timeEnd)&maxCount=10")
+    var firstRecordId: Int? = nil
 
     if logRes.status == 200, let body = logRes.body as? [String: Any] {
         print("  Total: \(body["totalCount"] ?? "N/A")")
 
         if let data = body["data"] as? [[String: Any]] {
+            firstRecordId = data.first?["id"] as? Int
             for entry in data {
+                let id = entry["id"] ?? "-"
                 let timeRange = entry["timeRange"] as? [String] ?? []
                 let time = timeRange.first ?? ""
-                let plateNo = entry["plateNo"] as? String ?? ""
+                // plateNo is null when no plate was read; direction is "entry"/"exit" or absent
+                let plateNo = (entry["plateNo"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? "(unrecognized)"
+                let direction = entry["direction"] as? String ?? "-"
                 let score = entry["score"] ?? "N/A"
                 let srcName = entry["srcName"] as? String ?? entry["srcCode"] as? String ?? ""
-                print("  \(time) | \(plateNo) (score: \(score)) [\(srcName)]")
+                var line = "  [\(id)] \(time) | \(plateNo) (score: \(score)) [\(srcName)] direction=\(direction)"
+                if entry["plateEdited"] as? Bool == true {
+                    let original = entry["originalPlateNo"] as? String ?? ""
+                    line += " (corrected, originally \(original.isEmpty ? "(unrecognized)" : original))"
+                }
+                print(line)
 
                 // VOD links for playback
                 // v1 returns relative paths (e.g. "/watch?ch=1&when=..."); prepend baseURL for non-browser clients.
@@ -114,7 +125,7 @@ struct App {
 
     // -------------------------------------------------
     // 4. Similar Plate Search
-    //    Finds plates similar to the keyword (edit distance based)
+    //    Returns every plate containing the keyword, most recent first
     //    Useful for partial or misrecognized plates
     // -------------------------------------------------
     print("\n=== Similar Plate Search ===")
@@ -122,27 +133,49 @@ struct App {
         "/api/v1/lpr/similar?keyword=\(keyword)&timeBegin=\(timeBegin)&timeEnd=\(timeEnd)"
     )
 
-    if similarRes.status == 200, let body = similarRes.body {
-        let dict = body as? [String: Any]
-        let totalCount = dict?["totalCount"] ?? "N/A"
-        print("  Similar to \"\(keyword)\": \(totalCount) results")
-
-        let data: [[String: Any]]
-        if let d = dict?["data"] as? [[String: Any]] {
-            data = d
-        } else if let d = body as? [[String: Any]] {
-            data = d
-        } else {
-            data = []
-        }
-        for entry in data.prefix(5) {
-            let plateNo = entry["plateNo"] as? String ?? ""
+    // Response: array of plate strings, most recent first
+    if similarRes.status == 200, let plates = similarRes.body as? [String] {
+        print("  Similar to \"\(keyword)\": \(plates.count) results")
+        for plateNo in plates.prefix(5) {
             print("    \(plateNo)")
+        }
+    } else {
+        print("  Status: \(similarRes.status)")
+    }
+
+    // -------------------------------------------------
+    // 5. Plate Correction History (one record, by id)
+    //    plateNo in the log is always the current value.
+    //    edits[] lists corrections in recorded order; it is empty if the record was never corrected.
+    // -------------------------------------------------
+    if let recId = firstRecordId {
+        print("\n=== Plate Correction History (id=\(recId)) ===")
+        let histRes = try await client.get("/api/v1/lpr/log/\(recId)/plate/history")
+        if histRes.status == 200, let h = histRes.body as? [String: Any] {
+            let original = h["originalPlateNo"] as? String ?? "(never corrected)"
+            print("  plateNo=\(h["plateNo"] ?? "") original=\(original)")
+            for e in h["edits"] as? [[String: Any]] ?? [] {
+                print("    \(e["time"] ?? "") \(e["user"] ?? ""): \(e["before"] ?? "") -> \(e["after"] ?? "") \(e["reason"] ?? "")")
+            }
+        } else {
+            print("  Status: \(histRes.status)")
         }
     }
 
     // -------------------------------------------------
-    // 5. CSV Export
+    // 6. Plate Correction (Control permission)
+    //    Changes the stored record, so it is not executed here. The target is always
+    //    one record id - from data[].id above, or the id a realtime LPR event carries
+    //    next to each plateNo. 409 when plateNo equals the current plate.
+    //
+    //    Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+    //    Uncomment it to try it against a test record.
+    //    _ = try await client.post("/api/v1/lpr/log/\(recId)/plate",
+    //                              body: ["plateNo": "12가3456", "reason": "misread at night"])
+    // -------------------------------------------------
+
+    // -------------------------------------------------
+    // 7. CSV Export
     //    Returns LPR data in CSV format for spreadsheet import
     // -------------------------------------------------
     print("\n=== CSV Export ===")

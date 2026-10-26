@@ -1,8 +1,14 @@
 // 01_login - Authentication methods
-// Demonstrates three authentication methods: Legacy Session, JWT, API Key.
-// NOTE: API Key only works with v1 endpoints (/api/v1/*). v0 returns 401.
 //
-// Run: cd examples/go && go run ./v1/01_login/
+// Three authentication methods:
+//   1. Client login - the client logs in with JWT and sends the Bearer token automatically
+//   2. JWT          - POST /api/v1/auth/login; manage accessToken/refreshToken yourself
+//   3. API Key      - X-API-Key header, for external integrations
+//
+// NOTE: v1 endpoints accept a JWT Bearer token or an API Key. Session cookies are not supported.
+// NOTE: v0 endpoints (/api/*) reject X-API-Key with 401.
+//
+// Run: cd go && go run ./01_login
 package main
 
 import (
@@ -20,16 +26,16 @@ func main() {
 	cfg := tsapi.LoadConfig()
 	client := tsapi.NewClient(cfg)
 
-	// ── 1. Session Login (for data API access, recommended) ──
+	// ── 1. Client login (JWT stored by the client) ──
 	// POST /api/v1/auth/login  {"auth":"base64(username:password)"}
-	// Server sets session cookie, automatically sent with subsequent requests.
+	// The client sends the Bearer token with subsequent requests.
 	fmt.Println("=== Session Login ===")
 	if err := client.Login(); err != nil {
 		log.Fatal("Legacy login failed:", err)
 	}
 	fmt.Println("Legacy session OK (cookie-based)")
 
-	// Verify session - whoAmI
+	// Check the logged-in user
 	r, err := client.Get("/api/v1/info?whoAmI")
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +47,7 @@ func main() {
 
 	// ── 2. JWT authentication (accessToken + refreshToken) ──
 	// POST /api/v1/auth/login   → {accessToken, refreshToken, expiresIn, tokenType}
-	// POST /api/v1/auth/refresh → {accessToken, expiresIn, tokenType}
+	// POST /api/v1/auth/refresh → {accessToken, refreshToken, expiresIn, tokenType} (rotates refreshToken)
 	// POST /api/v1/auth/logout  (revoke refreshToken)
 	fmt.Println("\n=== JWT Login ===")
 	tp, err := client.JwtLogin()
@@ -52,13 +58,13 @@ func main() {
 	fmt.Printf("Refresh Token: %s...\n", tp.RefreshToken[:30])
 	fmt.Printf("Expires In:    %ds\n", tp.ExpiresIn)
 
-	// Refresh accessToken using refreshToken
+	// Refresh accessToken
 	newToken, err := client.JwtRefresh(tp.RefreshToken)
 	if err == nil {
 		fmt.Printf("Refreshed:     %s...\n", newToken.AccessToken[:30])
 	}
 
-	// JWT logout (revoke refreshToken) - skip here, need token for API Key demo
+	// JWT logout (revokes refreshToken) - skipped: the API Key demo below needs the token
 	// client.JwtLogout(tp.RefreshToken)
 
 	// ── 3. API Key (create -> use -> list -> delete) ──
@@ -68,7 +74,7 @@ func main() {
 	// DELETE /api/v1/auth/apikey/{id} (delete)
 	fmt.Println("\n=== API Key ===")
 
-	// 1) Use JWT token obtained above
+	// 1) Reuse the access token from above
 	bearerAuth := "Bearer " + tp.AccessToken
 
 	// 2) Create API Key
@@ -102,7 +108,7 @@ func main() {
 		fmt.Printf("  WARNING: %s\n", keyResult.Message)
 	}
 
-	// 3) Access data endpoints with API Key (no login required)
+	// 3) Call a data endpoint with the API Key (no login required)
 	useReq, _ := http.NewRequest("GET", cfg.BaseURL+"/api/v1/channel", nil)
 	useReq.Header.Set("X-API-Key", keyResult.APIKey)
 	useReq.Header.Set("X-Host", cfg.Host+":"+cfg.Port)

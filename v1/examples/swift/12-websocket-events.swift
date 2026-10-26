@@ -2,10 +2,10 @@
  * Example 12: WebSocket - Real-time Event Subscription
  *
  * Demonstrates subscribing to real-time events via WebSocket.
- * Topics: LPR, channelStatus, emergencyCall, object, recording
+ * Topics: LPR, channelStatus, notice, emergencyCall, object, recordingStatus, motionChanges
  *
  * Two subscription modes:
- *   1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+ *   1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
  *   2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
  *
  * Endpoint:
@@ -27,6 +27,42 @@ import Foundation
 import FoundationNetworking
 #endif
 
+let lang = "ko-KR"
+
+/// Print LPR and notice events by field; other topics as raw JSON.
+func printEvent(_ json: [String: Any], text: String) {
+    let topic = json["topic"] as? String ?? ""
+    if topic == "LPR" {
+        // id: record id for plate correction (absent when the record could not be saved)
+        // direction: "entry" / "exit" (absent when unknown)
+        let plates = json["plates"] as? [[String: Any]] ?? [json]
+        for p in plates {
+            print("  [LPR] id=\(p["id"] ?? "-") plateNo=\(p["plateNo"] ?? "") score=\(p["score"] ?? "") direction=\(p["direction"] as? String ?? "-")")
+        }
+    } else if topic == "notice" {
+        // snapshot: current list once after subscribing; raised/updated/cleared: one notice
+        // message is keyed by language code: en-US always, plus the requested lang
+        let action = json["action"] as? String ?? ""
+        let notices: [[String: Any]]
+        if action == "snapshot" {
+            notices = json["notices"] as? [[String: Any]] ?? []
+        } else {
+            notices = [json["notice"] as? [String: Any] ?? [:]]
+        }
+        if notices.isEmpty {
+            print("  [notice] snapshot: (no notices)")
+        }
+        for n in notices {
+            let msg = n["message"] as? [String: String] ?? [:]
+            let textOut = msg[lang] ?? msg["en-US"] ?? ""
+            print("  [notice] \(action) \(n["id"] ?? "") \(n["severity"] ?? ""): \(textOut)")
+        }
+    } else {
+        let t = topic.isEmpty ? (json["type"] as? String ?? "?") : topic
+        print("  [\(t)] \(text)")
+    }
+}
+
 @main
 struct App {
   static func main() async throws {
@@ -43,7 +79,7 @@ struct App {
     print("=== Method 1: Subscribe via URL (10 seconds) ===")
 
     let wsTask1 = client.websocket(
-        path: "/wsapi/v1/events?topics=LPR,channelStatus"
+        path: "/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=\(lang)"
     )
 
     wsTask1.resume()
@@ -79,8 +115,7 @@ struct App {
                 messageCount1 += 1
                 if let data = text.data(using: .utf8),
                    let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                    let topic = json["topic"] ?? json["type"] ?? "?"
-                    print("  [\(topic)] \(text)")
+                    printEvent(json, text: text)
                 } else {
                     print("  Raw: \(text)")
                 }
@@ -125,7 +160,7 @@ struct App {
     wsTask2.resume()
     print("  Connected (no topics yet)")
 
-    // Dynamically subscribe to topics with per-topic filters
+    // Subscribe to initial topics with per-topic filters
     do {
         try await wsTask2.send(.string("{\"subscribe\":\"channelStatus\"}"))
         try await wsTask2.send(.string("{\"subscribe\":\"LPR\",\"ch\":[1,2]}"))
@@ -148,7 +183,7 @@ struct App {
     var didUpdateFilters = false
 
     while Date() < deadline2 {
-        // After 3 seconds: unsubscribe channelStatus, update LPR filter
+        // After 3s: unsubscribe channelStatus + expand LPR to ch 1-4
         if !didUpdateFilters && Date().addingTimeInterval(-3.0) > deadline2.addingTimeInterval(-10.0) {
             didUpdateFilters = true
             print("  --- Unsubscribing channelStatus, updating LPR filter ---")
@@ -195,8 +230,7 @@ struct App {
                         print("  Error: \(msg) (topic: \(topic))")
                     default:
                         // Event data
-                        let t = topic.isEmpty ? "?" : topic
-                        print("  [\(t)] \(text)")
+                        printEvent(json, text: text)
                     }
                 } else {
                     print("  Raw: \(text)")
@@ -245,4 +279,7 @@ struct App {
  *           print("Plate: \(plateNo)  Score: \(score)")
  *       }
  *   }
+ *
+ * Each plate carries the record "id" (use it with POST /api/v1/lpr/log/{id}/plate)
+ * and "direction" as a string ("entry" / "exit"), not a number.
  */

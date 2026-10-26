@@ -21,7 +21,7 @@
  * Optional filters (OR logic):
  *   &ch=1,2       - spots belonging to channels 1, 2
  *   &lot=1,2      - spots belonging to parking lots 1, 2
- *   &spot=100,200  - specific spot IDs
+ *   &spot=100,200 - specific spot IDs
  *
  * See also: 13-websocket-parking-lot.js for lot-level count monitoring
  *

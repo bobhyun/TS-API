@@ -5,9 +5,11 @@
  *   - Server info (API version, product, license, timezone)
  *   - System info (OS, CPU, disk, network)
  *   - System health (CPU usage, memory, disk usage)
+ *   - System disk status (GET /api/v1/system/health?item=systemDisk)
  *   - HDD S.M.A.R.T status
+ *   - System notices (GET /api/v1/system/notices?lang=ko-KR)
  *
- * NOTE: System info 'storage' parameter returns response field named 'disk'.
+ * NOTE: item=storage returns its data in the 'disk' field (NOT 'storage').
  */
 
 import Foundation
@@ -75,7 +77,7 @@ struct App {
     // -------------------------------------------------
     // 2. System Info (individual items)
     //    Available items: os, cpu, storage, network
-    //    NOTE: 'storage' request returns 'disk' field in response
+    //    NOTE: item=storage returns its data in the 'disk' field
     // -------------------------------------------------
     print("\n=== System Info ===")
 
@@ -152,7 +154,24 @@ struct App {
     }
 
     // -------------------------------------------------
-    // 4. HDD S.M.A.R.T Status
+    // 4. System Disk
+    //    Holds the database and logs (normally C:), separate from the recording disks.
+    //    When it is full, records stop being saved even if the recording disks have room.
+    //    Watch status here, not only disk[].
+    // -------------------------------------------------
+    print("\n=== System Disk ===")
+    let sysDiskRes = try await client.get("/api/v1/system/health?item=systemDisk")
+    if sysDiskRes.status == 200, let body = sysDiskRes.body as? [String: Any],
+       let sd = body["systemDisk"] as? [String: Any] {
+        print("  drive=\(sd["drive"] ?? "") free=\(sd["freeSpace"] ?? "")/\(sd["totalSpace"] ?? "") status=\(sd["status"] ?? "") dataWriteFailed=\(sd["dataWriteFailed"] ?? "")")
+    } else {
+        print("  Status: \(sysDiskRes.status)")
+    }
+
+    // -------------------------------------------------
+    // 5. HDD S.M.A.R.T Status
+    //    code: -1 not read yet, 0 unsupported, 1 ok (attributes in smart[]),
+    //          2 needs admin rights, 3 behind a RAID controller, 4 read failed
     // -------------------------------------------------
     print("\n=== HDD S.M.A.R.T ===")
     let smartRes = try await client.get("/api/v1/system/hddsmart")
@@ -162,12 +181,35 @@ struct App {
         if let disks = body as? [[String: Any]] {
             for disk in disks {
                 let model = disk["model"] as? String ?? disk["name"] as? String ?? "Disk"
-                let health = disk["health"] as? String ?? disk["status"] as? String ?? "N/A"
-                print("  \(model): \(health)")
+                let code = disk["code"] ?? "N/A"
+                let message = disk["message"] as? String ?? ""
+                print("  \(model): code=\(code) \(message)")
             }
         } else {
             print("  \(client.toJsonString(body, pretty: true))")
         }
+    }
+
+    // -------------------------------------------------
+    // 6. System Notices
+    //    Conditions in effect right now (raised, updated, cleared).
+    //    message is keyed by language code: en-US is always present,
+    //    plus the requested lang when it is not English.
+    // -------------------------------------------------
+    print("\n=== System Notices ===")
+    let lang = "ko-KR"
+    let noticeRes = try await client.get("/api/v1/system/notices?lang=\(lang)")
+    if noticeRes.status == 200, let notices = noticeRes.body as? [[String: Any]] {
+        if notices.isEmpty {
+            print("  (no notices)")
+        }
+        for n in notices {
+            let msg = n["message"] as? [String: String] ?? [:]
+            let text = msg[lang] ?? msg["en-US"] ?? ""
+            print("  [\(n["severity"] ?? "")] \(n["kind"] ?? ""): \(text)")
+        }
+    } else {
+        print("  Status: \(noticeRes.status)")
     }
   }
 }

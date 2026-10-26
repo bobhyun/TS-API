@@ -75,8 +75,7 @@ async function main() {
 
         case 'fileEnd': {
           // download: [{fileName, src}, ...]
-          // Server v1.0.2+ returns relative paths (e.g. "/download/...");
-          // prepend BASE_URL for non-browser clients to fetch.
+          // src is a relative path (e.g. "/download/..."); prepend BASE_URL outside a browser.
           const downloads = msg.channel?.file?.download || [];
           const src = downloads[0]?.src || 'N/A';
           const fullUrl = src.startsWith('http') ? src : `${BASE_URL}${src}`;

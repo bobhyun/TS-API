@@ -7,14 +7,14 @@
 #   - Navigate between recording segments (next/prev)
 #   - Filter by protocol and stream quality
 #
-# NOTE: X-Host header is required. When using nginx reverse proxy, X-Host is
-#       set by the proxy. For direct access, set it manually.
+# NOTE: The X-Host header is required. A reverse proxy sets it;
+#       for direct calls, send it yourself (as below).
 #
 # Response src format:
 #   src: [
 #     { protocol: "rtmp", profile: "main", src: "rtmp://...", label: "1080p", size: [1920, 1080] },
-#     { protocol: "flv", profile: "main", src: "http://.../.flv", label: "1080p", size: [1920, 1080] }
-#     { protocol: "websocket-flv", profile: "main", src: "ws://.../.flv", label: "1080p", size: [1920, 1080] }
+#     { protocol: "flv", profile: "main", src: "http://.../.flv", label: "1080p", size: [1920, 1080] },
+#     { protocol: "websocket-flv", profile: "main", src: "ws://.../.flv", label: "1080p", size: [1920, 1080] },
 #     { protocol: "rtsp", profile: "main", src: "rtsp://.../live/ch1main", label: "1080p", size: [1920, 1080] }
 #   ]
 #

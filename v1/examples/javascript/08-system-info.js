@@ -5,9 +5,11 @@
  *   - Server info (API version, product, license, timezone)
  *   - System info (OS, CPU, disk, network)
  *   - System health (CPU usage, memory, disk usage)
+ *   - System disk status (database and logs disk)
+ *   - System notices (conditions in effect now)
  *   - HDD S.M.A.R.T status
  *
- * NOTE: System info 'storage' parameter returns response field named 'disk'.
+ * NOTE: item=storage returns its data in the 'disk' field (NOT 'storage').
  */
 
 const { NVR_API_KEY } = require('./config');
@@ -39,7 +41,7 @@ async function main() {
   // ─────────────────────────────────────────────────
   // 2. System Info (individual items)
   //    Available items: os, cpu, storage, network
-  //    NOTE: 'storage' request returns 'disk' field in response
+  //    NOTE: item=storage returns its data in the 'disk' field
   // ─────────────────────────────────────────────────
   console.log('\n=== System Info ===');
 
@@ -112,7 +114,43 @@ async function main() {
   }
 
   // ─────────────────────────────────────────────────
-  // 4. HDD S.M.A.R.T Status
+  // 4. System Disk
+  //    Holds the database and logs (normally C:), separate from the recording disks.
+  //    When it is full, records stop being saved even if the recording disks have room.
+  //    Watch status here, not only disk[].
+  // ─────────────────────────────────────────────────
+  console.log('\n=== System Disk ===');
+  const sysDiskRes = await get('/api/v1/system/health?item=systemDisk');
+  if (sysDiskRes.status === 200 && sysDiskRes.body?.systemDisk) {
+    const sd = sysDiskRes.body.systemDisk;
+    console.log(`  ${sd.drive} free ${formatBytes(sd.freeSpace)} / ${formatBytes(sd.totalSpace)}` +
+      ` status: ${sd.status} (normal|low|critical), dataWriteFailed: ${sd.dataWriteFailed}`);
+  } else {
+    console.log(`  Status: ${sysDiskRes.status}`);
+  }
+
+  // ─────────────────────────────────────────────────
+  // 5. System Notices
+  //    Conditions in effect right now (raised, updated, cleared).
+  //    message is keyed by language code: en-US is always present,
+  //    plus the requested lang when it is not English.
+  // ─────────────────────────────────────────────────
+  console.log('\n=== System Notices ===');
+  const lang = 'ko-KR';
+  const noticeRes = await get(`/api/v1/system/notices?lang=${lang}`);
+  if (noticeRes.status === 200 && Array.isArray(noticeRes.body)) {
+    if (noticeRes.body.length === 0) console.log('  (no notices)');
+    for (const n of noticeRes.body) {
+      console.log(`  [${n.severity}] ${n.kind}: ${n.message[lang] ?? n.message['en-US']}`);
+    }
+  } else {
+    console.log(`  Status: ${noticeRes.status}`);
+  }
+
+  // ─────────────────────────────────────────────────
+  // 6. HDD S.M.A.R.T Status
+  //    code: -1 not read yet, 0 unsupported, 1 ok (attributes in smart[]),
+  //          2 needs admin rights, 3 behind a RAID controller, 4 read failed
   // ─────────────────────────────────────────────────
   console.log('\n=== HDD S.M.A.R.T ===');
   const smartRes = await get('/api/v1/system/hddsmart');
@@ -121,7 +159,7 @@ async function main() {
   if (smartRes.status === 200 && smartRes.body) {
     if (Array.isArray(smartRes.body)) {
       for (const disk of smartRes.body) {
-        console.log(`  ${disk.model || disk.name || 'Disk'}: ${disk.health || disk.status || 'N/A'}`);
+        console.log(`  ${disk.model || disk.name || 'Disk'}: ${disk.message ?? 'N/A'} (code ${disk.code})`);
       }
     } else {
       console.log(`  ${JSON.stringify(smartRes.body, null, 2)}`);

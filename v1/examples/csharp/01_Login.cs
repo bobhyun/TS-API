@@ -1,20 +1,12 @@
 // 01_Login.cs - v1 API Authentication Example
 //
-// v1 API supports two authentication methods:
+// Three authentication methods:
+//   1. Client login - NvrClient logs in with JWT and sends the Bearer token automatically
+//   2. JWT          - POST /api/v1/auth/login; manage accessToken/refreshToken yourself
+//   3. API Key      - X-API-Key header, for external integrations
 //
-// 1. JWT auth (POST with JSON body)
-//    POST /api/v1/auth/login  {"auth":"base64(username:password)"}
-//    POST /api/v1/auth/logout {"refreshToken":"..."}
-//
-// 2. JWT auth (token-based)
-//    POST /api/v1/auth/login -> {accessToken, refreshToken, expiresIn, tokenType}
-//
-// 3. API Key (external integration)
-//    POST /api/v1/auth/apikey (create, requires admin JWT)
-//    X-API-Key header (use, v1 endpoints only)
-//
-// IMPORTANT: JWT only works on /api/v1/auth/* endpoints!
-// API Key authentication is supported on v1 endpoints only. v0 returns 401.
+// NOTE: v1 endpoints accept a JWT Bearer token or an API Key. Session cookies are not supported.
+// NOTE: v0 endpoints (/api/*) reject X-API-Key with 401.
 
 using System;
 using System.Net.Http;
@@ -32,7 +24,7 @@ namespace TsApiExamples.V1
             using var client = new NvrClient();
             Console.WriteLine($"NVR: {client.BaseUrl}");
 
-            // ── Method 1: Session auth ──
+            // ── Method 1: Client login (JWT stored by NvrClient) ──
             Console.WriteLine("\n=== Session Login ===");
             var ok = await client.LoginAsync();
             Console.WriteLine($"Login: {(ok ? "OK" : "FAILED")}");
@@ -62,7 +54,7 @@ namespace TsApiExamples.V1
             Console.WriteLine($"Refresh Token: {refreshToken?.Substring(0, 20)}...");
             Console.WriteLine($"Expires In:    {jwtRoot.GetProperty("expiresIn").GetInt32()}s");
 
-            // Refresh accessToken using refreshToken
+            // Refresh accessToken (the server also rotates refreshToken)
             using var refreshDoc = await client.JwtRefreshAsync(refreshToken);
             if (refreshDoc != null)
             {
@@ -71,8 +63,8 @@ namespace TsApiExamples.V1
                 accessToken = newToken;  // use new token
             }
 
-            // JWT logout (revoke refreshToken)
-            // await client.JwtLogoutAsync(refreshToken);  // skip: need token for API Key demo below
+            // JWT logout (revokes refreshToken)
+            // await client.JwtLogoutAsync(refreshToken);  // skipped: the API Key demo below needs the token
 
             // ── Method 3: API Key lifecycle (Create -> Use -> List -> Delete) ──
             Console.WriteLine("\n=== API Key ===");
@@ -96,7 +88,7 @@ namespace TsApiExamples.V1
             Console.WriteLine($"  Key ID: {keyId}");
             Console.WriteLine($"  API Key: {apiKey?.Substring(0, Math.Min(24, apiKey?.Length ?? 0))}...");
 
-            // 2) Use API Key (no login needed)
+            // 2) Use API Key (no login required)
             var useReq = new HttpRequestMessage(HttpMethod.Get, "/api/v1/channel");
             useReq.Headers.Add("X-API-Key", apiKey);
             var useRes = await client.SendAsync(useReq);

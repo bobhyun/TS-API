@@ -9,7 +9,7 @@
  *
  *   GET /api/v1/event/log?maxCount=10
  *       - Query event log
- *       - Optional: timeBegin, timeEnd, offset, limit
+ *       - Optional: timeBegin, timeEnd, at, maxCount
  *
  * Compile: kotlinc TsApiClient.kt V1_05_EventLog.kt -include-runtime -d V1_05_EventLog.jar
  * Run:     java -jar V1_05_EventLog.jar
@@ -26,7 +26,7 @@ fun main() {
     // -- Event Types --
     // GET /api/v1/event/type
     // Response: [{id, name, code: [{id, name}]}, ...]
-    // Uses 'id' field (NOT "type")
+    // The field is 'id' (NOT "type")
     println("=== Event Types ===")
     var r = client.get("/api/v1/event/type")
     println("  status=${r.status}")
@@ -59,8 +59,7 @@ fun main() {
     }
 
     // -- Pagination --
-    // Use offset and limit for pagination
-    // Example:
-    //   page 1: /api/v1/event/log?offset=0&limit=20
-    //   page 2: /api/v1/event/log?offset=20&limit=20
+    // at = start index, maxCount = page size
+    //   page 1: /api/v1/event/log?at=0&maxCount=20
+    //   page 2: /api/v1/event/log?at=20&maxCount=20
 }

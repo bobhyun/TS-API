@@ -71,8 +71,8 @@ struct App {
 
     // -------------------------------------------------
     // 3. Recording Minutes (Timeline)
-    //    Returns 1440-char string per channel (24h x 60min)
-    //    '1' = recording exists, '0' = no recording
+    //    Returns one character per minute from timeBegin (1440 for a full day)
+    //    '1' = recorded, '0' = not recorded
     // -------------------------------------------------
     print("\n=== Recording Minutes (Timeline) ===")
 

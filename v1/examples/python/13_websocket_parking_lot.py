@@ -4,7 +4,7 @@
 Subscribes to parkingCount topic for real-time lot occupancy changes.
 
 Endpoint:
-  ws://host:port/wsapi/v1/events?topics=parkingCount&token={accessToken}
+  ws://host:port/wsapi/v1/events?topics=parkingCount
 
 Auth:
   Header: Authorization: Bearer {accessToken}  (primary)

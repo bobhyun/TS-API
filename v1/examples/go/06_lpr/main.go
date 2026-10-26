@@ -1,11 +1,15 @@
 // 06_lpr - License plate recognition search (LPR source & log search)
-// Demonstrates LPR source listing, recognition log search, and similar plate search.
+// Demonstrates LPR source listing, recognition log search, similar plate search,
+// and plate correction history.
 //
-// WARNING: Exporting large datasets (10,000+ records) may cause HTTP timeout
-// errors. For bulk exports, narrow the time range or use pagination
-// (at/maxCount) to keep each request under a manageable size.
+// Endpoints:
+//   GET  /api/v1/lpr/log/{id}/plate/history - Plate correction history of one record (Playback)
+//   POST /api/v1/lpr/log/{id}/plate         - Correct the plate of one record (Control, not executed here)
 //
-// Run: cd examples/go && go run ./v1/06_lpr/
+// WARNING: Large exports (10,000+ records) can hit HTTP timeouts.
+// Narrow the time range or page with at/maxCount.
+//
+// Run: cd go && go run ./06_lpr
 package main
 
 import (
@@ -59,13 +63,15 @@ func main() {
 		TotalCount int `json:"totalCount"`
 		At         int `json:"at"`
 		Data       []struct {
-			ID        int      `json:"id"`
-			PlateNo   string   `json:"plateNo"`
-			Score     float64  `json:"score"`
-			TimeRange []string `json:"timeRange"`
-			SrcCode   string   `json:"srcCode"`
-			SrcName   string   `json:"srcName"`
-			Direction string   `json:"direction"`
+			ID              int      `json:"id"`
+			PlateNo         *string  `json:"plateNo"` // null when no plate was read
+			PlateEdited     bool     `json:"plateEdited"`
+			OriginalPlateNo string   `json:"originalPlateNo"`
+			Score           float64  `json:"score"`
+			TimeRange       []string `json:"timeRange"`
+			SrcCode         string   `json:"srcCode"`
+			SrcName         string   `json:"srcName"`
+			Direction       string   `json:"direction"` // "entry" / "exit", absent when unknown
 		} `json:"data"`
 	}
 	r.JSON(&result)
@@ -75,8 +81,28 @@ func main() {
 		if len(d.TimeRange) > 0 {
 			t = d.TimeRange[0]
 		}
-		fmt.Printf("  [%d] %s (%.1f%%) %s %s %s\n",
-			d.ID, d.PlateNo, d.Score, d.SrcName, d.Direction, t)
+		plate := "(unrecognized)"
+		if d.PlateNo != nil && *d.PlateNo != "" {
+			plate = *d.PlateNo
+		}
+		dir := d.Direction
+		if dir == "" {
+			dir = "-"
+		}
+		fmt.Printf("  [%d] %s (%.1f%%) %s direction=%s %s",
+			d.ID, plate, d.Score, d.SrcName, dir, t)
+		if d.PlateEdited {
+			orig := d.OriginalPlateNo
+			if orig == "" {
+				orig = "(unrecognized)"
+			}
+			fmt.Printf(" (corrected, originally %s)", orig)
+		}
+		fmt.Println()
+	}
+	firstID := 0
+	if len(result.Data) > 0 {
+		firstID = result.Data[0].ID
 	}
 
 	// ── 3. Keyword search (partial match) ──
@@ -93,4 +119,51 @@ func main() {
 		"/api/v1/lpr/similar?keyword=1234&timeBegin=%s&timeEnd=%s",
 		timeBegin, timeEnd))
 	fmt.Println("similar:", r.String())
+
+	// ── 5. Plate correction history (one record, by id) ──
+	// plateNo in the log is always the current value.
+	// edits[] lists corrections in recorded order; it is empty if the record was never corrected.
+	if firstID > 0 {
+		fmt.Printf("\n=== GET /api/v1/lpr/log/%d/plate/history ===\n", firstID)
+		r, err = client.Get(fmt.Sprintf("/api/v1/lpr/log/%d/plate/history", firstID))
+		if err != nil {
+			log.Fatal(err)
+		}
+		if r.Status == 200 {
+			var h struct {
+				PlateNo         string  `json:"plateNo"`
+				OriginalPlateNo *string `json:"originalPlateNo"`
+				Edits           []struct {
+					Time   string `json:"time"`
+					User   string `json:"user"`
+					Before string `json:"before"`
+					After  string `json:"after"`
+					Reason string `json:"reason"`
+				} `json:"edits"`
+			}
+			r.JSON(&h)
+			orig := "(never corrected)"
+			if h.OriginalPlateNo != nil {
+				orig = *h.OriginalPlateNo
+			}
+			fmt.Printf("  plateNo=%s original=%s\n", h.PlateNo, orig)
+			for _, e := range h.Edits {
+				fmt.Printf("    %s %s: %s -> %s %s\n", e.Time, e.User, e.Before, e.After, e.Reason)
+			}
+		} else {
+			fmt.Printf("  Status: %d\n", r.Status)
+		}
+	}
+
+	// ── 6. Plate correction (Control permission) ──
+	// Changes the stored record, so it is not executed here. The target is always
+	// one record id - from data[].id above, or the id a realtime LPR event carries
+	// next to each plateNo. 409 when plateNo equals the current plate.
+	//
+	// Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+	// Uncomment it to try it against a test record.
+	//   client.Post(fmt.Sprintf("/api/v1/lpr/log/%d/plate", firstID), map[string]string{
+	//   	"plateNo": "12가3456",
+	//   	"reason":  "misread at night",
+	//   })
 }

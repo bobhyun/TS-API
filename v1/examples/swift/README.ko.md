@@ -25,7 +25,7 @@ curl -sk -X POST https://SERVER/api/v1/auth/apikey \
 export NVR_API_KEY=tsapi_key_...
 ```
 
-> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하세요.
+> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하십시오.
 
 ## 환경 변수
 
@@ -56,7 +56,7 @@ NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... ./example
 | [`03-ptz-control.swift`](03-ptz-control.swift) | PTZ 카메라 제어 |
 | [`04-recording-search.swift`](04-recording-search.swift) | 녹화 구간 검색 |
 | [`05-event-log.swift`](05-event-log.swift) | 이벤트 로그 조회 |
-| [`06-lpr-search.swift`](06-lpr-search.swift) | 차번 인식 검색 |
+| [`06-lpr-search.swift`](06-lpr-search.swift) | 차량 번호 인식 검색 |
 | [`07-vod-stream.swift`](07-vod-stream.swift) | VOD 스트림 URL (RTMP, FLV) |
 | [`08-system-info.swift`](08-system-info.swift) | 시스템 상태 |
 | [`09-push.swift`](09-push.swift) | 외부 이벤트 푸시 |

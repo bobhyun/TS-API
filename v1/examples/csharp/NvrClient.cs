@@ -91,7 +91,7 @@ namespace TsApiExamples
         public Task<HttpResponseMessage> GetAsync(string path) => _http.GetAsync(path);
 
         /// <summary>
-        /// GET request for streaming responses like SSE (receive headers first)
+        /// GET for streaming responses (e.g. SSE); completes once headers arrive
         /// </summary>
         public Task<HttpResponseMessage> GetStreamAsync(string path) =>
             _http.GetAsync(path, HttpCompletionOption.ResponseHeadersRead);

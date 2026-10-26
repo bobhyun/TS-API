@@ -78,15 +78,12 @@ echo ""
 #   --header="X-API-Key: ${API_KEY}" \
 #   "${URL}"
 
-# Interactive mode with auto-next:
-# This script automatically sends "next" after each fileEnd.
-# For production use, parse the JSON and extract download URLs.
+# Auto-next mode: sends {"cmd":"next"} every 3 seconds.
+# A real client parses the task ID from "ready", sends next after each fileEnd,
+# and extracts the download URLs.
 {
-  # Initial wait for ready stage
+  # Wait for the ready stage
   sleep 2
-  # The task ID will be in the first "ready" message
-  # For simplicity, we send a generic next command
-  # In production, parse the task ID from the ready message
   while true; do
     sleep 3
     echo '{"cmd":"next"}'

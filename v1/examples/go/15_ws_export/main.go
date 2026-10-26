@@ -14,8 +14,9 @@
 //   end     -> export complete
 //   error   -> error message
 //
-// Run: cd examples/go && go run ./v1/15_ws_export/
-// go get github.com/gorilla/websocket
+// REQUIRES: go get github.com/gorilla/websocket
+//
+// Run: cd go && go run ./15_ws_export
 package main
 
 import (
@@ -47,7 +48,7 @@ func main() {
 	fmt.Println("=== WebSocket Recording Export ===")
 	fmt.Printf("  Channel: 1,  %s ~ %s\n", timeBegin, timeEnd)
 
-	// Build WebSocket URL with X-API-Key header auth
+	// Auth via X-API-Key header
 	// Alt: use ?apikey=tsapi_key_... query param (browser fallback)
 	wsURL := fmt.Sprintf("%s/wsapi/v1/export?ch=1&timeBegin=%s&timeEnd=%s",
 		cfg.WsURL, timeBegin, timeEnd)
@@ -118,7 +119,7 @@ func main() {
 			if ch, ok := msg["channel"].(map[string]interface{}); ok {
 				if file, ok := ch["file"].(map[string]interface{}); ok {
 					// download: [{fileName, src}, ...]
-					// Server v1.0.2+ returns relative paths; prepend BaseURL for non-browser fetch.
+					// src is a relative path (e.g. "/download/..."); prepend cfg.BaseURL outside a browser.
 					if dlArr, ok := file["download"].([]interface{}); ok && len(dlArr) > 0 {
 						if dlObj, ok := dlArr[0].(map[string]interface{}); ok {
 							if src, ok := dlObj["src"].(string); ok {

@@ -8,9 +8,9 @@
  *
  * Auth:
  *   Header: X-API-Key: {apiKey}                  (primary)
- *   Header: Authorization: Bearer {accessToken}   (alternative)
- *   Query:  ?apikey={apiKey}                      (browser fallback)
- *   Query:  ?token={accessToken}                  (browser fallback)
+ *   Header: Authorization: Bearer {accessToken}  (alternative)
+ *   Query:  ?apikey={apiKey}                     (browser fallback)
+ *   Query:  ?token={accessToken}                 (browser fallback)
  *
  * Flow:
  *   Client --connect--> Server
@@ -97,7 +97,7 @@ struct App {
 
                 switch stage {
                 case "ready":
-                    // Check error status
+                    // Check status code (code:-1 = no recording in range)
                     if let status = msg["status"] as? [String: Any],
                        let code = status["code"] as? Int, code != 0 {
                         let message = status["message"] as? String ?? text
@@ -111,7 +111,7 @@ struct App {
                     print("  Ready - Task ID: \(taskId ?? "N/A")")
 
                 case "fileEnd":
-                    // Server v1.0.2+ returns relative paths; prepend client.baseURL for non-browser fetch.
+                    // src is a relative path (e.g. "/download/..."); prepend client.baseURL outside a browser.
                     let channel = msg["channel"] as? [String: Any]
                     let file = channel?["file"] as? [String: Any]
                     let downloads = file?["download"] as? [[String: Any]]

@@ -8,8 +8,8 @@
  *   NVR_SCHEME  - http or https        (default: https)
  *   NVR_HOST    - NVR server hostname  (default: localhost)
  *   NVR_PORT    - NVR server port      (default: 443 for https, 80 for http)
- *   NVR_USER    - Login username        (default: admin)
- *   NVR_PASS    - Login password        (default: 1234)
+ *   NVR_USER    - Login username       (default: admin)
+ *   NVR_PASS    - Login password       (default: 1234)
  *   NVR_API_KEY - API Key for v1 endpoints (optional, used by data examples)
  *
  * Compile:  javac NvrClient.java
@@ -165,13 +165,11 @@ public class NvrClient {
         return new Response(resp.statusCode(), resp.body());
     }
 
-    // ── Authentication (JWT Bearer token based) ──
+    // ── Authentication (JWT Bearer token) ──
 
     /**
-     * Login: POST /api/v1/auth/login with JSON body.
-     * On success (HTTP 200), parses accessToken and refreshToken from response and stores them.
-     * Returns true on success.
-     *
+     * Login: POST /api/v1/auth/login.
+     * On HTTP 200, stores accessToken and refreshToken. Returns true on success.
      */
     public boolean login() throws Exception {
         String auth = java.util.Base64.getEncoder().encodeToString((user + ":" + pass).getBytes());

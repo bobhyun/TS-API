@@ -4,13 +4,13 @@
  * Endpoints:
  *   GET /api/v1/vod
  *       - List available VOD streams
- *       - Response: [{chid, title, src: {rtmp, flv}}, ...]
+ *       - Response: [{chid, title, src: [{protocol, profile, src, type, label, size}]}, ...]
  *       - NOTE: stream URLs are in 'src' field (NOT 'streams')
  *
- *   GET /api/v1/vod?protocol=rtmp   - Filter RTMP protocol only
- *   GET /api/v1/vod?stream=sub      - Filter sub stream only
+ *   GET /api/v1/vod?protocol=rtmp   - RTMP streams only
+ *   GET /api/v1/vod?stream=sub      - Sub streams only
  *
- * VOD playback requires specifying a time range via the stream URL parameters.
+ * Recorded video: GET /api/v1/vod?ch=1&when=<ISO 8601>.
  *
  * Compile: javac NvrClient.java V1_07_VodStream.java
  * Run:     java V1_07_VodStream
@@ -27,8 +27,8 @@ public class V1_07_VodStream {
 
         // ── List all VOD streams ──
         // GET /api/v1/vod
-        // Response: [{chid, title, src: {rtmp, flv}}, ...]
-        // Stream URLs are in 'src' field (NOT "streams")
+        // Response: [{chid, title, src: [{protocol, src, ...}]}, ...]
+        // Stream URLs are in the 'src' array (NOT "streams")
         System.out.println("=== VOD Streams ===");
         NvrClient.Response r = client.get("/api/v1/vod");
         System.out.println("  status=" + r.status);

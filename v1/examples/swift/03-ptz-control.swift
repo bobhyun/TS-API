@@ -7,10 +7,10 @@
  *   - Zoom control (zoom=z, range: -1.0 ~ 1.0)
  *   - Focus/Iris control
  *   - Stop movement
- *   - Preset management (list, go to)
+ *   - Presets (list, go to)
  *
- * NOTE: PTZ commands are sent via ONVIF to the camera.
- *       Returns 500 if the camera doesn't support ONVIF or is unreachable.
+ * NOTE: PTZ commands are sent to the camera via ONVIF.
+ *       Returns 500 if the camera does not support ONVIF or is unreachable.
  */
 
 import Foundation
@@ -42,11 +42,11 @@ struct App {
     // -------------------------------------------------
     // 2. Pan/Tilt Movement
     //    move=x,y where x=pan(-1~1), y=tilt(-1~1)
-    //    Positive x = right, Positive y = up
+    //    Positive x = right, positive y = down
     // -------------------------------------------------
     print("\n=== Pan/Tilt ===")
 
-    // Move right and up
+    // Move right and down
     var res = try await client.get("/api/v1/channel/\(CHANNEL)/ptz?move=0.3,0.3")
     print("  Move right+up (0.3, 0.3): \(res.status)")
     await sleep(ms: 500)
@@ -56,7 +56,7 @@ struct App {
     print("  Stop: \(res.status)")
     await sleep(ms: 500)
 
-    // Move left and down
+    // Move left and up
     res = try await client.get("/api/v1/channel/\(CHANNEL)/ptz?move=-0.3,-0.3")
     print("  Move left+down (-0.3, -0.3): \(res.status)")
     await sleep(ms: 500)
@@ -113,7 +113,7 @@ struct App {
             print("    - Token: \(token), Name: \(name)")
         }
 
-        // Go to first preset if exists
+        // Go to the first preset, if any
         if let first = presets.first, let token = first["token"] {
             let name = first["name"] as? String ?? ""
             let goRes = try await client.get("/api/v1/channel/\(CHANNEL)/preset/\(token)/go")

@@ -26,7 +26,7 @@ curl -sk -X POST https://SERVER/api/v1/auth/apikey \
 export NVR_API_KEY=tsapi_key_...
 ```
 
-> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하세요.
+> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하십시오.
 
 ## 환경 변수
 
@@ -54,7 +54,7 @@ NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... python 02_channels.py
 | [`03_ptz_control.py`](03_ptz_control.py) | PTZ 카메라 제어 |
 | [`04_recording_search.py`](04_recording_search.py) | 녹화 구간 검색 |
 | [`05_event_log.py`](05_event_log.py) | 이벤트 로그 조회 |
-| [`06_lpr_search.py`](06_lpr_search.py) | 차번 인식 검색 |
+| [`06_lpr_search.py`](06_lpr_search.py) | 차량 번호 인식 검색 |
 | [`07_vod_stream.py`](07_vod_stream.py) | VOD 스트림 URL (RTMP, FLV) |
 | [`08_system_info.py`](08_system_info.py) | 시스템 상태 |
 | [`09_push.py`](09_push.py) | 외부 이벤트 푸시 |

@@ -11,14 +11,18 @@
         - Search LPR recognition log (timeBegin and timeEnd are required)
 
     GET /api/v1/lpr/similar?keyword=...&timeBegin=...&timeEnd=...
-        - Search for similar plate numbers (fuzzy match)
+        - Plates containing the keyword (partial or misread plates)
 
     GET /api/v1/lpr/log?timeBegin=...&timeEnd=...&export=true
-        - Export LPR log as downloadable file (CSV/Excel)
+        - Export the LPR log as CSV
 
-  WARNING: Exporting large datasets (10,000+ records) may cause HTTP timeout
-    errors. For bulk exports, narrow the time range or use pagination
-    (at/maxCount) to keep each request under a manageable size.
+    GET  /api/v1/lpr/log/{id}/plate/history
+        - Plate correction history of one record (Playback permission)
+    POST /api/v1/lpr/log/{id}/plate   {"plateNo": "...", "reason": "..."}
+        - Correct the plate of one record (Control permission, not executed here)
+
+  WARNING: Large exports (10,000+ records) can hit HTTP timeouts.
+    Narrow the time range or page with at/maxCount.
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -49,18 +53,27 @@ $timeBegin = $now.AddHours(-24).ToString('yyyy-MM-dd HH:mm:ss')
 
 Write-Host "`n=== LPR Log ($timeBegin ~ $timeEnd) ==="
 $r = Invoke-NvrGet "/api/v1/lpr/log?timeBegin=$timeBegin&timeEnd=$timeEnd"
+$records = @()
 if ($r) {
-    $records = $r.data
+    $records = @($r.data)
     Write-Host "  $($records.Count) records found"
     $show = [Math]::Min(5, $records.Count)
     for ($i = 0; $i -lt $show; $i++) {
         $rec = $records[$i]
-        Write-Host "  [$($rec.timeRange)] plateNo=$($rec.plateNo) ch=$($rec.chid)"
+        # plateNo is null when no plate was read; direction is "entry"/"exit" or absent
+        $plate = if ($rec.plateNo) { $rec.plateNo } else { '(unrecognized)' }
+        $dir   = if ($rec.direction) { $rec.direction } else { '-' }
+        $line  = "  [$($rec.id)] $($rec.timeRange) plateNo=$plate direction=$dir"
+        if ($rec.plateEdited) {
+            $orig = if ($rec.originalPlateNo) { $rec.originalPlateNo } else { '(unrecognized)' }
+            $line += " (corrected, originally $orig)"
+        }
+        Write-Host $line
     }
 }
 
 # --- Similar Plate Search ---
-$plateQuery = '1234'  # Partial or similar plate number
+$plateQuery = '1234'  # Partial plate number
 Write-Host "`n=== Similar Plate Search (keyword=$plateQuery) ==="
 $r = Invoke-NvrGet "/api/v1/lpr/similar?keyword=$plateQuery&timeBegin=$timeBegin&timeEnd=$timeEnd"
 if ($r) {
@@ -77,6 +90,31 @@ if ($r) {
         }
     }
 }
+
+# --- Plate Correction History (one record, by id) ---
+# plateNo in the log is always the current value.
+# edits[] lists corrections in recorded order; it is empty if the record was never corrected.
+if ($records.Count -gt 0) {
+    $recId = $records[0].id
+    Write-Host "`n=== Plate Correction History (id=$recId) ==="
+    $h = Invoke-NvrGet "/api/v1/lpr/log/$recId/plate/history"
+    if ($h) {
+        $orig = if ($null -ne $h.originalPlateNo) { $h.originalPlateNo } else { '(never corrected)' }
+        Write-Host "  plateNo=$($h.plateNo) original=$orig"
+        foreach ($e in $h.edits) {
+            Write-Host "    $($e.time) $($e.user): $($e.before) -> $($e.after) $($e.reason)"
+        }
+    }
+}
+
+# --- Plate Correction (Control permission) ---
+# Changes the stored record, so it is not executed here. The target is always
+# one record id - from data[].id above, or the id a realtime LPR event carries
+# next to each plateNo. 409 when plateNo equals the current plate.
+#
+# Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+# Uncomment it to try it against a test record.
+#   Invoke-NvrPost "/api/v1/lpr/log/$recId/plate" @{ plateNo = '12A3456'; reason = 'misread at night' }
 
 # --- Export LPR Log ---
 Write-Host "`n=== Export LPR Log ==="

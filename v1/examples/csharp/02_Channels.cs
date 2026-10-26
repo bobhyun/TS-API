@@ -1,8 +1,8 @@
 // 02_Channels.cs - v1 API Channel List & Status Example
 //
 // Endpoints:
-//   GET /api/v1/channel                          - Channel list
-//   GET /api/v1/channel/status?recordingStatus    - Channel recording status
+//   GET /api/v1/channel                          - List channels
+//   GET /api/v1/channel/status?recordingStatus   - Connection and recording status
 
 using System;
 using System.Text.Json;

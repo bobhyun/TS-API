@@ -99,7 +99,7 @@ public class V1_15_WebSocketExport {
 
                             case "fileEnd":
                                 // download: [{fileName, src}, ...]
-                                // Server v1.0.2+ returns relative paths; prepend client.baseUrl for non-browser fetch.
+                                // src is a relative path (e.g. "/download/..."); prepend client.baseUrl outside a browser.
                                 String src = extractField(json, "src");
                                 String fullUrl = src.isEmpty() ? "N/A"
                                         : (src.startsWith("http") ? src : client.baseUrl + src);

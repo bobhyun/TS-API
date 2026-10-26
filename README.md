@@ -4,7 +4,7 @@
 
 **TS-API** is a web API built into the video surveillance product lineup — **TS-CMS**, **TS-NVR**, and **TS-IVR** — by TS Solution Corp.
 
-> TS-API v1 web server is available from TS-IVR, TS-NVR, TS-CMS v3.0.0 and later.
+> The TS-API v1 web server is available in TS-IVR, TS-NVR, and TS-CMS v3.0.0 and later.
 > The RESTful API (`/api/v1`) supports JWT and API Key authentication with a path-based design.
 
 ## Table of Contents
@@ -155,7 +155,7 @@ curl "http://localhost/api/v1/channel" \
 #### 4.1.10. VOD (Video on Demand)
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/v1/vod` | GET | Live/recording stream URL retrieval |
+| `/api/v1/vod` | GET | Live/recorded stream URLs |
 
 #### 4.1.11. Other
 | Endpoint | Method | Description |
@@ -220,7 +220,7 @@ Response format varies by endpoint:
 
 ## 7. License-dependent Features
 
-Some API features require a corresponding license. Returns 404 if the license is not activated.
+Some API features require a corresponding license. If the license is not activated, the related endpoints return 404.
 
 | Feature | Related Endpoints |
 |---------|-------------------|
@@ -239,7 +239,7 @@ Some API features require a corresponding license. Returns 404 if the license is
 
 ## 8. WebSocket API
 
-WebSocket API for real-time event subscription and data export.
+The WebSocket API provides real-time event subscription and data export.
 
 | Endpoint | Description |
 |----------|-------------|

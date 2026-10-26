@@ -9,14 +9,18 @@ Endpoints:
       - Search LPR recognition log (timeBegin and timeEnd are required)
 
   GET /api/v1/lpr/similar?keyword=...&timeBegin=...&timeEnd=...
-      - Search for similar plate numbers (fuzzy match)
+      - Plates containing the keyword (partial or misread plates)
 
   GET /api/v1/lpr/log?timeBegin=...&timeEnd=...&export=true
-      - Export LPR log as downloadable file (CSV/Excel)
+      - Export the LPR log as CSV
 
-WARNING: Exporting large datasets (10,000+ records) may cause HTTP timeout
-  errors. For bulk exports, narrow the time range or use pagination
-  (at/maxCount) to keep each request under a manageable size.
+  GET  /api/v1/lpr/log/{id}/plate/history
+      - Plate correction history of one record (Playback permission)
+  POST /api/v1/lpr/log/{id}/plate   {"plateNo": "...", "reason": "..."}
+      - Correct the plate of one record (Control permission, not executed here)
+
+WARNING: Large exports (10,000+ records) can hit HTTP timeouts.
+  Narrow the time range or page with at/maxCount.
 """
 
 import os
@@ -61,13 +65,19 @@ def main():
         records = r.json().get('data', [])
         print(f"  {len(records)} records found")
         for rec in records[:5]:  # Show first 5
-            print(f"  [{rec.get('timeRange', '')}] plateNo={rec.get('plateNo', '')} "
-                  f"ch={rec.get('chid', '')}")
+            # plateNo is null when no plate was read; direction is "entry"/"exit" or absent
+            line = (f"  [{rec['id']}] {rec.get('timeRange', '')} "
+                    f"plateNo={rec.get('plateNo') or '(unrecognized)'} "
+                    f"direction={rec.get('direction', '-')}")
+            if rec.get('plateEdited'):
+                line += f" (corrected, originally {rec.get('originalPlateNo') or '(unrecognized)'})"
+            print(line)
     else:
+        records = []
         print(f"  Status: {r.status_code}")
 
     # --- Similar Plate Search ---
-    plate_query = '1234'  # Partial or similar plate number
+    plate_query = '1234'  # Partial plate number
     print(f"\n=== Similar Plate Search (keyword={plate_query}) ===")
     r = client.get('/api/v1/lpr/similar', params={
         'keyword': plate_query,
@@ -76,7 +86,7 @@ def main():
     })
     if r.status_code == 200:
         body = r.json()
-        # similar returns flat array of plate strings, or {data:[...]} wrapper
+        # Response: array of plate strings, most recent first
         results = body.get('data', body) if isinstance(body, dict) else body
         print(f"  {len(results)} similar plates found")
         for rec in results[:10]:
@@ -86,6 +96,31 @@ def main():
                 print(f"  [{rec.get('timeRange', '')}] plateNo={rec.get('plateNo', '')}")
     else:
         print(f"  Status: {r.status_code}")
+
+    # --- Plate Correction History (one record, by id) ---
+    # plateNo in the log is always the current value.
+    # edits[] lists corrections in recorded order; it is empty if the record was never corrected.
+    if records:
+        rec_id = records[0]['id']
+        print(f"\n=== Plate Correction History (id={rec_id}) ===")
+        r = client.get(f'/api/v1/lpr/log/{rec_id}/plate/history')
+        if r.status_code == 200:
+            h = r.json()
+            print(f"  plateNo={h.get('plateNo')} original={h.get('originalPlateNo', '(never corrected)')}")
+            for e in h.get('edits', []):
+                print(f"    {e['time']} {e['user']}: {e['before']} -> {e['after']} {e.get('reason', '')}")
+        else:
+            print(f"  Status: {r.status_code}")
+
+    # --- Plate Correction (Control permission) ---
+    # Changes the stored record, so it is not executed here. The target is always
+    # one record id - from data[].id above, or the id a realtime LPR event carries
+    # next to each plateNo. 409 when plateNo equals the current plate.
+    #
+    # Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+    # Uncomment it to try it against a test record.
+    #   client.post(f'/api/v1/lpr/log/{rec_id}/plate',
+    #               json={'plateNo': '12가3456', 'reason': 'misread at night'})
 
     # --- Export LPR Log ---
     print(f"\n=== Export LPR Log ===")

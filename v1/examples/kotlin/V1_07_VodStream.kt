@@ -4,13 +4,13 @@
  * Endpoints:
  *   GET /api/v1/vod
  *       - List available VOD streams
- *       - Response: [{chid, title, src: {rtmp, flv}}, ...]
+ *       - Response: [{chid, title, src: [{protocol, profile, src, type, label, size}]}, ...]
  *       - NOTE: stream URLs are in 'src' field (NOT 'streams')
  *
- *   GET /api/v1/vod?protocol=rtmp   - Filter by RTMP protocol only
- *   GET /api/v1/vod?stream=sub      - Filter by sub stream only
+ *   GET /api/v1/vod?protocol=rtmp   - RTMP streams only
+ *   GET /api/v1/vod?stream=sub      - Sub streams only
  *
- * VOD playback requires specifying a time range via the stream URL parameters.
+ * Recorded video: GET /api/v1/vod?ch=1&when=<ISO 8601>.
  *
  * Compile: kotlinc TsApiClient.kt V1_07_VodStream.kt -include-runtime -d V1_07_VodStream.jar
  * Run:     java -jar V1_07_VodStream.jar
@@ -26,8 +26,8 @@ fun main() {
 
     // -- List all VOD streams --
     // GET /api/v1/vod
-    // Response: [{chid, title, src: {rtmp, flv}}, ...]
-    // Stream URLs in 'src' field (NOT "streams")
+    // Response: [{chid, title, src: [{protocol, src, ...}]}, ...]
+    // Stream URLs are in the 'src' array (NOT "streams")
     println("=== VOD Streams ===")
     var r = client.get("/api/v1/vod")
     println("  status=${r.status}")

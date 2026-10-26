@@ -1,6 +1,6 @@
 // 02_channels - Channel (camera) list & status
 //
-// Run: cd examples/go && go run ./v1/02_channels/
+// Run: cd go && go run ./02_channels
 package main
 
 import (

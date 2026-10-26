@@ -2,11 +2,11 @@
  * v1 API - Channel List & Status
  *
  * Endpoints:
- *   GET /api/v1/channel                           - List all channels
- *   GET /api/v1/channel?staticSrc                 - Include static stream URLs
- *   GET /api/v1/channel?caps                      - Include channel capabilities
- *   GET /api/v1/channel/status?recordingStatus     - Per-channel recording status
- *   GET /api/v1/channel/{chid}/info?caps          - Single channel capabilities
+ *   GET /api/v1/channel                          - List all channels
+ *   GET /api/v1/channel?staticSrc                - Include static stream URLs
+ *   GET /api/v1/channel?caps                     - Include channel capabilities
+ *   GET /api/v1/channel/status?recordingStatus   - Per-channel recording status
+ *   GET /api/v1/channel/{chid}/info?caps         - Single channel capabilities
  *
  * Channel fields: chid, title, displayName (NOT 'name')
  *
@@ -32,7 +32,7 @@ public class V1_02_Channels {
 
         // ── Static source URLs ──
         // GET /api/v1/channel?staticSrc
-        // Includes RTMP/FLV addresses
+        // Adds stream URLs (RTMP/FLV)
         r = client.get("/api/v1/channel?staticSrc");
         System.out.println("\n=== Channels with staticSrc ===");
         System.out.println(r.body);

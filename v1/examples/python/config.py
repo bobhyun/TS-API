@@ -7,7 +7,7 @@ Environment variables:
   NVR_PORT    - NVR server port (default: 443 for https, 80 for http)
   NVR_USER    - Login username (default: admin)
   NVR_PASS    - Login password (default: 1234)
-  NVR_API_KEY - API Key for v1 endpoints (used by examples 02-16)
+  NVR_API_KEY - API Key for v1 endpoints (used by examples 02-15)
 
 Usage:
   NVR_API_KEY=tsapi_key_... python v1/02_channels.py
@@ -18,7 +18,7 @@ Usage:
 import os
 import sys
 
-# Fix Windows console encoding for Korean text output
+# UTF-8 console output on Windows for non-ASCII data (e.g. Korean plate numbers)
 if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 

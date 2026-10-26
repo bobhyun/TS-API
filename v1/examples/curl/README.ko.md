@@ -2,7 +2,7 @@
 
 # TS-API v1 curl 예제
 
-`curl`과 `websocat`을 사용한 TS-NVR REST API 쉘 스크립트 예제입니다.
+`curl`과 `websocat`을 사용한 TS-NVR REST API 셸 스크립트 예제입니다.
 
 ## 사전 요구사항
 
@@ -49,11 +49,11 @@ bash 02-channels.sh
 | [03-ptz-control.sh](03-ptz-control.sh) | PTZ 카메라 제어 | `GET channel/{id}/ptz`, `channel/{id}/preset` |
 | [04-recording-search.sh](04-recording-search.sh) | 녹화 캘린더 및 타임라인 | `GET recording/days`, `recording/minutes` |
 | [05-event-log.sh](05-event-log.sh) | 이벤트 검색 및 필터링 | `GET event/type`, `event/log` |
-| [06-lpr-search.sh](06-lpr-search.sh) | 차번 인식 검색 | `GET lpr/source`, `lpr/log`, `lpr/similar` |
+| [06-lpr-search.sh](06-lpr-search.sh) | 차량 번호 인식 검색 | `GET lpr/source`, `lpr/log`, `lpr/similar`, `lpr/log/{id}/plate/history` |
 | [07-vod-stream.sh](07-vod-stream.sh) | 라이브/재생 스트림 URL | `GET vod` |
-| [08-system-info.sh](08-system-info.sh) | 시스템 및 서버 정보 | `GET info`, `system/info`, `system/health`, `system/hddsmart` |
+| [08-system-info.sh](08-system-info.sh) | 시스템 및 서버 정보 | `GET info`, `system/info`, `system/health`, `system/notices`, `system/hddsmart` |
 | [09-push.sh](09-push.sh) | 외부 이벤트 푸시 (LPR, 비상호출) | `POST push` |
-| [10-parking.sh](10-parking.sh) | 주차장 및 주차면 관리 | `GET parking/lot`, `parking/spot`, `/status` |
+| [10-parking.sh](10-parking.sh) | 주차장 및 주차면 관리 | `GET parking/lot`, `parking/spot`, `/status`, `parking/session` |
 | [11-emergency.sh](11-emergency.sh) | 비상호출 장치 목록 | `GET emergency` |
 
 ### WebSocket (websocat)
@@ -89,7 +89,7 @@ TOKEN=$(echo "$RESPONSE" | jq -r '.accessToken')
 curl -sk -H "Authorization: Bearer ${TOKEN}" https://nvr-server/api/v1/channel
 ```
 
-> 토큰 갱신 시 서버는 토큰 로테이션을 수행합니다. 이전 refreshToken은 폐기되므로 반드시 새로운 refreshToken을 사용하세요.
+> 토큰을 갱신하면 서버는 refreshToken을 새로 발급합니다(토큰 로테이션). 이전 refreshToken은 폐기되므로 새로 발급된 refreshToken을 사용하십시오.
 
 ### WebSocket 인증
 
@@ -104,8 +104,8 @@ websocat -k -H "X-API-Key: tsapi_key_..." wss://nvr-server/wsapi/v1/events?topic
 
 ## 참고사항
 
-- 모든 스크립트는 `set -euo pipefail`로 안전 실행
+- 모든 스크립트에 `set -euo pipefail` 적용
 - 자체 서명 인증서 허용 (`curl -k`, `websocat -k`)
 - `jq` 설치 시 JSON 포맷 출력, 미설치 시 원본 출력
-- 시간 파라미터는 ISO 8601 형식 (예: `2025-01-15T09:30:00`)
+- 시간 매개변수는 ISO 8601 형식 (예: `2025-01-15T09:30:00`)
 - 채널 ID는 1부터 시작 (1-based)

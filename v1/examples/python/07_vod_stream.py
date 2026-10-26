@@ -13,7 +13,7 @@ Endpoints:
   GET /api/v1/vod?stream=sub
       - Filter by stream type (main, sub)
 
-VOD playback requires specifying a time range via the stream URL parameters.
+Recorded video: GET /api/v1/vod?ch=1&when=<ISO 8601>.
 """
 
 import os
@@ -45,7 +45,7 @@ def main():
             flv_url = next((s['src'] for s in src if s.get('protocol') == 'flv'), None)
             ws_flv_url = next((s['src'] for s in src if s.get('protocol') == 'websocket-flv'), None)
             # rtsp appears only on servers built with RTSP re-streaming.
-            # TCP transport only: ffplay -rtsp_transport tcp / vlc --rtsp-tcp
+            # TCP transport only: the server rejects UDP with 461.
             rtsp_url = next((s['src'] for s in src if s.get('protocol') == 'rtsp'), None)
             if rtmp_url:
                 print(f"    RTMP: {rtmp_url}")

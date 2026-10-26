@@ -9,6 +9,8 @@
 //   GET /api/v1/parking/spot/status  - Spot status
 //   GET /api/v1/info?license         - License check (parkingHistory extension token)
 //   GET /api/v1/parking/session      - Parking session history
+//   GET /api/v1/parking/session/{id}/plate/history - Plate correction history of one session
+//   POST /api/v1/parking/session/{id}/plate        - Correct the session plate (not executed here)
 //
 // Note: v0 API does not have parking-related endpoints.
 
@@ -123,10 +125,11 @@ namespace TsApiExamples.V1
             }
 
             // --- Parking Session History ---
-            // A session opens when a vehicle is confirmed present and closes when it is
-            // gone. Needs the parking history license - 403 without it. Ask /api/v1/info
-            // first: the "parkingHistory" extension token says whether the session
-            // endpoints will answer (the array is omitted when no extension is active).
+            // A session opens when a vehicle is confirmed present and closes when it
+            // leaves. Requires the parking history license (403 without it).
+            // Check /api/v1/info first: the `parkingHistory` extension token tells
+            // whether the session endpoints are available. license.extension is
+            // omitted when no extension is active.
             var hasParkingHistory = false;
             var ir = await client.GetAsync("/api/v1/info?license");
             if (ir.IsSuccessStatusCode)
@@ -159,6 +162,8 @@ namespace TsApiExamples.V1
                     var mins = row.GetProperty("durationMs").GetInt64() / 60000;
                     var plateEl = row.GetProperty("plateNo");
                     var plate = plateEl.ValueKind == JsonValueKind.Null ? "(no plate)" : plateEl.GetString();
+                    if (row.TryGetProperty("plateEdited", out var pe) && pe.GetBoolean())
+                        plate += " (corrected)";
                     Console.WriteLine($"  [{row.GetProperty("id").GetInt64()}] {row.GetProperty("src").GetProperty("name").GetString()} {plate} {mins}m");
                 }
             }
@@ -168,13 +173,14 @@ namespace TsApiExamples.V1
             }
 
             // --- Session Detail ---
-            // outKind / outTimeMeans say HOW the exit time was decided. Only "observed"
-            // is a measurement; the others are estimates whose error leans in different
-            // directions, so bill from the basis, not from the number alone.
+            // outKind / outTimeMeans tell how the exit time was determined.
+            // Only "observed" is a measurement; the others are estimates that can err
+            // in different directions, so bill from the basis, not from the time alone.
             //
-            // inKind / inTimeMeans do the same for the entry, and the error leans the
-            // OTHER way: firstSeen is an UPPER bound on the real entry (already there
-            // when observation started). It is present on OPEN sessions too.
+            // inKind / inTimeMeans do the same for the entry, but err the opposite way:
+            // firstSeen is an upper bound on the real entry (the vehicle was already
+            // there when observation started). Unlike the exit basis, it is present
+            // on open sessions too.
             Console.WriteLine();
             Console.WriteLine("=== Session Detail ===");
             var onr = await client.GetAsync("/api/v1/parking/session?maxCount=1");
@@ -207,9 +213,10 @@ namespace TsApiExamples.V1
             }
 
             // --- Scope: what the query is scoped to ---
-            // Items omitted means "the whole scope", which is NOT the same as no
-            // filter: scope=lot with no lot returns only sessions that belong to a
-            // parking lot, so no-parking-zone history is excluded.
+            // Omitting the items means "the whole scope", not "no filter":
+            // scope=lot without a lot list returns only sessions that belong to a
+            // parking lot, so no-parking-zone sessions (which belong to no lot) are
+            // excluded.
             Console.WriteLine("\n=== Scope ===");
             foreach (var qs in new[] { "scope=channel&ch=1,2", "scope=lot", "scope=noparking" })
             {
@@ -218,22 +225,23 @@ namespace TsApiExamples.V1
             }
 
             // --- Video for a session: otherwise=nearBefore ---
-            // A parked car does not move, so motion-triggered recording may have
-            // stopped while it was still there. The car is in the same place, so the
-            // preceding footage still shows the situation. Parking history only.
-            // An empty result means there is no usable recording at all (never
-            // recorded, or already recycled); the snapshots remain available.
+            // A parked car does not move, so motion-triggered recording may stop
+            // while it is still there. Because the car stays in place, earlier
+            // footage still shows it. Use otherwise=nearBefore for parking history only.
+            // An empty result means no usable recording exists (never recorded, or
+            // already recycled); the session snapshots are still available.
             Console.WriteLine("\n=== Video at entry time (nearest earlier if none) ===");
             var vr = await client.GetAsync(
                 "/api/v1/vod?ch=1&when=2024-01-08T09:30:00&otherwise=nearBefore");
             Console.WriteLine($"  => {(int)vr.StatusCode}");
 
             // --- Which car is it? the bounding box ---
-            // A snapshot can hold several cars. `box` points at the one this
-            // session is about. YOLO style: center based, all four values 0..1
-            // (see 1.2), so you multiply by the size of whatever you draw on.
-            // Entrance/exit sessions carry no vehicle box (a single plate read)
-            // and the value is null; the key is always present.
+            // A snapshot can contain several cars; `box` marks the one this session
+            // is about. YOLO style: center-based, all four values in 0..1 (see 1.2).
+            // Multiply by the size of the surface you draw on; the internal
+            // coordinate space does not matter.
+            // Entrance/exit sessions have no vehicle box (a single plate read):
+            // the value is null, but the key is always present.
             Console.WriteLine("\n=== Bounding box of the session vehicle ===");
             var bsr = await client.GetAsync("/api/v1/parking/session?maxCount=1");
             if (bsr.IsSuccessStatusCode)
@@ -252,7 +260,7 @@ namespace TsApiExamples.V1
                         double cy = box.GetProperty("cy").GetDouble();
                         double bw = box.GetProperty("w").GetDouble();
                         double bh = box.GetProperty("h").GetDouble();
-                        const int W = 1920, H = 1080;   // 그릴 대상 크기
+                        const int W = 1920, H = 1080;   // drawing surface size
                         Console.WriteLine($"  box = cx={cx} cy={cy} w={bw} h={bh}");
                         Console.WriteLine($"  on {W}x{H} -> left={(int)((cx - bw / 2) * W)} " +
                             $"top={(int)((cy - bh / 2) * H)} width={(int)(bw * W)} height={(int)(bh * H)}");
@@ -261,20 +269,55 @@ namespace TsApiExamples.V1
                 }
             }
 
+            // --- Plate correction history ---
+            // Only the session's representative plate (plateNo) is corrected; per-shot
+            // readings (snapshots[].plateNo) are kept as evidence.
+            // Reading requires Playback permission.
+            Console.WriteLine("\n=== Plate correction history ===");
+            if (sessionId > 0)
+            {
+                var phr = await client.GetAsync($"/api/v1/parking/session/{sessionId}/plate/history");
+                if (phr.IsSuccessStatusCode)
+                {
+                    using var phdoc = await NvrClient.ReadJsonAsync(phr);
+                    var h = phdoc.RootElement;
+                    var orig = h.TryGetProperty("originalPlateNo", out var op) ? op.GetString() : "(never corrected)";
+                    Console.WriteLine($"  session={h.GetProperty("id").GetInt64()} plateNo={h.GetProperty("plateNo").GetString()} original={orig}");
+                    foreach (var e in h.GetProperty("edits").EnumerateArray())
+                    {
+                        Console.WriteLine($"    {e.GetProperty("time").GetString()} {e.GetProperty("user").GetString()}: " +
+                            $"{e.GetProperty("before").GetString()} -> {e.GetProperty("after").GetString()} " +
+                            $"{e.GetProperty("reason").GetString()}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"  Response: {(int)phr.StatusCode}");
+                }
+            }
+
             // --- Writing history (Control permission) ---
-            // Both change stored history, so they are not executed here.
+            // These calls change stored history, so they are not executed here.
             // Payment state (16.7): commit settles it, exempt records a decision not to
-            // collect, undo reverts the most recent change (the response says which one).
+            // collect, and undo reverts the most recent change (the response says which).
             // Records are appended, never deleted.
             //
-            // close (16.8) is a different axis: it clears the lingering "parked" state left
-            // when an exit was never observed. Exempt takes a session out of billing and may
-            // leave it parked; close ends the session. Do not conflate the two.
+            // close (16.8) is separate: it ends a session whose exit was never observed
+            // and would otherwise stay "parked". exempt removes a session from billing
+            // but may leave it parked; close ends it. Do not confuse the two.
             //
             //   await client.PostAsync($"/api/v1/parking/session/{sessionId}/payment/commit?ref=POS-0042", null);
             //   await client.PostAsync($"/api/v1/parking/session/{sessionId}/payment/exempt", null);
             //   await client.PostAsync($"/api/v1/parking/session/{sessionId}/payment/undo", null);
             //   await client.PostAsync($"/api/v1/parking/session/{sessionId}/close", null);
+            //
+            // Plate correction (16.9): one session by id; no bulk correction or merging.
+            // Payments stay with the session. Returns 409 when plateNo equals the current plate.
+            //
+            // Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+            // Uncomment it to try it against a test record.
+            //   await client.PostJsonAsync($"/api/v1/parking/session/{sessionId}/plate",
+            //       new { plateNo = "12가3456", reason = "misread at night" });
         }
     }
 }

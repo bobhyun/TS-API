@@ -1,7 +1,7 @@
 // 03_ptz - PTZ camera control & presets
 // Controls cameras via ONVIF protocol.
 //
-// Run: cd examples/go && go run ./v1/03_ptz/
+// Run: cd go && go run ./03_ptz
 package main
 
 import (
@@ -29,7 +29,7 @@ func main() {
 
 	time.Sleep(time.Second)
 
-	// ── 2. Pan/Tilt move (move=x,y  range: -1.0 ~ 1.0) ──
+	// ── 2. Pan/Tilt move (move=x,y, range: -1.0 ~ 1.0; +x=right, +y=down) ──
 	fmt.Println("\n=== PTZ Move (upper right) ===")
 	r, _ = client.Get(fmt.Sprintf("/api/v1/channel/%d/ptz?move=0.3,-0.2", chid))
 	fmt.Println("move:", r.Status)

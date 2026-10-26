@@ -24,7 +24,7 @@ Code examples for the TS-API v1 RESTful API in 9 languages. Each example authent
 
 ## API Key Setup
 
-All examples (except `01_Login`) require an API Key. Issue one using `curl`:
+All examples except `01_Login` require an API Key. Create one with `curl`:
 
 ```bash
 # 1. Login as admin to get a JWT token
@@ -66,18 +66,18 @@ export NVR_API_KEY=tsapi_key_a1b2c3d4e5f6...
 | 03 | PTZ Control        | Pan/Tilt/Zoom camera control          |
 | 04 | Recording Search   | Search recorded video segments        |
 | 05 | Event Log          | Query system event logs               |
-| 06 | LPR Search         | License plate recognition search      |
+| 06 | LPR Search         | License plate recognition search, plate correction history |
 | 07 | VOD Stream         | Video-on-demand (RTMP, FLV)           |
-| 08 | System Info        | System status and health              |
+| 08 | System Info        | System status, health, system disk, notices |
 | 09 | Push               | External event push                   |
-| 10 | Parking            | Parking lot management                |
+| 10 | Parking            | Parking lot management, session history |
 | 11 | Emergency          | Emergency call device management      |
-| 12 | WebSocket Events   | WS real-time event subscription       |
+| 12 | WebSocket Events   | WS real-time event subscription (incl. `notice`) |
 | 13 | WS Parking Lot     | WS parking lot monitoring             |
 | 14 | WS Parking Spot    | WS parking spot monitoring            |
 | 15 | WS Data Export     | WS recording data export              |
 
-> `01_Login` uses JWT (username/password). All other examples use API Key.
+> `01_Login` uses JWT (username/password). All other examples use an API Key.
 
 ## Quick Start
 

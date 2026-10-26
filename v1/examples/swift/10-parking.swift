@@ -7,6 +7,8 @@
  *   - Parking spot status (AI vision-based, per-space occupancy)
  *   - Filtering by zone type, channel, ID, category, occupancy
  *   - License check via /api/v1/info extension token (parkingHistory)
+ *   - Parking session history, detail and plate correction history
+ *     (GET /api/v1/parking/session/{id}/plate/history; the POST correction is not executed)
  *
  * Build: swiftc -o 10-parking NvrClient.swift 10-parking.swift
  * Run:   NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... ./10-parking
@@ -183,10 +185,10 @@ struct App {
     // -------------------------------------------------
     // 8. Parking Session History
     //    A session opens when a vehicle is confirmed present and closes when it
-    //    is gone. Needs the parking history license - 403 without it. Ask
-    //    /api/v1/info first: the `parkingHistory` extension token says whether
-    //    the session endpoints will answer (the array is omitted when no
-    //    extension is active).
+    //    leaves. Requires the parking history license (403 without it).
+    //    Check /api/v1/info first: the `parkingHistory` extension token tells
+    //    whether the session endpoints are available. license.extension is
+    //    omitted when no extension is active.
     // -------------------------------------------------
     let infoRes = try await client.get("/api/v1/info?license")
     let license = (infoRes.body as? [String: Any])?["license"] as? [String: Any]
@@ -207,19 +209,21 @@ struct App {
         let mins = (row["durationMs"] as? Int ?? 0) / 60000
         let plate = row["plateNo"] as? String ?? "(no plate)"
         let name = (row["src"] as? [String: Any])?["name"] as? String ?? ""
-        print("  [\(id)] \(name) \(plate) \(mins)m")
+        let edited = (row["plateEdited"] as? Bool) == true ? " (corrected)" : ""
+        print("  [\(id)] \(name) \(plate)\(edited) \(mins)m")
       }
     }
 
     // -------------------------------------------------
     // 9. Session Detail
-    //    outKind / outTimeMeans say HOW the exit time was decided. Only
-    //    "observed" is a measurement; the others are estimates whose error leans
-    //    in different directions, so bill from the basis, not the number alone.
+    //    outKind / outTimeMeans tell how the exit time was determined.
+    //    Only "observed" is a measurement; the others are estimates that can err
+    //    in different directions, so bill from the basis, not from the time alone.
     //
-    //    inKind / inTimeMeans do the same for the entry, and the error leans the
-    //    OTHER way: firstSeen is an UPPER bound on the real entry (already there
-    //    when observation started). It is present on OPEN sessions too.
+    //    inKind / inTimeMeans do the same for the entry, but err the opposite way:
+    //    firstSeen is an upper bound on the real entry (the vehicle was already
+    //    there when observation started). Unlike the exit basis, it is present
+    //    on open sessions too.
     // -------------------------------------------------
     print("\n=== Session Detail ===")
     let oneRes = try await client.get("/api/v1/parking/session?maxCount=1")
@@ -245,9 +249,10 @@ struct App {
 
     // -------------------------------------------------
     // 9b. Scope — what the query is scoped to
-    //     Items omitted means "the whole scope", which is NOT the same as no
-    //     filter: scope=lot with no lot returns only sessions that belong to a
-    //     parking lot, so no-parking-zone history is excluded.
+    //     Omitting the items means "the whole scope", not "no filter":
+    //     scope=lot without a lot list returns only sessions that belong to a
+    //     parking lot, so no-parking-zone sessions (which belong to no lot) are
+    //     excluded.
     // -------------------------------------------------
     print("\n=== Scope ===")
     for qs in ["scope=channel&ch=1,2", "scope=lot", "scope=noparking"] {
@@ -257,11 +262,11 @@ struct App {
 
     // -------------------------------------------------
     // 9c. Video for a session — otherwise=nearBefore
-    //     A parked car does not move, so motion-triggered recording may have
-    //     stopped while it was still there. The car is in the same place, so the
-    //     preceding footage still shows the situation. Parking history only.
-    //     An empty result means there is no usable recording at all (never
-    //     recorded, or already recycled); the snapshots remain available.
+    //     A parked car does not move, so motion-triggered recording may stop
+    //     while it is still there. Because the car stays in place, earlier
+    //     footage still shows it. Use otherwise=nearBefore for parking history only.
+    //     An empty result means no usable recording exists (never recorded, or
+    //     already recycled); the session snapshots are still available.
     // -------------------------------------------------
     print("\n=== Video at entry time (nearest earlier if none) ===")
     let vr = try await client.get("/api/v1/vod?ch=1&when=2024-01-08T09:30:00&otherwise=nearBefore")
@@ -269,11 +274,12 @@ struct App {
 
     // -------------------------------------------------
     // 9d. Which car is it? — the bounding box
-    //     A snapshot can hold several cars. `box` points at the one this
-    //     session is about. YOLO style: center based, all four values 0..1
-    //     (see 1.2), so you multiply by the size of whatever you draw on.
-    //     Entrance/exit sessions carry no vehicle box (a single plate read)
-    //     and the value is null; the key is always present.
+    //     A snapshot can contain several cars; `box` marks the one this session
+    //     is about. YOLO style: center-based, all four values in 0..1 (see 1.2).
+    //     Multiply by the size of the surface you draw on; the internal
+    //     coordinate space does not matter.
+    //     Entrance/exit sessions have no vehicle box (a single plate read):
+    //     the value is null, but the key is always present.
     // -------------------------------------------------
     print("\n=== Bounding box of the session vehicle ===")
     let boxRes = try await client.get("/api/v1/parking/session?maxCount=1")
@@ -286,7 +292,7 @@ struct App {
         if let box = d["box"] as? [String: Any],
            let cx = box["cx"] as? Double, let cy = box["cy"] as? Double,
            let bw = box["w"] as? Double, let bh = box["h"] as? Double {
-          let W = 1920.0, H = 1080.0     // 그릴 대상 크기
+          let W = 1920.0, H = 1080.0     // drawing surface size
           print("  box = cx=\(cx) cy=\(cy) w=\(bw) h=\(bh)")
           print("  on \(Int(W))x\(Int(H)) -> left=\(Int((cx - bw / 2) * W)) "
             + "top=\(Int((cy - bh / 2) * H)) width=\(Int(bw * W)) height=\(Int(bh * H))")
@@ -297,20 +303,51 @@ struct App {
     }
 
     // -------------------------------------------------
+    // 9e. Plate correction history
+    //     Only the session's representative plate (plateNo) is corrected; per-shot
+    //     readings (snapshots[].plateNo) are kept as evidence.
+    //     Reading requires Playback permission.
+    // -------------------------------------------------
+    print("\n=== Plate correction history ===")
+    if boxRes.status == 200,
+       let hbody = boxRes.body as? [String: Any],
+       let hfirst = (hbody["data"] as? [[String: Any]])?.first,
+       let hid = hfirst["id"] as? Int {
+      let hr = try await client.get("/api/v1/parking/session/\(hid)/plate/history")
+      if hr.status == 200, let h = hr.body as? [String: Any] {
+        let original = h["originalPlateNo"] as? String ?? "(never corrected)"
+        print("  session=\(h["id"] ?? "") plateNo=\(h["plateNo"] ?? "") original=\(original)")
+        for e in h["edits"] as? [[String: Any]] ?? [] {
+          print("    \(e["time"] ?? "") \(e["user"] ?? ""): \(e["before"] ?? "") -> \(e["after"] ?? "") \(e["reason"] ?? "")")
+        }
+      } else {
+        print("  Status: \(hr.status)")
+      }
+    }
+
+    // -------------------------------------------------
     // 10. Writing history (Control permission)
-    //     Both change stored history, so they are not executed here.
+    //     These calls change stored history, so they are not executed here.
     //     Payment state (16.7): commit settles it, exempt records a decision not to
-    //     collect, undo reverts the most recent change (the response says which one).
+    //     collect, and undo reverts the most recent change (the response says which).
     //     Records are appended, never deleted.
-    //    
-    //     close (16.8) is a different axis: it clears the lingering "parked" state left
-    //     when an exit was never observed. Exempt takes a session out of billing and may
-    //     leave it parked; close ends the session. Do not conflate the two.
+    //
+    //     close (16.8) is separate: it ends a session whose exit was never observed
+    //     and would otherwise stay "parked". exempt removes a session from billing
+    //     but may leave it parked; close ends it. Do not confuse the two.
     //
     //     _ = try await client.post("/api/v1/parking/session/\(id)/payment/commit?ref=POS-0042")
     //     _ = try await client.post("/api/v1/parking/session/\(id)/payment/exempt")
     //     _ = try await client.post("/api/v1/parking/session/\(id)/payment/undo")
     //     _ = try await client.post("/api/v1/parking/session/\(id)/close")
+    //
+    //     Plate correction (16.9): one session by id; no bulk correction or merging.
+    //     Payments stay with the session. Returns 409 when plateNo equals the current plate.
+    //
+    //     Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+    //     Uncomment it to try it against a test record.
+    //     _ = try await client.post("/api/v1/parking/session/\(id)/plate",
+    //                               body: ["plateNo": "12가3456", "reason": "misread at night"])
     // -------------------------------------------------
   }
 }

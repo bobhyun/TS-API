@@ -91,7 +91,7 @@ fun main() {
                     }
                     "fileEnd" -> {
                         // download: [{fileName, src}, ...]
-                        // Server v1.0.2+ returns relative paths; prepend client.baseUrl for non-browser fetch.
+                        // src is a relative path (e.g. "/download/..."); prepend client.baseUrl outside a browser.
                         val src = extractField(json, "src")
                         val fullUrl = when {
                             src.isEmpty() -> "N/A"

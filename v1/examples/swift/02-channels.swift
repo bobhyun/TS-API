@@ -4,7 +4,7 @@
  * Demonstrates:
  *   - List channels (basic info, static source, capabilities)
  *   - Channel status (connection state, recording status)
- *   - Channel detailed info
+ *   - Single channel info
  */
 
 import Foundation

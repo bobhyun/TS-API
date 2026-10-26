@@ -7,14 +7,13 @@
  *   - Navigate between recording segments (next/prev)
  *   - Filter by protocol and stream quality
  *
- * NOTE: X-Host header is required. The http helper sets it automatically.
- *       When using nginx reverse proxy, X-Host is set by the proxy.
+ * NOTE: The X-Host header is required. The http helper sets it automatically.
  *
  * Response src format:
  *   src: [
  *     { protocol: "rtmp", profile: "main", src: "rtmp://...", type: "...", label: "1080p", size: [1920, 1080] },
- *     { protocol: "flv", profile: "main", src: "http://.../.flv", type: "...", label: "1080p", size: [1920, 1080] }
- *     { protocol: "websocket-flv", profile: "main", src: "ws://.../.flv", type: "...", label: "1080p", size: [1920, 1080] }
+ *     { protocol: "flv", profile: "main", src: "http://.../.flv", type: "...", label: "1080p", size: [1920, 1080] },
+ *     { protocol: "websocket-flv", profile: "main", src: "ws://.../.flv", type: "...", label: "1080p", size: [1920, 1080] },
  *     { protocol: "rtsp", profile: "main", src: "rtsp://.../live/ch1main", type: "...", label: "1080p", size: [1920, 1080] }
  *   ]
  */
@@ -49,8 +48,8 @@ async function main() {
       const rtmp = findStream(ch.src, 'rtmp');
       const flv = findStream(ch.src, 'flv');
       const wsFlv = findStream(ch.src, 'websocket-flv');
-      // rtsp is present only on servers built with RTSP re-streaming.
-      // Not playable in a browser — hand it to VLC/ffplay, and force TCP
+      // rtsp appears only on servers built with RTSP re-streaming.
+      // Not playable in a browser: use VLC or ffplay, over TCP only
       // (the server rejects UDP with 461 Unsupported Transport).
       const rtsp = findStream(ch.src, 'rtsp');
       if (rtmp) console.log(`    RTMP: ${rtmp}`);

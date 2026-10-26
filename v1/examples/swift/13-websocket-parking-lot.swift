@@ -8,9 +8,9 @@
  *
  * Auth:
  *   Header: X-API-Key: {apiKey}                  (primary)
- *   Header: Authorization: Bearer {accessToken}   (alternative)
- *   Query:  ?apikey={apiKey}                      (browser fallback)
- *   Query:  ?token={accessToken}                  (browser fallback)
+ *   Header: Authorization: Bearer {accessToken}  (alternative)
+ *   Query:  ?apikey={apiKey}                     (browser fallback)
+ *   Query:  ?token={accessToken}                 (browser fallback)
  *
  * Optional filter: &lot=1,2 (filter by parking lot ID)
  *
@@ -86,13 +86,13 @@ struct App {
                     continue
                 }
 
-                // First message may be subscription confirmation
+                // First message is subscription confirmation
                 if msg["subscriberId"] != nil {
                     print("  Subscribed (id=\(msg["subscriberId"]!))")
                     continue
                 }
 
-                // parkingCount: { topic, updated: [{id, name, type, maxCount, count}, ...] }
+                // parkingCount: {topic, updated: [{id, name, type, maxCount, count}, ...]}
                 if let updated = msg["updated"] as? [[String: Any]] {
                     for lot in updated {
                         let id = lot["id"] as? Int ?? 0

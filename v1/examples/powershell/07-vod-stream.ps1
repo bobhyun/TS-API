@@ -15,7 +15,7 @@
     GET /api/v1/vod?stream=sub
         - Filter by stream type (main, sub)
 
-  VOD playback requires specifying a time range via the stream URL parameters.
+  Recorded video: GET /api/v1/vod?ch=1&when=<ISO 8601>.
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -39,7 +39,8 @@ if ($vods) {
         $rtmpUrl = ($v.src | Where-Object { $_.protocol -eq 'rtmp' } | Select-Object -First 1).src
         $flvUrl  = ($v.src | Where-Object { $_.protocol -eq 'flv' }  | Select-Object -First 1).src
         $wsFlvUrl = ($v.src | Where-Object { $_.protocol -eq 'websocket-flv' } | Select-Object -First 1).src
-        # rtsp appears only on servers built with RTSP re-streaming. TCP transport only.
+        # rtsp appears only on servers built with RTSP re-streaming.
+        # TCP transport only: the server rejects UDP with 461.
         $rtspUrl = ($v.src | Where-Object { $_.protocol -eq 'rtsp' } | Select-Object -First 1).src
         if ($rtmpUrl) { Write-Host "    RTMP: $rtmpUrl" }
         if ($flvUrl)  { Write-Host "    FLV:  $flvUrl" }

@@ -7,10 +7,10 @@
 #   - Zoom control (zoom=z, range: -1.0 ~ 1.0)
 #   - Focus/Iris control
 #   - Stop movement
-#   - Preset management (list, go to)
+#   - Presets (list, go to)
 #
-# NOTE: PTZ commands are sent via ONVIF to the camera.
-#       Returns 500 if the camera doesn't support ONVIF or is unreachable.
+# NOTE: PTZ commands are sent to the camera via ONVIF.
+#       Returns 500 if the camera does not support ONVIF or is unreachable.
 #
 # Usage:
 #   NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... bash 03-ptz-control.sh
@@ -41,12 +41,12 @@ sleep 1
 # ─────────────────────────────────────────────────
 # 2. Pan/Tilt Movement
 #    move=x,y where x=pan(-1~1), y=tilt(-1~1)
-#    Positive x = right, Positive y = up
+#    Positive x = right, positive y = down
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Pan/Tilt ==="
 
-# Move right and up
+# Move right and down
 echo "--- Move right+up (0.3, 0.3) ---"
 "${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/channel/${CHANNEL}/ptz?move=0.3,0.3" | jqf
 sleep 0.5
@@ -56,7 +56,7 @@ echo "--- Stop ---"
 "${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/channel/${CHANNEL}/ptz?stop" | jqf
 sleep 0.5
 
-# Move left and down
+# Move left and up
 echo "--- Move left+down (-0.3, -0.3) ---"
 "${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/channel/${CHANNEL}/ptz?move=-0.3,-0.3" | jqf
 sleep 0.5
@@ -111,7 +111,7 @@ echo "--- List presets ---"
 PRESETS=$("${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/channel/${CHANNEL}/preset")
 echo "$PRESETS" | jqf
 
-# Go to first preset if exists
+# Go to the first preset, if any
 FIRST_TOKEN=$(echo "$PRESETS" | jq -r '.[0].token // empty' 2>/dev/null)
 if [ -n "$FIRST_TOKEN" ]; then
   FIRST_NAME=$(echo "$PRESETS" | jq -r '.[0].name // "unknown"' 2>/dev/null)

@@ -10,7 +10,7 @@
  *   - Index 0 = 00:00, Index 59 = 00:59, ..., Index 1439 = 23:59
  *   - '0' = no recording, '1' or higher = recording exists
  *
- * Use these endpoints to build a recording timeline calendar UI.
+ * Use days for a calendar UI and minutes for a timeline UI.
  *
  * Compile: javac NvrClient.java V1_04_RecordingSearch.java
  * Run:     java V1_04_RecordingSearch

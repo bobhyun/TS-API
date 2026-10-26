@@ -2,9 +2,9 @@
 
 [English](README.md) | **한국어**
 
-**TS-API**는 TS Solution Corp.의 영상 보안 제품군 — **TS-CMS**, **TS-NVR**, **TS-IVR** — 에 내장된 웹 API입니다.
+**TS-API**는 TS Solution Corp.의 영상 보안 제품군(**TS-CMS**, **TS-NVR**, **TS-IVR**)에 내장된 웹 API입니다.
 
-> TS-API v1 웹서버는 TS-IVR, TS-NVR, TS-CMS v3.0.0 이후버전부터 적용되었습니다.
+> TS-API v1 웹서버는 TS-IVR, TS-NVR, TS-CMS v3.0.0 이상 버전에 적용되었습니다.
 > RESTful API(`/api/v1`)는 JWT 및 API Key 인증을 지원하며, 경로 기반으로 설계되었습니다.
 
 ## 목차

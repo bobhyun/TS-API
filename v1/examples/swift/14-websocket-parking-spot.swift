@@ -14,9 +14,9 @@
  *
  * Auth:
  *   Header: X-API-Key: {apiKey}                  (primary)
- *   Header: Authorization: Bearer {accessToken}   (alternative)
- *   Query:  ?apikey={apiKey}                      (browser fallback)
- *   Query:  ?token={accessToken}                  (browser fallback)
+ *   Header: Authorization: Bearer {accessToken}  (alternative)
+ *   Query:  ?apikey={apiKey}                     (browser fallback)
+ *   Query:  ?token={accessToken}                 (browser fallback)
  *
  * Optional filters (OR logic):
  *   &ch=1,2       - spots belonging to channels 1, 2

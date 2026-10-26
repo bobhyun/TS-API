@@ -15,7 +15,7 @@
 //
 // REQUIRES: go get github.com/gorilla/websocket
 //
-// Run: cd examples/go && go run ./v1/13_ws_parking_lot/
+// Run: cd go && go run ./13_ws_parking_lot
 package main
 
 import (
@@ -83,7 +83,7 @@ func main() {
 			continue
 		}
 
-		// parkingCount messages: {topic, updated: [{id, name, type, maxCount, count}, ...]}
+		// parkingCount: {topic, updated: [{id, name, type, maxCount, count}, ...]}
 		updated, _ := msg["updated"].([]interface{})
 		for _, u := range updated {
 			lot, _ := u.(map[string]interface{})

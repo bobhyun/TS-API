@@ -1,13 +1,11 @@
 // 03_PtzControl.cs - v1 API PTZ Control Example
 //
-// v1 API uses RESTful path style. Channel ID is included in the path.
-//
 // Endpoints:
-//   GET /api/v1/channel/{chid}/ptz?home          - Move to home
-//   GET /api/v1/channel/{chid}/ptz?move=x,y      - Pan/tilt
-//   GET /api/v1/channel/{chid}/ptz?zoom=z         - Zoom control
-//   GET /api/v1/channel/{chid}/ptz?stop           - Stop PTZ
-//   GET /api/v1/channel/{chid}/preset             - Preset list
+//   GET /api/v1/channel/{chid}/ptz?home           - Go to home position
+//   GET /api/v1/channel/{chid}/ptz?move=x,y       - Pan/tilt (x,y: -1.0 ~ 1.0; +x=right, +y=down)
+//   GET /api/v1/channel/{chid}/ptz?zoom=z         - Zoom (positive=in, negative=out)
+//   GET /api/v1/channel/{chid}/ptz?stop           - Stop all PTZ movement
+//   GET /api/v1/channel/{chid}/preset             - List presets
 //   GET /api/v1/channel/{chid}/preset/{token}/go  - Go to preset
 
 using System;
@@ -62,7 +60,7 @@ namespace TsApiExamples.V1
             await Task.Delay(1000);
 
             // ── Pan/tilt ──
-            // x: -100 ~ 100 (left/right), y: -100 ~ 100 (down/up)
+            // x, y: -1.0 ~ 1.0 (+x=right, +y=down); out-of-range values are clamped
             Console.WriteLine("\nMoving left-down...");
             var mr = await client.GetAsync($"/api/v1/channel/{ch}/ptz?move=-50,-50");
             Console.WriteLine($"  Result: {(int)mr.StatusCode}");

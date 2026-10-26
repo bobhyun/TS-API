@@ -13,8 +13,8 @@
  * Optional filters (OR logic): &ch=1,2  &lot=1,2  &spot=100,200
  *
  * Events:
- *   currentStatus  - initial full state on connect
- *   statusChanged  - only changed spots
+ *   currentStatus  - full state on connect (all zone types)
+ *   statusChanged  - changed spots only (type="spot")
  *
  * Compile: javac NvrClient.java V1_14_WebSocketParkingSpot.java
  * Run:     java V1_14_WebSocketParkingSpot

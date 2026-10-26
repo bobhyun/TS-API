@@ -6,12 +6,13 @@
 #   - License plate log search (keyword, time range, pagination)
 #   - Similar plate search
 #   - CSV export
+#   - Plate correction history (GET /api/v1/lpr/log/{id}/plate/history)
+#   - Plate correction (POST /api/v1/lpr/log/{id}/plate, Control permission, not executed)
 #
 # NOTE: timeBegin and timeEnd are required for LPR log searches.
 #
-# WARNING: Exporting large datasets (10,000+ records) may cause HTTP timeout
-#   errors. For bulk exports, narrow the time range or use pagination
-#   (at/maxCount) to keep each request under a manageable size.
+# WARNING: Large exports (10,000+ records) can hit HTTP timeouts.
+#   Narrow the time range or page with at/maxCount.
 #
 # Usage:
 #   NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... bash 06-lpr-search.sh
@@ -46,7 +47,9 @@ echo "=== LPR Sources ==="
 
 # ─────────────────────────────────────────────────
 # 2. Recent LPR Logs
-#    Response: { totalCount, data: [{ plateNo, score, srcName, timeRange, vod }, ...] }
+#    Response: { totalCount, data: [{ id, plateNo, score, srcName, direction, timeRange, vod }, ...] }
+#    plateNo is null when no plate was read; direction is "entry"/"exit" or absent.
+#    Corrected records carry plateEdited: true and originalPlateNo.
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Recent LPR Logs (last 7 days, max 10) ==="
@@ -64,7 +67,7 @@ KEYWORD="1234"
 
 # ─────────────────────────────────────────────────
 # 4. Similar Plate Search
-#    Finds plates similar to the keyword (edit distance based)
+#    Returns every plate containing the keyword, most recent first
 #    Useful for partial or misrecognized plates
 # ─────────────────────────────────────────────────
 echo ""
@@ -73,7 +76,35 @@ echo "=== Similar Plate Search ==="
   "${BASE}/api/v1/lpr/similar?keyword=${KEYWORD}&timeBegin=${TIME_BEGIN}&timeEnd=${TIME_END}" | jqf
 
 # ─────────────────────────────────────────────────
-# 5. CSV Export
+# 5. Plate Correction History (one record, by id)
+#    plateNo in the log is always the current value.
+#    edits[] lists corrections in recorded order; it is empty if the record was never corrected.
+# ─────────────────────────────────────────────────
+echo ""
+echo "=== Plate Correction History ==="
+LPR_ID=$("${CURL[@]}" "${AUTH[@]}" \
+  "${BASE}/api/v1/lpr/log?timeBegin=${TIME_BEGIN}&timeEnd=${TIME_END}&maxCount=1" \
+  | jq -r '.data[0].id // empty' 2>/dev/null || true)
+if [ -n "${LPR_ID:-}" ]; then
+  "${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/lpr/log/${LPR_ID}/plate/history" | jqf
+else
+  echo "  (no records, or jq not installed)"
+fi
+
+# ─────────────────────────────────────────────────
+# 6. Plate Correction (Control permission)
+#    Changes the stored record, so it is not executed here. The target is always
+#    one record id - from data[].id above, or the id a realtime LPR event carries
+#    next to each plateNo. 409 when plateNo equals the current plate.
+# ─────────────────────────────────────────────────
+# Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+# Uncomment it to try it against a test record.
+# "${CURL[@]}" "${AUTH[@]}" -X POST -H "Content-Type: application/json" \
+#   -d '{"plateNo":"12가3456","reason":"misread at night"}' \
+#   "${BASE}/api/v1/lpr/log/${LPR_ID}/plate" | jqf
+
+# ─────────────────────────────────────────────────
+# 7. CSV Export
 #    Returns LPR data in CSV format for spreadsheet import
 #    ?export=true switches response format to CSV
 # ─────────────────────────────────────────────────

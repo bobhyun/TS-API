@@ -1,15 +1,13 @@
 /**
  * Example 01: Authentication
  *
- * TS-API v1 supports three authentication methods:
- *   1. JWT Login (POST) - primary method for all v1 endpoints
- *   2. API Key - for external system integration (v1 endpoints only)
- *   3. Session Login - uses JWT internally, tokens stored by http helper
+ * Three authentication methods:
+ *   1. Client login - http.js logs in with JWT and sends the Bearer token automatically
+ *   2. JWT          - POST /api/v1/auth/login; manage accessToken/refreshToken yourself
+ *   3. API Key      - X-API-Key header, for external integrations
  *
- * NOTE: v1 data endpoints require JWT Bearer token or API Key.
- *       Session cookies are NOT supported by v1 endpoints.
- * NOTE: API Key authentication is supported on v1 endpoints only.
- *       v0 endpoints (/api/*) reject X-API-Key with 401 Unauthorized.
+ * NOTE: v1 endpoints accept a JWT Bearer token or an API Key. Session cookies are not supported.
+ * NOTE: v0 endpoints (/api/*) reject X-API-Key with 401.
  */
 
 const { NVR_USER, NVR_PASS } = require('./config');
@@ -17,9 +15,9 @@ const { request, get, post, login, logout, jwtLogin, jwtRefresh, jwtLogout, getA
 
 async function main() {
   // ─────────────────────────────────────────────────
-  // Method 1: Simple Login (JWT stored internally by http helper)
-  //   POST /api/v1/auth/login with JSON body
-  //   Tokens are stored automatically; subsequent requests use Bearer header
+  // Method 1: Client login (JWT stored by http.js)
+  //   POST /api/v1/auth/login
+  //   Subsequent requests send the Bearer token automatically
   // ─────────────────────────────────────────────────
   console.log('=== Simple Login ===');
 
@@ -27,7 +25,7 @@ async function main() {
   console.log('Login:', ok ? 'OK' : 'Failed');
   console.log('Access Token:', getAccessToken().substring(0, 30) + '...');
 
-  // Now all data API calls will use the Bearer token automatically
+  // Token is stored; data endpoints are accessible
   const channelRes = await get('/api/v1/channel');
   console.log('Channels:', channelRes.status, Array.isArray(channelRes.body) ? `(${channelRes.body.length} channels)` : '');
 
@@ -35,7 +33,7 @@ async function main() {
   console.log('Logged out\n');
 
   // ─────────────────────────────────────────────────
-  // Method 2: JWT Login (manual token management)
+  // Method 2: JWT (manage tokens yourself)
   // ─────────────────────────────────────────────────
   console.log('=== JWT Login ===');
 
@@ -56,8 +54,8 @@ async function main() {
     });
     console.log('API Key List:', apikeyList.status);
 
-    // 3) Refresh accessToken using refreshToken
-    //    NOTE: Server performs token rotation - old refreshToken is revoked
+    // 3) Refresh accessToken
+    //    NOTE: The server rotates refreshToken: the old one is revoked
     const refreshed = await jwtRefresh(refreshToken);
     if (refreshed) {
       console.log('Refreshed:    ', refreshed.accessToken.substring(0, 30) + '...');
@@ -65,7 +63,7 @@ async function main() {
     }
 
     // 4) Logout (revoke refreshToken)
-    //    Must use the NEW refreshToken after rotation
+    //    Use the new refreshToken after rotation
     await jwtLogout(refreshed ? refreshed.refreshToken : refreshToken);
     console.log('JWT logged out (refreshToken revoked)');
   } else {
@@ -75,16 +73,15 @@ async function main() {
   console.log('');
 
   // ─────────────────────────────────────────────────
-  // Method 3: API Key (issue -> use -> list -> revoke)
-  //   POST /api/v1/auth/apikey   (create, requires admin JWT)
-  //   X-API-Key header           (use, v1 endpoints only)
-  //   GET /api/v1/auth/apikey    (list)
-  //   DELETE /api/v1/auth/apikey/{id}  (delete)
-  //   NOTE: v0 endpoints (/api/*) reject API Key with 401
+  // Method 3: API Key (create -> use -> list -> delete)
+  //   POST /api/v1/auth/apikey        (create, requires admin JWT)
+  //   X-API-Key header                (use, v1 endpoints only)
+  //   GET /api/v1/auth/apikey         (list)
+  //   DELETE /api/v1/auth/apikey/{id} (delete)
   // ─────────────────────────────────────────────────
   console.log('=== API Key ===');
 
-  // 1) JWT login for admin access
+  // 1) Get an admin token via JWT login
   const authTokens = await jwtLogin(NVR_USER, NVR_PASS);
   if (!authTokens) {
     console.log('JWT login failed');
@@ -95,10 +92,10 @@ async function main() {
   // 2) Create API Key
   const createRes = await post('/api/v1/auth/apikey', {
     name: 'example-integration',
-    // permissions: ['remote'],       // optional: specify permissions (default: remote)
-    // channels: [1, 2],              // optional: restrict accessible channels
-    // ipWhitelist: ['192.168.0.0/24'], // optional: IP restriction
-    // expiresAt: 1735689600,         // optional: expiration (Unix timestamp)
+    // permissions: ['remote'],         // optional: permissions (default: remote)
+    // channels: [1, 2],                // optional: allowed channels
+    // ipWhitelist: ['192.168.0.0/24'], // optional: allowed client IPs
+    // expiresAt: 1735689600,           // optional: expiry (Unix timestamp)
   }, auth);
   console.log('Create API Key:', createRes.status);
   if (createRes.status !== 200) return;
@@ -108,7 +105,7 @@ async function main() {
   console.log('  API Key:', apiKey.substring(0, 24) + '...');
   console.log('  WARNING:', createRes.body.message);
 
-  // 3) Use API Key for data endpoint access (no login required)
+  // 3) Call a data endpoint with the API Key (no login required)
   const dataRes = await get('/api/v1/channel', { 'X-API-Key': apiKey });
   console.log('Use API Key -> GET /api/v1/channel:', dataRes.status);
 

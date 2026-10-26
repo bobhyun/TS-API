@@ -4,8 +4,10 @@
 //   GET /api/v1/info?all                     - All system info
 //   GET /api/v1/system/info?item=storage     - Storage info
 //   GET /api/v1/system/health                - System health
+//   GET /api/v1/system/health?item=systemDisk - System disk (database and logs) status
+//   GET /api/v1/system/notices?lang=ko-KR    - Notices currently in effect
 //
-// Note: The storage response field name is 'disk' (NOT 'storage').
+// Note: item=storage returns its data in the 'disk' field (NOT 'storage').
 
 using System;
 using System.Text.Json;
@@ -69,6 +71,40 @@ namespace TsApiExamples.V1
 
             using var hdoc = await NvrClient.ReadJsonAsync(hr);
             Console.WriteLine(JsonSerializer.Serialize(hdoc.RootElement, options));
+
+            // ── System disk ──
+            // Holds the database and logs (normally C:), separate from the recording disks.
+            // When it is full, records stop being saved even if the recording disks have room.
+            // Watch status here, not only disk[].
+            Console.WriteLine("\n=== System Disk ===");
+            var dr = await client.GetAsync("/api/v1/system/health?item=systemDisk");
+            dr.EnsureSuccessStatusCode();
+
+            using var ddoc = await NvrClient.ReadJsonAsync(dr);
+            var sd = ddoc.RootElement.GetProperty("systemDisk");
+            Console.WriteLine($"  drive={sd.GetProperty("drive").GetString()} " +
+                $"free={sd.GetProperty("freeSpace").GetInt64()}/{sd.GetProperty("totalSpace").GetInt64()} " +
+                $"status={sd.GetProperty("status").GetString()} " +
+                $"dataWriteFailed={sd.GetProperty("dataWriteFailed").GetBoolean()}");
+
+            // ── System notices ──
+            // Conditions in effect right now (raised, updated, cleared).
+            // message is keyed by language code: en-US is always present,
+            // plus the requested lang when it is not English.
+            Console.WriteLine("\n=== System Notices ===");
+            var lang = "ko-KR";
+            var nr = await client.GetAsync($"/api/v1/system/notices?lang={lang}");
+            nr.EnsureSuccessStatusCode();
+
+            using var ndoc = await NvrClient.ReadJsonAsync(nr);
+            if (ndoc.RootElement.GetArrayLength() == 0)
+                Console.WriteLine("  (no notices)");
+            foreach (var n in ndoc.RootElement.EnumerateArray())
+            {
+                var msg = n.GetProperty("message");
+                var text = msg.TryGetProperty(lang, out var t) ? t.GetString() : msg.GetProperty("en-US").GetString();
+                Console.WriteLine($"  [{n.GetProperty("severity").GetString()}] {n.GetProperty("kind").GetString()}: {text}");
+            }
         }
     }
 }

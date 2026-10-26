@@ -1,10 +1,10 @@
 /**
  * v1 API - WebSocket Real-time Event Subscription
  *
- * Subscribes to real-time events via WebSocket.
+ * Subscribes to real-time events (LPR, channelStatus, notice, etc.) via WebSocket.
  *
  * Two subscription modes:
- *   1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+ *   1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
  *   2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
  *
  * Endpoint:
@@ -29,6 +29,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
+const val LANG = "ko-KR"
+
 fun main() {
     val client = TsApiClient()
     if (client.apiKey.isEmpty()) {
@@ -43,7 +45,7 @@ fun main() {
     println("=== Method 1: Subscribe via URL (10 seconds) ===")
 
     run {
-        val url = "$wsUrl/wsapi/v1/events?topics=LPR,channelStatus"
+        val url = "$wsUrl/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=$LANG"
         val messageCount = AtomicInteger(0)
         val closeLatch = CountDownLatch(1)
 
@@ -61,12 +63,7 @@ fun main() {
                     webSocket: WebSocket, data: CharSequence, last: Boolean
                 ): CompletionStage<*> {
                     messageCount.incrementAndGet()
-                    val text = data.toString()
-                    val topicRegex = """"topic"\s*:\s*"([^"]+)"""".toRegex()
-                    val typeRegex = """"type"\s*:\s*"([^"]+)"""".toRegex()
-                    val topic = topicRegex.find(text)?.groupValues?.get(1)
-                        ?: typeRegex.find(text)?.groupValues?.get(1) ?: "?"
-                    println("  [$topic] $text")
+                    printEvent(data.toString())
                     webSocket.request(1)
                     return CompletableFuture.completedFuture(null)
                 }
@@ -131,7 +128,7 @@ fun main() {
                             println("  [Phase 3] Unsubscribe channelStatus + add motionChanges (ch 1) + reduce LPR to ch 1,3")
                             webSocket.sendText("""{"unsubscribe":"channelStatus"}""", true)
                             webSocket.sendText("""{"subscribe":"motionChanges","ch":[1]}""", true)
-                            webSocket.sendText("""{"subscribe":"LPR","ch":[1,3]}""", true)  // re-subscribe with fewer ch drops ch 2,4
+                            webSocket.sendText("""{"subscribe":"LPR","ch":[1,3]}""", true)  // re-subscribe replaces the filter (drops ch 2,4)
                         } catch (_: Exception) { }
                     }.start()
 
@@ -159,8 +156,7 @@ fun main() {
                         }
                         else -> {
                             // Event data
-                            val t = topic.ifEmpty { "?" }
-                            println("  [$t] $text")
+                            printEvent(text)
                         }
                     }
                     webSocket.request(1)
@@ -185,6 +181,47 @@ fun main() {
 
         if (!ws.isOutputClosed) {
             ws.sendClose(WebSocket.NORMAL_CLOSURE, "done").join()
+        }
+    }
+}
+
+/** Print LPR and notice events by field; other topics as raw JSON (no JSON library). */
+private fun printEvent(text: String) {
+    fun match(s: String, regex: String, def: String) =
+        regex.toRegex().find(s)?.groupValues?.get(1) ?: def
+
+    when (val topic = extractField(text, "topic")) {
+        "LPR" -> {
+            // id: record id for plate correction (absent when the record could not be saved)
+            // direction: "entry" / "exit" (absent when unknown)
+            // Drop nested objects so each plate (plates[] item, or the message itself) is flat
+            val flat = text.replace(""""(roi|parkingLot|channel)":\{[^{}]*\}""".toRegex(), "\"$1\":0")
+            for (m in """\{[^{}]*"plateNo"[^{}]*\}""".toRegex().findAll(flat)) {
+                val p = m.value
+                println("  [LPR] id=${match(p, """"id":(\d+)""", "-")}" +
+                    " plateNo=${match(p, """"plateNo":(null|"[^"]*")""", "-")}" +
+                    " score=${match(p, """"score":([-0-9.eE+]+)""", "-")}" +
+                    " direction=${match(p, """"direction":"([^"]*)"""", "-")}")
+            }
+        }
+        "notice" -> {
+            // snapshot: current list once after subscribing (notices[]);
+            // raised/updated/cleared: one notice (notice).
+            // message is keyed by language code: en-US always, plus the requested lang
+            val action = extractField(text, "action")
+            val notices = """"id":"([^"]*)"[^{}]*?"severity":"([^"]*)"[^{}]*?"message":\{([^{}]*)\}"""
+                .toRegex().findAll(text).toList()
+            if (notices.isEmpty()) println("  [notice] $action: (no notices)")
+            for (n in notices) {
+                val (id, severity, message) = n.destructured
+                val msg = match(message, """"$LANG":"((?:[^"\\]|\\.)*)"""",
+                    match(message, """"en-US":"((?:[^"\\]|\\.)*)"""", ""))
+                println("  [notice] $action $id $severity: $msg")
+            }
+        }
+        else -> {
+            val t = topic.ifEmpty { extractField(text, "type") }.ifEmpty { "?" }
+            println("  [$t] $text")
         }
     }
 }
@@ -222,4 +259,7 @@ private fun extractField(json: String, field: String): String {
  *           println("Plate: ${p.optString("plateNo")}  Score: ${p.optDouble("score")}")
  *       }
  *   }
+ *
+ * Each plate carries the record "id" (use it with POST /api/v1/lpr/log/{id}/plate)
+ * and "direction" as a string ("entry" / "exit"), not a number.
  */

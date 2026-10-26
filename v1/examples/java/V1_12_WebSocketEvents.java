@@ -1,10 +1,10 @@
 /**
  * v1 API - WebSocket Real-time Event Subscription
  *
- * Subscribes to real-time events via WebSocket.
+ * Subscribes to real-time events (LPR, channelStatus, notice, etc.) via WebSocket.
  *
  * Two subscription modes:
- *   1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+ *   1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
  *   2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
  *
  * Endpoint:
@@ -31,6 +31,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class V1_12_WebSocketEvents {
 
+    static final String LANG = "ko-KR";
+
     public static void main(String[] args) throws Exception {
         NvrClient client = new NvrClient();
         if (client.getApiKey() == null || client.getApiKey().isEmpty()) {
@@ -45,7 +47,7 @@ public class V1_12_WebSocketEvents {
         System.out.println("=== Method 1: Subscribe via URL (10 seconds) ===");
 
         {
-            String url = wsUrl + "/wsapi/v1/events?topics=LPR,channelStatus";
+            String url = wsUrl + "/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=" + LANG;
             AtomicInteger messageCount = new AtomicInteger(0);
             CountDownLatch closeLatch = new CountDownLatch(1);
 
@@ -65,9 +67,7 @@ public class V1_12_WebSocketEvents {
                                 CharSequence data, boolean last) {
                             messageCount.incrementAndGet();
                             String text = data.toString();
-                            String topic = extractField(text, "topic");
-                            if (topic.isEmpty()) topic = extractField(text, "type");
-                            System.out.println("  [" + topic + "] " + text);
+                            printEvent(text);
                             return WebSocket.Listener.super.onText(webSocket, data, last);
                         }
 
@@ -133,7 +133,7 @@ public class V1_12_WebSocketEvents {
                                     System.out.println("  [Phase 3] Unsubscribe channelStatus + add motionChanges (ch 1) + reduce LPR to ch 1,3");
                                     webSocket.sendText("{\"unsubscribe\":\"channelStatus\"}", true);
                                     webSocket.sendText("{\"subscribe\":\"motionChanges\",\"ch\":[1]}", true);
-                                    webSocket.sendText("{\"subscribe\":\"LPR\",\"ch\":[1,3]}", true);  // re-subscribe with fewer ch drops ch 2,4
+                                    webSocket.sendText("{\"subscribe\":\"LPR\",\"ch\":[1,3]}", true);  // re-subscribe replaces the filter (drops ch 2,4)
                                 } catch (Exception e) { /* ignore */ }
                             }).start();
 
@@ -158,8 +158,7 @@ public class V1_12_WebSocketEvents {
                                 System.out.println("  Error: " + msg + " (topic: " + topic + ")");
                             } else {
                                 // Event data
-                                if (topic.isEmpty()) topic = "?";
-                                System.out.println("  [" + topic + "] " + text);
+                                printEvent(text);
                             }
                             return WebSocket.Listener.super.onText(webSocket, data, last);
                         }
@@ -185,6 +184,52 @@ public class V1_12_WebSocketEvents {
                 ws.sendClose(WebSocket.NORMAL_CLOSURE, "done").join();
             }
         }
+    }
+
+    /** Print LPR and notice events by field; other topics as raw JSON (no JSON library). */
+    private static void printEvent(String text) {
+        String topic = extractField(text, "topic");
+        if ("LPR".equals(topic)) {
+            // id: record id for plate correction (absent when the record could not be saved)
+            // direction: "entry" / "exit" (absent when unknown)
+            // Drop nested objects so each plate (plates[] item, or the message itself) is flat
+            String flat = text.replaceAll("\"(roi|parkingLot|channel)\":\\{[^{}]*\\}", "\"$1\":0");
+            java.util.regex.Matcher m = java.util.regex.Pattern
+                    .compile("\\{[^{}]*\"plateNo\"[^{}]*\\}").matcher(flat);
+            while (m.find()) {
+                String p = m.group();
+                System.out.println("  [LPR] id=" + matchOr(p, "\"id\":(\\d+)", "-")
+                        + " plateNo=" + matchOr(p, "\"plateNo\":(null|\"[^\"]*\")", "-")
+                        + " score=" + matchOr(p, "\"score\":([-0-9.eE+]+)", "-")
+                        + " direction=" + matchOr(p, "\"direction\":\"([^\"]*)\"", "-"));
+            }
+        } else if ("notice".equals(topic)) {
+            // snapshot: current list once after subscribing (notices[]);
+            // raised/updated/cleared: one notice (notice).
+            // message is keyed by language code: en-US always, plus the requested lang
+            String action = extractField(text, "action");
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                    "\"id\":\"([^\"]*)\"[^{}]*?\"severity\":\"([^\"]*)\"[^{}]*?\"message\":\\{([^{}]*)\\}")
+                    .matcher(text);
+            int count = 0;
+            while (m.find()) {
+                count++;
+                String msg = matchOr(m.group(3), "\"" + LANG + "\":\"((?:[^\"\\\\]|\\\\.)*)\"",
+                        matchOr(m.group(3), "\"en-US\":\"((?:[^\"\\\\]|\\\\.)*)\"", ""));
+                System.out.println("  [notice] " + action + " " + m.group(1) + " " + m.group(2) + ": " + msg);
+            }
+            if (count == 0) System.out.println("  [notice] " + action + ": (no notices)");
+        } else {
+            if (topic.isEmpty()) topic = extractField(text, "type");
+            if (topic.isEmpty()) topic = "?";
+            System.out.println("  [" + topic + "] " + text);
+        }
+    }
+
+    /** First capture group of regex in s, or def. */
+    private static String matchOr(String s, String regex, String def) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(regex).matcher(s);
+        return m.find() ? m.group(1) : def;
     }
 
     /** Extract a simple JSON string field value. */
@@ -225,4 +270,7 @@ public class V1_12_WebSocketEvents {
  *               + "  Score: " + p.optDouble("score"));
  *       }
  *   }
+ *
+ * Each plate carries the record "id" (use it with POST /api/v1/lpr/log/{id}/plate)
+ * and "direction" as a string ("entry" / "exit"), not a number.
  */

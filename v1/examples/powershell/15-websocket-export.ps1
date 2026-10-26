@@ -6,7 +6,7 @@
   Recording data backup/export via WebSocket.
 
   Endpoint:
-    ws://host:port/wsapi/v1/export?ch=1&timeBegin=...&timeEnd=...&token={accessToken}
+    ws://host:port/wsapi/v1/export?ch=1&timeBegin=...&timeEnd=...
 
   Auth:
     Header: Authorization: Bearer {accessToken}  (primary)
@@ -111,7 +111,7 @@ try {
             }
             'fileEnd' {
                 # download: [{fileName, src}, ...]
-                # Server v1.0.2+ returns relative paths; prepend $BASE_URL for non-browser fetch.
+                # src is a relative path (e.g. "/download/..."); prepend $BASE_URL outside a browser.
                 $dlArr = $msg.channel.file.download
                 $src = if ($dlArr -and $dlArr.Count -gt 0) { $dlArr[0].src } else { 'N/A' }
                 $fullUrl = if ($src.StartsWith('http')) { $src } else { "$BASE_URL$src" }

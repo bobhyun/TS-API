@@ -13,9 +13,12 @@
     GET /api/v1/system/info?item=network  - Network interfaces
 
     GET /api/v1/system/health             - System health status
+    GET /api/v1/system/health?item=systemDisk
+                                          - System disk (database and logs) status
     GET /api/v1/system/hddsmart           - HDD S.M.A.R.T. data
+    GET /api/v1/system/notices?lang=ko-KR - Notices currently in effect
 
-  Note: The 'storage' query returns data with the response field named 'disk'.
+  Note: item=storage returns its data in the 'disk' field (NOT 'storage').
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -65,6 +68,33 @@ if ($r) { Write-Host "  $($r | ConvertTo-Json -Depth 5)" }
 Write-Host "`n=== System Health ==="
 $r = Invoke-NvrGet '/api/v1/system/health'
 if ($r) { Write-Host "  $($r | ConvertTo-Json -Depth 5)" }
+
+# --- System Disk ---
+# Holds the database and logs (normally C:), separate from the recording disks.
+# When it is full, records stop being saved even if the recording disks have room.
+# Watch status here, not only disk[].
+Write-Host "`n=== System Disk ==="
+$r = Invoke-NvrGet '/api/v1/system/health?item=systemDisk'
+if ($r) {
+    $sd = $r.systemDisk
+    Write-Host "  drive=$($sd.drive) free=$($sd.freeSpace)/$($sd.totalSpace) status=$($sd.status) dataWriteFailed=$($sd.dataWriteFailed)"
+}
+
+# --- System Notices ---
+# Conditions in effect right now (raised, updated, cleared).
+# message is keyed by language code: en-US is always present,
+# plus the requested lang when it is not English.
+Write-Host "`n=== System Notices ==="
+$lang = 'ko-KR'
+$notices = @(Invoke-NvrGet "/api/v1/system/notices?lang=$lang")
+if ($notices.Count -eq 0) {
+    Write-Host '  (no notices)'
+}
+foreach ($n in $notices) {
+    $text = $n.message.$lang
+    if (-not $text) { $text = $n.message.'en-US' }
+    Write-Host "  [$($n.severity)] $($n.kind): $text"
+}
 
 # --- HDD S.M.A.R.T. ---
 Write-Host "`n=== HDD S.M.A.R.T. ==="

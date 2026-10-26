@@ -7,13 +7,13 @@
  *   - Navigate between recording segments (next/prev)
  *   - Filter by protocol and stream quality
  *
- * NOTE: X-Host header is required. NvrClient sets it automatically.
+ * NOTE: The X-Host header is required. NvrClient sets it automatically.
  *
  * Response src format:
  *   src: [
  *     { protocol: "rtmp", profile: "main", src: "rtmp://...", label: "1080p", size: [1920, 1080] },
- *     { protocol: "flv", profile: "main", src: "http://.../.flv", label: "1080p", size: [1920, 1080] }
- *     { protocol: "websocket-flv", profile: "main", src: "ws://.../.flv", label: "1080p", size: [1920, 1080] }
+ *     { protocol: "flv", profile: "main", src: "http://.../.flv", label: "1080p", size: [1920, 1080] },
+ *     { protocol: "websocket-flv", profile: "main", src: "ws://.../.flv", label: "1080p", size: [1920, 1080] },
  *     { protocol: "rtsp", profile: "main", src: "rtsp://.../live/ch1main", label: "1080p", size: [1920, 1080] }
  *   ]
  */

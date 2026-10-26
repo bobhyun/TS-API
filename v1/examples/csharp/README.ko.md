@@ -24,7 +24,7 @@ curl -sk -X POST https://SERVER/api/v1/auth/apikey \
 export NVR_API_KEY=tsapi_key_...
 ```
 
-> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하세요.
+> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하십시오.
 
 ## 환경 변수
 
@@ -55,7 +55,7 @@ NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... dotnet run
 | [`03_PtzControl.cs`](03_PtzControl.cs) | PTZ 카메라 제어 |
 | [`04_RecordingSearch.cs`](04_RecordingSearch.cs) | 녹화 구간 검색 |
 | [`05_EventLog.cs`](05_EventLog.cs) | 이벤트 로그 조회 |
-| [`06_LprSearch.cs`](06_LprSearch.cs) | 차번 인식 검색 |
+| [`06_LprSearch.cs`](06_LprSearch.cs) | 차량 번호 인식 검색 |
 | [`07_VodStream.cs`](07_VodStream.cs) | VOD 스트림 URL (RTMP, FLV) |
 | [`08_SystemInfo.cs`](08_SystemInfo.cs) | 시스템 상태 |
 | [`09_Push.cs`](09_Push.cs) | 외부 이벤트 푸시 |

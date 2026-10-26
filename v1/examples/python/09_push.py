@@ -12,9 +12,6 @@ Event Types:
 
   WARNING: emergencyCall with event=callStart triggers a REAL alarm on the NVR.
            The alarm persists until callEnd is sent. Always send callEnd after callStart.
-
-  IMPORTANT: For emergencyCall, you MUST send callEnd to stop the alarm.
-             Forgetting callEnd leaves the NVR in alarm state.
 """
 
 import os

@@ -1,8 +1,8 @@
 /**
  * TS-API Examples - Minimal HTTP Client
  *
- * Node.js built-in http module wrapper. No external dependencies required.
- * v1 API uses JWT Bearer token authentication (not session cookies).
+ * Wrapper around the Node.js built-in http/https modules (no external dependencies).
+ * v1 API supports JWT Bearer token and API Key authentication.
  */
 
 const https = require('https');
@@ -15,14 +15,13 @@ let _refreshToken = '';
 let _apiKey = '';
 
 /**
- * Set API Key for subsequent requests.
- * When set, requests will include X-API-Key header.
+ * Set the API key sent as the X-API-Key header on subsequent requests.
  * @param {string} key - The API key
  */
 function setApiKey(key) { _apiKey = key; }
 
 /**
- * Make HTTP request to NVR API
+ * Make an HTTP request to the NVR API.
  * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
  * @param {string} path - API path (e.g. '/api/v1/channel')
  * @param {object} [body] - Request body (will be JSON-serialized)

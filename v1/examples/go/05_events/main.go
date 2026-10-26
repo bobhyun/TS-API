@@ -1,7 +1,7 @@
 // 05_events - Event types & log search
 // Demonstrates event type listing and pagination-based log search.
 //
-// Run: cd examples/go && go run ./v1/05_events/
+// Run: cd go && go run ./05_events
 package main
 
 import (

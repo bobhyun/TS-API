@@ -63,7 +63,7 @@ async function main() {
           return;
         }
 
-        // parkingCount messages: {topic, updated: [{id, name, type, maxCount, count}, ...]}
+        // parkingCount: {topic, updated: [{id, name, type, maxCount, count}, ...]}
         const updated = msg.updated || [];
         for (const lot of updated) {
           const available = (lot.maxCount || 0) - (lot.count || 0);

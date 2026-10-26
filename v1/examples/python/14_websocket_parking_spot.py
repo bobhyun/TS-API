@@ -4,7 +4,7 @@
 Subscribes to parkingSpot topic for individual spot status changes.
 
 Endpoint:
-  ws://host:port/wsapi/v1/events?topics=parkingSpot&token={accessToken}
+  ws://host:port/wsapi/v1/events?topics=parkingSpot
 
 Auth:
   Header: Authorization: Bearer {accessToken}  (primary)
@@ -15,11 +15,11 @@ Auth:
 Optional filters (OR logic):
   &ch=1,2       - spots belonging to channels 1, 2
   &lot=1,2      - spots belonging to parking lots 1, 2
-  &spot=100,200  - specific spot IDs
+  &spot=100,200 - specific spot IDs
 
 Events:
-  currentStatus  - initial full state on connect (all zone types)
-  statusChanged  - only changed spots after initial (type="spot" only)
+  currentStatus  - full state on connect (all zone types)
+  statusChanged  - changed spots only (type="spot")
 
 Zone types (in currentStatus):
   spot         - parking space (has occupied, vehicle, category)

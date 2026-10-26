@@ -1,9 +1,9 @@
 // 12_WebSocketEvents.cs - v1 API WebSocket Real-time Event Subscription Example
 //
-// Subscribes to real-time events via WebSocket.
+// Subscribes to real-time events (LPR, channelStatus, notice, etc.) via WebSocket.
 //
 // Two subscription modes:
-//   1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+//   1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
 //   2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
 //
 // Endpoint:
@@ -16,6 +16,7 @@
 //   Query:  ?apikey={apiKey}                     (browser fallback)
 
 using System;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -42,7 +43,7 @@ namespace TsApiExamples.V1
             Console.WriteLine("=== Method 1: Subscribe via URL (10 seconds) ===");
 
             {
-                var url = $"{wsUrl}/wsapi/v1/events?topics=LPR,channelStatus";
+                var url = $"{wsUrl}/wsapi/v1/events?topics=LPR,channelStatus,notice&lang={Lang}";
                 using var ws = new ClientWebSocket();
                 ws.Options.RemoteCertificateValidationCallback = (_, _, _, _) => true;
                 ws.Options.SetRequestHeader("X-API-Key", client.ApiKey);
@@ -74,7 +75,7 @@ namespace TsApiExamples.V1
                                 ? t.GetString()
                                 : doc.RootElement.TryGetProperty("type", out var tp)
                                     ? tp.GetString() : "?";
-                            Console.WriteLine($"  [{topic}] {data}");
+                            PrintEvent(topic, doc.RootElement, data);
                         }
                         catch
                         {
@@ -134,7 +135,7 @@ namespace TsApiExamples.V1
                         Console.WriteLine("  [Phase 3] Unsubscribe channelStatus + add motionChanges (ch 1) + reduce LPR to ch 1,3");
                         await SendJson(ws, new { unsubscribe = "channelStatus" }, cts.Token);
                         await SendJson(ws, new { subscribe = "motionChanges", ch = new[] { 1 } }, cts.Token);
-                        await SendJson(ws, new { subscribe = "LPR", ch = new[] { 1, 3 } }, cts.Token);  // re-subscribe with fewer ch drops ch 2,4
+                        await SendJson(ws, new { subscribe = "LPR", ch = new[] { 1, 3 } }, cts.Token);  // re-subscribe replaces the filter (drops ch 2,4)
                     }
                 });
 
@@ -184,7 +185,7 @@ namespace TsApiExamples.V1
                             // Handle event data
                             var evTopic = doc.RootElement.TryGetProperty("topic", out var t)
                                 ? t.GetString() : "?";
-                            Console.WriteLine($"  [{evTopic}] {data}");
+                            PrintEvent(evTopic, doc.RootElement, data);
                         }
                         catch
                         {
@@ -198,6 +199,51 @@ namespace TsApiExamples.V1
 
                 if (ws.State == WebSocketState.Open)
                     await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+            }
+        }
+
+        const string Lang = "ko-KR";
+
+        // Print LPR and notice events by field; other topics as raw JSON.
+        static void PrintEvent(string topic, JsonElement root, string data)
+        {
+            if (topic == "LPR")
+            {
+                // id: record id for plate correction (absent when the record could not be saved)
+                // direction: "entry" / "exit" (absent when unknown)
+                var plates = root.TryGetProperty("plates", out var arr)
+                    ? arr.EnumerateArray().ToArray() : new[] { root };
+                foreach (var p in plates)
+                {
+                    var id = p.TryGetProperty("id", out var i) ? i.GetInt64().ToString() : "-";
+                    var plateNo = p.TryGetProperty("plateNo", out var pn) && pn.ValueKind == JsonValueKind.String
+                        ? pn.GetString() : "null";
+                    var score = p.TryGetProperty("score", out var sc) ? sc.GetDouble() : 0;
+                    var direction = p.TryGetProperty("direction", out var d) ? d.GetString() : "-";
+                    Console.WriteLine($"  [LPR] id={id} plateNo={plateNo} score={score} direction={direction}");
+                }
+            }
+            else if (topic == "notice")
+            {
+                // snapshot: current list once after subscribing; raised/updated/cleared: one notice
+                // message is keyed by language code: en-US always, plus the requested lang
+                var action = root.GetProperty("action").GetString();
+                var notices = action == "snapshot"
+                    ? root.GetProperty("notices").EnumerateArray().ToArray()
+                    : new[] { root.GetProperty("notice") };
+                if (notices.Length == 0)
+                    Console.WriteLine("  [notice] snapshot: (no notices)");
+                foreach (var n in notices)
+                {
+                    var msg = n.GetProperty("message");
+                    var text = msg.TryGetProperty(Lang, out var l) ? l.GetString() : msg.GetProperty("en-US").GetString();
+                    Console.WriteLine($"  [notice] {action} {n.GetProperty("id").GetString()} " +
+                        $"{n.GetProperty("severity").GetString()}: {text}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"  [{topic}] {data}");
             }
         }
 
@@ -240,4 +286,7 @@ namespace TsApiExamples.V1
  *           Console.WriteLine($"Plate: {plateNo}  Score: {score}");
  *       }
  *   }
+ *
+ * Each plate carries the record "id" (use it with POST /api/v1/lpr/log/{id}/plate)
+ * and "direction" as a string ("entry" / "exit"), not a number.
  */

@@ -2,10 +2,10 @@
 # Example 12: WebSocket - Real-time Event Subscription
 #
 # Demonstrates subscribing to real-time events via WebSocket.
-# Topics: LPR, channelStatus, emergencyCall, object, recording, motionChanges
+# Topics: LPR, channelStatus, notice, emergencyCall, object, recordingStatus, motionChanges
 #
 # Two subscription modes:
-#   1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+#   1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
 #   2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
 #
 # Endpoint:
@@ -42,20 +42,23 @@ fi
 
 # ─────────────────────────────────────────────────
 # Method 1: Subscribe via URL query params
-#   Subscribe to LPR and channelStatus on connect
+#   Subscribe to LPR, channelStatus and notice on connect
+#   notice sends the current list once ("action":"snapshot", "notices":[...]),
+#   then "raised" / "updated" / "cleared" with one "notice".
+#   lang=ko-KR adds the Korean text to each notice's message object
+#   (message is keyed by language code; "en-US" is always present).
 #   Press Ctrl+C to disconnect
 # ─────────────────────────────────────────────────
 echo "=== Method 1: Subscribe via URL ==="
-echo "Connecting to ${WS_BASE}/wsapi/v1/events?topics=LPR,channelStatus"
+echo "Connecting to ${WS_BASE}/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=ko-KR"
 echo "Press Ctrl+C to disconnect"
 echo ""
 
 # -k: accept self-signed certs
-# --ping-interval 30: keep connection alive
 # -E: exit on EOF from server
 websocat -k -E \
   --header="X-API-Key: ${API_KEY}" \
-  "${WS_BASE}/wsapi/v1/events?topics=LPR,channelStatus"
+  "${WS_BASE}/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=ko-KR"
 
 # ─────────────────────────────────────────────────
 # Method 2: Dynamic subscribe/unsubscribe via send()
@@ -79,7 +82,7 @@ websocat -k -E \
 #     {"type":"unsubscribed","topic":"channelStatus"}
 #     {"type":"error","message":"...","topic":"..."}
 #
-#   To use interactively, pipe commands:
+#   To send commands, pipe them into websocat:
 # ─────────────────────────────────────────────────
 
 # Example: subscribe, wait for events, then unsubscribe
@@ -115,8 +118,16 @@ websocat -k -E \
 #     if [ "$topic" = "LPR" ]; then
 #       echo "$line" | jq -r '
 #         (.plates // [.])[] |
-#         "Plate: \(.plateNo)  Score: \(.score)"
+#         "Plate: \(.plateNo)  Score: \(.score)  id: \(.id // "-")  direction: \(.direction // "-")"
+#       '
+#     elif [ "$topic" = "notice" ]; then
+#       echo "$line" | jq -r '
+#         .action as $a | (if $a == "snapshot" then .notices[] else .notice end) |
+#         "Notice \($a): \(.severity) \(.message["ko-KR"] // .message["en-US"])"
 #       '
 #     fi
 #   done
+#
+# Each plate carries the record "id" (use it with POST /api/v1/lpr/log/{id}/plate)
+# and "direction" as a string ("entry" / "exit"), not a number.
 #

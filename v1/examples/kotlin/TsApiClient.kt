@@ -1,7 +1,7 @@
 /**
  * TS-API Examples - Shared HTTP Client
  *
- * Kotlin + Java 11+ java.net.http.HttpClient with JWT Bearer authentication.
+ * Kotlin + Java 11+ java.net.http.HttpClient with JWT Bearer token and API Key authentication.
  * No external dependencies required.
  *
  * Environment variables:
@@ -12,8 +12,8 @@
  *   NVR_PASS    - Login password    (default: 1234)
  *   NVR_API_KEY - API Key auth      (default: "")
  *
- * Compile: kotlinc TsApiClient.kt -include-runtime -d TsApiClient.jar
- * Usage:   NVR_HOST=192.168.0.100 kotlin V0_01_LoginKt TsApiClient.jar
+ * Compile: kotlinc TsApiClient.kt V1_02_Channels.kt -include-runtime -d V1_02_Channels.jar
+ * Usage:   NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... java -jar V1_02_Channels.jar
  */
 
 import java.net.URI
@@ -84,9 +84,8 @@ class TsApiClient {
     // -- Authentication (JWT Bearer token) --
 
     /**
-     * Login: POST /api/v1/auth/login with JSON body.
-     * On success (HTTP 200), parses accessToken and refreshToken from response and stores them.
-     * Returns true on success.
+     * Login: POST /api/v1/auth/login.
+     * On HTTP 200, stores accessToken and refreshToken. Returns true on success.
      */
     fun login(): Boolean {
         val auth = java.util.Base64.getEncoder().encodeToString("$user:$pass".toByteArray())

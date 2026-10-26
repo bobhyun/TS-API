@@ -9,6 +9,10 @@
     GET /api/v1/parking/spot          - Recognition zones (all types: spot, entrance, exit, noParking, recognition)
     GET /api/v1/parking/spot/status   - Status of each parking spot
     GET /api/v1/info?license          - License check (parkingHistory extension token)
+    GET /api/v1/parking/session        - Parking session history
+    GET /api/v1/parking/session/{id}   - One session with its payment history
+    GET /api/v1/parking/session/{id}/plate/history - Plate correction history of one session
+    POST /api/v1/parking/session/{id}/plate        - Correct the session plate (not executed here)
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -79,10 +83,11 @@ if ($statuses) {
 }
 
 # --- Parking Session History ---
-# A session opens when a vehicle is confirmed present and closes when it is gone.
-# Needs the parking history license - 403 without it. Ask /api/v1/info first: the
-# 'parkingHistory' extension token says whether the session endpoints will answer
-# (the array is omitted when no extension is active).
+# A session opens when a vehicle is confirmed present and closes when it
+# leaves. Requires the parking history license (403 without it).
+# Check /api/v1/info first: the `parkingHistory` extension token tells
+# whether the session endpoints are available. license.extension is
+# omitted when no extension is active.
 $info = Invoke-NvrGet '/api/v1/info?license'
 if (-not ($info.license.extension -contains 'parkingHistory')) {
     Write-Host "`nparking history license not found (no 'parkingHistory' in license.extension) - skipping session examples"
@@ -96,18 +101,20 @@ if ($open) {
     foreach ($row in $open.data) {
         $mins = [Math]::Floor($row.durationMs / 60000)
         $plate = if ($row.plateNo) { $row.plateNo } else { '(no plate)' }
-        Write-Host "  [$($row.id)] $($row.src.name) $plate ${mins}m"
+        $edited = if ($row.plateEdited) { ' (corrected)' } else { '' }
+        Write-Host "  [$($row.id)] $($row.src.name) $plate$edited ${mins}m"
     }
 }
 
 # --- Session Detail ---
-# outKind / outTimeMeans say HOW the exit time was decided. Only "observed" is a
-# measurement; the others are estimates whose error leans in different directions,
-# so bill from the basis, not from the number alone.
+# outKind / outTimeMeans tell how the exit time was determined.
+# Only "observed" is a measurement; the others are estimates that can err
+# in different directions, so bill from the basis, not from the time alone.
 #
-# inKind / inTimeMeans do the same for the entry, and the error leans the OTHER way:
-# firstSeen is an UPPER bound on the real entry (already there when observation
-# started). Unlike the exit basis it is present on OPEN sessions too.
+# inKind / inTimeMeans do the same for the entry, but err the opposite way:
+# firstSeen is an upper bound on the real entry (the vehicle was already
+# there when observation started). Unlike the exit basis, it is present
+# on open sessions too.
 Write-Host "`n=== Session Detail ==="
 $one = Invoke-NvrGet '/api/v1/parking/session?maxCount=1'
 if ($one -and $one.data.Count -gt 0) {
@@ -124,9 +131,10 @@ if ($one -and $one.data.Count -gt 0) {
 }
 
 # --- Scope: what the query is scoped to ---
-# Items omitted means "the whole scope", which is NOT the same as no filter:
-# scope=lot with no lot returns only sessions that belong to a parking lot, so
-# no-parking-zone history is excluded (it belongs to no lot).
+# Omitting the items means "the whole scope", not "no filter":
+# scope=lot without a lot list returns only sessions that belong to a
+# parking lot, so no-parking-zone sessions (which belong to no lot) are
+# excluded.
 Write-Host "`n=== Scope ==="
 foreach ($qs in @('scope=channel&ch=1,2', 'scope=lot', 'scope=noparking')) {
     $r = Invoke-NvrGet "/api/v1/parking/session?$qs&maxCount=5"
@@ -135,21 +143,21 @@ foreach ($qs in @('scope=channel&ch=1,2', 'scope=lot', 'scope=noparking')) {
 }
 
 # --- Video for a session: otherwise=nearBefore ---
-# A parked car does not move, so motion-triggered recording may have stopped
-# while it was still there. The car is in the same place, so the preceding
-# footage still shows the situation. Use this for parking history only.
-# An empty result means there is no usable recording at all (never recorded, or
-# already recycled) — the session snapshots remain available either way.
+# A parked car does not move, so motion-triggered recording may stop
+# while it is still there. Because the car stays in place, earlier
+# footage still shows it. Use otherwise=nearBefore for parking history only.
+# An empty result means no usable recording exists (never recorded, or
+# already recycled); the session snapshots are still available.
 Write-Host "`n=== Video at entry time (nearest earlier if none) ==="
 if ($one -and $one.data.Count -gt 0) {
     $d = Invoke-NvrGet "/api/v1/parking/session/$($one.data[0].id)"
-    # snapshots 는 시각 오름차순 배열이고 각 항목이 tags 를 든다 — 키로 꺼내지 않는다.
-    # 같은 뜻이 여러 장일 수 있어(베스트샷) 태그로 찾고 첫 항목을 쓴다.
+    # snapshots is a time-ordered array, not a map; each entry carries tags.
+    # Several shots can share a tag (best shots), so find by tag and use the first (earliest).
     $snaps = if ($d) { @($d.snapshots) } else { @() }
     $shot = $snaps | Where-Object { $_.tags -contains 'in' } | Select-Object -First 1
 
-    # 어느 샷이 번호를 읽어냈나. bestshot = 시도, plate = 성공.
-    # 실패한 샷도 사진은 남는다(plateNo 는 null) — 나중에 사람이 확인할 수 있다.
+    # Which shots read the plate: bestshot = attempted, plate = succeeded.
+    # A failed shot keeps its image (plateNo is null) so a person can review it later.
     Write-Host "  snapshots:"
     foreach ($x in $snaps) {
         $t = if ($x.time) { $x.time } else { 'now' }
@@ -165,15 +173,17 @@ if ($one -and $one.data.Count -gt 0) {
 }
 
 # --- Which car is it? the bounding box ---
-# A snapshot can hold several cars. `box` points at the one this session is about.
-# YOLO style: center based, all four values 0..1 (see 1.2), so you multiply by the
-# size of whatever you draw on. Entrance/exit sessions carry no vehicle box
-# (a single plate read) and the value is null; the key is always present.
+# A snapshot can contain several cars; `box` marks the one this session
+# is about. YOLO style: center-based, all four values in 0..1 (see 1.2).
+# Multiply by the size of the surface you draw on; the internal
+# coordinate space does not matter.
+# Entrance/exit sessions have no vehicle box (a single plate read):
+# the value is null, but the key is always present.
 Write-Host "`n=== Bounding box of the session vehicle ==="
 if ($one -and $one.data.Count -gt 0) {
     $s = Invoke-NvrGet "/api/v1/parking/session/$($one.data[0].id)"
     if ($s -and $s.box) {
-        $W = 1920; $H = 1080        # 그릴 대상 크기
+        $W = 1920; $H = 1080        # drawing surface size
         $left = [int](($s.box.cx - $s.box.w / 2) * $W)
         $top = [int](($s.box.cy - $s.box.h / 2) * $H)
         Write-Host "  box = cx=$($s.box.cx) cy=$($s.box.cy) w=$($s.box.w) h=$($s.box.h)"
@@ -182,17 +192,40 @@ if ($one -and $one.data.Count -gt 0) {
     else { Write-Host "  (no box for this session)" }
 }
 
+# --- Plate correction history ---
+# Only the session's representative plate (plateNo) is corrected; per-shot
+# readings (snapshots[].plateNo) are kept as evidence.
+# Reading requires Playback permission.
+Write-Host "`n=== Plate correction history ==="
+if ($one -and $one.data.Count -gt 0) {
+    $h = Invoke-NvrGet "/api/v1/parking/session/$($one.data[0].id)/plate/history"
+    if ($h) {
+        $orig = if ($null -ne $h.originalPlateNo) { $h.originalPlateNo } else { '(never corrected)' }
+        Write-Host "  session=$($h.id) plateNo=$($h.plateNo) original=$orig"
+        foreach ($e in $h.edits) {
+            Write-Host "    $($e.time) $($e.user): $($e.before) -> $($e.after) $($e.reason)"
+        }
+    }
+}
+
 # --- Writing history (Control permission) ---
-# Both change stored history, so they are not executed here.
+# These calls change stored history, so they are not executed here.
 # Payment state (16.7): commit settles it, exempt records a decision not to
-# collect, undo reverts the most recent change (the response says which one).
+# collect, and undo reverts the most recent change (the response says which).
 # Records are appended, never deleted.
 #
-# close (16.8) is a different axis: it clears the lingering "parked" state left
-# when an exit was never observed. Exempt takes a session out of billing and may
-# leave it parked; close ends the session. Do not conflate the two.
+# close (16.8) is separate: it ends a session whose exit was never observed
+# and would otherwise stay "parked". exempt removes a session from billing
+# but may leave it parked; close ends it. Do not confuse the two.
 #
 #   Invoke-NvrPost "/api/v1/parking/session/$id/payment/commit?ref=POS-0042"
 #   Invoke-NvrPost "/api/v1/parking/session/$id/payment/exempt"
 #   Invoke-NvrPost "/api/v1/parking/session/$id/payment/undo"
 #   Invoke-NvrPost "/api/v1/parking/session/$id/close"
+#
+# Plate correction (16.9): one session by id; no bulk correction or merging.
+# Payments stay with the session. Returns 409 when plateNo equals the current plate.
+#
+# Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+# Uncomment it to try it against a test record.
+#   Invoke-NvrPost "/api/v1/parking/session/$id/plate" @{ plateNo = '12A3456'; reason = 'misread at night' }

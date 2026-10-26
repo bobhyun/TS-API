@@ -4,12 +4,13 @@
 //   GET /api/v1/lpr/source                                            - LPR source list
 //   GET /api/v1/lpr/log?timeBegin=...&timeEnd=...                     - Plate number search
 //   GET /api/v1/lpr/similar?keyword=...&timeBegin=...&timeEnd=...     - Similar plate search
+//   GET /api/v1/lpr/log/{id}/plate/history                            - Plate correction history (Playback)
+//   POST /api/v1/lpr/log/{id}/plate                                   - Correct one record's plate (Control, not executed here)
 //
 // Note: timeBegin and timeEnd are REQUIRED parameters.
 //
-// WARNING: Exporting large datasets (10,000+ records) may cause HTTP timeout
-//   errors. For bulk exports, narrow the time range or use pagination
-//   (at/maxCount) to keep each request under a manageable size.
+// WARNING: Large exports (10,000+ records) can hit HTTP timeouts.
+//   Narrow the time range or page with at/maxCount.
 
 using System;
 using System.Text.Json;
@@ -71,10 +72,23 @@ namespace TsApiExamples.V1
             Console.WriteLine($"  Results: {totalCount}");
 
             int shown = 0;
+            long firstId = 0;
             foreach (var item in results.EnumerateArray())
             {
                 if (++shown > 5) break;
-                Console.WriteLine($"  [{shown}] {item}");
+                // plateNo is null when no plate was read; direction is "entry"/"exit" or absent
+                long id = item.GetProperty("id").GetInt64();
+                if (firstId == 0) firstId = id;
+                var plateNo = item.TryGetProperty("plateNo", out var pn) && pn.ValueKind == JsonValueKind.String && pn.GetString() != ""
+                    ? pn.GetString() : "(unrecognized)";
+                var direction = item.TryGetProperty("direction", out var dir) ? dir.GetString() : "-";
+                var line = $"  [{id}] plateNo={plateNo} direction={direction}";
+                if (item.TryGetProperty("plateEdited", out var pe) && pe.GetBoolean())
+                {
+                    var orig = item.TryGetProperty("originalPlateNo", out var op) ? op.GetString() : "";
+                    line += $" (corrected, originally {(string.IsNullOrEmpty(orig) ? "(unrecognized)" : orig)})";
+                }
+                Console.WriteLine(line);
             }
             if (totalCount > 5)
                 Console.WriteLine($"  ... {totalCount - 5} more");
@@ -91,7 +105,7 @@ namespace TsApiExamples.V1
                 return;
             }
 
-            // Response: flat array of plate strings (e.g. ["12A3456", "78B9012"])
+            // Response: array of plate strings, most recent first (e.g. ["12A3456", "78B9012"])
             using var smdoc = await NvrClient.ReadJsonAsync(smr);
             var simRoot = smdoc.RootElement;
             var simResults = simRoot.ValueKind == JsonValueKind.Array
@@ -105,6 +119,42 @@ namespace TsApiExamples.V1
                 if (++shown > 5) break;
                 Console.WriteLine($"  [{shown}] {item}");
             }
+
+            // ── Plate correction history (one record, by id) ──
+            // plateNo in the log is always the current value.
+            // edits[] lists corrections in recorded order; it is empty if the record was never corrected.
+            if (firstId > 0)
+            {
+                Console.WriteLine($"\n=== Plate Correction History (id={firstId}) ===");
+                var hr = await client.GetAsync($"/api/v1/lpr/log/{firstId}/plate/history");
+                if (hr.IsSuccessStatusCode)
+                {
+                    using var hdoc = await NvrClient.ReadJsonAsync(hr);
+                    var h = hdoc.RootElement;
+                    var orig = h.TryGetProperty("originalPlateNo", out var op) ? op.GetString() : "(never corrected)";
+                    Console.WriteLine($"  plateNo={h.GetProperty("plateNo").GetString()} original={orig}");
+                    foreach (var e in h.GetProperty("edits").EnumerateArray())
+                    {
+                        Console.WriteLine($"    {e.GetProperty("time").GetString()} {e.GetProperty("user").GetString()}: " +
+                            $"{e.GetProperty("before").GetString()} -> {e.GetProperty("after").GetString()} " +
+                            $"{e.GetProperty("reason").GetString()}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"  Failed: {(int)hr.StatusCode}");
+                }
+            }
+
+            // ── Plate correction (Control permission) ──
+            // Changes the stored record, so it is not executed here. The target is always
+            // one record id - from data[].id above, or the id a realtime LPR event carries
+            // next to each plateNo. 409 when plateNo equals the current plate.
+            //
+            // Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+            // Uncomment it to try it against a test record.
+            //   await client.PostJsonAsync($"/api/v1/lpr/log/{firstId}/plate",
+            //       new { plateNo = "12가3456", reason = "misread at night" });
         }
     }
 }

@@ -2,7 +2,7 @@
 
 [English](README.md) | **한국어**
 
-TS-API v1 RESTful API를 PowerShell로 제공하는 코드 예제입니다. 각 예제는 **API Key** (`X-API-Key` 헤더) 인증 방식으로 독립 실행됩니다.
+TS-API v1 RESTful API를 사용하는 PowerShell 코드 예제입니다. 각 예제는 **API Key** (`X-API-Key` 헤더) 인증으로 독립 실행됩니다.
 
 > **API 레퍼런스**: [tsapi-v1.ko.md](../../tsapi-v1.ko.md)
 
@@ -44,9 +44,9 @@ $r2 = Invoke-RestMethod -Uri 'https://SERVER/api/v1/auth/apikey' `
 $env:NVR_API_KEY = $r2.key
 ```
 
-> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하세요.
+> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하십시오.
 >
-> API Key는 생성 시 한 번만 표시됩니다. 안전하게 보관하세요.
+> API Key는 생성 시 한 번만 표시됩니다. 안전하게 보관하십시오.
 
 ## 환경 변수
 
@@ -81,9 +81,9 @@ pwsh 12-websocket-events.ps1
 | [`03-ptz-control.ps1`](03-ptz-control.ps1) | PTZ 홈/이동/정지/줌/포커스/아이리스/프리셋 |
 | [`04-recording-search.ps1`](04-recording-search.ps1) | 녹화 일/분 검색 |
 | [`05-event-log.ps1`](05-event-log.ps1) | 이벤트 유형 및 로그 검색 (페이지네이션) |
-| [`06-lpr-search.ps1`](06-lpr-search.ps1) | LPR 소스, 로그, 키워드, 유사번호 검색 |
+| [`06-lpr-search.ps1`](06-lpr-search.ps1) | LPR 소스, 로그, 키워드, 유사번호 검색, 번호 수정 이력 |
 | [`07-vod-stream.ps1`](07-vod-stream.ps1) | 실시간/녹화 스트림 URL |
-| [`08-system-info.ps1`](08-system-info.ps1) | 서버/시스템 정보, 건강도, HDD SMART |
+| [`08-system-info.ps1`](08-system-info.ps1) | 서버/시스템 정보, 상태 점검(health), 시스템 디스크, 알림, HDD SMART |
 | [`09-push.ps1`](09-push.ps1) | LPR 푸시, 비상호출 푸시 |
 | [`10-parking.ps1`](10-parking.ps1) | 주차장/주차면 관리 |
 | [`11-emergency.ps1`](11-emergency.ps1) | 비상호출 장치 목록 |

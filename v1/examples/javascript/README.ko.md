@@ -25,7 +25,7 @@ curl -sk -X POST https://SERVER/api/v1/auth/apikey \
 export NVR_API_KEY=tsapi_key_...
 ```
 
-> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하세요.
+> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하십시오.
 
 ## 환경 변수
 
@@ -57,7 +57,7 @@ NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... node 02-channels.js
 | [`03-ptz-control.js`](03-ptz-control.js) | PTZ 카메라 제어 |
 | [`04-recording-search.js`](04-recording-search.js) | 녹화 구간 검색 |
 | [`05-event-log.js`](05-event-log.js) | 이벤트 로그 조회 |
-| [`06-lpr-search.js`](06-lpr-search.js) | 차번 인식 검색 |
+| [`06-lpr-search.js`](06-lpr-search.js) | 차량 번호 인식 검색 |
 | [`07-vod-stream.js`](07-vod-stream.js) | VOD 스트림 URL (RTMP, FLV) |
 | [`08-system-info.js`](08-system-info.js) | 시스템 상태 |
 | [`09-push-notification.js`](09-push-notification.js) | 외부 이벤트 푸시 |

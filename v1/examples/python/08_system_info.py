@@ -11,9 +11,12 @@ Endpoints:
   GET /api/v1/system/info?item=network  - Network interfaces
 
   GET /api/v1/system/health             - System health status
+  GET /api/v1/system/health?item=systemDisk
+                                        - System disk (database and logs) status
   GET /api/v1/system/hddsmart           - HDD S.M.A.R.T. data
+  GET /api/v1/system/notices?lang=ko-KR - Notices currently in effect
 
-Note: The 'storage' query returns data with the response field named 'disk'.
+Note: item=storage returns its data in the 'disk' field (NOT 'storage').
 """
 
 import os
@@ -73,6 +76,36 @@ def main():
     r = client.get('/api/v1/system/health')
     if r.status_code == 200:
         print(f"  {json.dumps(r.json(), indent=2, ensure_ascii=False)}")
+
+    # --- System Disk ---
+    # Holds the database and logs (normally C:), separate from the recording disks.
+    # When it is full, records stop being saved even if the recording disks have room.
+    # Watch status here, not only disk[].
+    print("\n=== System Disk ===")
+    r = client.get('/api/v1/system/health?item=systemDisk')
+    if r.status_code == 200:
+        sd = r.json().get('systemDisk', {})
+        print(f"  drive={sd.get('drive')} free={sd.get('freeSpace')}/{sd.get('totalSpace')} "
+              f"status={sd.get('status')} dataWriteFailed={sd.get('dataWriteFailed')}")
+    else:
+        print(f"  Status: {r.status_code}")
+
+    # --- System Notices ---
+    # Conditions in effect right now (raised, updated, cleared).
+    # message is keyed by language code: en-US is always present,
+    # plus the requested lang when it is not English.
+    print("\n=== System Notices ===")
+    lang = 'ko-KR'
+    r = client.get('/api/v1/system/notices', params={'lang': lang})
+    if r.status_code == 200:
+        notices = r.json()
+        if not notices:
+            print("  (no notices)")
+        for n in notices:
+            msg = n['message']
+            print(f"  [{n['severity']}] {n['kind']}: {msg.get(lang, msg['en-US'])}")
+    else:
+        print(f"  Status: {r.status_code}")
 
     # --- HDD S.M.A.R.T. ---
     print("\n=== HDD S.M.A.R.T. ===")

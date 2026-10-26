@@ -1,10 +1,10 @@
 """
 12_websocket_events.py - TS-API v1 WebSocket Real-time Event Subscription
 
-Subscribes to real-time events (LPR, channelStatus, etc.) via WebSocket.
+Subscribes to real-time events (LPR, channelStatus, notice, etc.) via WebSocket.
 
 Two subscription modes:
-  1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+  1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
   2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
 
 Endpoint:
@@ -39,6 +39,31 @@ except ImportError:
     print('REQUIRES: pip install websockets')
     sys.exit(1)
 
+LANG = 'ko-KR'
+
+
+def print_event(msg):
+    """Print LPR and notice events by field; other topics as raw JSON."""
+    topic = msg.get('topic')
+    if topic == 'LPR':
+        # id: record id for plate correction (absent when the record could not be saved)
+        # direction: "entry" / "exit" (absent when unknown)
+        for p in msg.get('plates') or [msg]:
+            print(f'  [LPR] id={p.get("id", "-")} plateNo={p.get("plateNo")} '
+                  f'score={p.get("score")} direction={p.get("direction", "-")}')
+    elif topic == 'notice':
+        # snapshot: current list once after subscribing; raised/updated/cleared: one notice
+        # message is keyed by language code: en-US always, plus the requested lang
+        notices = msg.get('notices', []) if msg.get('action') == 'snapshot' else [msg.get('notice', {})]
+        if not notices:
+            print('  [notice] snapshot: (no notices)')
+        for n in notices:
+            text = n.get('message', {})
+            print(f'  [notice] {msg.get("action")} {n.get("id")} {n.get("severity")}: '
+                  f'{text.get(LANG, text.get("en-US"))}')
+    else:
+        print(f'  [{topic or msg.get("type", "?")}] {json.dumps(msg)}')
+
 
 async def main():
     client = NvrClient()
@@ -52,7 +77,7 @@ async def main():
     # ── Method 1: Subscribe via URL query params (classic) ──
     print('=== Method 1: Subscribe via URL (10 seconds) ===')
 
-    ws_url = f'{WS_URL}/wsapi/v1/events?topics=LPR,channelStatus&apikey={NVR_API_KEY}'
+    ws_url = f'{WS_URL}/wsapi/v1/events?topics=LPR,channelStatus,notice&lang={LANG}&apikey={NVR_API_KEY}'
     messages = []
 
     try:
@@ -65,7 +90,7 @@ async def main():
                         try:
                             msg = json.loads(data)
                             messages.append(msg)
-                            print(f'  [{msg.get("topic", msg.get("type", "?"))}] {json.dumps(msg)}')
+                            print_event(msg)
                         except json.JSONDecodeError:
                             print(f'  Raw: {data}')
                 except websockets.ConnectionClosed:
@@ -119,7 +144,7 @@ async def main():
                                 continue
 
                             # Handle event data
-                            print(f'  [{msg.get("topic", "?")}] {json.dumps(msg)}')
+                            print_event(msg)
                         except json.JSONDecodeError:
                             print(f'  Raw: {data}')
                 except websockets.ConnectionClosed:
@@ -139,7 +164,7 @@ async def main():
                 print('  [Phase 3] Unsubscribe channelStatus + add motionChanges (ch 1) + reduce LPR to ch 1,3')
                 await ws.send(json.dumps({'unsubscribe': 'channelStatus'}))
                 await ws.send(json.dumps({'subscribe': 'motionChanges', 'ch': [1]}))
-                await ws.send(json.dumps({'subscribe': 'LPR', 'ch': [1, 3]}))  # re-subscribe with fewer ch drops ch 2,4
+                await ws.send(json.dumps({'subscribe': 'LPR', 'ch': [1, 3]}))  # re-subscribe replaces the filter (drops ch 2,4)
 
                 await asyncio.sleep(4)
                 recv_task.cancel()
@@ -174,4 +199,7 @@ if __name__ == '__main__':
 #       plates = msg.get('plates') or [msg]
 #       for p in plates:
 #           print(f"Plate: {p.get('plateNo')}  Score: {p.get('score')}")
+#
+# Each plate carries the record "id" (use it with POST /api/v1/lpr/log/{id}/plate)
+# and "direction" as a string ("entry" / "exit"), not a number.
 #

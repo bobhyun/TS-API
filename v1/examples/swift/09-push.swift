@@ -30,7 +30,7 @@ struct App {
 
     // -------------------------------------------------
     // 1. LPR Push
-    //    External LPR camera sends recognized plate number
+    //    An external LPR camera reports a recognized plate
     // -------------------------------------------------
     print("=== LPR Push ===")
 
@@ -50,12 +50,12 @@ struct App {
 
     // -------------------------------------------------
     // 2. Emergency Call Push
-    //    Sends alarm start/stop events from emergency call device
+    //    Alarm start/stop events from an emergency call device
     //
     //    IMPORTANT:
-    //    - callStart triggers actual alarm bell
+    //    - callStart rings the actual alarm bell
     //    - Always send callEnd to stop the alarm
-    //    - camera field links to NVR channels for popup
+    //    - camera: NVR channels to pop up
     // -------------------------------------------------
     print("\n=== Emergency Call Push ===")
 

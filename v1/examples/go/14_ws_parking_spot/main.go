@@ -12,14 +12,14 @@
 // Optional filters (OR logic): &ch=1,2  &lot=1,2  &spot=100,200
 //
 // Events:
-//   currentStatus  - initial full state on connect
-//   statusChanged  - only changed spots
+//   currentStatus  - full state on connect (all zone types)
+//   statusChanged  - changed spots only (type="spot")
 //
 // See also: 13_ws_parking_lot for lot-level count monitoring
 //
 // REQUIRES: go get github.com/gorilla/websocket
 //
-// Run: cd examples/go && go run ./v1/14_ws_parking_spot/
+// Run: cd go && go run ./14_ws_parking_spot
 package main
 
 import (

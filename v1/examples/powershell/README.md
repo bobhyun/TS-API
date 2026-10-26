@@ -22,7 +22,7 @@ winget install Microsoft.PowerShell
 
 ## API Key Setup
 
-All examples (except `01-login.ps1`) require an API Key. Issue one using `curl` or PowerShell:
+All examples except `01-login.ps1` require an API Key. Create one with `curl` or PowerShell:
 
 ```powershell
 # 1. Login as admin to get a JWT token
@@ -81,9 +81,9 @@ pwsh 12-websocket-events.ps1
 | [`03-ptz-control.ps1`](03-ptz-control.ps1) | PTZ home/move/stop/zoom/focus/iris/preset |
 | [`04-recording-search.ps1`](04-recording-search.ps1) | Recording days and minutes search |
 | [`05-event-log.ps1`](05-event-log.ps1) | Event types and log search with pagination |
-| [`06-lpr-search.ps1`](06-lpr-search.ps1) | LPR sources, log, keyword, similar plate search |
+| [`06-lpr-search.ps1`](06-lpr-search.ps1) | LPR sources, log, keyword, similar plate search, plate correction history |
 | [`07-vod-stream.ps1`](07-vod-stream.ps1) | Live/recording stream URLs |
-| [`08-system-info.ps1`](08-system-info.ps1) | Server/system info, health, HDD SMART |
+| [`08-system-info.ps1`](08-system-info.ps1) | Server/system info, health, system disk, notices, HDD SMART |
 | [`09-push.ps1`](09-push.ps1) | LPR push, emergency call push |
 | [`10-parking.ps1`](10-parking.ps1) | Parking lot/spot management |
 | [`11-emergency.ps1`](11-emergency.ps1) | Emergency call device list |
@@ -97,6 +97,6 @@ pwsh 12-websocket-events.ps1
 - **SSL**: PowerShell 7+ uses `-SkipCertificateCheck` splatting. Windows PowerShell 5.1 uses `TrustAllCertsPolicy` for self-signed certificates.
 - **WebSocket**: Uses `System.Net.WebSockets.ClientWebSocket` (built-in .NET class, no external dependencies).
 - **Korean text**: Console encoding is set to UTF-8 automatically in `config.ps1`.
-- **Authentication**: `01-login.ps1` uses JWT (username/password). All other examples use API Key.
+- **Authentication**: `01-login.ps1` uses JWT (username/password). All other examples use an API Key.
 - Channel IDs are **1-based** (e.g., channel 1, 2, 3...).
 - Time format: **ISO 8601** (e.g., `2026-01-15T10:30:00`).

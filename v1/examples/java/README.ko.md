@@ -24,7 +24,7 @@ curl -sk -X POST https://SERVER/api/v1/auth/apikey \
 export NVR_API_KEY=tsapi_key_...
 ```
 
-> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하세요.
+> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하십시오.
 
 ## 환경 변수
 
@@ -52,7 +52,7 @@ NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... java NvrClient.java V1_02_Chann
 | [`V1_03_PtzControl.java`](V1_03_PtzControl.java) | PTZ 카메라 제어 |
 | [`V1_04_RecordingSearch.java`](V1_04_RecordingSearch.java) | 녹화 구간 검색 |
 | [`V1_05_EventLog.java`](V1_05_EventLog.java) | 이벤트 로그 조회 |
-| [`V1_06_LprSearch.java`](V1_06_LprSearch.java) | 차번 인식 검색 |
+| [`V1_06_LprSearch.java`](V1_06_LprSearch.java) | 차량 번호 인식 검색 |
 | [`V1_07_VodStream.java`](V1_07_VodStream.java) | VOD 스트림 URL (RTMP, FLV) |
 | [`V1_08_SystemInfo.java`](V1_08_SystemInfo.java) | 시스템 상태 |
 | [`V1_09_Push.java`](V1_09_Push.java) | 외부 이벤트 푸시 |

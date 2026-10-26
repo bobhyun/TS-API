@@ -1,7 +1,7 @@
-// 07_vod - Live/recording stream URL query (VOD stream URLs)
-// Stream URLs are in the "src" field of the response (differs from v0's "streams").
+// 07_vod - Live and recorded stream URLs
+// Stream URLs are in the "src" field (v0 used "streams").
 //
-// Run: cd examples/go && go run ./v1/07_vod/
+// Run: cd go && go run ./07_vod
 package main
 
 import (
@@ -19,13 +19,12 @@ func main() {
 	client := tsapi.NewClient(cfg)
 	client.SetApiKey(cfg.ApiKey)
 
-	// ── 1. All channels live stream URLs ──
+	// ── 1. Live stream URLs for all channels ──
 	fmt.Println("=== GET /api/v1/vod ===")
 	r, err := client.Get("/api/v1/vod")
 	if err != nil {
 		log.Fatal(err)
 	}
-	// v1 response: src field (differs from v0's streams)
 	var vods []struct {
 		Chid  int    `json:"chid"`
 		Title string `json:"title"`
@@ -49,7 +48,7 @@ func main() {
 		fmt.Printf("  CH%d: %s\n", v.Chid, v.Src.RTMP)
 	}
 
-	// ── 3. Stream type filter (sub-stream = low resolution) ──
+	// ── 3. Stream filter (sub = low resolution) ──
 	fmt.Println("\n=== GET /api/v1/vod?stream=sub ===")
 	r, _ = client.Get("/api/v1/vod?stream=sub")
 	r.JSON(&vods)
@@ -57,7 +56,7 @@ func main() {
 		fmt.Printf("  CH%d sub: RTMP=%s\n", v.Chid, v.Src.RTMP)
 	}
 
-	// ── 4. Specific channel + protocol combination ──
+	// ── 4. Channel + protocol + stream filters combined ──
 	fmt.Println("\n=== GET /api/v1/vod?ch=1&protocol=flv&stream=main ===")
 	r, _ = client.Get("/api/v1/vod?ch=1&protocol=flv&stream=main")
 	r.JSON(&vods)
@@ -65,7 +64,7 @@ func main() {
 		fmt.Printf("  CH%d main FLV: %s\n", v.Chid, v.Src.FLV)
 	}
 
-	// ── 5. Recording playback (specific time) ──
+	// ── 5. Recorded video at a given time ──
 	fmt.Println("\n=== GET /api/v1/vod?ch=1&when=2024-01-08T09:30:00 ===")
 	r, _ = client.Get("/api/v1/vod?ch=1&when=2024-01-08T09:30:00")
 	fmt.Println("playback:", r.String())

@@ -2,14 +2,12 @@
  * v1 API - Authentication Methods
  *
  * Three authentication methods:
- *   1. Session Login   - POST /api/v1/auth/login (JSON body, cookie-based)
- *   2. JWT Token       - POST /api/v1/auth/login (JSON body)
- *   3. API Key         - X-API-Key header (v1 endpoints only)
+ *   1. Client login - NvrClient logs in with JWT and sends the Bearer token automatically
+ *   2. JWT          - POST /api/v1/auth/login; manage accessToken/refreshToken yourself
+ *   3. API Key      - X-API-Key header, for external integrations
  *
- * IMPORTANT: JWT tokens only work on /api/v1/auth/* endpoints.
- *            For data endpoints (channel, event, etc.), use Legacy Session or API Key.
- * IMPORTANT: API Key authentication is supported on v1 endpoints only.
- *            v0 endpoints (/api/*) reject X-API-Key with 401 Unauthorized.
+ * NOTE: v1 endpoints accept a JWT Bearer token or an API Key. Session cookies are not supported.
+ * NOTE: v0 endpoints (/api/*) reject X-API-Key with 401.
  *
  * Compile: javac NvrClient.java V1_01_Login.java
  * Run:     java V1_01_Login
@@ -23,8 +21,8 @@ public class V1_01_Login {
     }
 
     /**
-     * Method 1: Session Login (POST with JSON body).
-     * Login via POST /api/v1/auth/login. Server sets a session cookie.
+     * Method 1: Client login.
+     * NvrClient stores the JWT and sends it as a Bearer token.
      */
     static void demoSessionLogin() throws Exception {
         System.out.println("=== Session Login ===");
@@ -35,11 +33,11 @@ public class V1_01_Login {
         System.out.println("Login: " + (ok ? "OK" : "FAILED"));
 
         if (ok) {
-            // Session cookie is set; data endpoints are accessible
+            // Token is stored; data endpoints are accessible
             NvrClient.Response r = client.get("/api/v1/channel");
             System.out.println("GET /api/v1/channel -> " + r.status);
 
-            // Always logout to release session
+            // Log out to revoke the refreshToken
             client.logout();
             System.out.println("Logged out");
         }
@@ -48,7 +46,7 @@ public class V1_01_Login {
     /**
      * Method 2: JWT Token (accessToken + refreshToken).
      * POST /api/v1/auth/login    -> {accessToken, refreshToken, expiresIn, tokenType}
-     * POST /api/v1/auth/refresh  -> {accessToken, expiresIn, tokenType}
+     * POST /api/v1/auth/refresh  -> {accessToken, refreshToken, expiresIn, tokenType} (rotates refreshToken)
      * POST /api/v1/auth/logout   (revoke refreshToken)
      */
     static void demoJwt() throws Exception {
@@ -68,7 +66,7 @@ public class V1_01_Login {
         System.out.println("Access Token:  " + accessToken.substring(0, 30) + "...");
         System.out.println("Refresh Token: " + refreshToken.substring(0, 30) + "...");
 
-        // 2) Refresh accessToken using refreshToken
+        // 2) Refresh accessToken
         NvrClient.Response rr = client.jwtRefresh(refreshToken);
         if (rr.status == 200) {
             String newToken = rr.body.split("\"accessToken\":\"")[1].split("\"")[0];
@@ -81,18 +79,18 @@ public class V1_01_Login {
     }
 
     /**
-     * Method 3: API Key (Create -> Use -> List -> Delete).
+     * Method 3: API Key (create -> use -> list -> delete).
      *
-     * POST /api/v1/auth/apikey        (Create, requires admin JWT)
-     * X-API-Key header                (Use, v1 endpoints only. v0 rejects with 401)
-     * GET /api/v1/auth/apikey         (List)
-     * DELETE /api/v1/auth/apikey/{id} (Delete)
+     * POST /api/v1/auth/apikey        (create, requires admin JWT)
+     * X-API-Key header                (use, v1 endpoints only)
+     * GET /api/v1/auth/apikey         (list)
+     * DELETE /api/v1/auth/apikey/{id} (delete)
      */
     static void demoApiKey() throws Exception {
         System.out.println("\n=== API Key ===");
         NvrClient client = new NvrClient();
 
-        // 1) Obtain admin token via JWT login
+        // 1) Get an admin token via JWT login
         NvrClient.Response jr = client.jwtLogin();
         if (jr.status != 200) {
             System.out.println("JWT login failed: " + jr.status);
@@ -121,7 +119,7 @@ public class V1_01_Login {
         System.out.println("  Key ID: " + keyId);
         System.out.println("  API Key: " + apiKey.substring(0, 24) + "...");
 
-        // 3) Access data endpoints with API Key (no login required)
+        // 3) Call a data endpoint with the API Key (no login required)
         req = client.requestBuilder("/api/v1/channel")
                 .header("X-API-Key", apiKey)
                 .GET()

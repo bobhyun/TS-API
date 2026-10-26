@@ -1,14 +1,12 @@
 // 04_RecordingSearch.cs - v1 API Recording Search Example
 //
-// v1 API searches recording data with RESTful path-style endpoints.
-//
 // Endpoints:
 //   GET /api/v1/recording/days?ch={chid}
 //       -> List of dates with recordings
 //       -> Response: {data: [{chid, data: [{year, month, days: [1,5,...]}]}]}
 //   GET /api/v1/recording/minutes?ch={chid}&timeBegin=...&timeEnd=...
 //       -> JSON: {data: [{chid, minutes: "010101..."}]}
-//       -> minutes: 1440-char string (each char = 1 minute, '0'=no rec, '1'=has rec)
+//       -> minutes: one char per minute ('1'=recorded, '0'=not recorded); 1440 chars per day
 
 using System;
 using System.Text.Json;

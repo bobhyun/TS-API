@@ -4,7 +4,7 @@
 # Demonstrates:
 #   - List channels (basic info, static source, capabilities)
 #   - Channel status (connection state, recording status)
-#   - Channel detailed info
+#   - Single channel info
 #
 # Usage:
 #   NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... bash 02-channels.sh
@@ -32,7 +32,7 @@ echo "=== Channel List ==="
 
 # ─────────────────────────────────────────────────
 # 2. List Channels with static source URLs
-#    ?staticSrc includes camera source configuration
+#    ?staticSrc adds a src array of stream URLs
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Channel List with Sources ==="
@@ -40,7 +40,7 @@ echo "=== Channel List with Sources ==="
 
 # ─────────────────────────────────────────────────
 # 3. List Channels with capabilities
-#    ?caps includes PTZ capabilities (pantilt, zoom, relay)
+#    ?caps includes camera capabilities (PTZ, relay outputs, etc.)
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Channel Capabilities ==="
@@ -48,7 +48,7 @@ echo "=== Channel Capabilities ==="
 
 # ─────────────────────────────────────────────────
 # 4. Channel Status
-#    ?recordingStatus includes recording state
+#    ?recordingStatus adds the recording flag
 #    Status codes: 0=Connected, -1=Disconnected, -2=Connecting, -3=Auth Failed
 # ─────────────────────────────────────────────────
 echo ""

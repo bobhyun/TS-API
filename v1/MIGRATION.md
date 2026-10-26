@@ -17,11 +17,11 @@
 
 ## 1. Overview
 
-v1 API has been changed to RESTful path-based. The existing v0 API is still supported and can be optionally enabled/disabled through server settings.
+The v1 API uses a RESTful, path-based design. The v0 API is still supported and can be enabled or disabled in the server settings.
 
 ### Legacy API (v0) Settings
 
-You can control whether the v0 API is available from server settings:
+You can enable or disable the v0 API in the server settings:
 
 | Setting | Behavior |
 |---------|----------|
@@ -172,7 +172,7 @@ Setting location: **Web Admin** → **Server Settings** → **API** tab
 |----|-----|
 | `ws:///wsapi/dataExport?ch=1&timeBegin=...&timeEnd=...` | `ws:///wsapi/v1/export?ch=1&timeBegin=...&timeEnd=...` |
 
-> **Auth change**: v0 uses `auth=base64(user:pass)` query parameter, while v1 uses `token={JWT}` or `apikey={key}` query parameter.
+> **Auth change**: v0 uses the `auth=base64(user:pass)` query parameter. v1 uses the `token={JWT}` or `apikey={key}` query parameter.
 
 ---
 
@@ -238,11 +238,11 @@ requests.post(f'{base}/api/v1/system/restart')
    - v0: `/api/channel/ptz?ch=1`
    - v1: `/api/v1/channel/1/ptz`
 
-2. **RESTful HTTP Methods**: Uses appropriate HTTP methods for state-changing operations
+2. **RESTful HTTP Methods**: State-changing operations use the appropriate HTTP method
    - v0: `GET /api/system?restart`
    - v1: `POST /api/v1/system/restart`
 
-3. **Resource-oriented URLs**: Resource-oriented URL structure
+3. **Resource-oriented URLs**: URLs identify resources directly
    - v0: `/api/enum?what=channel`
    - v1: `/api/v1/channel`
 
@@ -253,20 +253,20 @@ requests.post(f'{base}/api/v1/system/restart')
 5. **Response URL format**: Absolute URLs in v0, relative URLs in v1
    - v0 (legacy): `"image": "http://nvr.example.com/storage/..."`, `"videoSrc": "http://nvr.example.com/watch?ch=1&when=..."`
    - v1: `"image": "/storage/..."`, `"videoSrc": "/watch?ch=1&when=..."`
-   - The host for v0 absolute URLs comes from the **Canonical Host** setting (Web Admin → Server Settings → API) when configured, otherwise falls back to the request's `X-Host` header.
-   - v1 returns relative URLs so clients can prepend their own base URL — useful behind reverse proxies or in cross-origin scenarios.
+   - The host for v0 absolute URLs comes from the **Canonical Host** setting (Web Admin → Server Settings → API). If that setting is not configured, the request's `X-Host` header is used.
+   - v1 returns relative URLs so that clients can prepend their own base URL. This is useful behind reverse proxies or in cross-origin scenarios.
 
 6. **Response field name notes** (same for v0/v1):
    - Channel list: `title` (channel name), `displayName` (display name, `"CH{N}. {title}"` format)
    - VOD response: stream URLs are in the `src` field (e.g., `src.rtmp`, `src.flv`)
    - Event types: `id` (type ID), `code` (sub-code array)
-   - System info: response field name is `disk` when requesting `item=storage`
+   - System info: the response field is named `disk` when `item=storage` is requested
 
 ---
 
 ## 6. Authentication Notes
 
-v1 API supports **JWT Bearer Token** and **API Key** authentication on all endpoints. Session cookies are not supported on v1 endpoints.
+The v1 API supports **JWT Bearer Token** and **API Key** authentication on all endpoints. Session cookies are not supported on v1 endpoints.
 
 | Existing v0 Auth | v1 Recommended Method |
 |-------------|-------------|
@@ -277,15 +277,15 @@ v1 API supports **JWT Bearer Token** and **API Key** authentication on all endpo
 
 ## 7. Disabling v0 API
 
-v0 API is deprecated and can be disabled in settings for enhanced security. Since v0 API uses insecure patterns such as passing credentials via query strings, it is recommended to disable it once v1 migration is complete.
+The v0 API is deprecated and can be disabled in the settings for better security. Because the v0 API uses insecure patterns, such as passing credentials in query strings, we recommend disabling it after migrating to v1.
 
 **How to disable:**
 
-Uncheck "Enable legacy API (v0)" in web server settings.
+Uncheck "Enable legacy API (v0)" in the web server settings.
 
 **Behavior when disabled:**
 
-Returns 404 error when v0 API is called:
+Calls to the v0 API return a 404 error:
 
 ```json
 {

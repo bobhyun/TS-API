@@ -1,9 +1,9 @@
 // 12_ws_events - WebSocket Real-time Event Subscription
 //
-// Receives real-time events (LPR, channelStatus, etc.) via WebSocket.
+// Receives real-time events (LPR, channelStatus, notice, etc.) via WebSocket.
 //
 // Two subscription modes:
-//   1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+//   1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
 //   2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
 //
 // Endpoint: ws://host:port/wsapi/v1/events
@@ -16,7 +16,7 @@
 //
 // REQUIRES: go get github.com/gorilla/websocket
 //
-// Run: cd examples/go && go run ./v1/12_ws_events/
+// Run: cd go && go run ./12_ws_events
 package main
 
 import (
@@ -47,7 +47,7 @@ func main() {
 	// ── Method 1: Subscribe via URL query params (classic) ──
 	fmt.Println("=== Method 1: Subscribe via URL (10 seconds) ===")
 
-	wsURL1 := cfg.WsURL + "/wsapi/v1/events?topics=LPR,channelStatus"
+	wsURL1 := cfg.WsURL + "/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=" + lang
 	conn1, _, err := dialer.Dial(wsURL1, headers)
 	if err != nil {
 		log.Fatal("Connect failed:", err)
@@ -71,7 +71,7 @@ func main() {
 				if topic == "" {
 					topic, _ = msg["type"].(string)
 				}
-				fmt.Printf("  [%s] %s\n", topic, string(data))
+				printEvent(topic, data)
 			} else {
 				fmt.Printf("  Raw: %s\n", string(data))
 			}
@@ -142,7 +142,7 @@ func main() {
 
 			// Handle event data
 			topic, _ := msg["topic"].(string)
-			fmt.Printf("  [%s] %s\n", topic, string(data))
+			printEvent(topic, data)
 		}
 	}()
 
@@ -159,7 +159,7 @@ func main() {
 		fmt.Println("  [Phase 3] Unsubscribe channelStatus + add motionChanges (ch 1) + reduce LPR to ch 1,3")
 		sendJSON(conn2, map[string]interface{}{"unsubscribe": "channelStatus"})
 		sendJSON(conn2, map[string]interface{}{"subscribe": "motionChanges", "ch": []int{1}})
-		sendJSON(conn2, map[string]interface{}{"subscribe": "LPR", "ch": []int{1, 3}}) // re-subscribe with fewer ch drops ch 2,4
+		sendJSON(conn2, map[string]interface{}{"subscribe": "LPR", "ch": []int{1, 3}}) // re-subscribe replaces the filter (drops ch 2,4)
 	}()
 
 	select {
@@ -170,6 +170,79 @@ func main() {
 	conn2.WriteMessage(websocket.CloseMessage,
 		websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 	conn2.Close()
+}
+
+const lang = "ko-KR"
+
+// wsPlate is one LPR plate. ID is the record id for plate correction (absent when
+// the record could not be saved); Direction is "entry" / "exit" (absent when unknown).
+type wsPlate struct {
+	ID        int64   `json:"id"`
+	PlateNo   *string `json:"plateNo"`
+	Score     float64 `json:"score"`
+	Direction string  `json:"direction"`
+}
+
+// wsNotice is one notice. Message is an object keyed by language code:
+// en-US always, plus the requested lang when it is not English.
+type wsNotice struct {
+	ID       string            `json:"id"`
+	Severity string            `json:"severity"`
+	Message  map[string]string `json:"message"`
+}
+
+// printEvent prints LPR and notice events by field; other topics as raw JSON.
+func printEvent(topic string, data []byte) {
+	switch topic {
+	case "LPR":
+		var msg struct {
+			wsPlate
+			Plates []wsPlate `json:"plates"`
+		}
+		json.Unmarshal(data, &msg)
+		plates := msg.Plates
+		if plates == nil {
+			plates = []wsPlate{msg.wsPlate} // v1.0.0 single-plate format
+		}
+		for _, p := range plates {
+			plate := "null"
+			if p.PlateNo != nil {
+				plate = *p.PlateNo
+			}
+			id, dir := "-", p.Direction
+			if p.ID > 0 {
+				id = fmt.Sprint(p.ID)
+			}
+			if dir == "" {
+				dir = "-"
+			}
+			fmt.Printf("  [LPR] id=%s plateNo=%s score=%v direction=%s\n", id, plate, p.Score, dir)
+		}
+	case "notice":
+		// snapshot: current list once after subscribing; raised/updated/cleared: one notice
+		var msg struct {
+			Action  string     `json:"action"`
+			Notices []wsNotice `json:"notices"`
+			Notice  wsNotice   `json:"notice"`
+		}
+		json.Unmarshal(data, &msg)
+		notices := msg.Notices
+		if msg.Action != "snapshot" {
+			notices = []wsNotice{msg.Notice}
+		}
+		if len(notices) == 0 {
+			fmt.Println("  [notice] snapshot: (no notices)")
+		}
+		for _, n := range notices {
+			text, ok := n.Message[lang]
+			if !ok {
+				text = n.Message["en-US"]
+			}
+			fmt.Printf("  [notice] %s %s %s: %s\n", msg.Action, n.ID, n.Severity, text)
+		}
+	default:
+		fmt.Printf("  [%s] %s\n", topic, string(data))
+	}
 }
 
 func sendJSON(conn *websocket.Conn, v interface{}) {
@@ -208,3 +281,6 @@ func sendJSON(conn *websocket.Conn, v interface{}) {
 //           fmt.Printf("Plate: %s  Score: %v\n", p["plateNo"], p["score"])
 //       }
 //   }
+//
+// Each plate carries the record "id" (use it with POST /api/v1/lpr/log/{id}/plate)
+// and "direction" as a string ("entry" / "exit"), not a number.

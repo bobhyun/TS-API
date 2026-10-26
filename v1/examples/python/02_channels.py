@@ -2,11 +2,11 @@
 02_channels.py - TS-API v1 Channel
 
 Endpoints:
-  GET /api/v1/channel              - List all channels
-  GET /api/v1/channel?staticSrc    - Include static stream source URLs
-  GET /api/v1/channel?caps         - Include channel capabilities
-  GET /api/v1/channel/status?recordingStatus - Recording status per channel
-  GET /api/v1/channel/{chid}/info?caps       - Single channel capabilities
+  GET /api/v1/channel                          - List all channels
+  GET /api/v1/channel?staticSrc                - Include static stream URLs
+  GET /api/v1/channel?caps                     - Include channel capabilities
+  GET /api/v1/channel/status?recordingStatus   - Per-channel recording status
+  GET /api/v1/channel/{chid}/info?caps         - Single channel capabilities
 
 Channel fields: chid, title, displayName (NOT 'name')
 """
@@ -36,7 +36,7 @@ def main():
         print(f"  chid={ch['chid']}  title={ch.get('title', '')}  "
               f"displayName={ch.get('displayName', '')}")
 
-    # --- Static source URLs (RTMP/FLV addresses for each channel) ---
+    # --- Static stream URLs (RTMP/FLV) ---
     r = client.get('/api/v1/channel?staticSrc')
     print(f"\n=== Channels with staticSrc ===")
     for ch in r.json():
@@ -55,7 +55,7 @@ def main():
     for s in statuses:
         print(f"  chid={s.get('chid')}  recording={s.get('recordingStatus')}")
 
-    # --- Single channel capabilities (channel 1) ---
+    # --- Single channel capabilities (first channel) ---
     if channels:
         chid = channels[0]['chid']
         r = client.get(f'/api/v1/channel/{chid}/info?caps')

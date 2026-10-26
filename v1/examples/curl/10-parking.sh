@@ -76,11 +76,11 @@ echo "=== Empty Spots Only ==="
 
 # ─────────────────────────────────────────────────
 # 7. Parking Session History — vehicles still parked
-#    A session opens when a vehicle is confirmed present and closes when it is gone.
-#    Response: { totalCount, at, asOf, summary, data: [ ... ] }
-#    Needs the parking history license (403 without it). Ask /api/v1/info first —
-#    the `parkingHistory` extension token says whether the session endpoints will
-#    answer (the array is omitted when no extension is active).
+#    A session opens when a vehicle is confirmed present and closes when it
+#    leaves. Requires the parking history license (403 without it).
+#    Check /api/v1/info first: the `parkingHistory` extension token tells
+#    whether the session endpoints are available. license.extension is
+#    omitted when no extension is active.
 # ─────────────────────────────────────────────────
 HAS_HISTORY=$("${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/info?license" \
   | jq -r '(.license.extension // []) | any(. == "parkingHistory")' 2>/dev/null || true)
@@ -96,7 +96,7 @@ echo "=== Currently Parked ==="
 
 # ─────────────────────────────────────────────────
 # 8. Vehicles that left today
-#    timeField=out puts the period on the exit time (default is the entry time).
+#    timeField=out applies the time range to the exit time (default: entry time).
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Left Today ==="
@@ -105,18 +105,19 @@ TODAY=$(date +%Y-%m-%d)
 
 # ─────────────────────────────────────────────────
 # 9. One session with its payment history
-#    outKind/outTimeMeans tell how the exit time was decided — only "observed"
-#    is a measurement, the rest are estimates (see the guide, 16.5).
-#    inKind/inTimeMeans do the same for the entry and lean the OTHER way:
-#    firstSeen is an UPPER bound (already there when observation started), and it
-#    is present on OPEN sessions too.
+#    outKind / outTimeMeans tell how the exit time was determined.
+#    Only "observed" is a measurement; the others are estimates (see the guide, 16.5).
+#    inKind / inTimeMeans do the same for the entry, but err the opposite way:
+#    firstSeen is an upper bound on the real entry (the vehicle was already
+#    there when observation started). Unlike the exit basis, it is present
+#    on open sessions too.
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Session Detail ==="
 SESSION_ID=$("${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/parking/session?maxCount=1"   | jq -r '.data[0].id // empty' 2>/dev/null || true)
 if [ -n "${SESSION_ID:-}" ]; then
   "${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/parking/session/${SESSION_ID}" | jqf
-  # 두 경계의 근거만 따로 뽑아 본다 — 입차 쪽은 열린 세션에도 있다.
+  # Print just the entry and exit basis; the entry basis is present on open sessions too.
   "${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/parking/session/${SESSION_ID}" \
     | jq -r '"  entry basis: \(.inKind) (\(.inTimeMeans))",
              "  exit  basis: \(.outKind // "-") (\(.outTimeMeans // "-"))"' 2>/dev/null || true
@@ -126,9 +127,10 @@ fi
 
 # ─────────────────────────────────────────────────
 # 9b. Scope — what the query is scoped to
-#     Items omitted means "the whole scope", which is NOT the same as no filter:
-#     scope=lot with no lot returns only sessions that belong to a parking lot,
-#     so no-parking-zone history is excluded (it belongs to no lot).
+#     Omitting the items means "the whole scope", not "no filter":
+#     scope=lot without a lot list returns only sessions that belong to a
+#     parking lot, so no-parking-zone sessions (which belong to no lot) are
+#     excluded.
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== By channel ==="
@@ -144,18 +146,17 @@ echo "=== No-parking zones only ==="
 
 # ─────────────────────────────────────────────────
 # 9c. Video for a session — otherwise=nearBefore
-#     A parked car does not move, so motion-triggered recording may have stopped
-#     while it was still there. The car is in the same place, so the preceding
-#     footage still shows the situation — ask for it with otherwise=nearBefore.
-#     Use this for parking history only. If nothing comes back, there is no
-#     usable recording at all (never recorded, or already recycled); the
-#     session snapshots are stored independently and remain available.
+#     A parked car does not move, so motion-triggered recording may stop
+#     while it is still there. Because the car stays in place, earlier
+#     footage still shows it. Use otherwise=nearBefore for parking history only.
+#     An empty result means no usable recording exists (never recorded, or
+#     already recycled); the session snapshots are still available.
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Video at entry time (nearest earlier if none) ==="
 if [ -n "${SESSION_ID:-}" ]; then
-  # snapshots 는 시각 오름차순 배열이고 각 항목이 tags 를 든다 — 키로 꺼내지 않는다.
-  # 같은 뜻이 여러 장일 수 있어(베스트샷) 태그로 찾고 첫 항목(가장 이른 것)을 쓴다.
+  # snapshots is a time-ordered array, not a map; each entry carries tags.
+  # Several shots can share a tag (best shots), so find by tag and use the first (earliest).
   S_CH=$("${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/parking/session/${SESSION_ID}" \
     | jq -r '[.snapshots[] | select(.tags | index("in"))][0].chid // empty' 2>/dev/null || true)
   S_AT=$("${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/parking/session/${SESSION_ID}" \
@@ -168,9 +169,9 @@ fi
 
 # ─────────────────────────────────────────────────
 # 9c-2. Which shots read a plate?
-#     snapshots is time-ordered; each entry carries tags. `bestshot` means recognition was
-#     attempted, `plate` means it succeeded — a failed attempt keeps the picture but has
-#     plateNo: null and no `plate` tag, so a person can still check it later.
+#     snapshots is a time-ordered array; each entry carries tags.
+#     bestshot = attempted, plate = succeeded.
+#     A failed shot keeps its image (plateNo is null) so a person can review it later.
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Snapshots (time order) ==="
@@ -182,12 +183,12 @@ fi
 
 # ─────────────────────────────────────────────────
 # 9d. Which car is it? — the bounding box
-#     A snapshot can hold several cars. `box` points at the one this session is
-#     about. It is YOLO-style: center based, all four values 0..1 (see 1.2), so
-#     you multiply by the size of whatever you draw on — there is no need to know
-#     the internal coordinate space.
-#     Entrance/exit sessions carry no vehicle box (a single plate read), so the
-#     value is null. The key is always present.
+#     A snapshot can contain several cars; `box` marks the one this session
+#     is about. YOLO style: center-based, all four values in 0..1 (see 1.2).
+#     Multiply by the size of the surface you draw on; the internal
+#     coordinate space does not matter.
+#     Entrance/exit sessions have no vehicle box (a single plate read):
+#     the value is null, but the key is always present.
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== Bounding box of the session vehicle ==="
@@ -198,7 +199,7 @@ if [ -n "${SESSION_ID:-}" ]; then
     echo "  (no box for this session)"
   else
     echo "  box = ${BOX}"
-    # 그릴 대상 크기에 곱한다. 여기서는 1920x1080 을 예로 든다.
+    # Multiply by the drawing surface size (1920x1080 here as an example).
     W=1920; H=1080
     echo "${BOX}" | jq -r --argjson w "$W" --argjson h "$H" \
       '"  on \($w)x\($h) -> left=\(((.cx - .w/2) * $w) | floor) top=\(((.cy - .h/2) * $h) | floor) width=\((.w * $w) | floor) height=\((.h * $h) | floor)"'
@@ -207,14 +208,15 @@ fi
 
 # ─────────────────────────────────────────────────
 # 10. Writing history — payment and manual close
-#     Both need Control permission and both change stored history, so they are
+#     These calls need Control permission and change stored history, so they
+#     are not executed here.
 #     Payment state (16.7): commit settles it, exempt records a decision not to
-#     collect, undo reverts the most recent change (the response says which one).
+#     collect, and undo reverts the most recent change (the response says which).
 #     Records are appended, never deleted.
-#    
-#     close (16.8) is a different axis: it clears the lingering "parked" state left
-#     when an exit was never observed. Exempt takes a session out of billing and may
-#     leave it parked; close ends the session. Do not conflate the two.
+#
+#     close (16.8) is separate: it ends a session whose exit was never observed
+#     and would otherwise stay "parked". exempt removes a session from billing
+#     but may leave it parked; close ends it. Do not confuse the two.
 # ─────────────────────────────────────────────────
 # "${CURL[@]}" "${AUTH[@]}" -X POST \
 #   "${BASE}/api/v1/parking/session/${SESSION_ID}/payment/commit?ref=POS-0042" | jqf
@@ -222,4 +224,11 @@ fi
 #   "${BASE}/api/v1/parking/session/${SESSION_ID}/payment/undo" | jqf
 #   "${BASE}/api/v1/parking/session/${SESSION_ID}/close" | jqf
 #
-# "${CURL[@]}" "${AUTH[@]}" -X POST \
+#     Plate correction (16.9): one session by id; no bulk correction or merging.
+#     Payments stay with the session. Returns 409 when plateNo equals the current plate.
+#
+#     Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+#     Uncomment it to try it against a test record.
+# "${CURL[@]}" "${AUTH[@]}" -X POST -H "Content-Type: application/json" \
+#   -d '{"plateNo":"12가3456","reason":"misread at night"}' \
+#   "${BASE}/api/v1/parking/session/${SESSION_ID}/plate" | jqf

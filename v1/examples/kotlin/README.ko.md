@@ -24,7 +24,7 @@ curl -sk -X POST https://SERVER/api/v1/auth/apikey \
 export NVR_API_KEY=tsapi_key_...
 ```
 
-> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하세요.
+> `SERVER`, `admin`, `1234`는 예시입니다. 실제 서버 주소, 사용자명, 비밀번호로 변경하십시오.
 
 ## 환경 변수
 
@@ -51,7 +51,7 @@ NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... kotlinc -script TsApiClient.kt 
 | [`V1_03_PtzControl.kt`](V1_03_PtzControl.kt) | PTZ 카메라 제어 |
 | [`V1_04_RecordingSearch.kt`](V1_04_RecordingSearch.kt) | 녹화 구간 검색 |
 | [`V1_05_EventLog.kt`](V1_05_EventLog.kt) | 이벤트 로그 조회 |
-| [`V1_06_LprSearch.kt`](V1_06_LprSearch.kt) | 차번 인식 검색 |
+| [`V1_06_LprSearch.kt`](V1_06_LprSearch.kt) | 차량 번호 인식 검색 |
 | [`V1_07_VodStream.kt`](V1_07_VodStream.kt) | VOD 스트림 URL (RTMP, FLV) |
 | [`V1_08_SystemInfo.kt`](V1_08_SystemInfo.kt) | 시스템 상태 |
 | [`V1_09_Push.kt`](V1_09_Push.kt) | 외부 이벤트 푸시 |

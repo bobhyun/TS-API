@@ -4,7 +4,7 @@
 // WARNING: emergencyCall's callStart triggers a real emergency alarm!
 //          You MUST send callEnd to stop the alarm.
 //
-// Run: cd examples/go && go run ./v1/09_push/
+// Run: cd go && go run ./09_push
 package main
 
 import (
@@ -43,7 +43,7 @@ func main() {
 	fmt.Println("\n=== POST /api/v1/push (emergencyCall) ===")
 	fmt.Println("WARNING: This triggers a real alarm! Use caution when testing.")
 
-	// callStart - emergency call start
+	// callStart - start the alarm
 	r, err = client.Post("/api/v1/push", map[string]interface{}{
 		"topic":  "emergencyCall",
 		"device": "dev1",

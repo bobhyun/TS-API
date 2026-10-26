@@ -17,7 +17,7 @@
   $env:NVR_SCHEME = 'http'; $env:NVR_PORT = '80'; pwsh 01-login.ps1
 #>
 
-# Fix console encoding for Korean text output
+# UTF-8 console output for non-ASCII data (e.g. Korean plate numbers)
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $Script:NVR_HOST    = if ($env:NVR_HOST)    { $env:NVR_HOST }    else { 'localhost' }

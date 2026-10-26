@@ -4,11 +4,11 @@
 
 .DESCRIPTION
   Endpoints:
-    GET /api/v1/channel              - List all channels
-    GET /api/v1/channel?staticSrc    - Include static stream source URLs
-    GET /api/v1/channel?caps         - Include channel capabilities
-    GET /api/v1/channel/status?recordingStatus - Recording status per channel
-    GET /api/v1/channel/{chid}/info?caps       - Single channel capabilities
+    GET /api/v1/channel                          - List all channels
+    GET /api/v1/channel?staticSrc                - Include static stream URLs
+    GET /api/v1/channel?caps                     - Include channel capabilities
+    GET /api/v1/channel/status?recordingStatus   - Per-channel recording status
+    GET /api/v1/channel/{chid}/info?caps         - Single channel capabilities
 
   Channel fields: chid, title, displayName (NOT 'name')
 #>
@@ -31,7 +31,7 @@ foreach ($ch in $channels) {
     Write-Host "  chid=$($ch.chid)  title=$($ch.title)  displayName=$($ch.displayName)"
 }
 
-# --- Static source URLs (RTMP/FLV addresses for each channel) ---
+# --- Static stream URLs (RTMP/FLV) ---
 $r = Invoke-NvrGet '/api/v1/channel?staticSrc'
 Write-Host "`n=== Channels with staticSrc ==="
 foreach ($ch in $r) {
@@ -52,7 +52,7 @@ foreach ($s in $r) {
     Write-Host "  chid=$($s.chid)  recording=$($s.recordingStatus)"
 }
 
-# --- Single channel capabilities (channel 1) ---
+# --- Single channel capabilities (first channel) ---
 if ($channels -and $channels.Count -gt 0) {
     $chid = $channels[0].chid
     $r = Invoke-NvrGet "/api/v1/channel/$chid/info?caps"

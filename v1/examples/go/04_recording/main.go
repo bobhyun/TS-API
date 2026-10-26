@@ -1,7 +1,7 @@
 // 04_recording - Recording search (days & minutes timeline)
-// Useful for implementing calendar UI and timeline UI.
+// Use days for a calendar UI and minutes for a timeline UI.
 //
-// Run: cd examples/go && go run ./v1/04_recording/
+// Run: cd go && go run ./04_recording
 package main
 
 import (
@@ -49,7 +49,7 @@ func main() {
 	}
 
 	// ── 2. Per-minute recording segments (for timeline) ──
-	// minutes: 1440-char string (24h x 60min), '1'=recording exists, '0'=none
+	// minutes: one char per minute from timeBegin (1440 for a full day), '1'=recorded, '0'=not recorded
 	now := time.Now()
 	today := now.Format("2006-01-02")
 	timeBegin := today + "T00:00:00"
@@ -80,7 +80,7 @@ func main() {
 		}
 		fmt.Printf("  CH%d: %d/%d minutes recorded (len=%d)\n",
 			m.Chid, total, len(m.Minutes), len(m.Minutes))
-		// Hourly summary output (4-hour blocks)
+		// Summary in 4-hour blocks
 		if len(m.Minutes) < 1440 {
 			continue
 		}

@@ -6,12 +6,13 @@
  *   - License plate log search (keyword, time range, pagination)
  *   - Similar plate search
  *   - CSV export
+ *   - Plate correction history (GET /api/v1/lpr/log/{id}/plate/history)
+ *   - Plate correction (POST /api/v1/lpr/log/{id}/plate, Control permission, not executed)
  *
  * NOTE: timeBegin and timeEnd are required for LPR log searches.
  *
- * WARNING: Exporting large datasets (10,000+ records) may cause HTTP timeout
- *   errors. For bulk exports, narrow the time range or use pagination
- *   (at/maxCount) to keep each request under a manageable size.
+ * WARNING: Large exports (10,000+ records) can hit HTTP timeouts.
+ *   Narrow the time range or page with at/maxCount.
  */
 
 const { BASE_URL, NVR_API_KEY } = require('./config');
@@ -59,7 +60,12 @@ async function main() {
     if (Array.isArray(logRes.body.data)) {
       for (const entry of logRes.body.data) {
         const time = Array.isArray(entry.timeRange) ? entry.timeRange[0] : '';
-        console.log(`  ${time} | ${entry.plateNo} (score: ${entry.score}) [${entry.srcName || entry.srcCode}]`);
+        // plateNo is null when no plate was read; direction is "entry"/"exit" or absent
+        console.log(`  [${entry.id}] ${time} | ${entry.plateNo || '(unrecognized)'} (score: ${entry.score}) ` +
+          `[${entry.srcName || entry.srcCode}] direction: ${entry.direction || '-'}`);
+        if (entry.plateEdited) {
+          console.log(`    corrected, originally: ${entry.originalPlateNo || '(unrecognized)'}`);
+        }
 
         // VOD links for playback
         // v1 returns relative paths (e.g. "/watch?ch=1&when=..."); prepend BASE_URL for non-browser clients.
@@ -95,7 +101,7 @@ async function main() {
 
   // ─────────────────────────────────────────────────
   // 4. Similar Plate Search
-  //    Finds plates similar to the keyword (edit distance based)
+  //    Returns every plate containing the keyword, most recent first
   //    Useful for partial or misrecognized plates
   // ─────────────────────────────────────────────────
   console.log('\n=== Similar Plate Search ===');
@@ -109,13 +115,45 @@ async function main() {
     const data = Array.isArray(similarRes.body.data) ? similarRes.body.data : similarRes.body;
     if (Array.isArray(data)) {
       for (const entry of data.slice(0, 5)) {
-        console.log(`    ${entry.plateNo}`);
+        // Response: array of plate strings, most recent first
+        console.log(`    ${typeof entry === 'string' ? entry : entry.plateNo}`);
       }
     }
   }
 
   // ─────────────────────────────────────────────────
-  // 5. CSV Export
+  // 5. Plate Correction History (one record, by id)
+  //    plateNo in the log is always the current value.
+  //    edits[] lists corrections in recorded order; it is empty if the record was never corrected.
+  // ─────────────────────────────────────────────────
+  const first = logRes.status === 200 && Array.isArray(logRes.body?.data) ? logRes.body.data[0] : null;
+  if (first) {
+    console.log(`\n=== Plate Correction History (id=${first.id}) ===`);
+    const histRes = await get(`/api/v1/lpr/log/${first.id}/plate/history`);
+    if (histRes.status === 200 && histRes.body) {
+      const h = histRes.body;
+      console.log(`  plateNo: ${h.plateNo}, original: ${h.originalPlateNo ?? '(never corrected)'}`);
+      for (const e of h.edits || []) {
+        console.log(`    ${e.time} ${e.user}: ${e.before} -> ${e.after} ${e.reason || ''}`);
+      }
+    } else {
+      console.log(`  Status: ${histRes.status}`);
+    }
+  }
+
+  // ─────────────────────────────────────────────────
+  // 6. Plate Correction (Control permission)
+  //    Changes the stored record, so it is not executed here. The target is always
+  //    one record id - from data[].id above, or the id a realtime LPR event carries
+  //    next to each plateNo. 409 when plateNo equals the current plate.
+  //
+  //    Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+  //    Uncomment it to try it against a test record.
+  //    await post(`/api/v1/lpr/log/${first.id}/plate`, { plateNo: '12가3456', reason: 'misread at night' });
+  // ─────────────────────────────────────────────────
+
+  // ─────────────────────────────────────────────────
+  // 7. CSV Export
   //    Returns LPR data in CSV format for spreadsheet import
   // ─────────────────────────────────────────────────
   console.log('\n=== CSV Export ===');

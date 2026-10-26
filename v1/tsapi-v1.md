@@ -9,6 +9,7 @@
 1. [Overview](#1-overview)
    - [1.1. Time Notation](#11-time-notation)
    - [1.2. Box Coordinates](#12-box-coordinates)
+   - [1.3. Language (`lang`)](#13-language-lang)
 2. [API Call Flow](#2-api-call-flow)
    - [2.1. Basic Flow (JWT Authentication)](#21-basic-flow-jwt-authentication)
    - [2.2. Recording Search and Playback Flow](#22-recording-search-and-playback-flow)
@@ -99,6 +100,7 @@
   - [Kotlin](#kotlin)
   - [Swift](#swift)
   - [PowerShell](#powershell)
+- [D. Supported Languages](#d-supported-languages)
 
 ---
 
@@ -114,7 +116,7 @@ TS-API v1 is a RESTful path-based API.
 
 ### 1.1. Time Notation
 
-**The notation you send decides the notation you get back.**
+**The response uses the time notation of the request.**
 
 | Time sent in the request | Interpreted as | Response notation for that request |
 |--------------------------|----------------|------------------------------------|
@@ -124,26 +126,25 @@ TS-API v1 is a RESTful path-based API.
 | `today` · `yesterday` | midnight, server local | `...+09:00` (server local) |
 | (no time parameter) | — | `...+09:00` (server local) |
 
-**Responses always carry an offset (or `Z`)** — it is never omitted. So even if you send a
-time without one, the response shows **how the server read it**: the digits you sent come
-back unchanged, followed by the offset the server assumed. If your zone differs from the
-server's, that offset is what reveals it.
+**Response times always include an offset (or `Z`).** If you send a time without an offset,
+the response returns the same digits followed by the offset the server assumed. If your
+time zone differs from the server's, this offset shows the difference.
 
-Sending an explicit offset is clearer. But you do not have to: the response states the
-interpretation, so a client that does not deal with time zones still works.
+Sending an explicit offset is recommended but not required. The response states how the
+server interpreted the time, so clients that do not handle time zones still work.
 
-Storage is UTC (microseconds) internally. Responses carry milliseconds.
+Times are stored internally in UTC with microsecond precision. Responses use millisecond
+precision.
 
 **Times sent by a billing app** (the `time` parameter in
-[16.7](#167-change-payment-state) and [16.8](#168-no-exit-cleanup)) are **kept separately**
-as that app's clock reading; the NVR's own recorded time is **always the server clock**.
-That separation keeps parking durations and video positions stable even when the two
-systems' clocks drift apart.
+[16.7](#167-change-payment-state) and [16.8](#168-no-exit-cleanup)) are **stored separately**
+as that app's clock reading. The time the NVR records **always comes from the server clock**.
+This keeps parking durations and video positions consistent when the two systems' clocks
+differ.
 
-When the server supports NTP (TS-IVR, TS-LPR4), the clocks themselves can be aligned.
-The NVR serves its own clock over standard NTP (UDP 123), so pointing the integrating
-system's time synchronization at the NVR address makes both clocks agree and removes the
-discrepancy the separation above accounts for.
+On servers that support NTP (TS-IVR, TS-LPR4), you can synchronize the clocks. The NVR
+runs a standard NTP server (UDP 123). Point the integrating system's time synchronization
+at the NVR address to keep both clocks in agreement.
 
 ### 1.2. Box Coordinates
 
@@ -159,8 +160,8 @@ normalized to `0..1`.
 | `cx` · `cy` | **Center** of the box (0 = left/top, 1 = right/bottom) |
 | `w` · `h` | **Size** of the box |
 
-To draw it, multiply by the size of the target image or video. You never need to know the
-internal coordinate space.
+To draw a box, multiply its values by the dimensions of the target image or video. The
+internal coordinate space is not needed.
 
 ```
 left = (cx - w/2) * displayWidth      top = (cy - h/2) * displayHeight
@@ -169,20 +170,19 @@ left = (cx - w/2) * displayWidth      top = (cy - h/2) * displayHeight
 | Rule | Detail |
 |------|--------|
 | Range | `cx ± w/2` and `cy ± h/2` never leave `0..1` — the server clamps before sending |
-| When absent | `null`. The key is not omitted — "no box" and "this version sends no boxes" must stay distinguishable |
+| When absent | `null`. The key is not omitted, so "no box" can be distinguished from "this version does not send boxes" |
 | Reference frame | The **image or video** the box came with. A box on a cropped image is relative to that crop |
 
 > **A parking-history box is a single observation taken when the session opened.** It is
-> only correct for that instant, so **draw it on the stillcut and clear it once video
-> playback starts** — it is not tracked. Entrance/exit sessions carry no vehicle box (they
-> are a single plate read), so the value is `null`.
+> not tracked and is valid only for that moment. **Draw it on the stillcut and remove it
+> when video playback starts.** Entrance/exit sessions come from a single plate read and
+> have no vehicle box, so the value is `null`.
 
-**Exception — `vehicle.plate` in [16.4](#164-parking-spot-status).** That field keeps
-**absolute pixels** (`left`, `top`, `right`, `bottom`). It is already deployed and partner
-applications read those values, so it is not changed. Compatibility takes precedence
-over a uniform notation.
+**Exception — `vehicle.plate` in [16.4](#164-parking-spot-status).** This field uses
+**absolute pixels** (`left`, `top`, `right`, `bottom`). It is kept unchanged for
+compatibility with deployed partner applications.
 
-Those pixels are **not** relative to the whole frame. They are relative to the
+These pixels are **not** relative to the whole frame. They are relative to the
 `vehicle.image` crop in the same response, whose dimensions are `vehicle.imageSize`
 (all three fields come only with `image=true`). To normalize, divide by
 `imageSize.width` / `imageSize.height`.
@@ -195,6 +195,35 @@ h  = (bottom - top)     / imageSize.height
 ```
 
 **New box fields use YOLO.**
+
+### 1.3. Language (`lang`)
+
+Text meant for people — event type and code names, status messages, notice text — is
+translated into the language named by `lang`. It is a query parameter on REST calls and a
+parameter of the WebSocket URL ([17.4](#174-event-subscription), [18.2](#182-endpoint)). The
+same rule applies wherever it is accepted.
+
+`lang` is a language code such as `ko-KR` or `zh-TW` ([D. Supported Languages](#d-supported-languages)).
+A code that is not in the list is resolved to the closest supported language, in this order:
+
+| Step | Rule | Example |
+|------|------|---------|
+| 1 | Exact match, ignoring case | `ko-kr` → `ko-KR` |
+| 2 | Default region of a language with several files | `zh`, `zh-Hans`, `zh-SG` → `zh-CN` · `zh-Hant`, `zh-HK`, `zh-MO` → `zh-TW` · `pt` → `pt-BR` · `pt-AO`, `pt-MZ`, `pt-CV`, `pt-GW`, `pt-ST`, `pt-TL`, `pt-MO` → `pt-PT` |
+| 3 | Drop the last subtag and repeat steps 1–2 | `zh-Hant-HK` → `zh-Hant` → `zh-TW` |
+| 4 | The only file of the same language | `ar-SA` → `ar-AE` · `ko` → `ko-KR` · `sw-TZ` → `sw-KE` |
+| 5 | None of the above | Not translated — the text stays in English |
+
+Without `lang`, text is in the language the NVR itself is set to. Notices
+([5.5](#55-system-notices)) are the exception: without `lang` they carry English only.
+
+When a response includes a language code (the keys of a notice `message`), it uses the
+resolved code, not the value that was sent. For example, `lang=zh-HK` returns `zh-TW`.
+
+Codes are interpreted by their standard meaning. Codes that referred to a different language
+before v1.3.0 (`ru-KG`, `sr-Latn`, `nso-ZA`, `swc-CD`, `ku-Arab-IR`, and `pt-PT`, whose text
+was Brazilian Portuguese) are not mapped to the corrected codes. See the
+[Changelog](CHANGELOG.md#v130).
 
 
 ---
@@ -301,7 +330,7 @@ sequenceDiagram
 
 ### 2.4. API Key Flow (No Login Required)
 
-No login required. Suitable for server-to-server integration, VMS, monitoring centers, and long-running services.
+Suitable for server-to-server integration, VMS, monitoring centers, and long-running services.
 
 ```mermaid
 sequenceDiagram
@@ -473,14 +502,14 @@ GET /download/export_20240101.mp4?token=eyJhbGc...
 | `/event-storage/{path}` | Event-related media (LPR images, etc.) |
 | `/download/{file}` | Exported files |
 
-> **URL format**: v1 returns **relative URLs** (paths starting with `/`) in response fields such as `image`, `videoSrc`, `src`. Clients should prepend their own base URL (`http://{host}:{port}`) when constructing absolute requests. This is the opposite of v0 (legacy) which returns absolute URLs — see [Migration Guide](MIGRATION.md#5-key-changes) for details.
+> **URL format**: v1 returns **relative URLs** (paths starting with `/`) in response fields such as `image`, `videoSrc`, `src`. Clients should prepend their own base URL (`http://{host}:{port}`) when constructing absolute requests. v0 (legacy) returns absolute URLs instead. See [Migration Guide](MIGRATION.md#5-key-changes) for details.
 
 ---
 
 ### 3.5. API Key Authentication
 
-API Key is suitable for external system integration (monitoring center, VMS, etc.).
-Can be used permanently without expiration; administrators can revoke at any time.
+API Keys are suitable for external system integration (monitoring center, VMS, etc.).
+An API Key can be used indefinitely, and administrators can revoke it at any time.
 
 > ⚠️ API Key authentication is supported on **v1 endpoints only**. v0 endpoints (`/api/*`) reject `X-API-Key` with `401 Unauthorized`.
 
@@ -558,7 +587,7 @@ Authorization: Bearer {admin_token}
 
 Retrieves server and product information.
 
-> **No authentication required** — This endpoint is accessible without any authentication, except for the `whoAmI` parameter which requires JWT or session authentication.
+> **No authentication required.** This endpoint can be called without authentication, except for the `whoAmI` parameter, which requires JWT or session authentication.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
@@ -658,7 +687,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `license.nChTrafficCount` | Int | Traffic count license active | Traffic count channels |
 | `license.nChSpeedometer` | Int | Vehicle speed license active | Vehicle speedometer channels |
 | `license.nChPeopleCount` | Int | People count license active | People count channels |
-| `license.fisheyeCamSupports` | Boolean | Fisheye dewarping license active | `true` is emitted only when active; the field is omitted otherwise |
+| `license.fisheyeCamSupports` | Boolean | Fisheye dewarping license active | `true` when active; omitted otherwise |
 | `license.maxVehicles` | Int | ANPR + non-default value | Concurrent LPR vehicle tracking count |
 | `license.mediaType` | String | Always | `"USB dongle"` or `"Software"` |
 | `license.extension` | Array | At least one extension active | Extension feature tokens (see table below) |
@@ -679,7 +708,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `vehicleTracking` | Vehicle tracking |
 | `parkingGuide` | Parking guidance |
 | `parkingSpot` | Parking spot occupancy detection |
-| `parkingHistory` | Parking session history — the endpoints in [16.5–16.8](#165-parking-session-history) answer only when this is present |
+| `parkingHistory` | Parking session history — the endpoints in [16.5–16.8](#165-parking-session-history) are available only when this token is present |
 
 ---
 
@@ -706,7 +735,7 @@ Retrieves system hardware and software information.
 |-----------|------|----------|---------|-------------|
 | `item` | String | N | All | Items to query (comma-separated: `os`, `cpu`, `storage`, `network`) |
 
-> **Note**: Storage info is returned as the `disk` field in the response (requested as `item=storage` but response field name is `disk`). When requesting network info, the `lastUpdate` field is also included.
+> **Note**: Storage info is requested with `item=storage` but returned in the `disk` field. When requesting network info, the `lastUpdate` field is also included.
 
 **Response Fields**:
 
@@ -771,8 +800,7 @@ Retrieves real-time system status.
 | `recording.current` | String | Current recording path |
 | `recording.storage` | Array | Recording storage list |
 | `recording.storage[].path` | String | Storage path |
-| `recording.storage[].usage` | Int | Usage status code |
-| `recording.storage[].comment` | String | Status description |
+| `recording.storage[].usage` | String | `overwrite`, `write-once`, `read-only`, `event-backup`, `disabled` or `unknown` |
 | `network` | Array | Network interface status (when `item` includes `network`) |
 | `network[].name` | String | Interface name |
 | `network[].totalBytesPerSec` | Int | Total transfer rate (bytes/sec) |
@@ -786,10 +814,10 @@ Retrieves real-time system status.
 | `systemDisk.status` | String | `normal`, `low` (under 1 GB free) or `critical` (under 200 MB free, or a recent write failure) |
 | `systemDisk.dataWriteFailed` | Boolean | A record could not be written for lack of space or an I/O error within the last 60 seconds |
 
-The *system disk* is the disk where the product keeps its database and logs — normally the Windows
-drive `C:`, separate from the recording disks. When it fills up, new recordings cannot be indexed
-and recognition records are not saved, while the recording disks still have room — so watch
-`systemDisk.status`, not only `disk[]`. To be told when it changes, use the `notice` channel
+The *system disk* holds the product's database and logs. It is normally the Windows drive `C:`,
+separate from the recording disks. When it is full, new recordings cannot be indexed and
+recognition records are not saved, even if the recording disks have free space. Monitor
+`systemDisk.status` in addition to `disk[]`. To be notified of changes, use the `notice` channel
 ([5.5. System Notices](#55-system-notices)).
 
 ### 5.3. HDD S.M.A.R.T
@@ -806,12 +834,13 @@ Retrieves disk health status.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `disk` | Int | N | Disk number (all disks if omitted) |
+| `lang` | String | N | Language of `[].message` ([1.3](#13-language-lang)) |
 
 **Response**: Returns an array with one entry per fixed disk.
 
 An empty array means the server found no fixed disks. A disk whose attributes have not
-been read yet is still listed, with `code` = `-1`; S.M.A.R.T. is read in the background
-and cached for an hour, so an entry can report `-1` for a short while after startup.
+been read yet is still listed, with `code` = `-1`. S.M.A.R.T. data is read in the background
+and cached for one hour, so an entry may report `-1` briefly after startup.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -863,25 +892,28 @@ System control commands. **Admin privileges required**
 
 ### 5.5. System Notices
 
-Notices are conditions that are **true right now** and need attention — they are raised, updated
-and cleared. Events (§9) are a history of what happened; notices are the current state. Notices are
-kept in memory only, so they keep working when the system disk is full.
+Notices describe conditions that are **currently in effect** and need attention. A notice is
+raised, updated, and cleared. Events (§9) record what happened; notices show the current state.
+Notices are kept in memory only, so they remain available when the system disk is full.
 
 | Endpoint | Description |
 |----------|-------------|
 | `GET /api/v1/system/notices` | Notices currently in effect |
 | `GET /api/v1/system/notices?lang=ko-KR` | Same, with the `ko-KR` text added to `message` |
+| `GET /api/v1/system/notices?lang=zh-HK` | Same, with the text added under `zh-TW` (see *Language* below) |
 
-Any signed-in user can read notices. For live updates subscribe to the `notice` topic
-([17.4. Event Subscription](#174-event-subscription)) — it sends the current list on subscribe and
-every change after that.
+Any signed-in user can read notices. For live updates, subscribe to the `notice` topic
+([17.4. Event Subscription](#174-event-subscription)). It sends the current list when you
+subscribe, and then each change.
 
-**Language** — `message` is an object keyed by language code. `en-US` is always there and is the
-canonical text. When the request (`lang` query of the REST call, or of the WebSocket URL) names a
-language other than English, that language is added under its language code — the same codes as
-the `lang` parameter everywhere in this API (e.g. `ko-KR`, `zh-TW`). A language the server cannot
-translate is not added. A client that translates on its own can use `messageKey` and `args` instead, and
-does not need to reconnect when its user switches language.
+**Language** — `message` is an object keyed by language code. `en-US` is always present and is the
+canonical text. When `lang` (a query parameter of the REST call or the WebSocket URL) names a
+language other than English, the translation is added under the resolved language code
+([1.3. Language](#13-language-lang)), not the value that was sent. For example, `lang=ko` or
+`lang=ko-kr` adds `ko-KR`, and `lang=zh-HK` adds `zh-TW`. If the server cannot translate the
+language, no translation is added. Without `lang`, only `en-US` is sent. Clients that translate
+text themselves can use `messageKey` and `args` instead, and do not need to reconnect when the user
+changes language.
 
 **Response** — an array, most severe first, then oldest first:
 ```json
@@ -906,16 +938,16 @@ does not need to reconnect when its user switches language.
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | String | Identifies one notice. A notice with the same `id` is updated in place, never duplicated |
-| `kind` | String | What raised it. Currently `systemDisk` |
+| `kind` | String | Source of the notice. Currently `systemDisk` |
 | `severity` | String | `info`, `warning` or `critical`. Show `critical` prominently — it needs immediate action |
 | `message` | Object | Text by language code, placeholders filled |
 | `message.en-US` | String | English — always present |
-| `message.{lang}` | String | The requested language, under its language code (e.g. `ko-KR`). Only when `lang` names a supported language other than English |
+| `message.{code}` | String | The translation, under the server's code for the requested language (e.g. `ko-KR`; `zh-TW` for `lang=zh-HK`). Only when `lang` names a language other than English that the server can translate |
 | `messageKey` | String | English text with `%1%`, `%2%` … placeholders — the translation key, for clients that translate themselves |
 | `args` | Array | Placeholder values, in order (not translated) |
 | `param` | Object | `kind`-specific detail. Omitted when there is none. Treat as open-ended |
-| `timeBegin` | String | When it was first raised. Stays the same while it is updated |
-| `timeUpdate` | String | Last change |
+| `timeBegin` | String | Time the notice was first raised. Does not change when the notice is updated |
+| `timeUpdate` | String | Time of the last change |
 
 **`notice` topic messages:**
 
@@ -923,8 +955,8 @@ does not need to reconnect when its user switches language.
 |----------|------|------|
 | `snapshot` | `notices`: array as above | Once, right after subscribing |
 | `raised` | `notice`: one notice | A new notice |
-| `updated` | `notice`: one notice | Its content changed (for `systemDisk`, every change of the free-space figure — about every 5 seconds while it lasts) |
-| `cleared` | `notice`: the last content | It no longer applies |
+| `updated` | `notice`: one notice | The notice content changed (for `systemDisk`, each change in free space, about every 5 seconds while the notice is active) |
+| `cleared` | `notice`: the last content | The condition no longer applies |
 
 ```json
 {"topic": "notice", "action": "updated", "notice": {"id": "systemDisk", "severity": "critical", "message": {"en-US": "Disk C: is almost full: 140MB left"}, "...": "..."}}
@@ -932,20 +964,20 @@ does not need to reconnect when its user switches language.
 
 #### System disk notice (`kind: systemDisk`)
 
-The *system disk* is the disk where the product keeps its database and logs — normally the
-Windows drive `C:`, separate from the recording disks. When it fills up, new recordings cannot be
-indexed and recognition records are not saved, even though the recording disks still have room.
+The *system disk* holds the product's database and logs. It is normally the Windows drive `C:`,
+separate from the recording disks. When it is full, new recordings cannot be indexed and
+recognition records are not saved, even if the recording disks have free space.
 
 | `severity` | Condition | `messageKey` |
 |----------|------|------|
 | `warning` | Under 1 GB free | `Low disk space on %1%: %2% left` |
 | `critical` | Under 200 MB free | `Disk %1% is almost full: %2% left` |
-| `critical` | A record could not be written for lack of space within the last 60 seconds | `Disk %1% is full. Data is not being saved.` |
+| `critical` | A record could not be written for lack of space or an I/O error within the last 60 seconds | `Disk %1% is full. Data is not being saved.` |
 
-It is cleared when the disk is back to normal. `param` carries the same fields as `systemDisk` in
-[5.2. System Health](#52-system-health). Each change of level is also recorded as a `systemEvent`
-(see [System disk warning](#system-disk-warning)) — when the disk is too full to record it, only
-the notice remains.
+The notice is cleared when the disk returns to normal. `param` contains the same fields as
+`systemDisk` in [5.2. System Health](#52-system-health). Each level change is also recorded as a
+`systemEvent` (see [System disk warning](#system-disk-warning)). If the disk is too full to record
+the event, only the notice is available.
 
 ## 6. Channel
 
@@ -1156,7 +1188,7 @@ Controls camera Pan/Tilt/Zoom.
              move
 ```
 
-> **Note**: PTZ commands are executed through the camera's ONVIF service. May return 500 error if the camera doesn't support ONVIF or the connection is unstable.
+> **Note**: PTZ commands are executed through the camera's ONVIF service. The request may return a 500 error if the camera does not support ONVIF or the connection is unstable.
 
 **Example**:
 ```bash
@@ -1285,7 +1317,7 @@ Remotely reboots camera. **Admin privileges required**
 
 ## 8. Recording
 
-Recording data search API. Used for calendar UI implementation.
+Recording data search API, used to build calendar UIs.
 
 ### 8.1. Recording Days
 
@@ -1306,7 +1338,7 @@ Retrieves dates with recording data.
 | `timeBegin` | DateTime | N | - | Search start time (ISO 8601) |
 | `timeEnd` | DateTime | N | - | Search end time (ISO 8601) |
 
-> **Note**: The `X-Host` header is required. Set automatically on standard web browser requests.
+> **Note**: The `X-Host` header is required. It is set automatically on standard web browser requests.
 
 **Response**:
 ```json
@@ -1413,7 +1445,7 @@ Retrieves event types supported by the system.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `lang` | String | N | Language code (e.g., `en-US`, `ko-KR`) |
+| `lang` | String | N | Language code ([1.3](#13-language-lang)). Without it, the NVR's own language |
 
 **Response**:
 ```json
@@ -1538,9 +1570,9 @@ Searches stored event logs.
 | `data[].typeName` | String | Event type name |
 | `data[].code` | Int | Event code |
 | `data[].codeName` | String | Event code name |
-| `data[].chid` | Int | Related channel ID. `null` when the event is not tied to a single channel — an incident spanning several channels lists them in `param` instead (see below) |
+| `data[].chid` | Int | Related channel ID. `null` when the event is not tied to a single channel. For an incident that spans several channels, the channels are listed in `param` (see below) |
 | `data[].timeRange` | Array | Event time range |
-| `data[].param` | Object | Event-specific detail, as stored. Its shape depends on `code` — treat it as open-ended and ignore keys you do not handle. Unlike `typeName` / `codeName` it is **not** localized. |
+| `data[].param` | Object | Event-specific detail, as stored. Its structure depends on `code`. Treat it as open-ended and ignore keys you do not handle. Unlike `typeName` / `codeName`, it is **not** localized. |
 
 #### Storage failure detail
 
@@ -1553,22 +1585,22 @@ Recording events with `codeName` `"Storage error"` / `"Storage ready"` carry `pa
 | `-2` | Write only |
 | `-4` | Read only |
 | `-6` | Read write denied |
-| `-8` | Storage cleanup stopped — the housekeeping thread stalled. Recording continues, but deferred deletion and orphan cleanup are not running |
-| `-9` | Storage write stalled — the storage accepted no writes while data was queued |
+| `-8` | Storage cleanup stopped. Recording continues, but deferred deletion and orphaned-file cleanup are not running |
+| `-9` | Storage write stalled. The storage accepted no writes while data was waiting to be written |
 | `-100` | Unknown error |
 
-`-9` has two emitters, and they answer different questions:
+`-9` is emitted in two cases:
 
 | Emitted when | Payload |
 |---|---|
 | Disk I/O calls repeatedly took over 10 seconds — three or more within a rolling 1-hour window | `stallCount`, `stalledSec`, `chid` |
 | The storage accepted no writes at all while data was queued | `stalledSec` |
 
-The first is an **incident row**. It opens as soon as the condition is met rather than after the trouble passes, is refreshed about once a minute while it lasts (`ongoing: true`), and is finalized when the window falls back under the threshold. `data[].timeRange` grows with it, so the same `data[].id` returns a wider range on a later poll. The second is emitted once, after the stall ends.
+The first is an **incident row**. It is created as soon as the condition is met, not after the problem ends. It is updated about once a minute while the condition lasts (`ongoing: true`) and is finalized when the count in the window falls below the threshold. `data[].timeRange` extends as the incident continues, so the same `data[].id` can return a wider range on a later poll. The second is emitted once, after the stall ends.
 
-Both carry a **loss summary** when the stall actually cost video — `lostSec`, `channels`, `channelList` and `droppedFrames`, measured from the moment the incident opened. This is the answer to "how bad was it", and it is deliberately expressed in seconds of video and channel count rather than a frame count.
+Both include a **loss summary** when video was lost: `lostSec`, `channels`, `channelList` and `droppedFrames`, measured from the start of the incident. The loss is expressed in seconds of video and number of channels rather than in frames.
 
-**When no video was lost, none of those four keys are present.** That is the normal outcome: the write queue absorbed the stall. Treat their absence as "no loss", not as missing data — do not default them to zero and report a loss of 0.
+**When no video was lost, these four keys are omitted.** This is the normal case: the write queue absorbed the stall. Treat their absence as "no loss", not as missing data. Do not default them to zero and report a loss of 0.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -1582,7 +1614,7 @@ Both carry a **loss summary** when the stall actually cost video — `lostSec`, 
 | `droppedFrames` | Int | Frames lost, all channels combined. Diagnostic detail behind `lostSec`. Absent when nothing was lost |
 | `ongoing` | Bool | Present and `true` while the incident is still open |
 
-Stall with no loss — the common case:
+Stall with no loss (the common case):
 
 ```json
 {
@@ -1592,7 +1624,7 @@ Stall with no loss — the common case:
 }
 ```
 
-Stall that cost video:
+Stall with video loss:
 
 ```json
 {
@@ -1609,15 +1641,15 @@ Stall that cost video:
 }
 ```
 
-`lostSec` is the **total missing video**, not the span it happened over. A `-9` incident lasting two hours may have lost only three minutes; the `"Recording frame drop"` event's `period` gives the span, and `lostSec` gives the damage.
+`lostSec` is the **total missing video**, not the duration of the incident. A `-9` incident lasting two hours may have lost only three minutes of video. The `period` of the `"Recording frame drop"` event gives the duration, and `lostSec` gives the amount lost.
 
 #### Recording frame drop detail
 
 `"Recording frame drop"` reports video that was lost and cannot be recovered.
 
-**One event covers one incident, not one channel.** Frames dropped across many channels within the same stretch are collected into a single row, so `data[].chid` is `null` and the affected channels are listed in `param`. An incident ends after 60 seconds with no further drops. Like `-9` above, the row opens immediately and is refreshed while the incident lasts — both `data[].timeRange` and `param.period` grow with it.
+**One event covers one incident, not one channel.** Frames dropped on multiple channels during the same period are recorded in a single row, so `data[].chid` is `null` and the affected channels are listed in `param`. An incident ends after 60 seconds without further drops. As with `-9` above, the row is created immediately and updated while the incident lasts. Both `data[].timeRange` and `param.period` extend with it.
 
-`-9` at the same timestamp is the usual **cause**: the storage stopped keeping up and the write queue had to reject frames. A drop confined to one or two channels points elsewhere, since disk latency does not single out channels.
+A `-9` event at the same time is the usual **cause**: the storage could not keep up and the write queue rejected frames. A drop limited to one or two channels has a different cause, because disk latency affects all channels.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -1639,16 +1671,16 @@ Stall that cost video:
 
 #### Missing recording detail
 
-`"Missing recording"` is per-channel, so `data[].chid` names the channel: the recording watchdog saw nothing written for it and restarted its stream. The remaining fields describe the state at that moment, which is what separates a storage problem from a stream problem.
+`"Missing recording"` is reported per channel, so `data[].chid` identifies the channel. The recording watchdog detected that nothing was written for the channel and restarted its stream. The other fields describe the state at that moment and help distinguish a storage problem from a stream problem.
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `secs` | Int | How long recording had been failing before the restart, in seconds |
-| `streamFps` | Int | Stream frame rate at that moment. `0` points at the camera or network rather than the storage |
+| `streamFps` | Int | Stream frame rate at that moment. `0` indicates a camera or network problem rather than a storage problem |
 | `storage` | Int | ID of the recording storage in use |
 | `freeMB` | Int | Free space on it, in MB. `-1` if it could not be read |
-| `anchorAge` | Int | Seconds since the last successful free-space reading. A large value means the volume stopped answering; `-1` if it was never read |
-| `queuePct` | Int | Write queue occupancy, in percent. A low value with recording still failing rules out back-pressure. `-1` if unavailable |
+| `anchorAge` | Int | Seconds since the last successful free-space reading. A large value means the volume stopped responding. `-1` if it was never read |
+| `queuePct` | Int | Write queue occupancy, in percent. A low value while recording is failing rules out a full write queue as the cause. `-1` if unavailable |
 
 ```json
 {
@@ -1663,22 +1695,22 @@ Stall that cost video:
 
 #### System disk warning
 
-System log events record each change of the system disk level (see `systemDisk` in
-[5.2. System Health](#52-system-health)). For the current state use the `notice` channel
-([5.5. System Notices](#55-system-notices)). One event is emitted per change of level:
+System log events record each change in the system disk level (see `systemDisk` in
+[5.2. System Health](#52-system-health)). For the current state, use the `notice` channel
+([5.5. System Notices](#55-system-notices)). One event is emitted for each level change:
 
 | `code` | `codeName` | When |
 |-----:|---------|------|
 | `51` | `"System disk space is low"` | Free space fell under 1 GB |
-| `52` | `"System disk is full"` | Free space fell under 200 MB, or a record could not be written for lack of space |
+| `52` | `"System disk is full"` | Free space fell under 200 MB, or a record could not be written for lack of space or an I/O error |
 | `53` | `"System disk space has been restored."` | Back to normal |
 
 `codeName` is localized to the requested language. `param` carries `drive`, `totalSpace`,
 `freeSpace`, `status` and `dataWriteFailed` — the same fields as `systemDisk` in the health response.
 
-When the disk is too full to store the event, it is still delivered to `systemEvent`
-subscribers, with `id` `-1`, and does not appear in the event log. A client that must not miss
-it should subscribe rather than poll the log.
+If the disk is too full to store the event, the event is still delivered to `systemEvent`
+subscribers with `id` `-1`, but it does not appear in the event log. Clients that must not miss
+it should subscribe instead of polling the log.
 
 ### 9.4. Event Trigger (Event Backup)
 
@@ -1765,7 +1797,7 @@ Content-Type: application/json
 | `eventId` | Int | Event log ID |
 | `videoURLs` | Array\<String\> | Backup video URLs (available after post-alarm recording completes) |
 
-> The backup runs asynchronously. `videoURLs` are returned immediately but the video files become available only after the post-alarm period has elapsed and the backup is completed.
+> The backup runs asynchronously. `videoURLs` are returned immediately, but the files become available only after the post-alarm period ends and the backup completes.
 
 > **Examples:** [JavaScript](examples/javascript/05-event-log.js) · [Python](examples/python/05_event_log.py) · [C#](examples/csharp/05_EventLog.cs) · [Go](examples/go/05_events/) · [Java](examples/java/V1_05_EventLog.java) · [Kotlin](examples/kotlin/V1_05_EventLog.kt) · [Swift](examples/swift/05-event-log.swift) · [PowerShell](examples/powershell/05-event-log.ps1) · [curl](examples/curl/05-event-log.sh)
 
@@ -1824,7 +1856,7 @@ Searches license plate recognition logs.
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `keyword` | String | N | - | Plate keyword (partial match) |
-| `unrecognized` | Boolean | N | false | Only records where **no plate was read**. A keyword cannot express this, so it is a separate condition |
+| `unrecognized` | Boolean | N | false | Only records where **no plate was read**. This cannot be expressed with `keyword` |
 | `timeBegin` | DateTime | Y | - | Search start time (ISO 8601) |
 | `timeEnd` | DateTime | Y | - | Search end time (ISO 8601) |
 | `src` | String | N | - | LPR source filter (comma-separated) |
@@ -1833,9 +1865,9 @@ Searches license plate recognition logs.
 | `sort` | String | N | `"desc"` | Sort order (`"asc"` or `"desc"`) |
 | `export` | Boolean | N | false | When true, returns CSV format |
 
-> **Records with no plate.** `plateNo` is `null`. A placeholder string (`xxxx`) used to be
-> stored there and looked like a real plate; it now uses the same representation as
-> "no plate" (`null`). A keyword cannot match it, so use `unrecognized=true`.
+> **Records with no plate.** `plateNo` is `null`. Earlier versions stored a placeholder string
+> (`xxxx`) that looked like a real plate. Those records now also return `null`. A keyword
+> cannot match them, so use `unrecognized=true`.
 
 > **Note**: `timeBegin` and `timeEnd` are required. `export=true` requests may take a long time on large datasets, so set an appropriate timeout.
 
@@ -1871,7 +1903,7 @@ Searches license plate recognition logs.
 | `at` | Int | Current offset |
 | `data` | Array | Recognition result list |
 | `data[].id` | Int | Record ID |
-| `data[].plateNo` | String | License plate number. Always the **current** value — after a correction ([10.4](#104-vehicle-number-correction)) it is the corrected one |
+| `data[].plateNo` | String | License plate number. Always the **current** value. After a correction ([10.4](#104-vehicle-number-correction)), this is the corrected plate |
 | `data[].plateEdited` | Boolean | `true` if a person corrected the plate |
 | `data[].originalPlateNo` | String | (only when `plateEdited`) The plate as first recognized (`""` if none was read) |
 | `data[].score` | Float | Recognition confidence |
@@ -1886,7 +1918,7 @@ Searches license plate recognition logs.
 
 ### 10.3. Similar Plate Search
 
-Searches plates by partial or full keyword. Returns all plates containing the keyword, useful for partial number lookup or misrecognition recovery.
+Searches plates by partial or full keyword. Returns all plates containing the keyword. This is useful for looking up a partial number or finding misrecognized plates.
 
 For example, if you only know the four-digit number `1234`, searching with `keyword=1234` returns all recognized plates containing that number, such as `"12가1234"`, `"56나1234"`, etc.
 
@@ -1922,7 +1954,7 @@ billing, correct the session's representative plate instead ([16.9](#169-vehicle
 |---|---|
 | Target | Exactly **one** record, by its `id`. There is no bulk correction and no correction by plate value |
 | Where the `id` comes from | `data[].id` of [10.2](#102-lpr-log), or the `id` that the realtime `LPR` event carries next to each `plateNo` |
-| History | Every correction adds a row; earlier rows are never changed. A wrong correction stays on record and is fixed by correcting again |
+| History | Each correction adds a new row. Earlier rows are not changed. An incorrect correction remains in the history; fix it by submitting another correction |
 | Format | Not checked (plates differ by country). 1–32 characters after trimming |
 | Effect | Changes the stored record only. Events already sent (push, registered-vehicle matching, signboard) are not re-evaluated |
 | Permission | **Control** |
@@ -1944,7 +1976,7 @@ billing, correct the session's representative plate instead ([16.9](#169-vehicle
   "editCount": 1,
   "edit": {
     "id": 57,
-    "time": "2026-10-22T14:03:11+09:00",
+    "time": "2026-10-22T14:03:11.000+09:00",
     "user": "admin",
     "reason": "misread at night"
   }
@@ -1966,16 +1998,16 @@ billing, correct the session's representative plate instead ([16.9](#169-vehicle
   "plateNo": "12가3456",
   "originalPlateNo": "12가3458",
   "edits": [
-    { "id": 41, "time": "2026-10-22T13:58:02+09:00", "user": "admin",
+    { "id": 41, "time": "2026-10-22T13:58:02.000+09:00", "user": "admin",
       "before": "12가3458", "after": "12가3486", "reason": "" },
-    { "id": 57, "time": "2026-10-22T14:03:11+09:00", "user": "admin",
+    { "id": 57, "time": "2026-10-22T14:03:11.000+09:00", "user": "admin",
       "before": "12가3486", "after": "12가3456", "reason": "misread at night" }
   ]
 }
 ```
 
-`edits` is in recorded order. It is empty (and `originalPlateNo` is absent) when the record
-was never corrected. Reading the history needs **Playback** permission.
+`edits` is listed in the order recorded. It is empty (and `originalPlateNo` is omitted) when the
+record was never corrected. Reading the history requires **Playback** permission.
 
 | Status | Meaning |
 |--------|---------|
@@ -1990,9 +2022,9 @@ was never corrected. Reading the history needs **Playback** permission.
 
 ## 11. Object Detection
 
-API for recording and querying metadata output from AI cameras equipped with object detection capabilities. An AI camera that supports object detection must be connected to use this feature.
+API for querying stored object detection metadata from AI cameras. An AI camera that supports object detection must be connected to use this feature.
 
-> **Note**: Object Detection API requires a corresponding license. Returns 404 if the license is not activated.
+> **Note**: The Object Detection API requires a license. Returns 404 if the license is not activated.
 
 ### 11.1. Object Types
 
@@ -2083,9 +2115,9 @@ Searches detected objects by attributes.
 
 ## 12. Face Search
 
-API for finding a person in recorded video using a photo image. Compares deep learning-based facial feature vectors to search for similar faces. An AI camera with object detection capabilities must be connected to use this feature.
+API for finding a person in recorded video using a photo. It compares facial feature vectors from a deep learning model to find similar faces. An AI camera with object detection capabilities must be connected to use this feature.
 
-> **Note**: Face Search requires a corresponding license. Returns 404 if the license is not activated.
+> **Note**: Face Search requires a license. Returns 404 if the license is not activated.
 
 ### 12.1. Search by Image
 
@@ -2178,7 +2210,7 @@ Retrieves recording playback URLs.
 | `GET /api/v1/vod?id=1304&prev` | Previous recording segment |
 | `GET /api/v1/vod?ch=1&when=...&otherwise=nearBefore` | Playback at that time, or the nearest **earlier** recording if there is none |
 
-**`otherwise` — what to return when nothing was recorded at that time**
+**`otherwise` — behavior when no recording exists at the requested time**
 
 | Value | Behavior |
 |-------|----------|
@@ -2186,12 +2218,11 @@ Retrieves recording playback URLs.
 | `nearBefore` | The nearest recording **before** the requested time |
 | `nearAfter` | The nearest recording **after** the requested time |
 
-`nearBefore` exists for parking history. A parked vehicle does not move, so motion-triggered
-recording may have stopped while it was still there — but the car is in the same place, so the
-preceding footage still shows the situation at that moment. Use it when the request comes from
-parking history (section 16.5+). Do not use it for event, LPR or object searches: those ask what
-happened *at* that instant, and showing earlier footage would present a different moment as if it
-were that one.
+`nearBefore` is intended for parking history. A parked vehicle does not move, so
+motion-triggered recording may stop while the vehicle is still present. Because the vehicle is
+in the same place, the preceding footage still shows the situation at that moment. Use it for
+requests from parking history (section 16.5+). Do not use it for event, LPR, or object searches.
+Those searches concern a specific moment, and earlier footage would show a different moment.
 
 **Response**:
 ```json
@@ -2298,9 +2329,9 @@ were that one.
 | `src[].label` | String | Resolution label (e.g., `"1080p"`) |
 | `src[].size` | number[] | Resolution `[width, height]` |
 
-**The recording-playback response** (when `when` carries a time) has a different shape.
-`protocol` and `profile` are live-only; instead the segment is identified by `fileId` and
-carries the `timeRange` it covers.
+**The recording-playback response** (when `when` specifies a time) has a different structure.
+`protocol` and `profile` are returned only for live streams. Instead, each segment is identified
+by `fileId` and includes the `timeRange` it covers.
 
 ```json
 [
@@ -2323,18 +2354,19 @@ carries the `timeRange` it covers.
 
 | Response Field (recording) | Type | Description |
 |----------------------------|------|-------------|
-| `fileId` | Int | Segment ID. Use `?id=<fileId>&next` / `&prev` to walk adjacent segments |
+| `fileId` | Int | Segment ID. Use `?id=<fileId>&next` / `&prev` to navigate to adjacent segments |
 | `src[].timeRange` | String[] | `[start, end]` of that segment (see [1.1](#11-time-notation)) |
 
-> **Live fallback.** When the query finds nothing **and the requested time is at or after now**,
-> the server answers with that channel's live stream instead (the response takes the live shape
-> above). That is why a future timestamp does not come back empty. Pass `nolive=true` to get
+> **Live fallback.** When the query finds nothing **and the requested time is now or later**,
+> the server returns that channel's live stream instead, in the live format shown above. For
+> this reason, a future timestamp does not return an empty result. Pass `nolive=true` to get
 > recordings only.
 
-> **Deleted files are omitted.** Segments already removed by the retention policy are left out
-> even though the record still exists. An `otherwise` lookup can therefore return an **empty
-> array** — `nearAfter` especially, because it reaches for the oldest end. An empty array is not
-> an error.
+> **Deleted files are omitted.** Segments removed by the retention policy are excluded even if
+> their records still exist. An `otherwise` lookup can therefore return an **empty array**. This
+> is most likely with `nearAfter`: when the requested time is earlier than every remaining
+> recording, it selects the oldest one, and the oldest recordings are the first to be deleted.
+> An empty array is not an error.
 
 **Available Protocols**:
 | Protocol | Description | Condition |
@@ -2344,15 +2376,15 @@ carries the `timeRange` it covers.
 | `websocket-flv` | WebSocket-FLV stream (`ws`/`wss`) | HTTP-FLV enabled |
 | `rtsp` | RTSP re-stream (`rtsp`), TCP only | RTSP re-streaming enabled |
 
-> **`flv` vs `websocket-flv`**: same stream, same endpoint — only the transport framing differs. `flv` uses HTTP chunked transfer, `websocket-flv` upgrades the connection and sends each FLV tag as one WebSocket binary frame. The scheme follows the request scheme (`http`→`ws`, `https`→`wss`). Both work with players such as flv.js / mpegts.js.
+> **`flv` vs `websocket-flv`**: Both use the same stream and endpoint; only the transport differs. `flv` uses HTTP chunked transfer. `websocket-flv` upgrades the connection to WebSocket and sends each FLV tag as one binary frame. The scheme matches the request scheme (`http`→`ws`, `https`→`wss`). Both work with players such as flv.js / mpegts.js.
 
-> **Prefer `websocket-flv` when watching several channels at once.** A live stream keeps its connection open while it plays, so the number of simultaneous connections equals the number of channels on screen. Browsers cap **HTTP/1.1 connections per origin at about 6**, and HTTP-FLV cannot escape that cap — this endpoint refuses HTTP/2 and HTTP/3, so every `flv` stream consumes one of those 6 slots. Past that point additional channels simply wait, and other requests to the same origin (REST calls, thumbnails) queue behind them. WebSocket connections are not taken from that pool and are allowed in far greater numbers, so `websocket-flv` has no practical concurrency limit for a video wall. For a single channel either choice is fine.
+> **Use `websocket-flv` when displaying several channels at once.** A live stream keeps its connection open during playback, so the number of open connections equals the number of channels on screen. Browsers limit **HTTP/1.1 connections to about 6 per origin**. This endpoint does not support HTTP/2 or HTTP/3, so each `flv` stream uses one of those 6 connections. Additional channels wait for a free connection, and other requests to the same origin (REST calls, thumbnails) are queued behind them. WebSocket connections do not count toward this limit, so `websocket-flv` has no practical concurrency limit for a video wall. For a single channel, either protocol works.
 
-> **`rtsp`**: the same RTMP publish, re-sent by the server as RTP. **TCP interleaved only** — a UDP `SETUP` is answered with `461 Unsupported Transport`, so clients that default to UDP must be told to use TCP (`vlc --rtsp-tcp`, `ffplay -rtsp_transport tcp`). Basic authentication is required and cannot be turned off: put the credentials in the URL (`rtsp://user:pass@host/live/ch1main`) and percent-encode reserved characters (`@` becomes `%40`). Video is **H.264 only**. Browsers cannot play RTSP — use it for external players, VMS integrations and FFmpeg-based pipelines, not for a web page.
+> **`rtsp`**: The server re-sends the same RTMP stream over RTP. **Only TCP interleaved transport is supported.** A UDP `SETUP` request returns `461 Unsupported Transport`, so configure clients that default to UDP to use TCP (`vlc --rtsp-tcp`, `ffplay -rtsp_transport tcp`). Basic authentication is required and cannot be disabled. Include the credentials in the URL (`rtsp://user:pass@host/live/ch1main`) and percent-encode reserved characters (`@` becomes `%40`). Video is **H.264 only**. Browsers cannot play RTSP. Use it for external players, VMS integrations, and FFmpeg-based pipelines, not for web pages.
 
-> **Embedding video in a web page?** You usually need none of these URLs — the server ships a ready-made player at [`GET /watch`](#133-watch-page-embeddable-player). Put it in an `<iframe>` and it handles the protocol choice, authentication (`token` / `apikey`) and recorded playback for you. Build your own player on `flv` / `websocket-flv` only when you need control the Watch Page does not offer.
+> **Embedding video in a web page?** You usually do not need these URLs. The server provides a ready-made player at [`GET /watch`](#133-watch-page-embeddable-player). Place it in an `<iframe>`; it handles protocol selection, authentication (`token` / `apikey`), and recorded playback. Build your own player on `flv` / `websocket-flv` only if you need features the Watch Page does not provide.
 
-> **Note**: The `X-Host` header is required. Set automatically on standard web browser requests. When calling directly, include the `X-Host: {host}:{port}` header.
+> **Note**: The `X-Host` header is required. It is set automatically on standard web browser requests. When calling directly, include the `X-Host: {host}:{port}` header.
 
 > **Examples:** [JavaScript](examples/javascript/07-vod-stream.js) · [Python](examples/python/07_vod_stream.py) · [C#](examples/csharp/07_VodStream.cs) · [Go](examples/go/07_vod/) · [Java](examples/java/V1_07_VodStream.java) · [Kotlin](examples/kotlin/V1_07_VodStream.kt) · [Swift](examples/swift/07-vod-stream.swift) · [PowerShell](examples/powershell/07-vod-stream.ps1) · [curl](examples/curl/07-vod-stream.sh)
 
@@ -2396,7 +2428,7 @@ Returns an HTML page with an embedded video player. Useful for embedding live or
 
 Emergency call API.
 
-> **Note**: Emergency API requires a corresponding license. Returns 404 if the license is not activated.
+> **Note**: The Emergency API requires a license. Returns 404 if the license is not activated.
 
 ### 14.1. Emergency Call List
 
@@ -2431,9 +2463,9 @@ Retrieves registered emergency call device list.
 
 ## 15. Push (LPR Camera, Emergency Bell Integration)
 
-Sends events to NVR from external sources. Used for LPR camera and emergency bell integration.
+Sends events to the NVR from external sources. Used for LPR camera and emergency bell integration.
 
-> **Note**: Push API requires a corresponding license. Returns 404 if the license is not activated.
+> **Note**: The Push API requires a license. Returns 404 if the license is not activated.
 
 ### 15.1. Send Push Event
 
@@ -2542,7 +2574,7 @@ Counter-based entry/exit management per parking lot.
 | `type` | string | `"counter"` (entry/exit counting) or `"group"` (aggregated from members) |
 | `maxCount` | number | Maximum parking capacity |
 | `member` | number[] | (group only) Member parking lot IDs |
-| `parkingSpots` | number[] | (optional) Associated parking spot IDs (LprSrc IDs for CountBySpots mode) |
+| `parkingSpots` | number[] | (optional) Associated parking spot IDs (LPR source IDs, used when the lot is counted by spot occupancy) |
 
 ### 16.2. Parking Lot Status
 
@@ -2717,24 +2749,24 @@ Retrieves real-time spot occupancy. Returns only parking spots (`type:"spot"`).
 
 ### 16.5. Parking Session History
 
-A *parking session* is one vehicle's stay in one place: it opens when the vehicle is
-confirmed present and closes when it is gone. Use it to answer "how long has this car
-been here" and to build billing records.
+A *parking session* is one vehicle's stay in one place. It opens when the vehicle is
+confirmed present and closes when the vehicle leaves. Use sessions to find how long a
+vehicle has been parked and to build billing records.
 
-Sessions come from three kinds of place (`kind`): a parking spot, an entrance/exit gate,
-and a no-parking (dwell) zone.
+Sessions are recorded for three kinds of location (`kind`): a parking spot, an
+entrance/exit gate, and a no-parking (dwell) zone.
 
-> Requires the parking history license. Without it every endpoint in 16.5–16.9 returns
-> `403`. Check beforehand with `GET /api/v1/info?license`: the license is active when
+> Requires the parking history license. Without it, every endpoint in 16.5–16.9 returns
+> `403`. To check in advance, call `GET /api/v1/info?license`: the license is active when
 > `license.extension` contains `parkingHistory` (see [Server Info](#4-server-info)).
-> Reading needs **Playback** permission; 16.7, 16.8 and 16.9 write history and need
-> **Control**.
+> Reading requires **Playback** permission. 16.7, 16.8 and 16.9 modify history and require
+> **Control** permission.
 
 | Endpoint | Description |
 |----------|-------------|
 | `GET /api/v1/parking/session` | Session list |
 | `GET /api/v1/parking/session?open=true` | Vehicles still parked |
-| `GET /api/v1/parking/session?plateNo=12가3456&open=true` | Is this plate parked, and for how long |
+| `GET /api/v1/parking/session?plateNo=12가3456&open=true` | Whether this plate is parked, and for how long |
 | `GET /api/v1/parking/session?timeField=out&timeBegin=...&timeEnd=...` | Vehicles that left in a period |
 
 **Parameters**:
@@ -2755,17 +2787,20 @@ and a no-parking (dwell) zone.
 | `inKind` | String | N | Entry basis, comma-separated (see table below). Also matches open sessions |
 | `open` | Boolean | N | `true` = still parked, `false` = already left |
 | `paid` | Boolean | N | `true` = has an **effective** payment record (undone ones excluded) |
-| `exempt` | Boolean | N | `true` = only sessions exempt from billing. Needed because an exemption has to be **found before it can be reverted** (see [16.7](#167-change-payment-state)) |
+| `exempt` | Boolean | N | `true` = only sessions exempt from billing. Use it to **find an exemption before reverting it** (see [16.7](#167-change-payment-state)) |
 | `hasPlate` | Boolean | N | `true` = plate was recognized |
 | `durationMin` | Int | N | Minimum stay, seconds |
 | `durationMax` | Int | N | Maximum stay, seconds |
 | `unpaidDurationMin` | Int | N | Minimum unpaid time, seconds (time since the last payment) |
 | `at` | Int | N | Offset for paging (default `0`) |
 | `maxCount` | Int | N | Page size (server cap applies) |
+| `sort` | String | N | `desc` (default) or `asc` |
+| `sortBy` | String | N | `time` (entry time, default) or `duration` |
+| `includePayments` | Boolean | N | Include the `payments` array in each session |
 
 **`scope` — what the query is scoped to**
 
-`scope` decides *which list* the secondary items come from. Each scope reads a different item
+`scope` determines *which list* the item parameter refers to. Each scope uses a different item
 parameter.
 
 | `scope` | Item parameter | When items are omitted |
@@ -2777,17 +2812,13 @@ parameter.
 | `channel` | `ch` | All channels (no condition) |
 | `lot` | `lot` | **Only sessions that belong to a parking lot** |
 
-Omitting the items means "the whole scope", which is **not the same as no condition**. With
-`scope=lot` and no `lot`, only sessions that belong to a parking lot are returned — no-parking-zone
-history does not belong to a lot and is therefore excluded. For the same reason `scope=spot`
-returns parking-space history only.
+Omitting the items means "the entire scope", which is **not the same as no condition**. With
+`scope=lot` and no `lot`, only sessions that belong to a parking lot are returned. No-parking-zone
+history does not belong to a lot and is excluded. Similarly, `scope=spot` returns parking-space
+history only.
 
-When `scope` is `spot`, `gate` or `noparking` it also fixes the session kind, so it overrides
-`kind`. Omitting `scope` keeps the previous behavior exactly.
-
-| `sort` | String | N | `desc` (default) or `asc` |
-| `sortBy` | String | N | `time` (entry time, default) or `duration` |
-| `includePayments` | Boolean | N | Include the `payments` array in each session |
+When `scope` is `spot`, `gate` or `noparking`, it also determines the session kind and overrides
+`kind`. Omitting `scope` keeps the previous behavior.
 
 **Response**:
 ```json
@@ -2861,42 +2892,42 @@ When `scope` is `spot`, `gate` or `noparking` it also fixes the session kind, so
 |-------|------|-------------|
 | `totalCount` | Int | Total matches (`-1` when no time filter was given, so the count was skipped) |
 | `at` | Int | Offset of this page |
-| `asOf` | DateTime | Server time the response was built. Open sessions are measured up to this instant |
+| `asOf` | DateTime | Server time when the response was generated. Open sessions are measured up to this time |
 | `summary.count` | Int | Session count in the whole result |
 | `summary.totalDurationMs` | Int | Sum of stay time, milliseconds |
 | `summary.firstTimeIn` | DateTime\|null | Earliest entry in the result |
 | `summary.lastTimeOut` | DateTime\|null | Latest exit in the result |
 | `data[].id` | Int | Session ID |
 | `data[].kind` | String | `spot`, `gate` or `dwell` |
-| `data[].src` | Object | Where it happened — `id` and `name` of the spot / gate / zone |
+| `data[].src` | Object | Location of the session: `id` and `name` of the spot / gate / zone |
 | `data[].srcOut` | Int | (gate only) Source ID the vehicle left through |
-| `data[].lots` | Int[] | Parking lots the source belonged to **at the time**, not now |
+| `data[].lots` | Int[] | Parking lots the source belonged to **when the session was recorded**, not currently |
 | `data[].usageFlags` | Int | Source usage flags recorded with the session |
 | `data[].chid` | Int | Channel number (1-based) |
-| `data[].plateNo` | String\|null | Plate number, `null` if never recognized. Always the **current** value — after a correction ([16.9](#169-vehicle-number-correction)) it is the corrected one |
+| `data[].plateNo` | String\|null | Plate number, `null` if never recognized. Always the **current** value. After a correction ([16.9](#169-vehicle-number-correction)), this is the corrected plate |
 | `data[].plateEdited` | Boolean | `true` if a person corrected the plate |
 | `data[].originalPlateNo` | String | (only when `plateEdited`) The plate as first recognized (`""` if none was read) |
 | `data[].plateTime` | DateTime\|null | When the plate was read |
 | `data[].score` | Float | Recognition confidence (present with `plateNo`) |
 | `data[].timeRange` | DateTime[] | `[entry]` while open, `[entry, exit]` once closed |
 | `data[].open` | Boolean | `true` = still parked |
-| `data[].outKind` | String | How the exit time was decided (closed sessions only) |
-| `data[].outTimeMeans` | String | What the exit time *is* (closed sessions only) |
-| `data[].inKind` | String | How the entry time was decided (present on **open sessions too**) |
-| `data[].inTimeMeans` | String | What the entry time *is* |
-| `data[].durationMs` | Int | Stay in milliseconds — up to `asOf` while open |
+| `data[].outKind` | String | How the exit time was determined (closed sessions only) |
+| `data[].outTimeMeans` | String | What the exit time represents (closed sessions only) |
+| `data[].inKind` | String | How the entry time was determined (present on **open sessions too**) |
+| `data[].inTimeMeans` | String | What the entry time represents |
+| `data[].durationMs` | Int | Stay in milliseconds. For open sessions, measured up to `asOf` |
 | `data[].paidCount` | Int | Number of **effective** payments (undone ones are excluded) |
 | `data[].lastPaidTime` | DateTime\|null | Last payment time |
 | `data[].unpaidDurationMs` | Int | Time not covered by a payment. **Do not bill from this when `exempt` is `true`** |
 | `data[].exempt` | Boolean | Exempt from billing (see [16.7](#167-change-payment-state)) |
-| `data[].box` | Object\|null | Box for that vehicle (see [1.2](#12-box-coordinates)) — points out **which** car in the snapshot |
+| `data[].box` | Object\|null | Box for the vehicle (see [1.2](#12-box-coordinates)). Identifies **which** vehicle in the snapshot belongs to the session |
 | `data[].snapshots` | Object[] | Moments of the session, **oldest first** (below) |
 | `data[].payments` | Object[] | (with `includePayments=true`) `{ id, time, kind, target?, ref? }`. `kind` is `commit`, `exempt` or `undo`; `target` is the `id` the `undo` reverted |
 
 **Snapshots** — each entry is `{ time, chid, tags, plateNo, image, video }`, **oldest first**.
-A single picture can mean several things (the entry frame is often the very shot that read the
-plate), so meaning is carried by a **tag array**, not by a key. The same meaning can also occur
-several times — an AI camera sends several bestshots for one car.
+One picture can have several meanings (the entry frame is often the same shot that read the
+plate), so meanings are given as a **tag array** rather than as keys. The same tag can also
+appear more than once. For example, an AI camera sends several bestshots for one vehicle.
 
 | Field | Content |
 |-------|---------|
@@ -2904,7 +2935,7 @@ several times — an AI camera sends several bestshots for one car.
 | `chid` | Channel number (1-based) |
 | `tags` | Tags from the table below |
 | `plateNo` | Plate this shot read. **`null` when it read none** |
-| `image` | Picture URL, or `null` when reclaimed by retention or when the moment has no picture |
+| `image` | Picture URL, or `null` when the picture was deleted by the retention policy or the moment has no picture |
 | `video` | VOD link for that moment (see [13.2](#132-playback-urls), includes `otherwise=nearBefore`) |
 
 | Tag | Meaning |
@@ -2912,58 +2943,58 @@ several times — an AI camera sends several bestshots for one car.
 | `in` | Entry |
 | `out` | Exit |
 | `current` | "Now" for a session still parked (no picture, live link) |
-| `bestshot` | A shot plate recognition was **attempted** on |
-| `plate` | That shot **did** read a plate |
+| `bestshot` | A shot on which plate recognition was **attempted** |
+| `plate` | Plate recognition **succeeded** on that shot |
 
-> **`bestshot` and `plate` are not the same.** A shot that failed recognition still appears as
-> `bestshot`, without `plate` and with `plateNo: null`. The picture is kept, so a person can
-> check it later. To use only entries that carry a number, look for `plate` in `tags`.
+> **`bestshot` and `plate` are not the same.** A shot on which recognition failed still appears
+> as `bestshot`, without `plate` and with `plateNo: null`. The picture is kept for later review.
+> To use only entries with a plate number, check for `plate` in `tags`.
 
-> **At most 20 pictures per session.** Beyond that, shots that read a plate are kept first, then
-> the larger images. Moments with no picture (`in`, `out`, `current`) are video links and are
-> always included, regardless of the cap.
+> **At most 20 pictures per session.** Beyond that limit, shots that read a plate are kept
+> first, then larger images. Moments without a picture (`in`, `out`, `current`) are video links
+> and are always included regardless of the limit.
 
-**Exit basis** — only `observed` is a measured value. The others are estimates, and the
-error leans in different directions, so a billing app should treat them differently
-rather than reading the timestamp alone.
+**Exit basis** — only `observed` is a measured value. The others are estimates whose errors
+go in different directions, so a billing app should handle each one differently instead of
+relying on the timestamp alone.
 
 | `outKind` | `outTimeMeans` | What the exit time is |
 |-----------|----------------|-----------------------|
 | `observed` | `exitedAt` | The exit was seen. The only measurement |
 | `paid` | `paidAt` | Last payment time. Vehicles usually leave right after paying, so this is closer than video evidence and matches the receipt |
-| `covered` | `discoveredAt` | The spot was blocked from view; this is when the vehicle was found gone. It left **some time earlier** |
-| `lastSeen` | `lastSeenAt` | **Observation ended** (camera disconnected, program exited). This is the last time that channel was evaluated — a **lower bound**. The cause is not recorded, so the name states only the fact |
-| `manual` | `closedByOperator` | An operator closed it (night opening, long occlusion). An operational action, not an observed exit |
-| `unknown` | `unknown` | Pre-dates this rule; only a retrospective approximation exists |
+| `covered` | `discoveredAt` | The spot was hidden from view; this is when the vehicle was found to be gone. The vehicle left **some time earlier** |
+| `lastSeen` | `lastSeenAt` | **Observation ended** (camera disconnected, program exited). This is the last time the channel was evaluated, which is a **lower bound**. The cause is not recorded |
+| `manual` | `closedByOperator` | An operator closed the session (night opening, long occlusion). This is an operational action, not an observed exit |
+| `unknown` | `unknown` | Recorded before this rule was introduced; only an approximate value reconstructed later is available |
 
-**Entry basis** — the mirror of the exit basis, and the error leans the **other way**.
-`lastSeenAt` is a lower bound on the real exit, while `firstSeenAt` is an **upper bound**
-on the real entry (the vehicle was already there). Both understate the time parked.
+**Entry basis** — the counterpart of the exit basis, with the error in the **opposite
+direction**. `lastSeenAt` is a lower bound on the actual exit, while `firstSeenAt` is an
+**upper bound** on the actual entry (the vehicle was already present). Both understate the
+parking duration.
 
-Unlike the exit basis, this is present on **open sessions too** — the start has already
-happened, so a vehicle still parked may have been recorded from `firstSeen`.
+Unlike the exit basis, the entry basis is present on **open sessions too**. The entry has
+already occurred, so a vehicle that is still parked may have been recorded as `firstSeen`.
 
 | `inKind` | `inTimeMeans` | What the entry time is |
 |----------|---------------|------------------------|
 | `observed` | `enteredAt` | An empty → occupied transition was seen. The only measurement |
-| `firstSeen` | `firstSeenAt` | The vehicle was **already there** when observation started. How long it had been is unknown |
-| `unknown` | `unknown` | Pre-dates this rule; whether the start was observed is unknown |
+| `firstSeen` | `firstSeenAt` | The vehicle was **already present** when observation started. How long it had been there is unknown |
+| `unknown` | `unknown` | Recorded before this rule was introduced; whether the start was observed is unknown |
 
-> **One stay may appear as several sessions.** When observation is lost for a while, the
-> session is closed as `lastSeen` and a new one opens as `firstSeen` once observation
-> resumes — the unobserved gap is deliberately excluded from the time parked. A session
-> closed as `lastSeen` and one opened as `firstSeen` on the same space, adjacent in time,
-> are likely the same stay. Whether to add them up is billing policy, not something the
-> API decides.
+> **One stay may appear as several sessions.** When observation is interrupted, the session
+> is closed as `lastSeen`, and a new session opens as `firstSeen` when observation resumes.
+> The unobserved gap is excluded from the parking duration. A `lastSeen` session and a
+> `firstSeen` session on the same space that are adjacent in time are likely the same stay.
+> Whether to combine them is a billing policy decision; the API does not combine them.
 >
-> A short loss does not split the record. No exit or entry can be confirmed within it, so
-> it would have been one session even if observation had continued. The threshold is
-> whichever of these is **longer**:
+> A short interruption does not split the record. No exit or entry can be confirmed within
+> it, so it would have been one session even if observation had continued. The threshold is
+> the **longer** of:
 >
 > - **twice the entry/exit confirmation time**
-> - **twice the plate recognition interval** — a floor that keeps a normal cycle from
->   being read as a loss. On a unit configured with a long recognition interval this is
->   what applies, so the same gap does not split the record.
+> - **twice the plate recognition interval** — a minimum that prevents a normal recognition
+>   cycle from being treated as an interruption. On a unit with a long recognition interval,
+>   this value applies, so the same gap does not split the record.
 
 | Query | Description |
 |-------|-------------|
@@ -2972,15 +3003,15 @@ happened, so a vehicle still parked may have been recorded from `firstSeen`.
 
 ### 16.6. Parking Session Detail
 
-Returns one session with its payment history always included. Use it as the evidence
-view for a dispute.
+Returns one session, always including its payment history. Use it to review the evidence
+in a dispute.
 
 | Endpoint | Description |
 |----------|-------------|
 | `GET /api/v1/parking/session/{id}` | Session detail |
 
-**Response**: a single session object, same shape as `data[]` in 16.5, always carrying
-`payments`.
+**Response**: a single session object with the same structure as `data[]` in 16.5, always
+including `payments`.
 
 ```json
 {
@@ -3026,8 +3057,8 @@ view for a dispute.
 
 ### 16.7. Change Payment State
 
-Changes the payment state of this session. The NVR stores the **time** and the caller's
-reference only — amounts, tariffs and discount rules stay in the billing app.
+Changes the payment state of a session. The NVR stores only the **time** and the caller's
+reference. Amounts, tariffs and discount rules remain in the billing app.
 
 | Endpoint | What it does | `409` |
 |----------|--------------|-------|
@@ -3041,7 +3072,7 @@ reference only — amounts, tariffs and discount rules stay in the billing app.
 |--------|-------------|----------------|--------------------|----------|
 | `commit` | +1 | this time | recounted from this time | unchanged |
 | `exempt` | unchanged | unchanged | unchanged | `true` |
-| `undo` | −1 (when a payment is reverted) | previous effective payment | follows that | `false` when an exemption is reverted |
+| `undo` | −1 (when a payment is reverted) | previous effective payment | recounted from that payment | `false` when an exemption is reverted |
 
 **Rules**
 
@@ -3050,10 +3081,10 @@ reference only — amounts, tariffs and discount rules stay in the billing app.
 | Records | Appended, never deleted. An `undo` adds a row of its own |
 | `undo` target | Omitted: the latest effective change (payment or exemption). With `ref`: the **payment** carrying that reference |
 | `undo` response | `undone` says which kind was reverted (`commit` or `exempt`) |
-| Repeated `undo` | Walks further back through the log |
+| Repeated `undo` | Reverts earlier changes one at a time, from newest to oldest |
 | What `exempt` means | Records a **decision not to collect**. The time values do not change, so when `exempt` is `true`, do not bill from `unpaidDurationMs` |
-| Exempt and queries | Exempt sessions are left out of `unpaidDurationMin` results. The filter returns only sessions that still have unsettled time, and an exempt session is not in scope for settlement |
-| Reverted payments | Are not a basis for the `outKind:"paid"` exit time |
+| Exempt and queries | Exempt sessions are excluded from `unpaidDurationMin` results. The filter returns only sessions with unsettled time, and exempt sessions are not subject to settlement |
+| Reverted payments | Not used as the basis for the `outKind:"paid"` exit time |
 | Recorded time | **Always the server clock.** A `time` you pass is kept separately as `clientTime` (see [1.1](#11-time-notation)) |
 
 **Parameters**:
@@ -3061,7 +3092,7 @@ reference only — amounts, tariffs and discount rules stay in the billing app.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `time` | DateTime | N | The **caller's clock** reading. Kept separately; the NVR always records its own server time (see [1.1](#11-time-notation)) |
-| `ref` | String | N | Transaction identifier in the billing app. For `undo`, singles out the payment to revert |
+| `ref` | String | N | Transaction identifier in the billing app. For `undo`, identifies the payment to revert |
 
 **Response**:
 ```json
@@ -3088,29 +3119,28 @@ reference only — amounts, tariffs and discount rules stay in the billing app.
 | `404` | No session with that ID |
 | `409` | `exempt` on an already exempt session, or `undo` with nothing left to revert |
 
-> A payment on an open session can also become the basis for the exit time. **When the
-> program restarts**, parking space and dwell sessions still left open are closed, and if
-> the last payment is later than the video-based estimate, that time is used as the exit
-> time with `paid` as the basis (see the exit basis table in
-> [16.5](#165-parking-session-history)). It does not apply to entrance/exit sessions.
+> A payment on an open session can also be used as the exit time. **When the program
+> restarts**, parking space and dwell sessions that are still open are closed. If the last
+> payment is later than the video-based estimate, the payment time is used as the exit time,
+> with `paid` as the basis (see the exit basis table in [16.5](#165-parking-session-history)).
+> This does not apply to entrance/exit sessions.
 >
-> **Undone payments and exemptions are not used as a basis** (if they were, the exit time
-> itself would be wrong). A session closed during operation after observation was lost
-> stays `lastSeen`; a payment arriving later does not change it to `paid`.
+> **Undone payments and exemptions are not used as a basis**, because the exit time would
+> then be wrong. A session closed during operation after observation was lost remains
+> `lastSeen`; a later payment does not change it to `paid`.
 
 ### 16.8. No-exit Cleanup
 
-Lets an operator clear a session left "parked" because its exit was never observed
-(it closes the session).
+Lets an operator close a session that remains "parked" because its exit was never observed.
 
 | Item | Detail |
 |---|---|
 | Purpose | Clear entries where the vehicle left but no exit was recognized |
 | Why they occur | Gate left open during free night hours (no exit at a gate) · a spot hidden behind a large vehicle for a long time |
-| If left alone | "Parked" entries pile up and make the live status and the history untrustworthy |
+| If not cleared | "Parked" entries accumulate and make the live status and the history unreliable |
 | Recorded as | `outKind: "manual"` · `outTimeMeans: "closedByOperator"` |
-| A billing app should | **Not** treat it like an observed exit — single it out |
-| vs. `exempt` in [16.7](#167-change-payment-state) | This closes the **parking state**; `exempt` takes the session out of **billing** and may leave it parked |
+| A billing app should | **Not** treat it as an observed exit; handle it separately |
+| vs. `exempt` in [16.7](#167-change-payment-state) | This closes the **parking state**. `exempt` removes the session from **billing** and may leave it parked |
 
 | Endpoint | Description |
 |----------|-------------|
@@ -3138,19 +3168,19 @@ Lets an operator clear a session left "parked" because its exit was never observ
 | `400` | Invalid session ID, or a time at or before the entry time |
 | `403` | Needs **Control** permission |
 | `404` | No session with that ID |
-| `409` | The session is already closed — an existing exit record is never overwritten |
+| `409` | The session is already closed. An existing exit record is never overwritten |
 
-> Closing means the session **no longer exists**. The NVR also drops what it was tracking
-> for that spot or zone, so it does not reopen the same session on its own. If a vehicle
-> is really there, it is confirmed again from scratch (entry confirm time) and gets a
+> Closing a session is **final**. The NVR also discards its tracking state for that spot or
+> zone, so it does not reopen the same session automatically. If a vehicle is actually
+> present, it is confirmed again from the start (entry confirmation time) and receives a
 > **new** session.
 
 ### 16.9. Vehicle Number Correction
 
-Corrects a session's **representative plate** — the one plate the session reports in
-`plateNo`. A tracked session may have read many shots; only the representative plate is the
-correction target, the per-shot readings (`snapshots[].plateNo`) are evidence and stay as
-they were.
+Corrects a session's **representative plate**, the single plate that the session reports in
+`plateNo`. A tracked session may include readings from many shots. Only the representative
+plate can be corrected. The per-shot readings (`snapshots[].plateNo`) are kept unchanged as
+evidence.
 
 | Endpoint | Description |
 |----------|-------------|
@@ -3158,19 +3188,20 @@ they were.
 | `GET /api/v1/parking/session/{id}/plate/history` | Correction history of session `{id}` |
 
 Parameters, responses, history and status codes are the same as [10.4](#104-vehicle-number-correction),
-with `"session": {id}` in place of `"id"` in the correction response and `"target": "session"`
-in the history.
+except that the correction response has `"session": {id}` instead of `"id"`, and the history has
+`"target": "session"`. Without the parking history license, both endpoints return `403`, like
+the other session endpoints.
 
 **Rules**
 
 | Item | Rule |
 |---|---|
 | Target | Exactly **one** session, by its `id`. There is no bulk correction, no correction by plate value, and no merging of sessions |
-| History | Every correction adds a row; earlier rows are never changed |
-| Open sessions | The corrected plate is kept: later recognitions of the vehicle do not overwrite it. If a **different** vehicle takes the spot, that is a new session with its own plate |
+| History | Each correction adds a new row. Earlier rows are not changed |
+| Open sessions | The corrected plate is kept; later recognitions of the vehicle do not overwrite it. If a **different** vehicle takes the spot, it starts a new session with its own plate |
 | Payments | Stay attached to the session (they are keyed by session ID, not by plate) |
-| Gate sessions | The exit is matched to the open entry by plate. Correcting an open entry helps only if the exit is read as the corrected plate. Two sessions already split by a misread are **not** merged — close the entry with [16.8](#168-no-exit-cleanup) |
-| Program restart | A session that carries on across the restart keeps its corrected plate. A session that the restart closes (see the note in 16.7) does not pass the correction to the session opened after it |
+| Gate sessions | The exit is matched to the open entry by plate. Correcting an open entry helps only if the exit is read as the corrected plate. Two sessions that were already split by a misread are **not** merged. Close the entry with [16.8](#168-no-exit-cleanup) |
+| Program restart | A session that continues across the restart keeps its corrected plate. If the restart closes a session (see the note in 16.7), the correction does not carry over to the session opened after it |
 
 > **Examples:** [JavaScript](examples/javascript/10-parking.js) · [Python](examples/python/10_parking.py) · [C#](examples/csharp/10_Parking.cs) · [Go](examples/go/10_parking/) · [Java](examples/java/V1_10_Parking.java) · [Kotlin](examples/kotlin/V1_10_Parking.kt) · [Swift](examples/swift/10-parking.swift) · [PowerShell](examples/powershell/10-parking.ps1) · [curl](examples/curl/10-parking.sh)
 
@@ -3238,7 +3269,7 @@ WebSocket v1 API supports the following authentication methods:
 | JWT Bearer Token | `Authorization: Bearer {token}` | `?token={accessToken}` |
 | API Key | `X-API-Key: {apiKey}` | `?apikey={apiKey}` |
 
-> **Note**: Browser WebSocket API does not support custom headers, so query parameters (`?token=`, `?apikey=`) are provided as alternatives. Non-browser clients (Node.js, Python, Go, etc.) can use either headers or query parameters.
+> **Note**: The browser WebSocket API does not support custom headers, so query parameters (`?token=`, `?apikey=`) are provided instead. Non-browser clients (Node.js, Python, Go, etc.) can use either headers or query parameters.
 >
 > **Important**: `?session=` and `?auth=` are **not supported** on v1 WebSocket endpoints (v0 only).
 
@@ -3259,7 +3290,7 @@ ws://{host}:{port}/wsapi/v1/events?topics={topics}&apikey={apiKey}
 | `spot` | Parking spot ID filter (optional, v1 only) |
 | `verbose` | Include detailed info (true/false) |
 | `indent` | JSON indentation (0-8) |
-| `lang` | Language code (en-US, ko-KR, etc.) |
+| `lang` | Language of the text in events ([1.3](#13-language-lang)) |
 | `objectTypes` | Object type filter (human, face, vehicle) |
 
 **Topics:**
@@ -3312,8 +3343,8 @@ Unsubscribe:
 
 **Connecting without topics:**
 
-v1 lets you connect without `topics`. Pick topics afterwards with `subscribe` messages, so a
-client whose subscription list changes at runtime can change topics without reconnecting.
+In v1, you can connect without `topics` and choose topics later with `subscribe` messages.
+This lets a client change its topics at runtime without reconnecting.
 
 ```
 ws://{host}:{port}/wsapi/v1/events?apikey={apiKey}
@@ -3365,9 +3396,57 @@ ws.send(JSON.stringify({ unsubscribe: 'channelStatus' }));
 ws.send(JSON.stringify({ subscribe: 'object', objectTypes: ['human'] }));
 ```
 
+**LPR Event Format:**
+
+One event is sent per recognized frame. Each plate read in that frame is an entry in `plates`.
+
+```json
+{
+  "timestamp": "2026-10-23T09:12:31.250+09:00",
+  "topic": "LPR",
+  "channel": {
+    "chid": 1,
+    "title": "Main Gate",
+    "displayName": "CH1. Main Gate",
+    "src": "/watch?ch=1&when=2026-10-23T09%3A12%3A31.250%2B09%3A00"
+  },
+  "image": "/storage/e/.../plate.jpg",
+  "plates": [
+    {
+      "id": 91234,
+      "plateNo": "12가3456",
+      "score": 95.5,
+      "srcCode": "GATE-IN",
+      "srcName": "Entrance Gate",
+      "direction": "entry",
+      "roi": { "offset": [812, 604], "size": [180, 44] },
+      "timeBegin": "2026-10-23T09:12:30.900+09:00",
+      "parkingLot": { "entrance": 1 }
+    }
+  ]
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `timestamp` | String | Event time |
+| `channel` | Object | Channel of the source — `chid`, `title`, `displayName`, `src` (watch URL at the event time). Omitted when the source is not tied to a channel |
+| `linkedChannel` | Array | Linked channels, the same objects as `channel` |
+| `image` | String | Image URL of the frame. Omitted when no image was saved |
+| `plates[].id` | Int | Recognition record ID — `data[].id` of [10.2](#102-lpr-log) and the `{id}` of [10.4](#104-vehicle-number-correction). Omitted when the record could not be saved (system disk full) |
+| `plates[].plateNo` | String\|null | Plate number. `null` when no plate was read |
+| `plates[].score` | Number | Recognition confidence. Omitted when the source does not provide one |
+| `plates[].srcCode` · `srcName` | String | LPR source code and name ([10.1](#101-lpr-source-list-recognition-pointzone)) |
+| `plates[].direction` | String | `entry` or `exit`. Omitted when the direction is unknown (no driving direction is set for the source) |
+| `plates[].roi` | Object | Plate area in pixels: `offset` `[x, y]`, `size` `[w, h]` |
+| `plates[].timeBegin` | String | Time the plate was first read |
+| `plates[].parkingLot` | Object | `entrance` / `exit` parking lot ID. Only for sources linked to a parking lot |
+
+Fields without a value are omitted, except `plateNo`, which is `null`.
+
 **Parking Spot Event Filters:**
 
-The `parkingSpot` topic supports three filter types that can be combined with OR logic:
+The `parkingSpot` topic supports three filter types, combined with OR logic:
 - `ch=1,2` — zones belonging to specified channels (1-based)
 - `lot=1,2` — zones in specified parking lots
 - `spot=100,200` — specific zone IDs
@@ -3376,8 +3455,8 @@ When no filter is specified, all zones are included.
 
 **parkingSpot Response Format:**
 
-On initial connection, `event` is `"currentStatus"` — all zone types are included (spot, entrance, exit, noParking, recognition).
-Subsequent updates use `event: "statusChanged"` — only parking spots (`type:"spot"`) trigger status change events.
+The first message after connecting has `event: "currentStatus"` and includes all zone types (spot, entrance, exit, noParking, recognition).
+Later updates have `event: "statusChanged"`. Only parking spots (`type:"spot"`) generate status change events.
 
 ```json
 {
@@ -3417,7 +3496,7 @@ Subsequent updates use `event: "statusChanged"` — only parking spots (`type:"s
 | `type` | string | Zone type: `"spot"`, `"entrance"`, `"exit"`, `"noParking"`, `"recognition"` |
 | `category` | string\|null | Spot category (only for `type:"spot"`). `null` for non-spot types. |
 | `occupied` | boolean | (spot only) Whether the spot is occupied |
-| `vehicle` | object\|null | Vehicle info. For spots: full vehicle object when occupied. For non-spot types: may contain `plateNo` and `score` from last recognition. |
+| `vehicle` | object\|null | Vehicle info. For spots: full vehicle object when occupied. For non-spot types: may contain `plateNo` and `score` from the last recognition. |
 
 **Example:**
 
@@ -3541,13 +3620,13 @@ sequenceDiagram
 
 | Step | stage | Description |
 |------|-------|-------------|
-| **1. Connect** | `ready` | After WebSocket connection, the server validates parameters and issues a task ID. If `status.code` is non-zero, an error occurred. |
+| **1. Connect** | `ready` | After the connection opens, the server validates the parameters and issues a task ID. A non-zero `status.code` indicates an error. |
 | **2. Start** | `begin` | The export task has started. |
 | **3-1. Channel start** | `channelBegin` | Begins processing recorded data for the channel. |
 | **3-2. Channel skip** | `channelSkip` | Sent when no recorded data exists for the channel in the specified time range. |
 | **3-3. File start** | `fileBegin` | Starts creating a new video file. May occur multiple times if split by `mediaSize`. |
-| **3-4. File writing** | `fileWriting` | Periodically sends progress when `statusInterval` parameter is set. |
-| **3-5. File complete** | `fileEnd` | File is ready for download. **Server waits for client response.** Client must send `next`, `wait`, or `cancel` within the `ttl` time. |
+| **3-4. File writing** | `fileWriting` | Sends progress periodically when the `statusInterval` parameter is set. |
+| **3-5. File complete** | `fileEnd` | The file is ready for download. **The server waits for a client response.** The client must send `next`, `wait`, or `cancel` within the `ttl` time. |
 | **3-6. Channel complete** | `channelEnd` | All files for this channel have been processed. |
 | **4. Complete** | `end` | All channels have been processed. Check `status.code` for final result. |
 
@@ -3652,11 +3731,11 @@ After receiving a `fileEnd` message, send one of the following commands within t
 
 | cmd | Description |
 |-----|-------------|
-| `next` | Download complete, proceed to next file. Server cleans up temporary files and starts processing the next file. |
-| `wait` | More time needed for download. Server resets the `ttl` timer and waits again. Use for large file downloads. |
-| `cancel` | Cancel the export task. Server stops processing and sends an `end` message. |
+| `next` | Download complete; proceed to the next file. The server deletes temporary files and starts processing the next file. |
+| `wait` | More time is needed for the download. The server resets the `ttl` timer and waits again. Use this for large files. |
+| `cancel` | Cancels the export task. The server stops processing and sends an `end` message. |
 
-> **Note**: If no response is received within the `ttl` time, the server sends a `timeoutAlert` message. If still no response, the task is automatically cancelled.
+> **Note**: If no response is received within the `ttl` time, the server sends a `timeoutAlert` message. If there is still no response, the task is cancelled.
 
 ### 18.2. Endpoint
 
@@ -3676,7 +3755,7 @@ ws://{host}:{port}/wsapi/v1/export?ch={channels}&timeBegin={start}&timeEnd={end}
 | `mediaSize` | Media file size limit (e.g., `1GB`, `100MB`) |
 | `subtitleFormat` | Subtitle format (srt, vtt, ass, ssa) |
 | `statusInterval` | Progress update interval during file writing (e.g., `5s`, `1m`. Default: disabled) |
-| `lang` | Language code (e.g., `ko-KR`, `en-US`) |
+| `lang` | Language code ([1.3](#13-language-lang)) |
 | `indent` | JSON indentation (0-8) |
 
 **Example:**
@@ -3734,6 +3813,7 @@ ws.onmessage = (event) => {
 | 401 | Unauthorized |
 | 403 | Forbidden |
 | 404 | Not Found |
+| 409 | Conflict — the request conflicts with the current state |
 | 500 | Internal Server Error |
 
 When an error occurs, the following JSON response body is returned along with the HTTP status code:
@@ -3942,3 +4022,115 @@ Example code for each API feature, available in 9 languages.
 | 13 | WS Parking Lot | [13-websocket-parking-lot.sh](examples/curl/13-websocket-parking-lot.sh) |
 | 14 | WS Parking Spot | [14-websocket-parking-spot.sh](examples/curl/14-websocket-parking-spot.sh) |
 | 15 | WS Data Export | [15-websocket-export.sh](examples/curl/15-websocket-export.sh) |
+
+### D. Supported Languages
+
+Codes accepted by `lang` ([1.3. Language](#13-language-lang)). `en-US` is the source text.
+
+| Code | Native | English |
+|------|--------|---------|
+| `af-ZA` | Afrikaans | Afrikaans |
+| `sq-AL` | Shqip | Albanian |
+| `am-ET` | አማርኛ | Amharic |
+| `ar-AE` | العربية | Arabic |
+| `hy-AM` | Հայերեն | Armenian |
+| `az-Latn` | Azərbaycan | Azerbaijani |
+| `eu-ES` | euskara | Basque |
+| `be-BY` | беларускі | Belarusian |
+| `bn-BD` | বাংলা | Bengali |
+| `bs-Latn` | Bosanski | Bosnian |
+| `bg-BG` | български | Bulgarian |
+| `ca-ES` | Català | Catalan |
+| `ceb` | Cebuano | Cebuano |
+| `ny` | Chichewa | Chichewa |
+| `zh-CN` | 简体中国 | Chinese (Simplified) |
+| `zh-TW` | 中國傳統 | Chinese (Traditional) |
+| `co-FR` | Corsu | Corsican |
+| `hr-HR` | hrvatski | Croatian |
+| `cs-CZ` | čeština | Czech |
+| `da-DK` | dansk | Danish |
+| `nl-NL` | Nederlands | Dutch |
+| `en-US` | English | English |
+| `eo` | Esperanto | Esperanto |
+| `et-EE` | Eesti keel | Estonian |
+| `fil-PH` | Filipino | Filipino |
+| `fi-FI` | Suomalainen | Finnish |
+| `fr-FR` | français | French |
+| `fy-NL` | Frysk | Frisian |
+| `gl-ES` | Galego | Galician |
+| `ka-GE` | ქართული | Georgian |
+| `de-DE` | Deutsch | German |
+| `el-GR` | Ελληνικά | Greek |
+| `gu-IN` | ગુજરાતી | Gujarati |
+| `ht` | Kreyòl ayisyen | Haitian Creole |
+| `ha` | Hausa | Hausa |
+| `haw-US` | ʻŌlelo Hawaiʻi | Hawaiian |
+| `he-IL` | עברית | Hebrew |
+| `hi-IN` | हिन्दी | Hindi |
+| `hmn` | Hmong | Hmong |
+| `hu-HU` | Magyar | Hungarian |
+| `is-IS` | Íslensku | Icelandic |
+| `ig-NG` | Igbo | Igbo |
+| `id-ID` | bahasa Indonesia | Indonesian |
+| `ga-IE` | Gaeilge | Irish |
+| `it-IT` | Italiano | Italian |
+| `ja-JP` | 日本語 | Japanese |
+| `jv-Latn` | Jawa | Javanese |
+| `kn-IN` | ಕನ್ನಡ | Kannada |
+| `kk-KZ` | Қазақ тілінде | Kazakh |
+| `km-KH` | ភាសាខ្មែរ | Khmer |
+| `ko-KR` | 한국어 | Korean |
+| `kmr-Latn-TR` | Kurdî (Kurmancî) | Kurdish (Kurmanji) |
+| `ky-KG` | Кыргызча | Kyrgyz |
+| `lo-LA` | ລາວ | Lao |
+| `la` | Latine | Latin |
+| `lv-LV` | Latviešu | Latvian |
+| `lt-LT` | Lietuviškai | Lithuanian |
+| `lb-LU` | Lëtzebuergesch | Luxembourgish |
+| `mk-MK` | Македонски | Macedonian |
+| `mg-MG` | Malagasy | Malagasy |
+| `ms-MY` | Melayu | Malay |
+| `ml-IN` | മലയാളം | Malayalam |
+| `mt-MT` | Malti | Maltese |
+| `mi-NZ` | Maori | Maori |
+| `mr-IN` | मराठी | Marathi |
+| `mn-MN` | Монгол хэл дээр | Mongolian |
+| `my-MM` | မြန်မာ | Myanmar (Burmese) |
+| `ne-NP` | नेपाली | Nepali |
+| `nb-NO` | Norwegian | Norwegian |
+| `ps-AF` | پښتو | Pashto |
+| `fa-IR` | فارسی | Persian |
+| `pl-PL` | Polskie | Polish |
+| `pt-BR` | Português (Brasil) | Portuguese |
+| `pt-PT` | Português (Portugal) | Portuguese |
+| `pa-IN` | ਪੰਜਾਬੀ | Punjabi |
+| `ro-RO` | Română | Romanian |
+| `ru-RU` | Русский | Russian |
+| `sm` | Samoan | Samoan |
+| `gd-GB` | Gàidhlig | Scots Gaelic |
+| `sr-Cyrl-RS` | Српски | Serbian |
+| `st-ZA` | Sesotho | Sesotho |
+| `sn-Latn-ZW` | Shona | Shona |
+| `sd-Arab-PK` | سنڌي | Sindhi |
+| `si-LK` | සිංහල | Sinhala |
+| `sk-SK` | slovenský | Slovak |
+| `sl-SI` | Slovenščina | Slovenian |
+| `so-SO` | Soomaali | Somali |
+| `es-ES` | Español | Spanish |
+| `su` | Basa Sunda | Sundanese |
+| `sw-KE` | Kiswahili | Swahili |
+| `sv-SE` | Svenska | Swedish |
+| `tg-Cyrl-TJ` | Тоҷикистон | Tajik |
+| `ta-IN` | தமிழ் | Tamil |
+| `te-IN` | తెలుగు | Telugu |
+| `th-TH` | ไทย | Thai |
+| `tr-TR` | Türkçe | Turkish |
+| `uk-UA` | Українська | Ukrainian |
+| `ur-PK` | اردو | Urdu |
+| `uz-Latn-UZ` | O'zbek | Uzbek |
+| `vi-VN` | Tiếng Việt | Vietnamese |
+| `cy-GB` | Cymraeg | Welsh |
+| `xh-ZA` | isiXhosa | Xhosa |
+| `yi` | ייִדיש | Yiddish |
+| `yo-NG` | Yorùbá | Yoruba |
+| `zu-ZA` | isiZulu | Zulu |

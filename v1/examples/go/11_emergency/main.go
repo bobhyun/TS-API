@@ -4,7 +4,7 @@
 // Response: [{ id, code, name, linkedChannel }, ...]
 // Note: Requires Emergency Call license. Returns 404 if not supported.
 //
-// Run: cd examples/go && go run ./v1/11_emergency/
+// Run: cd go && go run ./11_emergency
 package main
 
 import (

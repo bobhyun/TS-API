@@ -1,8 +1,10 @@
 // 10_parking - Parking lot & spot status
 // Parking lot: entry/exit counter based, Parking spot: AI video analysis based
 // License check via /api/v1/info extension token (parkingHistory) before session history
+// Plate correction history via GET /api/v1/parking/session/{id}/plate/history
+// (POST /api/v1/parking/session/{id}/plate corrects it - not executed here)
 //
-// Run: cd examples/go && go run ./v1/10_parking/
+// Run: cd go && go run ./10_parking
 package main
 
 import (
@@ -105,10 +107,11 @@ func main() {
 	fmt.Printf("\nSummary: %d/%d spots occupied\n", occupied, len(spotStatus))
 
 	// --- Parking Session History ---
-	// A session opens when a vehicle is confirmed present and closes when it is
-	// gone. Needs the parking history license - 403 without it. Ask /api/v1/info
-	// first: the "parkingHistory" extension token says whether the session
-	// endpoints will answer (the array is omitted when no extension is active).
+	// A session opens when a vehicle is confirmed present and closes when it
+	// leaves. Requires the parking history license (403 without it).
+	// Check /api/v1/info first: the `parkingHistory` extension token tells
+	// whether the session endpoints are available. license.extension is
+	// omitted when no extension is active.
 	r, _ = client.Get("/api/v1/info?license")
 	var info struct {
 		License struct {
@@ -127,10 +130,11 @@ func main() {
 		TotalCount int64  `json:"totalCount"`
 		AsOf       string `json:"asOf"`
 		Data       []struct {
-			ID         int64  `json:"id"`
-			PlateNo    string `json:"plateNo"`
-			DurationMs int64  `json:"durationMs"`
-			Src        struct {
+			ID          int64  `json:"id"`
+			PlateNo     string `json:"plateNo"`
+			PlateEdited bool   `json:"plateEdited"`
+			DurationMs  int64  `json:"durationMs"`
+			Src         struct {
 				Name string `json:"name"`
 			} `json:"src"`
 		} `json:"data"`
@@ -142,17 +146,21 @@ func main() {
 		if plate == "" {
 			plate = "(no plate)"
 		}
+		if s.PlateEdited {
+			plate += " (corrected)"
+		}
 		fmt.Printf("  [%d] %s %s %dm\n", s.ID, s.Src.Name, plate, s.DurationMs/60000)
 	}
 
 	// --- Session Detail ---
-	// outKind / outTimeMeans say HOW the exit time was decided. Only "observed"
-	// is a measurement; the others are estimates whose error leans in different
-	// directions, so bill from the basis, not from the number alone.
+	// outKind / outTimeMeans tell how the exit time was determined.
+	// Only "observed" is a measurement; the others are estimates that can err
+	// in different directions, so bill from the basis, not from the time alone.
 	//
-	// inKind / inTimeMeans do the same for the entry, and the error leans the OTHER
-	// way: firstSeen is an UPPER bound on the real entry (already there when
-	// observation started). It is present on OPEN sessions too.
+	// inKind / inTimeMeans do the same for the entry, but err the opposite way:
+	// firstSeen is an upper bound on the real entry (the vehicle was already
+	// there when observation started). Unlike the exit basis, it is present
+	// on open sessions too.
 	fmt.Println("\n=== Session Detail ===")
 	if len(openList.Data) > 0 {
 		r, _ = client.Get(fmt.Sprintf("/api/v1/parking/session/%d", openList.Data[0].ID))
@@ -176,9 +184,10 @@ func main() {
 	}
 
 	// --- Scope: what the query is scoped to ---
-	// Items omitted means "the whole scope", which is NOT the same as no filter:
-	// scope=lot with no lot returns only sessions that belong to a parking lot,
-	// so no-parking-zone history is excluded (it belongs to no lot).
+	// Omitting the items means "the whole scope", not "no filter":
+	// scope=lot without a lot list returns only sessions that belong to a
+	// parking lot, so no-parking-zone sessions (which belong to no lot) are
+	// excluded.
 	fmt.Println("\n=== Scope ===")
 	for _, qs := range []string{"scope=channel&ch=1,2", "scope=lot", "scope=noparking"} {
 		r, _ = client.Get("/api/v1/parking/session?" + qs + "&maxCount=5")
@@ -186,21 +195,22 @@ func main() {
 	}
 
 	// --- Video for a session: otherwise=nearBefore ---
-	// A parked car does not move, so motion-triggered recording may have stopped
-	// while it was still there. The car is in the same place, so the preceding
-	// footage still shows the situation. Use this for parking history only.
-	// An empty result means there is no usable recording at all (never recorded,
-	// or already recycled) — the session snapshots remain available either way.
+	// A parked car does not move, so motion-triggered recording may stop
+	// while it is still there. Because the car stays in place, earlier
+	// footage still shows it. Use otherwise=nearBefore for parking history only.
+	// An empty result means no usable recording exists (never recorded, or
+	// already recycled); the session snapshots are still available.
 	fmt.Println("\n=== Video at entry time (nearest earlier if none) ===")
 	r, _ = client.Get("/api/v1/vod?ch=1&when=2024-01-08T09:30:00&otherwise=nearBefore")
 	fmt.Printf("  => %d\n", r.Status)
 
 	// --- Which car is it? the bounding box ---
-	// A snapshot can hold several cars. `box` points at the one this session is
-	// about. YOLO style: center based, all four values 0..1 (see 1.2), so you
-	// multiply by the size of whatever you draw on. Entrance/exit sessions carry
-	// no vehicle box (a single plate read) and the value is null; the key is
-	// always present.
+	// A snapshot can contain several cars; `box` marks the one this session
+	// is about. YOLO style: center-based, all four values in 0..1 (see 1.2).
+	// Multiply by the size of the surface you draw on; the internal
+	// coordinate space does not matter.
+	// Entrance/exit sessions have no vehicle box (a single plate read):
+	// the value is null, but the key is always present.
 	fmt.Println("\n=== Bounding box of the session vehicle ===")
 	var list struct {
 		Data []struct {
@@ -219,7 +229,7 @@ func main() {
 			}
 			if dr, err := client.Get(fmt.Sprintf("/api/v1/parking/session/%d", list.Data[0].ID)); err == nil {
 				if dr.JSON(&detail) == nil && detail.Box != nil {
-					const W, H = 1920.0, 1080.0 // 그릴 대상 크기
+					const W, H = 1920.0, 1080.0 // drawing surface size
 					b := detail.Box
 					fmt.Printf("  box = cx=%v cy=%v w=%v h=%v\n", b.Cx, b.Cy, b.W, b.H)
 					fmt.Printf("  on %dx%d -> left=%d top=%d width=%d height=%d\n",
@@ -232,18 +242,62 @@ func main() {
 		}
 	}
 
+	// --- Plate correction history ---
+	// Only the session's representative plate (plateNo) is corrected; per-shot
+	// readings (snapshots[].plateNo) are kept as evidence.
+	// Reading requires Playback permission.
+	fmt.Println("\n=== Plate correction history ===")
+	if len(list.Data) > 0 {
+		r, _ = client.Get(fmt.Sprintf("/api/v1/parking/session/%d/plate/history", list.Data[0].ID))
+		if r.Status == 200 {
+			var h struct {
+				ID              int64   `json:"id"`
+				PlateNo         string  `json:"plateNo"`
+				OriginalPlateNo *string `json:"originalPlateNo"`
+				Edits           []struct {
+					Time   string `json:"time"`
+					User   string `json:"user"`
+					Before string `json:"before"`
+					After  string `json:"after"`
+					Reason string `json:"reason"`
+				} `json:"edits"`
+			}
+			r.JSON(&h)
+			orig := "(never corrected)"
+			if h.OriginalPlateNo != nil {
+				orig = *h.OriginalPlateNo
+			}
+			fmt.Printf("  session=%d plateNo=%s original=%s\n", h.ID, h.PlateNo, orig)
+			for _, e := range h.Edits {
+				fmt.Printf("    %s %s: %s -> %s %s\n", e.Time, e.User, e.Before, e.After, e.Reason)
+			}
+		} else {
+			fmt.Printf("  Status: %d\n", r.Status)
+		}
+	}
+
 	// --- Writing history (Control permission) ---
-	// Both change stored history, so they are not executed here.
+	// These calls change stored history, so they are not executed here.
 	// Payment state (16.7): commit settles it, exempt records a decision not to
-	// collect, undo reverts the most recent change (the response says which one).
+	// collect, and undo reverts the most recent change (the response says which).
 	// Records are appended, never deleted.
 	//
-	// close (16.8) is a different axis: it clears the lingering "parked" state left
-	// when an exit was never observed. Exempt takes a session out of billing and may
-	// leave it parked; close ends the session. Do not conflate the two.
+	// close (16.8) is separate: it ends a session whose exit was never observed
+	// and would otherwise stay "parked". exempt removes a session from billing
+	// but may leave it parked; close ends it. Do not confuse the two.
 	//
 	//   client.Post(fmt.Sprintf("/api/v1/parking/session/%d/payment/commit?ref=POS-0042", id), nil)
 	//   client.Post(fmt.Sprintf("/api/v1/parking/session/%d/payment/exempt", id), nil)
 	//   client.Post(fmt.Sprintf("/api/v1/parking/session/%d/payment/undo", id), nil)
 	//   client.Post(fmt.Sprintf("/api/v1/parking/session/%d/close", id), nil)
+	//
+	// Plate correction (16.9): one session by id; no bulk correction or merging.
+	// Payments stay with the session. Returns 409 when plateNo equals the current plate.
+	//
+	// Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+	// Uncomment it to try it against a test record.
+	//   client.Post(fmt.Sprintf("/api/v1/parking/session/%d/plate", id), map[string]string{
+	//   	"plateNo": "12가3456",
+	//   	"reason":  "misread at night",
+	//   })
 }

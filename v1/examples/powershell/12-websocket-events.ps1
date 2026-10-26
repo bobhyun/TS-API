@@ -3,10 +3,10 @@
   12-websocket-events.ps1 - TS-API v1 WebSocket Real-time Event Subscription
 
 .DESCRIPTION
-  Subscribes to real-time events (LPR, channelStatus, etc.) via WebSocket.
+  Subscribes to real-time events (LPR, channelStatus, notice, etc.) via WebSocket.
 
   Two subscription modes:
-    1. URL query params:  ?topics=LPR,channelStatus  (subscribe on connect)
+    1. URL query params:  ?topics=LPR,channelStatus,notice  (subscribe on connect)
     2. Dynamic send():    {"subscribe":"LPR"}         (subscribe after connect, v1 only)
 
   Endpoint:
@@ -76,11 +76,40 @@ function New-WsClient([string]$Url) {
     return $ws
 }
 
+$LANG = 'ko-KR'
+
+function Write-WsEvent($Msg, [string]$Raw) {
+    # Print LPR and notice events by field; other topics as raw JSON.
+    if ($Msg.topic -eq 'LPR') {
+        # id: record id for plate correction (absent when the record could not be saved)
+        # direction: "entry" / "exit" (absent when unknown)
+        $plates = if ($Msg.plates) { $Msg.plates } else { @($Msg) }
+        foreach ($p in $plates) {
+            $id  = if ($null -ne $p.id) { $p.id } else { '-' }
+            $dir = if ($p.direction) { $p.direction } else { '-' }
+            Write-Host "  [LPR] id=$id plateNo=$($p.plateNo) score=$($p.score) direction=$dir"
+        }
+    } elseif ($Msg.topic -eq 'notice') {
+        # snapshot: current list once after subscribing; raised/updated/cleared: one notice
+        # message is keyed by language code: en-US always, plus the requested lang
+        $notices = if ($Msg.action -eq 'snapshot') { @($Msg.notices) } else { @($Msg.notice) }
+        if ($notices.Count -eq 0) { Write-Host '  [notice] snapshot: (no notices)' }
+        foreach ($n in $notices) {
+            $text = $n.message.$LANG
+            if (-not $text) { $text = $n.message.'en-US' }
+            Write-Host "  [notice] $($Msg.action) $($n.id) $($n.severity): $text"
+        }
+    } else {
+        $topic = if ($Msg.topic) { $Msg.topic } elseif ($Msg.type) { $Msg.type } else { '?' }
+        Write-Host "  [$topic] $Raw"
+    }
+}
+
 
 # ── Method 1: Subscribe via URL query params (classic) ──
 Write-Host '=== Method 1: Subscribe via URL (10 seconds) ==='
 
-$wsUrl = "$WS_URL/wsapi/v1/events?topics=LPR,channelStatus&apikey=$NVR_API_KEY"
+$wsUrl = "$WS_URL/wsapi/v1/events?topics=LPR,channelStatus,notice&lang=$LANG&apikey=$NVR_API_KEY"
 $msgCount = 0
 
 try {
@@ -93,8 +122,7 @@ try {
         if ($null -eq $raw) { continue }
         $msg = $raw | ConvertFrom-Json
         $msgCount++
-        $topic = if ($msg.topic) { $msg.topic } elseif ($msg.type) { $msg.type } else { '?' }
-        Write-Host "  [$topic] $raw"
+        Write-WsEvent $msg $raw
     }
     Write-Host "  Received $msgCount events"
     $ws.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, '',
@@ -134,7 +162,7 @@ try {
             Send-WsMessage $ws '{"subscribe":"LPR","ch":[1,2,3,4]}'
         }
 
-        # Phase 3 (6s): Unsubscribe + subscribe new + reduce channels
+        # Phase 3 (6s): Unsubscribe topic + subscribe new topic + reduce channels
         if ($phase -eq 2 -and $elapsed -ge 6) {
             $phase = 3
             Write-Host '  [Phase 3] Unsubscribe channelStatus + add motionChanges (ch 1) + reduce LPR to ch 1,3'
@@ -154,8 +182,7 @@ try {
         if ($msg.type -eq 'error')        { Write-Host "  Error: $($msg.message) (topic: $($msg.topic))"; continue }
 
         # Handle event data
-        $topic = if ($msg.topic) { $msg.topic } else { '?' }
-        Write-Host "  [$topic] $raw"
+        Write-WsEvent $msg $raw
     }
     Write-Host "  Received $msgCount2 messages"
     $ws.CloseAsync([System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, '',
@@ -184,4 +211,7 @@ try {
 #           Write-Host "Plate: $($p.plateNo)  Score: $($p.score)"
 #       }
 #   }
+#
+# Each plate carries the record "id" (use it with POST /api/v1/lpr/log/{id}/plate)
+# and "direction" as a string ("entry" / "exit"), not a number.
 #

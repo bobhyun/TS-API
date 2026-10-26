@@ -14,9 +14,6 @@
  *          The alarm persists until callEnd is sent.
  *          ALWAYS send callEnd after callStart.
  *
- * WARNING (repeated): emergencyCall callStart triggers a REAL alarm.
- *       You MUST send callEnd to stop the alarm.
- *
  * Compile: kotlinc TsApiClient.kt V1_09_Push.kt -include-runtime -d V1_09_Push.jar
  * Run:     java -jar V1_09_Push.jar
  */
@@ -60,8 +57,6 @@ private fun pushEmergencyCall(client: TsApiClient) {
     println("\n=== Push Emergency Call ===")
     println("  WARNING: This triggers a REAL alarm on the NVR!")
 
-    // Uncomment the code below to actually trigger the alarm.
-    // Make sure you always send callEnd after callStart.
     // Uncomment the code below to actually trigger the alarm.
     // Make sure you always send callEnd after callStart.
 

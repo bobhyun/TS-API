@@ -5,9 +5,11 @@
 #   - Server info (API version, product, license, timezone)
 #   - System info (OS, CPU, disk, network)
 #   - System health (CPU usage, memory, disk usage)
+#   - System disk status (database and logs disk)
+#   - System notices (conditions in effect now)
 #   - HDD S.M.A.R.T status
 #
-# NOTE: System info 'storage' parameter returns response field named 'disk'.
+# NOTE: item=storage returns its data in the 'disk' field (NOT 'storage').
 #
 # Usage:
 #   NVR_HOST=192.168.0.100 NVR_API_KEY=tsapi_key_... bash 08-system-info.sh
@@ -36,7 +38,7 @@ echo "=== Server Info ==="
 # ─────────────────────────────────────────────────
 # 2. System Info (individual items)
 #    Available items: os, cpu, storage, network
-#    NOTE: 'storage' request returns 'disk' field in response
+#    NOTE: item=storage returns its data in the 'disk' field
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== System Info (OS) ==="
@@ -68,7 +70,31 @@ echo "=== System Health ==="
 "${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/system/health" | jqf
 
 # ─────────────────────────────────────────────────
-# 4. HDD S.M.A.R.T Status
+# 4. System Disk
+#    Holds the database and logs (normally C:), separate from the recording disks.
+#    When it is full, records stop being saved even if the recording disks have room.
+#    Watch status here, not only disk[].
+#    Response: { systemDisk: { drive, totalSpace, freeSpace, status, dataWriteFailed } }
+#    status: normal | low | critical
+# ─────────────────────────────────────────────────
+echo ""
+echo "=== System Disk ==="
+"${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/system/health?item=systemDisk" | jqf
+
+# ─────────────────────────────────────────────────
+# 5. System Notices
+#    Conditions in effect right now (raised, updated, cleared).
+#    message is keyed by language code: en-US is always present,
+#    plus the requested lang when it is not English.
+#    Response: [{ id, kind, severity, message: { "en-US": "...", "ko-KR": "..." },
+#                 messageKey, args, param, timeBegin, timeUpdate }, ...]
+# ─────────────────────────────────────────────────
+echo ""
+echo "=== System Notices ==="
+"${CURL[@]}" "${AUTH[@]}" "${BASE}/api/v1/system/notices?lang=ko-KR" | jqf
+
+# ─────────────────────────────────────────────────
+# 6. HDD S.M.A.R.T Status
 # ─────────────────────────────────────────────────
 echo ""
 echo "=== HDD S.M.A.R.T ==="

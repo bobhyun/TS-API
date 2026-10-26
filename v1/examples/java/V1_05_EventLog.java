@@ -9,7 +9,7 @@
  *
  *   GET /api/v1/event/log?maxCount=10
  *       - Query event log
- *       - Optional: timeBegin, timeEnd, offset, limit
+ *       - Optional: timeBegin, timeEnd, at, maxCount
  *
  * Compile: javac NvrClient.java V1_05_EventLog.java
  * Run:     java V1_05_EventLog
@@ -27,7 +27,7 @@ public class V1_05_EventLog {
         // ── Event Types ──
         // GET /api/v1/event/type
         // Response: [{id, name, code: [{id, name}]}, ...]
-        // Use 'id' field (NOT "type")
+        // The field is 'id' (NOT "type")
         System.out.println("=== Event Types ===");
         NvrClient.Response r = client.get("/api/v1/event/type");
         System.out.println("  status=" + r.status);
@@ -61,9 +61,8 @@ public class V1_05_EventLog {
         }
 
         // ── Pagination ──
-        // Use offset and limit for pagination
-        // Example:
-        //   page 1: /api/v1/event/log?offset=0&limit=20
-        //   page 2: /api/v1/event/log?offset=20&limit=20
+        // at = start index, maxCount = page size
+        //   page 1: /api/v1/event/log?at=0&maxCount=20
+        //   page 2: /api/v1/event/log?at=20&maxCount=20
     }
 }

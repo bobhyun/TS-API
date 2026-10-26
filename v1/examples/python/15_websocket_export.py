@@ -4,7 +4,7 @@
 Recording data backup/export via WebSocket.
 
 Endpoint:
-  ws://host:port/wsapi/v1/export?ch=1&timeBegin=...&timeEnd=...&token={accessToken}
+  ws://host:port/wsapi/v1/export?ch=1&timeBegin=...&timeEnd=...
 
 Auth:
   Header: Authorization: Bearer {accessToken}  (primary)
@@ -86,8 +86,7 @@ async def main():
 
                 elif stage == 'fileEnd':
                     # download: [{fileName, src}, ...]
-                    # Server v1.0.2+ returns relative paths (e.g. "/download/...");
-                    # prepend BASE_URL for non-browser clients to fetch.
+                    # src is a relative path (e.g. "/download/..."); prepend BASE_URL outside a browser.
                     dl_arr = msg.get('channel', {}).get('file', {}).get('download', [])
                     src = dl_arr[0].get('src', 'N/A') if dl_arr else 'N/A'
                     full_url = src if src.startswith('http') else f'{BASE_URL}{src}'

@@ -7,6 +7,7 @@
  *   - Parking spot status (AI vision-based, per-space occupancy)
  *   - Filtering by zone type, channel, ID, category, occupancy
  *   - License check via /api/v1/info extension token (parkingHistory)
+ *   - Parking session history, plate correction history (/plate/history)
  */
 
 const { NVR_API_KEY } = require('./config');
@@ -144,10 +145,10 @@ async function main() {
   // ─────────────────────────────────────────────────
   // 8. Parking Session History
   //    A session opens when a vehicle is confirmed present and closes when it
-  //    is gone. Needs the parking history license — 403 without it. Ask
-  //    /api/v1/info first: the `parkingHistory` extension token says whether
-  //    the session endpoints will answer (the array is omitted when no
-  //    extension is active).
+  //    leaves. Requires the parking history license (403 without it).
+  //    Check /api/v1/info first: the `parkingHistory` extension token tells
+  //    whether the session endpoints are available. license.extension is
+  //    omitted when no extension is active.
   // ─────────────────────────────────────────────────
   const infoRes = await get('/api/v1/info?license');
   const extension = infoRes.body?.license?.extension || [];
@@ -163,7 +164,8 @@ async function main() {
     console.log(`  total=${totalCount} asOf=${asOf}`);
     for (const row of data) {
       const mins = Math.floor(row.durationMs / 60000);
-      console.log(`  [${row.id}] ${row.src.name} ${row.plateNo || '(no plate)'} ${mins}m`);
+      const edited = row.plateEdited ? ' (corrected)' : '';
+      console.log(`  [${row.id}] ${row.src.name} ${row.plateNo || '(no plate)'}${edited} ${mins}m`);
     }
   } else {
     console.log(`  Status: ${openRes.status}`);
@@ -171,13 +173,14 @@ async function main() {
 
   // ─────────────────────────────────────────────────
   // 9. Session Detail
-  //    outKind / outTimeMeans say HOW the exit time was decided. Only
-  //    "observed" is a measurement; the others are estimates whose error leans
-  //    in different directions, so bill from the basis, not the number alone.
+  //    outKind / outTimeMeans tell how the exit time was determined.
+  //    Only "observed" is a measurement; the others are estimates that can err
+  //    in different directions, so bill from the basis, not from the time alone.
   //
-  //    inKind / inTimeMeans do the same for the entry, and the error leans the
-  //    OTHER way: firstSeen is an UPPER bound on the real entry (already there
-  //    when observation started). It is present on OPEN sessions too.
+  //    inKind / inTimeMeans do the same for the entry, but err the opposite way:
+  //    firstSeen is an upper bound on the real entry (the vehicle was already
+  //    there when observation started). Unlike the exit basis, it is present
+  //    on open sessions too.
   // ─────────────────────────────────────────────────
   console.log('\n=== Session Detail ===');
   const oneRes = await get('/api/v1/parking/session?maxCount=1');
@@ -196,10 +199,10 @@ async function main() {
 
   // ─────────────────────────────────────────────────
   // 9b. Scope — what the query is scoped to
-  //     Items omitted means "the whole scope", which is NOT the same as no
-  //     filter: scope=lot with no lot returns only sessions that belong to a
-  //     parking lot, so no-parking-zone history is excluded (it belongs to no
-  //     lot).
+  //     Omitting the items means "the whole scope", not "no filter":
+  //     scope=lot without a lot list returns only sessions that belong to a
+  //     parking lot, so no-parking-zone sessions (which belong to no lot) are
+  //     excluded.
   // ─────────────────────────────────────────────────
   console.log('\n=== Scope ===');
   for (const qs of [
@@ -213,25 +216,25 @@ async function main() {
 
   // ─────────────────────────────────────────────────
   // 9c. Video for a session — otherwise=nearBefore
-  //     A parked car does not move, so motion-triggered recording may have
-  //     stopped while it was still there. The car is in the same place, so the
-  //     preceding footage still shows the situation. Parking history only.
-  //     An empty result means there is no usable recording at all (never
-  //     recorded, or already recycled); the snapshots remain available.
+  //     A parked car does not move, so motion-triggered recording may stop
+  //     while it is still there. Because the car stays in place, earlier
+  //     footage still shows it. Use otherwise=nearBefore for parking history only.
+  //     An empty result means no usable recording exists (never recorded, or
+  //     already recycled); the session snapshots are still available.
   // ─────────────────────────────────────────────────
   console.log('\n=== Video at entry time (nearest earlier if none) ===');
   if (first) {
     const d = (await get(`/api/v1/parking/session/${first.id}`)).body;
-    // snapshots 는 시각 오름차순 배열이고 각 항목이 tags 를 든다 — 키로 꺼내지 않는다.
-    // 같은 뜻이 여러 장일 수 있어(베스트샷) 태그로 찾고 첫 항목을 쓴다.
+    // snapshots is a time-ordered array, not a map; each entry carries tags.
+    // Several shots can share a tag (best shots), so find by tag and use the first (earliest).
     const snaps = (d && d.snapshots) || [];
     const tagged = t => snaps.find(x => (x.tags || []).indexOf(t) >= 0) || null;
     const shot = tagged('in');
     const chid = shot ? shot.chid : null;
     const at = shot ? shot.time : null;
 
-    // 어느 샷이 번호를 읽어냈나. bestshot = 시도, plate = 성공.
-    // 실패한 샷도 사진은 남는다(plateNo 는 null) — 나중에 사람이 확인할 수 있다.
+    // Which shots read the plate: bestshot = attempted, plate = succeeded.
+    // A failed shot keeps its image (plateNo is null) so a person can review it later.
     console.log('  snapshots:');
     for (const x of snaps) {
       console.log(`    ${x.time || 'now'}  tags=${(x.tags || []).join(',')}` +
@@ -248,11 +251,12 @@ async function main() {
 
   // ─────────────────────────────────────────────────
   // 9d. Which car is it? — the bounding box
-  //     A snapshot can hold several cars. `box` points at the one this session
-  //     is about. YOLO style: center based, all four values 0..1 (see 1.2), so
-  //     you multiply by the size of whatever you draw on — no need to know the
-  //     internal coordinate space. Entrance/exit sessions carry no vehicle box
-  //     (a single plate read) and the value is null; the key is always present.
+  //     A snapshot can contain several cars; `box` marks the one this session
+  //     is about. YOLO style: center-based, all four values in 0..1 (see 1.2).
+  //     Multiply by the size of the surface you draw on; the internal
+  //     coordinate space does not matter.
+  //     Entrance/exit sessions have no vehicle box (a single plate read):
+  //     the value is null, but the key is always present.
   // ─────────────────────────────────────────────────
   console.log('\n=== Bounding box of the session vehicle ===');
   if (first) {
@@ -260,7 +264,7 @@ async function main() {
     if (!box) {
       console.log('  (no box for this session)');
     } else {
-      const W = 1920, H = 1080;       // 그릴 대상 크기
+      const W = 1920, H = 1080;       // drawing surface size
       const left = Math.round((box.cx - box.w / 2) * W);
       const top = Math.round((box.cy - box.h / 2) * H);
       console.log(`  box = ${JSON.stringify(box)}`);
@@ -270,20 +274,47 @@ async function main() {
   }
 
   // ─────────────────────────────────────────────────
+  // 9e. Plate correction history
+  //     Only the session's representative plate (plateNo) is corrected; per-shot
+  //     readings (snapshots[].plateNo) are kept as evidence.
+  //     Reading requires Playback permission.
+  // ─────────────────────────────────────────────────
+  console.log('\n=== Plate correction history ===');
+  if (first) {
+    const r = await get(`/api/v1/parking/session/${first.id}/plate/history`);
+    if (r.status === 200) {
+      const h = r.body;
+      console.log(`  session=${h.id} plateNo=${h.plateNo} original=${h.originalPlateNo ?? '(never corrected)'}`);
+      for (const e of h.edits || []) {
+        console.log(`    ${e.time} ${e.user}: ${e.before} -> ${e.after} ${e.reason || ''}`);
+      }
+    } else {
+      console.log(`  Status: ${r.status}`);
+    }
+  }
+
+  // ─────────────────────────────────────────────────
   // 10. Writing history (Control permission)
-  //     Both change stored history, so they are not executed here.
+  //     These calls change stored history, so they are not executed here.
   //     Payment state (16.7): commit settles it, exempt records a decision not to
-  //     collect, undo reverts the most recent change (the response says which one).
+  //     collect, and undo reverts the most recent change (the response says which).
   //     Records are appended, never deleted.
-  //    
-  //     close (16.8) is a different axis: it clears the lingering "parked" state left
-  //     when an exit was never observed. Exempt takes a session out of billing and may
-  //     leave it parked; close ends the session. Do not conflate the two.
+  //
+  //     close (16.8) is separate: it ends a session whose exit was never observed
+  //     and would otherwise stay "parked". exempt removes a session from billing
+  //     but may leave it parked; close ends it. Do not confuse the two.
   //
   //     await post(`/api/v1/parking/session/${id}/payment/commit?ref=POS-0042`);
   //     await post(`/api/v1/parking/session/${id}/payment/exempt`);
   //     await post(`/api/v1/parking/session/${id}/payment/undo`);
   //     await post(`/api/v1/parking/session/${id}/close`);
+  //
+  //     Plate correction (16.9): one session by id; no bulk correction or merging.
+  //     Payments stay with the session. Returns 409 when plateNo equals the current plate.
+  //
+  //     Disabled by default: this call changes the stored plate number on the server, and the edit is permanently kept in the correction history.
+  //     Uncomment it to try it against a test record.
+  //     await post(`/api/v1/parking/session/${id}/plate`, { plateNo: '12가3456', reason: 'misread at night' });
   // ─────────────────────────────────────────────────
 
 }
