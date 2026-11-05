@@ -441,6 +441,21 @@ Content-Type: application/json
 }
 ```
 
+**Sign-in attempt limit:**
+- After a failed password authentication, the same client address cannot retry for 3 seconds.
+- After 3 failures within 1 minute, password authentication from that address is blocked for 1 minute. The block remains for its remaining time when the server restarts.
+- A password authentication request received while a retry wait or block is active is not authenticated. The server returns `429 Too Many Requests`, and the `Retry-After` header gives the seconds until the next attempt is allowed.
+- Token (JWT) and API Key authentication are not affected.
+- A deactivated account is not authenticated even with the correct password, and the attempt counts as a failure.
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 54
+Content-Type: application/json
+
+{"error": "Too Many Requests", "message": "Too many login attempts. Please try again later."}
+```
+
 #### 3.3.2. API Call
 ```http
 GET /api/v1/channel
@@ -591,7 +606,7 @@ Retrieves server and product information.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.3.0") |
+| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.4.0") |
 | `GET /api/v1/info?siteName` | - | Site name query |
 | `GET /api/v1/info?timezone` | - | Server timezone query (name, bias) |
 | `GET /api/v1/info?product` | - | Product info query (name, version) |
@@ -626,7 +641,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **Response** (genuine license with ANPR / object detection / parking guidance enabled):
 ```json
 {
-  "apiVersion": "TS-API@1.3.0",
+  "apiVersion": "TS-API@1.4.0",
   "siteName": "Main Office",
   "timezone": {
     "name": "Asia/Seoul",
@@ -1711,6 +1726,18 @@ System log events record each change in the system disk level (see `systemDisk` 
 If the disk is too full to store the event, the event is still delivered to `systemEvent`
 subscribers with `id` `-1`, but it does not appear in the event log. Clients that must not miss
 it should subscribe instead of polling the log.
+
+#### Sign-in failure
+
+Privacy events (`type` `1`) with `code` `6` (`"Failure to sign in"`) record sign-in failures,
+including password authentication failures from the local screen, the API and live streams.
+`param` has the following fields:
+
+| Field | Description |
+|------|------|
+| `uid` | User ID that was entered |
+| `addr` | Client address. `"local"` for a connection from the server PC |
+| `lockedUntil` | Time the sign-in block ends (ISO 8601), when this failure started a block. Omitted otherwise. |
 
 ### 9.4. Event Trigger (Event Backup)
 
@@ -3814,6 +3841,7 @@ ws.onmessage = (event) => {
 | 403 | Forbidden |
 | 404 | Not Found |
 | 409 | Conflict — the request conflicts with the current state |
+| 429 | Too Many Requests — sign-in attempt limit (see `Retry-After`) |
 | 500 | Internal Server Error |
 
 When an error occurs, the following JSON response body is returned along with the HTTP status code:

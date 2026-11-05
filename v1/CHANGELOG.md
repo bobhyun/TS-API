@@ -2,6 +2,24 @@
 
 **English** | [한국어](CHANGELOG.ko.md)
 
+## v1.4.0
+
+### Sign-in attempt limit
+
+Password authentication is now limited to protect it from brute-force attempts ([3.3. JWT Authentication](tsapi-v1.md#33-jwt-authentication)).
+
+- After a failure, the same client address cannot retry for 3 seconds.
+- After 3 failures within 1 minute, password authentication from that address is blocked for 1 minute. The block remains for its remaining time when the server restarts.
+- Password authentication requests received during this time return `429 Too Many Requests` with `Retry-After` (seconds remaining).
+- Token (JWT) and API Key authentication are not affected.
+
+The `param` of sign-in failure events (`type` `1`, `code` `6`) now carries the client address `addr` and, when a block
+started, the block end time `lockedUntil`. Sign-in failures through the API and live streams are now recorded as well.
+
+### Deactivated accounts
+
+A deactivated account (**Deactivate user ID** in the user properties) is not authenticated even with the correct password (`401`). Previously, API authentication did not check the account state.
+
 ## v1.3.0
 
 ### Vehicle number correction

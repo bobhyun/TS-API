@@ -434,6 +434,21 @@ Content-Type: application/json
 }
 ```
 
+**로그인 시도 제한:**
+- 비밀번호 인증에 실패하면 같은 접속 주소에서는 3초 동안 다시 시도할 수 없습니다.
+- 1분 안에 3회 실패하면 그 주소의 비밀번호 인증을 1분 동안 차단합니다. 차단은 서버를 다시 시작해도 남은 시간만큼 유지됩니다.
+- 재시도 대기·차단 중에 받은 비밀번호 인증 요청은 인증하지 않고 `429 Too Many Requests` 를 반환합니다. `Retry-After` 헤더는 다시 시도할 수 있을 때까지 남은 초입니다.
+- 토큰(JWT)과 API Key 인증에는 적용하지 않습니다.
+- 사용 중지된 계정은 비밀번호가 맞아도 인증되지 않으며, 실패로 처리됩니다.
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 54
+Content-Type: application/json
+
+{"error": "Too Many Requests", "message": "Too many login attempts. Please try again later."}
+```
+
 #### API 호출
 ```http
 GET /api/v1/channel
@@ -584,7 +599,7 @@ Authorization: Bearer {admin_token}
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.3.0") |
+| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.4.0") |
 | `GET /api/v1/info?siteName` | - | 사이트 이름 조회 |
 | `GET /api/v1/info?timezone` | - | 서버 타임존 조회 (name, bias) |
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
@@ -619,7 +634,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **응답** (정품 라이선스 + ANPR/객체감지/주차안내 활성 예시):
 ```json
 {
-  "apiVersion": "TS-API@1.3.0",
+  "apiVersion": "TS-API@1.4.0",
   "siteName": "Main Office",
   "timezone": {
     "name": "Asia/Seoul",
@@ -1698,6 +1713,17 @@ curl "http://localhost/api/v1/channel/1/preset/preset1/go"
 디스크가 가득 차 이벤트를 저장하지 못한 경우에도 `systemEvent` 구독자에게는 `id` 가 `-1` 인 이벤트로
 전달되지만, 이벤트 로그에는 기록되지 않습니다. 이 경고를 반드시 받아야 하는 클라이언트는 로그 조회
 대신 구독을 사용하십시오.
+
+#### 로그인 실패
+
+개인 정보 이벤트(`type` `1`)의 `code` `6`(`"Failure to sign in"`)은 로그인 실패를 기록합니다.
+로컬 화면, API, 실시간 스트림의 비밀번호 인증 실패가 모두 포함됩니다. `param` 필드는 다음과 같습니다.
+
+| 필드 | 설명 |
+|------|------|
+| `uid` | 입력한 사용자 ID |
+| `addr` | 접속 주소. 서버 PC 에서 접속한 경우 `"local"` |
+| `lockedUntil` | 이 실패로 로그인 차단이 시작된 경우 차단 해제 시각(ISO 8601). 그 밖에는 생략됩니다. |
 
 ### 9.4. 이벤트 트리거 (이벤트 백업)
 
@@ -3771,6 +3797,7 @@ ws.onmessage = (event) => {
 | 403 | 접근 거부 |
 | 404 | 찾을 수 없음 |
 | 409 | 충돌 — 요청이 현재 상태와 맞지 않음 |
+| 429 | 요청 과다 — 로그인 시도 제한 (`Retry-After` 참조) |
 | 500 | 내부 서버 오류 |
 
 오류 발생 시 HTTP 상태 코드와 함께 다음 형식의 JSON 응답 본문이 반환됩니다:
