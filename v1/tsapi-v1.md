@@ -408,11 +408,15 @@ API Key permissions determine which endpoints are accessible:
 |------------|-----------|
 | Remote | Channel, VOD, Event (realtime/type), LPR (source), Parking, System, Info |
 | Playback | Recording, Event (log), LPR (log), Object (log) |
-| Settings | API Key CRUD (`/api/v1/auth/apikey`) |
+| Settings | System settings |
 | Control | PTZ control, relay output, event trigger |
 | DataExport | Recording data export |
 
 > Endpoints return `403 Forbidden` if the API Key does not have the required permission.
+
+> **API Key management** (issuing, listing, and revoking keys at `/api/v1/auth/apikey`) requires a JWT from an administrator account that has all permissions. API Keys cannot manage keys, regardless of their permissions, and receive `403 Forbidden`.
+>
+> Each time an API Key is used, its permissions are limited to the current permissions of the account that issued it. If that account loses a permission, the key loses it too. If the account is disabled or deleted, the keys it issued can no longer be used.
 
 ---
 
@@ -499,6 +503,9 @@ Media file paths (`/storage`, `/event-storage`, `/download`) require authenticat
 **Supported methods:**
 - `?token={accessToken}` — JWT access token
 - `?apikey={apiKey}` — API Key
+- `?auth={base64(id:pw)}`, `?login={base64(id:pw)}` — user ID and password. The password is part of the URL, so `token` or `apikey` is recommended.
+
+Live streams (`flv`, `websocket-flv`) are authenticated with the same parameters. `rtmp` is authenticated with the user information in the URL ([13.1](#131-stream-urls)).
 
 > ⚠️ `Authorization` header cannot be used for direct `<img>`, `<video>` src attributes. Use URL query parameters instead.
 
@@ -530,6 +537,8 @@ An API Key can be used indefinitely, and administrators can revoke it at any tim
 
 #### 3.5.1. Issue API Key (admin only)
 
+Requires a JWT from an administrator account that has all permissions. A request made with an API Key returns `403 Forbidden`.
+
 > **Note**: You can also issue API Keys through the web interface by logging in as an administrator and navigating to the **"API Key"** page.
 
 ```http
@@ -552,7 +561,7 @@ Content-Type: application/json
 |-------|-------------|
 | `remote` | Basic access (channel, VOD, event type/realtime, LPR source, parking, system, info) |
 | `playback` | Recording search, event/LPR/object logs |
-| `settings` | API Key CRUD, system settings |
+| `settings` | System settings |
 | `control` | PTZ control, relay output, event trigger |
 | `dataExport` | Recording data export |
 | `*` | All permissions (super) |
@@ -606,7 +615,7 @@ Retrieves server and product information.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.4.0") |
+| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.5.0") |
 | `GET /api/v1/info?siteName` | - | Site name query |
 | `GET /api/v1/info?timezone` | - | Server timezone query (name, bias) |
 | `GET /api/v1/info?product` | - | Product info query (name, version) |
@@ -641,7 +650,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **Response** (genuine license with ANPR / object detection / parking guidance enabled):
 ```json
 {
-  "apiVersion": "TS-API@1.4.0",
+  "apiVersion": "TS-API@1.5.0",
   "siteName": "Main Office",
   "timezone": {
     "name": "Asia/Seoul",
@@ -2407,6 +2416,18 @@ by `fileId` and includes the `timeRange` it covers.
 
 > **Use `websocket-flv` when displaying several channels at once.** A live stream keeps its connection open during playback, so the number of open connections equals the number of channels on screen. Browsers limit **HTTP/1.1 connections to about 6 per origin**. This endpoint does not support HTTP/2 or HTTP/3, so each `flv` stream uses one of those 6 connections. Additional channels wait for a free connection, and other requests to the same origin (REST calls, thumbnails) are queued behind them. WebSocket connections do not count toward this limit, so `websocket-flv` has no practical concurrency limit for a video wall. For a single channel, either protocol works.
 
+> **Live stream authentication**: `flv` and `websocket-flv` streams play only with an authentication parameter in the URL.
+> The parameters are the same as for media files ([3.4](#34-storage--media-file-authentication)): `?token=` (JWT), `?apikey=` (API Key), `?auth=` and `?login=` (base64 `id:pw`).
+> Cookies and the `Authorization` header are not accepted. Append the parameter to the URL from the response before playing it
+> (for example, `https://host/live?app=live&stream=ch1main&token=eyJhbGc...`).
+> `rtmp` and `rtsp` are authenticated with the user information in the URL as described below.
+
+> **`rtmp`**: Include the credentials in the URL (`rtmp://user:pass@host/live/ch1main`). For an API Key, use `apikey` as the user name and the key as the password (`rtmp://apikey:tsapi_key_...@host/live/ch1main`). Percent-encode reserved characters (`@` becomes `%40`).
+> The client and the server verify the credentials with Adobe RTMP authentication (challenge and response), and the password is not transmitted. Use a client that supports it, such as VLC, FFmpeg, or OBS. Authentication parameters in the URL query (`?token=` and others) are not accepted.
+> - Accounts: after upgrading to v1.5.0 or importing settings, the user must log in once before RTMP authentication can be used.
+> - API Keys: keys issued before v1.5.0 cannot be used for RTMP. Issue a new key.
+> - Both accounts and API Keys require the `remote` permission. Failed attempts count toward the login attempt limit ([3.3](#33-jwt-authentication)).
+
 > **`rtsp`**: The server re-sends the same RTMP stream over RTP. **Only TCP interleaved transport is supported.** A UDP `SETUP` request returns `461 Unsupported Transport`, so configure clients that default to UDP to use TCP (`vlc --rtsp-tcp`, `ffplay -rtsp_transport tcp`). Basic authentication is required and cannot be disabled. Include the credentials in the URL (`rtsp://user:pass@host/live/ch1main`) and percent-encode reserved characters (`@` becomes `%40`). Video is **H.264 only**. Browsers cannot play RTSP. Use it for external players, VMS integrations, and FFmpeg-based pipelines, not for web pages.
 
 > **Embedding video in a web page?** You usually do not need these URLs. The server provides a ready-made player at [`GET /watch`](#133-watch-page-embeddable-player). Place it in an `<iframe>`; it handles protocol selection, authentication (`token` / `apikey`), and recorded playback. Build your own player on `flv` / `websocket-flv` only if you need features the Watch Page does not provide.
@@ -2440,6 +2461,8 @@ Returns an HTML page with an embedded video player. Useful for embedding live or
 | `apikey` | String | N | - | API Key for authentication |
 
 > **Note**: Authentication is optional when opening the URL. If no valid session exists, a login dialog is displayed. The `token` or `apikey` parameter can pre-authenticate the session.
+
+> **Long-running displays**: Live video is authenticated again on every reconnect. The page cannot renew a JWT passed in `token`, so a reconnect after the token expires displays the login dialog. Use `apikey` for displays that stay open for a long time, such as wall monitors.
 
 **Response**: `text/html` — HTML page with embedded video player.
 

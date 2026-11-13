@@ -2,6 +2,44 @@
 
 **English** | [한국어](CHANGELOG.ko.md)
 
+## v1.5.0
+
+### Live stream authentication
+
+`flv`, `websocket-flv`, and `rtmp` live streams are now authenticated ([13.1](tsapi-v1.md#131-stream-urls)).
+Previously, these streams played without authentication.
+
+- `flv` and `websocket-flv`: an authentication parameter in the URL, `?token=` (JWT), `?apikey=` (API Key), `?auth=` or `?login=` (base64 `id:pw`). They are the same as for media files ([3.4](tsapi-v1.md#34-storage--media-file-authentication)). Cookies and the `Authorization` header are not accepted.
+- `rtmp`: the user information in the URL, `rtmp://user:pass@host/...`, or `rtmp://apikey:<key>@host/...` for an API Key. It is verified with Adobe RTMP authentication.
+  - After the upgrade, a user must log in once before using it.
+  - API Keys issued earlier cannot be used for RTMP and must be reissued.
+- `rtsp` uses Basic authentication as before.
+
+### Media files: `?auth=` and `?login=`
+
+Media files (`/storage`, `/event-storage`, `/download`) now always accept `?auth=` and `?login=`. Previously, they were accepted only when v0 API compatibility was enabled.
+This change applies the same rule as live streams. The password is part of the URL, so `token` or `apikey` is recommended.
+
+### API Key client address restriction
+
+The allowed IP addresses of an API Key (`ipWhitelist`) are checked against the address of the client that sent the request. Previously, they were checked against an internal relay address on the server, so the restriction did not work as intended.
+
+### API Key management permission
+
+API Key management (issuing, listing, and revoking keys at `/api/v1/auth/apikey`) now requires a JWT from an administrator account that has all permissions ([3.2](tsapi-v1.md#32-api-key-permission-model)).
+Previously, accounts and API Keys with the `settings` permission could issue keys with all permissions. This change prevents a leaked key from being used to issue new keys.
+
+- A request made with an API Key returns `403 Forbidden`, regardless of the key's permissions.
+- Each time an API Key is used, its permissions are limited to the current permissions of the account that issued it. If the account is disabled or deleted, the keys it issued can no longer be used.
+
+### Breaking Changes
+
+Clients that manage API Keys with an API Key or with a non-administrator account receive `403 Forbidden`. Sign in with an administrator account to manage keys.
+
+Clients that play `flv`, `websocket-flv`, or `rtmp` URLs without authentication can no longer play them.
+For `flv` and `websocket-flv`, append `?token=` or `?apikey=` to the URL returned by `GET /api/v1/vod`.
+For `rtmp`, include the credentials in the URL (`user:pass@` or `apikey:<key>@`).
+
 ## v1.4.0
 
 ### Sign-in attempt limit

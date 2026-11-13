@@ -2,6 +2,44 @@
 
 [English](CHANGELOG.md) | **한국어**
 
+## v1.5.0
+
+### 실시간 스트림 인증
+
+`flv`·`websocket-flv`·`rtmp` 실시간 스트림을 인증합니다([13.1](tsapi-v1.ko.md#131-스트림-url)).
+이전에는 이 스트림들이 인증 없이 재생되었습니다.
+
+- `flv`·`websocket-flv`: URL 의 인증 매개변수 `?token=`(JWT), `?apikey=`(API Key), `?auth=`·`?login=`(base64 `id:pw`). 미디어 파일과 같습니다([3.4](tsapi-v1.ko.md#34-storage--미디어-파일-인증)). 쿠키와 `Authorization` 헤더로는 인증되지 않습니다.
+- `rtmp`: URL 의 계정 정보 `rtmp://user:pass@host/...`, API Key 는 `rtmp://apikey:<키>@host/...`. Adobe RTMP 인증 방식으로 확인합니다.
+  - 업그레이드 후 계정은 한 번 로그인해야 사용할 수 있습니다.
+  - 이전에 발급한 API Key 는 RTMP 에 사용할 수 없으므로 새로 발급해야 합니다.
+- `rtsp` 는 이전과 같이 Basic 인증을 사용합니다.
+
+### 미디어 파일: `?auth=`·`?login=`
+
+미디어 파일(`/storage`, `/event-storage`, `/download`)이 `?auth=`·`?login=` 을 항상 받습니다. 이전에는 v0 API 호환을 켠 경우에만 받았습니다.
+실시간 스트림과 같은 규칙을 적용하기 위해 변경합니다. 비밀번호가 URL 에 포함되므로 `token` 또는 `apikey` 사용을 권장합니다.
+
+### API Key 접속 주소 제한
+
+API Key 의 허용 IP(`ipWhitelist`)를 요청을 보낸 클라이언트 주소로 확인합니다. 이전에는 서버 내부 중계 주소로 확인되어 허용 IP 가 의도대로 적용되지 않았습니다.
+
+### API Key 관리 권한
+
+API Key 관리(`/api/v1/auth/apikey` 발급·목록·폐기)는 모든 권한을 가진 관리자 계정으로 로그인한 JWT 로만 사용할 수 있습니다([3.2](tsapi-v1.ko.md#32-api-key-권한-모델)).
+이전에는 `settings` 권한을 가진 계정과 API Key 가 모든 권한의 키를 발급할 수 있었습니다. 유출된 키로 새 키를 발급할 수 없도록 변경합니다.
+
+- API Key 로 요청하면 권한과 무관하게 `403 Forbidden` 을 반환합니다.
+- API Key 의 권한은 사용할 때마다 발급한 계정의 현재 권한으로 제한됩니다. 계정이 사용 중지되거나 삭제되면 그 계정이 발급한 키는 사용할 수 없습니다.
+
+### Breaking Changes
+
+API Key 또는 관리자가 아닌 계정으로 API Key 를 관리하던 클라이언트는 `403 Forbidden` 을 받습니다. 관리자 계정으로 로그인하여 관리하십시오.
+
+인증 없이 `flv`·`websocket-flv`·`rtmp` URL 을 재생하는 클라이언트는 재생되지 않습니다.
+`flv`·`websocket-flv` 는 `GET /api/v1/vod` 가 반환한 URL 에 `?token=` 또는 `?apikey=` 를 덧붙이십시오.
+`rtmp` 는 URL 에 계정 정보(`user:pass@` 또는 `apikey:<키>@`)를 포함하십시오.
+
 ## v1.4.0
 
 ### 로그인 시도 제한

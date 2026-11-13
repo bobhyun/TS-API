@@ -401,11 +401,15 @@ API Key의 권한에 따라 접근 가능한 엔드포인트가 결정됩니다:
 |------|---------------------|
 | Remote | Channel, VOD, Event (realtime/type), LPR (source), Parking, System, Info |
 | Playback | Recording, Event (log), LPR (log), Object (log) |
-| Settings | API Key CRUD (`/api/v1/auth/apikey`) |
+| Settings | 시스템 설정 |
 | Control | PTZ 제어, 릴레이 출력, 이벤트 트리거 |
 | DataExport | 녹화 데이터 내보내기 |
 
 > API Key에 필요한 권한이 없는 엔드포인트는 `403 Forbidden`을 반환합니다.
+
+> **API Key 관리**(`/api/v1/auth/apikey` 발급·목록·폐기)는 모든 권한을 가진 관리자 계정으로 로그인한 JWT 로만 사용할 수 있습니다. API Key 로는 권한과 무관하게 사용할 수 없으며 `403 Forbidden` 을 반환합니다.
+>
+> API Key 의 권한은 사용할 때마다 발급한 계정의 현재 권한으로 제한됩니다. 발급한 계정의 권한이 줄면 키의 권한도 함께 줄고, 계정이 사용 중지되거나 삭제되면 그 계정이 발급한 키는 사용할 수 없습니다.
 
 ---
 
@@ -492,6 +496,9 @@ Content-Type: application/json
 **지원 방식:**
 - `?token={accessToken}` — JWT access token
 - `?apikey={apiKey}` — API Key
+- `?auth={base64(id:pw)}`, `?login={base64(id:pw)}` — 계정·비밀번호. 비밀번호가 URL 에 포함되므로 `token` 또는 `apikey` 사용을 권장합니다.
+
+같은 매개변수로 실시간 스트림(`flv`·`websocket-flv`)도 인증합니다. `rtmp` 는 URL 의 계정 정보로 인증합니다([13.1](#131-스트림-url)).
 
 > ⚠️ `<img>`, `<video>` src 속성에서는 `Authorization` 헤더를 사용할 수 없으므로 URL 쿼리 파라미터를 사용합니다.
 
@@ -523,6 +530,8 @@ API Key는 외부 시스템 연동(상황실 모니터링, VMS 등)에 적합합
 
 #### API Key 발급 (관리자 전용)
 
+모든 권한을 가진 관리자 계정으로 로그인한 JWT 가 필요합니다. API Key 로 요청하면 `403 Forbidden` 을 반환합니다.
+
 > **참고**: 웹 페이지에서 관리자로 로그인한 후 **"API Key"** 페이지에서도 API Key를 발급할 수 있습니다.
 
 ```http
@@ -545,7 +554,7 @@ Content-Type: application/json
 |----|------|
 | `remote` | 기본 접근 (채널, VOD, 이벤트 type/realtime, LPR source, 주차, 시스템, 정보) |
 | `playback` | 녹화 검색, 이벤트/LPR/객체 로그 |
-| `settings` | API Key CRUD, 시스템 설정 |
+| `settings` | 시스템 설정 |
 | `control` | PTZ 제어, 릴레이 출력, 이벤트 트리거 |
 | `dataExport` | 녹화 데이터 내보내기 |
 | `*` | 모든 권한 (super) |
@@ -599,7 +608,7 @@ Authorization: Bearer {admin_token}
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.4.0") |
+| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.5.0") |
 | `GET /api/v1/info?siteName` | - | 사이트 이름 조회 |
 | `GET /api/v1/info?timezone` | - | 서버 타임존 조회 (name, bias) |
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
@@ -634,7 +643,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **응답** (정품 라이선스 + ANPR/객체감지/주차안내 활성 예시):
 ```json
 {
-  "apiVersion": "TS-API@1.4.0",
+  "apiVersion": "TS-API@1.5.0",
   "siteName": "Main Office",
   "timezone": {
     "name": "Asia/Seoul",
@@ -2394,6 +2403,18 @@ ch: 1,2,3
 
 > **여러 채널을 동시에 재생할 때는 `websocket-flv` 를 사용하십시오.** 실시간 스트림은 재생하는 동안 연결이 유지되므로 채널 수만큼 연결이 동시에 열립니다. 브라우저는 **출처(origin)당 HTTP/1.1 연결을 약 6개로 제한**하며, 이 엔드포인트는 HTTP/2 와 HTTP/3 을 지원하지 않으므로 `flv` 스트림은 각각 이 연결 하나를 사용합니다. 한도를 넘으면 나머지 채널은 대기하고, 같은 출처로 보내는 다른 요청(REST 호출, 썸네일)도 대기합니다. WebSocket 연결은 이 한도에 포함되지 않고 훨씬 많은 수가 허용되므로, `websocket-flv` 를 사용하면 비디오월에서도 동시 접속 수 제한이 사실상 없습니다. 채널이 하나뿐이면 어느 방식을 사용해도 됩니다.
 
+> **실시간 스트림 인증**: `flv`·`websocket-flv` 스트림은 URL 에 인증 매개변수가 있어야 재생됩니다.
+> 매개변수는 미디어 파일과 같습니다([3.4](#34-storage--미디어-파일-인증)) — `?token=`(JWT), `?apikey=`(API Key), `?auth=`·`?login=`(base64 `id:pw`).
+> 쿠키와 `Authorization` 헤더로는 인증되지 않습니다. 응답의 URL 에 매개변수를 덧붙여 재생하십시오
+> (예: `https://host/live?app=live&stream=ch1main&token=eyJhbGc...`).
+> `rtmp` 와 `rtsp` 는 아래와 같이 URL 의 계정 정보로 인증합니다.
+
+> **`rtmp`**: 계정 정보를 URL 에 포함합니다(`rtmp://user:pass@host/live/ch1main`). API Key 는 사용자 이름에 `apikey`, 비밀번호에 키를 지정합니다(`rtmp://apikey:tsapi_key_...@host/live/ch1main`). 예약 문자는 퍼센트 인코딩하십시오(`@` 는 `%40`).
+> 클라이언트와 서버는 Adobe RTMP 인증 방식(질의·응답)으로 확인하며, 비밀번호는 전송되지 않습니다. VLC·FFmpeg·OBS 등 이 방식을 지원하는 클라이언트를 사용하십시오. URL 쿼리의 인증 매개변수(`?token=` 등)로는 인증되지 않습니다.
+> - 계정: v1.5.0 으로 업그레이드하거나 설정을 가져온 뒤에는 한 번 로그인해야 RTMP 인증을 사용할 수 있습니다.
+> - API Key: v1.5.0 이전에 발급한 키는 RTMP 에 사용할 수 없습니다. 키를 새로 발급하십시오.
+> - 계정과 API Key 모두 `remote` 권한이 필요합니다. 실패한 시도는 로그인 시도 제한([3.3](#33-jwt-인증))에 포함됩니다.
+
 > **`rtsp`**: 서버가 같은 RTMP 스트림을 RTP 로 재송출합니다. **TCP interleaved 전용**입니다. UDP `SETUP` 요청에는 `461 Unsupported Transport` 로 응답하므로, 기본값이 UDP 인 클라이언트는 TCP 를 지정해야 합니다(`vlc --rtsp-tcp`, `ffplay -rtsp_transport tcp`). Basic 인증은 필수이며 해제할 수 없습니다. 인증 정보를 URL 에 포함하고(`rtsp://user:pass@host/live/ch1main`) 예약 문자는 퍼센트 인코딩하십시오(`@` 는 `%40`). 영상은 **H.264 전용**입니다. 브라우저는 RTSP 를 재생할 수 없으므로, 웹 페이지가 아니라 외부 플레이어·VMS 연동·FFmpeg 기반 파이프라인에 사용합니다.
 
 > **웹 페이지에 영상을 삽입하려면** 대개 위 URL 이 필요하지 않습니다. 서버가 [`GET /watch`](#133-watch-페이지-임베드-플레이어) 로 완성된 플레이어를 제공합니다. `<iframe>` 에 넣으면 프로토콜 선택·인증(`token` / `apikey`)·녹화 재생을 자동으로 처리합니다. Watch 페이지에서 제공하지 않는 제어가 필요한 경우에만 `flv` / `websocket-flv` 로 직접 구현하십시오.
@@ -2427,6 +2448,8 @@ ch: 1,2,3
 | `apikey` | String | N | - | API Key 인증 |
 
 > **참고**: 인증 없이 URL을 열 수 있습니다. 유효한 세션이 없으면 로그인 대화상자가 표시됩니다. `token` 또는 `apikey` 파라미터로 사전 인증할 수 있습니다.
+
+> **장시간 표시**: 실시간 영상은 재접속할 때마다 인증을 다시 확인합니다. `token` 으로 전달한 JWT 는 페이지에서 갱신할 수 없으므로 만료 후 재접속하면 로그인 대화상자가 표시됩니다. 상황판처럼 장시간 표시하는 화면에는 `apikey` 사용을 권장합니다.
 
 **응답**: `text/html` — 비디오 플레이어가 포함된 HTML 페이지
 
