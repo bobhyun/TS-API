@@ -1167,6 +1167,59 @@ Content-Type: application/json
 }
 ```
 
+#### Registering a channel of a TS-API server (v1.5.0+)
+
+Registers a channel of another TS-API server (the source) as a channel of this server. Set `device.url` to the source address in the form `tsapi://host[:port]` (HTTP) or `tsapis://host[:port]` (HTTPS).
+The stream address is taken from the source's `GET /api/v1/vod`, so `source` is not specified.
+
+```http
+POST /api/v1/channel
+Content-Type: application/json
+
+[
+  {
+    "name": "Front Gate",
+    "device": {
+      "url": "tsapi://203.0.113.5:8080",
+      "chid": 3,
+      "protocol": "flv",
+      "apikey": "tsapi_key_..."
+    }
+  }
+]
+```
+
+| Field | Required | Description |
+|-------|:--------:|-------------|
+| `device.url` | ✅ | Source address (`tsapi://` or `tsapis://`) |
+| `device.chid` | ✅ | Channel number on the source |
+| `device.protocol` | - | `flv` or `rtmp`. Omitted: `flv`, or `rtmp` when the source has no `flv` stream |
+| `device.apikey` | - | An API Key issued by the source (`remote` permission; `control` for PTZ and other control) |
+| `uid`, `password` | - | An administrator account of the source. When given, this server obtains its own API Key from the source and stores it. The account is not stored |
+| `name` | - | Omitted: the channel name on the source |
+
+- Credentials are used in this order: `device.apikey`, the administrator account, then the API Key stored for that source. Channels of the same source share one API Key.
+- The API Key is stored encrypted so that only this server can decrypt it, and it is not included in settings exports. Deleting all channels of a source also deletes its stored API Key.
+- `rtsp` cannot be used, because the source accepts only account credentials for RTSP.
+- The substream is looked up on the source at each connection, using the same protocol as the main stream.
+
+**Refusals** (HTTP 400, `status.code`):
+
+| code | Meaning |
+|------|---------|
+| -5 | The source refused the credentials, or no credentials were given |
+| -6 | The same stream is already registered |
+| -7 | The source is this server (determined by `nodeId`, regardless of the address) |
+| -8 | That channel on the source is received from this server (a registration loop) |
+| -9 | The source cannot be reached |
+| -10 | The source has no such channel |
+| -11 | The API Key lacks a required permission |
+| -12 | `device.chid` is missing |
+| -13 | The source has no stream that can be received (the requested protocol is not available) |
+| -14 | Sign-in to the source is temporarily blocked by its sign-in attempt limit |
+
+> The channel info of such a channel (`GET /api/v1/channel/{id}/info`) has `type` set to `tsapi` or `tsapis`, and the source's `nodeId` as `sourceNode`.
+
 ### 6.5. Delete Channel
 
 Deletes channel. **Admin privileges required**

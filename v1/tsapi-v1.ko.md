@@ -1154,6 +1154,59 @@ Content-Type: application/json
 }
 ```
 
+#### TS-API 서버의 채널 등록 (v1.5.0+)
+
+다른 TS-API 서버(원본)의 채널을 이 서버의 채널로 등록합니다. `device.url` 에 원본 주소를 `tsapi://host[:port]`(HTTP) 또는 `tsapis://host[:port]`(HTTPS) 형식으로 지정합니다.
+영상 주소는 원본의 `GET /api/v1/vod` 에서 받으므로 `source` 는 지정하지 않습니다.
+
+```http
+POST /api/v1/channel
+Content-Type: application/json
+
+[
+  {
+    "name": "정문",
+    "device": {
+      "url": "tsapi://203.0.113.5:8080",
+      "chid": 3,
+      "protocol": "flv",
+      "apikey": "tsapi_key_..."
+    }
+  }
+]
+```
+
+| 필드 | 필수 | 설명 |
+|------|:----:|------|
+| `device.url` | ✅ | 원본 주소 (`tsapi://` 또는 `tsapis://`) |
+| `device.chid` | ✅ | 원본의 채널 번호 |
+| `device.protocol` | - | `flv` 또는 `rtmp`. 생략하면 `flv`, 원본에 없으면 `rtmp` 를 사용합니다 |
+| `device.apikey` | - | 원본에서 발급받은 API Key (`remote` 권한 필요, PTZ 등 제어에는 `control` 권한 필요) |
+| `uid`, `password` | - | 원본 관리자 계정. 지정하면 이 서버용 API Key 를 원본에서 발급받아 저장하며, 계정 정보는 저장하지 않습니다 |
+| `name` | - | 생략하면 원본의 채널 이름을 사용합니다 |
+
+- 자격 증명은 `device.apikey`, 관리자 계정, 이 원본에 대해 저장된 API Key 순으로 사용합니다. 같은 원본의 채널은 하나의 API Key 를 함께 사용합니다.
+- API Key 는 이 서버에서만 복호화할 수 있도록 암호화하여 저장하며, 설정 내보내기에 포함하지 않습니다. 그 원본의 채널을 모두 삭제하면 저장된 API Key 도 삭제됩니다.
+- `rtsp` 는 원본이 계정 인증만 받으므로 사용할 수 없습니다.
+- 서브스트림은 접속할 때마다 원본에서 메인과 같은 프로토콜의 항목을 찾아 사용합니다.
+
+**등록 거부** (HTTP 400, `status.code`):
+
+| code | 의미 |
+|------|------|
+| -5 | 원본이 자격 증명을 거부했거나 자격 증명이 없음 |
+| -6 | 같은 영상이 이미 등록됨 |
+| -7 | 원본이 이 서버 자신임 (주소와 무관하게 `nodeId` 로 판별) |
+| -8 | 원본의 그 채널이 이 서버에서 받은 채널임 (순환 등록) |
+| -9 | 원본에 접속할 수 없음 |
+| -10 | 원본에 그 채널이 없음 |
+| -11 | API Key 에 필요한 권한이 없음 |
+| -12 | `device.chid` 가 없음 |
+| -13 | 원본에 받을 수 있는 영상이 없음 (지정한 프로토콜 없음) |
+| -14 | 원본의 로그인 시도 제한으로 일시 차단됨 |
+
+> 원격 채널의 채널 정보(`GET /api/v1/channel/{id}/info`)에는 `type` 이 `tsapi`·`tsapis` 로, 원본의 `nodeId` 가 `sourceNode` 로 포함됩니다.
+
 ### 6.5. 채널 삭제
 
 채널을 삭제합니다. **관리자 권한 필요**
