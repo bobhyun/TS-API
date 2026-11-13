@@ -611,7 +611,7 @@ Authorization: Bearer {admin_token}
 
 Retrieves server and product information.
 
-> **No authentication required.** This endpoint can be called without authentication, except for the `whoAmI` parameter, which requires JWT or session authentication.
+> **No authentication required.** This endpoint can be called without authentication, except for the `whoAmI` and `nodeId` parameters. `whoAmI` requires JWT or session authentication, and `nodeId` requires a JWT or API Key with the `remote` permission.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
@@ -621,9 +621,14 @@ Retrieves server and product information.
 | `GET /api/v1/info?product` | - | Product info query (name, version) |
 | `GET /api/v1/info?license` | - | License info query (type, maxChannels) |
 | `GET /api/v1/info?whoAmI` | ✅ | Current logged-in user info |
+| `GET /api/v1/info?nodeId` | ✅ | Server identifier query (v1.5.0+) |
 | `GET /api/v1/info?all` | ✅* | Retrieve all info at once |
 
-> \* `?all` includes `whoAmI`, so authentication is required to get user info. If unauthenticated, `whoAmI` is omitted from the response and returns HTTP 401 status.
+> \* `?all` includes `whoAmI` and `nodeId`, so authentication is required to get these two items. If unauthenticated, both are omitted from the response and the request returns HTTP 401 status.
+
+> **`nodeId`**: A UUID that identifies the server. It is generated randomly the first time the server runs and does not change afterward. Resetting the settings generates a new value.
+> Use it to determine whether different addresses (internal IP, domain name, external address) lead to the same server.
+> An unauthenticated request returns `401 Unauthorized`. Requesting `?nodeId` with credentials that lack the `remote` permission returns `403 Forbidden`. It is not available on v0 `/api/info`.
 
 **Parameters**:
 
@@ -636,6 +641,7 @@ Retrieves server and product information.
 | `license` | Flag | License info |
 | `whoAmI` | Flag | Authenticated user info |
 | `timezone` | Flag | Timezone info |
+| `nodeId` | Flag | Server identifier (authentication required) |
 
 **Example** (no auth needed):
 ```bash
@@ -718,6 +724,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `whoAmI.uid` | String | whoAmI requested | User ID |
 | `whoAmI.name` | String | whoAmI requested | User name |
 | `whoAmI.accessRights` | Object | whoAmI requested | Access rights |
+| `nodeId` | String | Authenticated request (`remote` permission) | Server identifier (UUID, 36 lowercase characters) |
 
 **`license.extension` tokens**:
 

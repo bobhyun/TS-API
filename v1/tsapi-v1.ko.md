@@ -604,7 +604,7 @@ Authorization: Bearer {admin_token}
 
 서버 및 제품 정보를 조회합니다.
 
-> **인증 불필요** — `whoAmI` 파라미터를 제외한 모든 정보는 인증 없이 조회할 수 있습니다. `whoAmI`는 JWT 또는 세션 인증이 필요합니다.
+> **인증 불필요** — `whoAmI`·`nodeId` 매개변수를 제외한 모든 정보는 인증 없이 조회할 수 있습니다. `whoAmI`는 JWT 또는 세션 인증이 필요하고, `nodeId`는 `remote` 권한을 가진 JWT 또는 API Key 가 필요합니다.
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
@@ -614,9 +614,14 @@ Authorization: Bearer {admin_token}
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
 | `GET /api/v1/info?license` | - | 라이선스 정보 조회 (type, maxChannels) |
 | `GET /api/v1/info?whoAmI` | ✅ | 현재 로그인 사용자 정보 |
+| `GET /api/v1/info?nodeId` | ✅ | 서버 식별자 조회 (v1.5.0+) |
 | `GET /api/v1/info?all` | ✅* | 모든 정보 한번에 조회 |
 
-> \* `?all`은 `whoAmI`를 포함하므로 사용자 정보를 얻으려면 인증이 필요합니다. 미인증 시 `whoAmI`는 응답에서 제외되며 HTTP 401 상태를 반환합니다.
+> \* `?all`은 `whoAmI`·`nodeId`를 포함하므로 이 두 항목을 얻으려면 인증이 필요합니다. 미인증 시 두 항목은 응답에서 제외되며 HTTP 401 상태를 반환합니다.
+
+> **`nodeId`**: 서버를 식별하는 UUID 입니다. 서버를 처음 실행할 때 무작위로 만들어지며 이후 바뀌지 않습니다. 설정을 초기화하면 새 값이 만들어집니다.
+> 여러 주소(내부 IP·도메인·외부 주소)로 같은 서버에 접속하는 클라이언트가 같은 서버인지 판별할 때 사용합니다.
+> 인증되지 않은 요청에는 `401 Unauthorized`, `remote` 권한이 없는 자격 증명으로 `?nodeId` 를 요청하면 `403 Forbidden` 을 반환합니다. v0 `/api/info` 에서는 제공하지 않습니다.
 
 **파라미터**:
 
@@ -629,6 +634,7 @@ Authorization: Bearer {admin_token}
 | `license` | Flag | 라이선스 정보 |
 | `whoAmI` | Flag | 인증된 사용자 정보 |
 | `timezone` | Flag | 타임존 정보 |
+| `nodeId` | Flag | 서버 식별자 (인증 필요) |
 
 **예제** (인증 불필요):
 ```bash
@@ -711,6 +717,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `whoAmI.uid` | String | whoAmI 요청 시 | 사용자 ID |
 | `whoAmI.name` | String | whoAmI 요청 시 | 사용자 이름 |
 | `whoAmI.accessRights` | Object | whoAmI 요청 시 | 접근 권한 |
+| `nodeId` | String | 인증된 요청(`remote` 권한) | 서버 식별자 (UUID, 소문자 36자) |
 
 **`license.extension` 토큰**:
 
