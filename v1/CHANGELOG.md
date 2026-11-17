@@ -24,21 +24,6 @@ This change applies the same rule as live streams. The password is part of the U
 
 The allowed IP addresses of an API Key (`ipWhitelist`) are checked against the address of the client that sent the request. Previously, they were checked against an internal relay address on the server, so the restriction did not work as intended.
 
-### Registering channels of a TS-API server
-
-`POST /api/v1/channel` registers a channel of another TS-API server (`device.url` = `tsapi://` or `tsapis://`, [6.4](tsapi-v1.md#64-add-channel)).
-
-- Credentials are an API Key of the source, or an administrator account of the source (this server obtains and stores its own API Key).
-- The channel is not registered when the source is this server, or when that channel on the source is received from this server.
-- Channel info includes the source's `nodeId` (`sourceNode`).
-
-### Server identifier `nodeId`
-
-`GET /api/v1/info?nodeId` returns the server identifier (UUID) ([4](tsapi-v1.md#4-server-info)). Clients use it to determine whether different addresses lead to the same server.
-
-- Requires a JWT or API Key with the `remote` permission. An unauthenticated request returns `401`, and a request without the permission returns `403`.
-- `?all` includes `nodeId` only for authenticated requests. The authentication requirements of the other items do not change.
-
 ### API Key management permission
 
 API Key management (issuing, listing, and revoking keys at `/api/v1/auth/apikey`) now requires a JWT from an administrator account that has all permissions ([3.2](tsapi-v1.md#32-api-key-permission-model)).

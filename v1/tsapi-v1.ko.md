@@ -604,7 +604,7 @@ Authorization: Bearer {admin_token}
 
 서버 및 제품 정보를 조회합니다.
 
-> **인증 불필요** — `whoAmI`·`nodeId` 매개변수를 제외한 모든 정보는 인증 없이 조회할 수 있습니다. `whoAmI`는 JWT 또는 세션 인증이 필요하고, `nodeId`는 `remote` 권한을 가진 JWT 또는 API Key 가 필요합니다.
+> **인증 불필요** — `whoAmI` 파라미터를 제외한 모든 정보는 인증 없이 조회할 수 있습니다. `whoAmI`는 JWT 또는 세션 인증이 필요합니다.
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
@@ -614,14 +614,9 @@ Authorization: Bearer {admin_token}
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
 | `GET /api/v1/info?license` | - | 라이선스 정보 조회 (type, maxChannels) |
 | `GET /api/v1/info?whoAmI` | ✅ | 현재 로그인 사용자 정보 |
-| `GET /api/v1/info?nodeId` | ✅ | 서버 식별자 조회 (v1.5.0+) |
 | `GET /api/v1/info?all` | ✅* | 모든 정보 한번에 조회 |
 
-> \* `?all`은 `whoAmI`·`nodeId`를 포함하므로 이 두 항목을 얻으려면 인증이 필요합니다. 미인증 시 두 항목은 응답에서 제외되며 HTTP 401 상태를 반환합니다.
-
-> **`nodeId`**: 서버를 식별하는 UUID 입니다. 서버를 처음 실행할 때 무작위로 만들어지며 이후 바뀌지 않습니다. 설정을 초기화하면 새 값이 만들어집니다.
-> 여러 주소(내부 IP·도메인·외부 주소)로 같은 서버에 접속하는 클라이언트가 같은 서버인지 판별할 때 사용합니다.
-> 인증되지 않은 요청에는 `401 Unauthorized`, `remote` 권한이 없는 자격 증명으로 `?nodeId` 를 요청하면 `403 Forbidden` 을 반환합니다. v0 `/api/info` 에서는 제공하지 않습니다.
+> \* `?all`은 `whoAmI`를 포함하므로 사용자 정보를 얻으려면 인증이 필요합니다. 미인증 시 `whoAmI`는 응답에서 제외되며 HTTP 401 상태를 반환합니다.
 
 **파라미터**:
 
@@ -634,7 +629,6 @@ Authorization: Bearer {admin_token}
 | `license` | Flag | 라이선스 정보 |
 | `whoAmI` | Flag | 인증된 사용자 정보 |
 | `timezone` | Flag | 타임존 정보 |
-| `nodeId` | Flag | 서버 식별자 (인증 필요) |
 
 **예제** (인증 불필요):
 ```bash
@@ -717,7 +711,6 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 | `whoAmI.uid` | String | whoAmI 요청 시 | 사용자 ID |
 | `whoAmI.name` | String | whoAmI 요청 시 | 사용자 이름 |
 | `whoAmI.accessRights` | Object | whoAmI 요청 시 | 접근 권한 |
-| `nodeId` | String | 인증된 요청(`remote` 권한) | 서버 식별자 (UUID, 소문자 36자) |
 
 **`license.extension` 토큰**:
 
@@ -1153,59 +1146,6 @@ Content-Type: application/json
   "source": "rtsp://192.168.1.100/stream"
 }
 ```
-
-#### TS-API 서버의 채널 등록 (v1.5.0+)
-
-다른 TS-API 서버(원본)의 채널을 이 서버의 채널로 등록합니다. `device.url` 에 원본 주소를 `tsapi://host[:port]`(HTTP) 또는 `tsapis://host[:port]`(HTTPS) 형식으로 지정합니다.
-영상 주소는 원본의 `GET /api/v1/vod` 에서 받으므로 `source` 는 지정하지 않습니다.
-
-```http
-POST /api/v1/channel
-Content-Type: application/json
-
-[
-  {
-    "name": "정문",
-    "device": {
-      "url": "tsapi://203.0.113.5:8080",
-      "chid": 3,
-      "protocol": "flv",
-      "apikey": "tsapi_key_..."
-    }
-  }
-]
-```
-
-| 필드 | 필수 | 설명 |
-|------|:----:|------|
-| `device.url` | ✅ | 원본 주소 (`tsapi://` 또는 `tsapis://`) |
-| `device.chid` | ✅ | 원본의 채널 번호 |
-| `device.protocol` | - | `flv` 또는 `rtmp`. 생략하면 `flv`, 원본에 없으면 `rtmp` 를 사용합니다 |
-| `device.apikey` | - | 원본에서 발급받은 API Key (`remote` 권한 필요, PTZ 등 제어에는 `control` 권한 필요) |
-| `uid`, `password` | - | 원본 관리자 계정. 지정하면 이 서버용 API Key 를 원본에서 발급받아 저장하며, 계정 정보는 저장하지 않습니다 |
-| `name` | - | 생략하면 원본의 채널 이름을 사용합니다 |
-
-- 자격 증명은 `device.apikey`, 관리자 계정, 이 원본에 대해 저장된 API Key 순으로 사용합니다. 같은 원본의 채널은 하나의 API Key 를 함께 사용합니다.
-- API Key 는 이 서버에서만 복호화할 수 있도록 암호화하여 저장하며, 설정 내보내기에 포함하지 않습니다. 그 원본의 채널을 모두 삭제하면 저장된 API Key 도 삭제됩니다.
-- `rtsp` 는 원본이 계정 인증만 받으므로 사용할 수 없습니다.
-- 서브스트림은 접속할 때마다 원본에서 메인과 같은 프로토콜의 항목을 찾아 사용합니다.
-
-**등록 거부** (HTTP 400, `status.code`):
-
-| code | 의미 |
-|------|------|
-| -5 | 원본이 자격 증명을 거부했거나 자격 증명이 없음 |
-| -6 | 같은 영상이 이미 등록됨 |
-| -7 | 원본이 이 서버 자신임 (주소와 무관하게 `nodeId` 로 판별) |
-| -8 | 원본의 그 채널이 이 서버에서 받은 채널임 (순환 등록) |
-| -9 | 원본에 접속할 수 없음 |
-| -10 | 원본에 그 채널이 없음 |
-| -11 | API Key 에 필요한 권한이 없음 |
-| -12 | `device.chid` 가 없음 |
-| -13 | 원본에 받을 수 있는 영상이 없음 (지정한 프로토콜 없음) |
-| -14 | 원본의 로그인 시도 제한으로 일시 차단됨 |
-
-> 원격 채널의 채널 정보(`GET /api/v1/channel/{id}/info`)에는 `type` 이 `tsapi`·`tsapis` 로, 원본의 `nodeId` 가 `sourceNode` 로 포함됩니다.
 
 ### 6.5. 채널 삭제
 
