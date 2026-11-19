@@ -615,7 +615,7 @@ Retrieves server and product information.
 
 | Endpoint | Auth | Description |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.5.0") |
+| `GET /api/v1/info?apiVersion` | - | API version query (e.g., "TS-API@1.4.1") |
 | `GET /api/v1/info?siteName` | - | Site name query |
 | `GET /api/v1/info?timezone` | - | Server timezone query (name, bias) |
 | `GET /api/v1/info?product` | - | Product info query (name, version) |
@@ -650,7 +650,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **Response** (genuine license with ANPR / object detection / parking guidance enabled):
 ```json
 {
-  "apiVersion": "TS-API@1.5.0",
+  "apiVersion": "TS-API@1.4.1",
   "siteName": "Main Office",
   "timezone": {
     "name": "Asia/Seoul",
@@ -2424,8 +2424,8 @@ by `fileId` and includes the `timeRange` it covers.
 
 > **`rtmp`**: Include the credentials in the URL (`rtmp://user:pass@host/live/ch1main`). For an API Key, use `apikey` as the user name and the key as the password (`rtmp://apikey:tsapi_key_...@host/live/ch1main`). Percent-encode reserved characters (`@` becomes `%40`).
 > The client and the server verify the credentials with Adobe RTMP authentication (challenge and response), and the password is not transmitted. Use a client that supports it, such as VLC, FFmpeg, or OBS. Authentication parameters in the URL query (`?token=` and others) are not accepted.
-> - Accounts: after upgrading to v1.5.0 or importing settings, the user must log in once before RTMP authentication can be used.
-> - API Keys: keys issued before v1.5.0 cannot be used for RTMP. Issue a new key.
+> - Accounts: after upgrading to v1.4.1 or importing settings, the user must log in once before RTMP authentication can be used.
+> - API Keys: keys issued before v1.4.1 cannot be used for RTMP. Issue a new key.
 > - Both accounts and API Keys require the `remote` permission. Failed attempts count toward the login attempt limit ([3.3](#33-jwt-authentication)).
 
 > **`rtsp`**: The server re-sends the same RTMP stream over RTP. **Only TCP interleaved transport is supported.** A UDP `SETUP` request returns `461 Unsupported Transport`, so configure clients that default to UDP to use TCP (`vlc --rtsp-tcp`, `ffplay -rtsp_transport tcp`). Basic authentication is required and cannot be disabled. Include the credentials in the URL (`rtsp://user:pass@host/live/ch1main`) and percent-encode reserved characters (`@` becomes `%40`). Video is **H.264 only**. Browsers cannot play RTSP. Use it for external players, VMS integrations, and FFmpeg-based pipelines, not for web pages.

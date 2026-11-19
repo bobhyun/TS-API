@@ -2,7 +2,7 @@
 
 **English** | [한국어](CHANGELOG.ko.md)
 
-## v1.5.0
+## v1.4.1
 
 ### Live stream authentication
 
@@ -214,7 +214,7 @@ the exit basis. Unlike the exit basis, the entry basis is also present on **open
 ### Existing parking endpoints unchanged
 
 `/api/v1/parking/lot`, `/lot/status`, `/spot` and `/spot/status` are unchanged. Session
-objects use the same leaf names as the spot API (`id`, `name`, `chid`), nested under `src`
+objects use the same field names as the spot API (`id`, `name`, `chid`), nested under `src`
 because a session's source is not always a spot. `kind` indicates the source type.
 
 ## v1.1.0

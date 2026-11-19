@@ -608,7 +608,7 @@ Authorization: Bearer {admin_token}
 
 | 엔드포인트 | 인증 | 설명 |
 |----------|:----:|-------------|
-| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.5.0") |
+| `GET /api/v1/info?apiVersion` | - | API 버전 조회 (예: "TS-API@1.4.1") |
 | `GET /api/v1/info?siteName` | - | 사이트 이름 조회 |
 | `GET /api/v1/info?timezone` | - | 서버 타임존 조회 (name, bias) |
 | `GET /api/v1/info?product` | - | 제품 정보 조회 (name, version) |
@@ -643,7 +643,7 @@ curl "http://localhost/api/v1/info?all" -H "Authorization: Bearer eyJhbGc..."
 **응답** (정품 라이선스 + ANPR/객체감지/주차안내 활성 예시):
 ```json
 {
-  "apiVersion": "TS-API@1.5.0",
+  "apiVersion": "TS-API@1.4.1",
   "siteName": "Main Office",
   "timezone": {
     "name": "Asia/Seoul",
@@ -2411,8 +2411,8 @@ ch: 1,2,3
 
 > **`rtmp`**: 계정 정보를 URL 에 포함합니다(`rtmp://user:pass@host/live/ch1main`). API Key 는 사용자 이름에 `apikey`, 비밀번호에 키를 지정합니다(`rtmp://apikey:tsapi_key_...@host/live/ch1main`). 예약 문자는 퍼센트 인코딩하십시오(`@` 는 `%40`).
 > 클라이언트와 서버는 Adobe RTMP 인증 방식(질의·응답)으로 확인하며, 비밀번호는 전송되지 않습니다. VLC·FFmpeg·OBS 등 이 방식을 지원하는 클라이언트를 사용하십시오. URL 쿼리의 인증 매개변수(`?token=` 등)로는 인증되지 않습니다.
-> - 계정: v1.5.0 으로 업그레이드하거나 설정을 가져온 뒤에는 한 번 로그인해야 RTMP 인증을 사용할 수 있습니다.
-> - API Key: v1.5.0 이전에 발급한 키는 RTMP 에 사용할 수 없습니다. 키를 새로 발급하십시오.
+> - 계정: v1.4.1 로 업그레이드하거나 설정을 가져온 뒤에는 한 번 로그인해야 RTMP 인증을 사용할 수 있습니다.
+> - API Key: v1.4.1 이전에 발급한 키는 RTMP 에 사용할 수 없습니다. 키를 새로 발급하십시오.
 > - 계정과 API Key 모두 `remote` 권한이 필요합니다. 실패한 시도는 로그인 시도 제한([3.3](#33-jwt-인증))에 포함됩니다.
 
 > **`rtsp`**: 서버가 같은 RTMP 스트림을 RTP 로 재송출합니다. **TCP interleaved 전용**입니다. UDP `SETUP` 요청에는 `461 Unsupported Transport` 로 응답하므로, 기본값이 UDP 인 클라이언트는 TCP 를 지정해야 합니다(`vlc --rtsp-tcp`, `ffplay -rtsp_transport tcp`). Basic 인증은 필수이며 해제할 수 없습니다. 인증 정보를 URL 에 포함하고(`rtsp://user:pass@host/live/ch1main`) 예약 문자는 퍼센트 인코딩하십시오(`@` 는 `%40`). 영상은 **H.264 전용**입니다. 브라우저는 RTSP 를 재생할 수 없으므로, 웹 페이지가 아니라 외부 플레이어·VMS 연동·FFmpeg 기반 파이프라인에 사용합니다.
